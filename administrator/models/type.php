@@ -166,7 +166,6 @@ class TjucmModelType extends JModelAdmin
 				{
 					throw new Exception($table->getError());
 				}
-				
 
 				// Trigger the before save event.
 				$result = $dispatcher->trigger($this->event_before_save, array($context, &$table, true));
@@ -285,6 +284,8 @@ class TjucmModelType extends JModelAdmin
 			}
 		}
 
+
+
 		if (parent::save($data))
 		{
 			return true;
@@ -293,13 +294,11 @@ class TjucmModelType extends JModelAdmin
 		return false;
 	}
 
-
 	/**
 	 * Method to change the title & alias.
 	 *
-	 * @param   integer  $category_id  The id of the category.
-	 * @param   string   $alias        The alias.
-	 * @param   string   $title        The title.
+	 * @param   string  $alias  The alias.
+	 * @param   string  $title  The title.
 	 *
 	 * @return	array  Contains the modified title and alias.
 	 *

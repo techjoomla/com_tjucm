@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @version    CVS: 1.0.0
  * @package    Com_Tjucm
@@ -66,7 +65,6 @@ class TjucmTabletype extends JTable
 	 */
 	public function bind($array, $ignore = '')
 	{
-
 		// Support for alias field: alias
 		if (empty($array['alias']))
 		{
@@ -76,7 +74,7 @@ class TjucmTabletype extends JTable
 			}
 			else
 			{
-				if(JFactory::getConfig()->get('unicodeslugs') == 1)
+				if (JFactory::getConfig()->get('unicodeslugs') == 1)
 				{
 					$array['alias'] = JFilterOutput::stringURLUnicodeSlug(trim($array['title']));
 				}
@@ -104,6 +102,9 @@ class TjucmTabletype extends JTable
 		{
 			$array['modified_by'] = JFactory::getUser()->id;
 		}
+
+		$array['unique_identifier'] = 'com_tjucm.' . $array['alias'];
+
 		$task = JFactory::getApplication()->input->get('task');
 
 		if ($task == 'apply' || $task == 'save')
@@ -171,7 +172,7 @@ class TjucmTabletype extends JTable
 			{
 				foreach ($jaccess->getData() as $group => $allow)
 				{
-					$actions[$group] = ((bool)$allow);
+					$actions[$group] = ((bool) $allow);
 				}
 			}
 
@@ -199,7 +200,6 @@ class TjucmTabletype extends JTable
 		{
 			// $this->alias .= '-' . JFilterOutput::stringURLSafe(date('Y-m-d-H:i:s'));
 		}
-
 
 		return parent::check();
 	}
