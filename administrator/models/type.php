@@ -284,8 +284,6 @@ class TjucmModelType extends JModelAdmin
 			}
 		}
 
-
-
 		if (parent::save($data))
 		{
 			return true;
