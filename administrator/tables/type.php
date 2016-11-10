@@ -193,13 +193,13 @@ class TjucmTabletype extends JTable
 		{
 			$this->ordering = self::getNextOrder();
 		}
-		
+
 		// Check if alias is unique
 		if (!$this->isUnique('alias'))
 		{
-			$this->alias .= '-' . JFilterOutput::stringURLSafe(date('Y-m-d-H:i:s'));
+			// $this->alias .= '-' . JFilterOutput::stringURLSafe(date('Y-m-d-H:i:s'));
 		}
-		
+
 
 		return parent::check();
 	}
@@ -340,7 +340,7 @@ class TjucmTabletype extends JTable
 	{
 		$this->load($pk);
 		$result = parent::delete($pk);
-		
+
 		return $result;
 	}
 }
