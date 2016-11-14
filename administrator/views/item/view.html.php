@@ -40,6 +40,9 @@ class TjucmViewItem extends JViewLegacy
 		$this->item  = $this->get('Item');
 		$this->form  = $this->get('Form');
 
+		// Get form for extra fields.
+		$this->form_extra = $this->get('FormExtra');
+
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{

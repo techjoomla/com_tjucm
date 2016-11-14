@@ -19,6 +19,15 @@ if (!JFactory::getUser()->authorise('core.manage', 'com_tjucm'))
 // Include dependancies
 jimport('joomla.application.component.controller');
 
+$path = JPATH_COMPONENT_ADMINISTRATOR . '/classes/' . 'funlist.php';
+
+if (!class_exists('TjucmFunlist'))
+{
+	// Require_once $path;
+	JLoader::register('TjucmFunlist', $path);
+	JLoader::load('TjucmFunlist');
+}
+
 JLoader::registerPrefix('Tjucm', JPATH_COMPONENT_ADMINISTRATOR);
 
 $controller = JControllerLegacy::getInstance('Tjucm');
