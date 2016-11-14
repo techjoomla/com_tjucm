@@ -141,14 +141,12 @@ class TjucmModelItem extends JModelAdmin
 		}
 
 		// Get the form.
-		$form = $this->loadForm($client[0] . '.' . $client[1] . '_extra',
-			$client[1] . '_extra',
-			array('control' => 'jform', 'load_data' => $loadData)
-		);
+		$form = $this->loadForm($client[0] . '.' . $client[1] . '_extra', $client[1] . '_extra', array('control' => 'jform', 'load_data' => $loadData));
 
 		if (!empty($courseInfo))
 		{
-			$form = $this->loadForm($client[0] . '.' . $courseInfo->category_id . $client[1] . '_extra',
+			$form = $this->loadForm(
+				$client[0] . '.' . $courseInfo->category_id . $client[1] . '_extra',
 				$courseInfo->category_id . $client[1] . '_extra',
 				array('control' => 'jform', 'load_data' => $loadData)
 			);
@@ -270,8 +268,6 @@ class TjucmModelItem extends JModelAdmin
 		$data['content_id'] = $id;
 		$extra_fields_data = $tjFieldsHelper->FetchDatavalue($data);
 
-
-
 		return $extra_fields_data;
 	}
 
@@ -360,8 +356,6 @@ class TjucmModelItem extends JModelAdmin
 		}
 
 		$this->_item_extra_fields = $extra_fields_data_formatted;
-
-		echo"<pre>"; print_r($this->_item_extra_fields); echo"</pre>";
 
 		return $this->_item_extra_fields;
 	}

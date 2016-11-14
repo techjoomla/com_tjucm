@@ -99,7 +99,8 @@ class TjucmViewItem extends JViewLegacy
 		}
 
 		// Button for version control
-		if ($this->state->params->get('save_history', 1) && $user->authorise('core.edit')) {
+		if ($this->state->params->get('save_history', 1) && $user->authorise('core.edit'))
+		{
 			JToolbarHelper::versions('com_tjucm.item', $this->item->id);
 		}
 
