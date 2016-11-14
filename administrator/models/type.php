@@ -166,7 +166,6 @@ class TjucmModelType extends JModelAdmin
 				{
 					throw new Exception($table->getError());
 				}
-				
 
 				// Trigger the before save event.
 				$result = $dispatcher->trigger($this->event_before_save, array($context, &$table, true));
@@ -215,5 +214,104 @@ class TjucmModelType extends JModelAdmin
 				$table->ordering = $max + 1;
 			}
 		}
+	}
+
+	/**
+	 * Method to save the form data.
+	 *
+	 * @param   array  $data  The form data.
+	 *
+	 * @return  boolean  True on success.
+	 *
+	 * @since   1.6
+	 */
+	public function save($data)
+	{
+		$input  = JFactory::getApplication()->input;
+		$filter = JFilterInput::getInstance();
+
+		// Alter the title for save as copy
+		if ($input->get('task') == 'save2copy')
+		{
+			$origTable = clone $this->getTable();
+			$origTable->load($input->getInt('id'));
+
+			if ($data['title'] == $origTable->title)
+			{
+				list($title, $alias) = $this->generateNewAlias($data['alias'], $data['title']);
+				$data['title'] = $title;
+				$data['alias'] = $alias;
+			}
+			else
+			{
+				if ($data['alias'] == $origTable->alias)
+				{
+					$data['alias'] = '';
+				}
+			}
+
+			$data['state'] = 0;
+		}
+
+		// Automatic handling of alias for empty fields
+		if (in_array($input->get('task'), array('apply', 'save', 'save2new')) && (!isset($data['id']) || (int) $data['id'] == 0))
+		{
+			if ($data['alias'] == null)
+			{
+				if (JFactory::getConfig()->get('unicodeslugs') == 1)
+				{
+					$data['alias'] = JFilterOutput::stringURLUnicodeSlug($data['title']);
+				}
+				else
+				{
+					$data['alias'] = JFilterOutput::stringURLSafe($data['title']);
+				}
+
+				$table = $this->getTable();
+
+				if ($table->load(array('alias' => $data['alias'])))
+				{
+					$msg = JText::_('COM_TJUCM_SAVE_WARNING');
+				}
+
+				list($title, $alias) = $this->generateNewAlias($data['alias'], $data['title']);
+				$data['alias'] = $alias;
+
+				if (isset($msg))
+				{
+					JFactory::getApplication()->enqueueMessage($msg, 'warning');
+				}
+			}
+		}
+
+		if (parent::save($data))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Method to change the title & alias.
+	 *
+	 * @param   string  $alias  The alias.
+	 * @param   string  $title  The title.
+	 *
+	 * @return	array  Contains the modified title and alias.
+	 *
+	 * @since	12.2
+	 */
+	protected function generateNewAlias($alias, $title)
+	{
+		$table = $this->getTable();
+
+		while ($table->load(array('alias' => $alias)))
+		{
+			$title = JString::increment($title);
+			$alias = JString::increment($alias, 'dash');
+		}
+
+		return array($title, $alias);
 	}
 }

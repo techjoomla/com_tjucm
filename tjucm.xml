@@ -8,10 +8,10 @@
     <authorEmail>contact@techjoomla.com</authorEmail>
     <authorUrl>http://techjoomla.com</authorUrl>
     <version>CVS: 1.0.0</version>
-    <description>TJ Universal Content Manager test</description>
-    
+    <description>TJ Universal Content Manager</description>
+
     <scriptfile>script.php</scriptfile>
-    
+
     <install> <!-- Runs on install -->
         <sql>
             <file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file>
@@ -43,13 +43,13 @@
         <folder>css</folder>
     </media>
     <languages folder="languages/site">
-        
+
 			<language tag="en-GB">en-GB/en-GB.com_tjucm.ini</language>
     </languages>
     <administration>
         <menu img="media/com_tjucm/images/s_com_tjucm.png" >COM_TJUCM</menu>
         <submenu>
-            
+
 			<menu link="option=com_tjucm&amp;view=types" view="types" img="media/com_tjucm/images/s_types.png" alt="Tjucm/Types">COM_TJUCM_TITLE_TYPES</menu>
 
 			<menu link="option=com_tjucm&amp;view=items" view="items" img="media/com_tjucm/images/s_items.png" alt="Tjucm/Items">COM_TJUCM_TITLE_ITEMS</menu>
@@ -70,7 +70,7 @@
             <folder>views</folder>
         </files>
         <languages folder="languages/administrator">
-            
+
 			<language tag="en-GB">en-GB/en-GB.com_tjucm.ini</language>
 			<language tag="en-GB">en-GB/en-GB.com_tjucm.sys.ini</language>
         </languages>
@@ -82,10 +82,7 @@
             </fieldset>
         </fields>
     </config>
-    <plugins>
-        <plugin group="search" plugin="tjucm"/>
-    </plugins>
-    
+
 </extension>
 <!-- Component built by the Joomla Component Creator -->
 <!-- http://www.component-creator.com/ -->
