@@ -38,6 +38,21 @@ class TjucmModelType extends JModelAdmin
 	protected $item = null;
 
 	/**
+	 * Constructor.
+	 *
+	 * @param   array  $config  An optional associative array of configuration settings.
+	 *
+	 * @see        JController
+	 * @since      1.6
+	 */
+	public function __construct($config = array())
+	{
+		$this->common  = new TjucmFunlist;
+
+		parent::__construct($config);
+	}
+
+	/**
 	 * Returns a reference to the a Table object, always creating it.
 	 *
 	 * @param   string  $type    The table type to instantiate
@@ -123,6 +138,9 @@ class TjucmModelType extends JModelAdmin
 		if ($item = parent::getItem($pk))
 		{
 			// Do any procesing on fields here if needed
+
+			$item->field_group = $this->common->getDataValues('#__tjfields_groups', 'count(*)', 'client = "' . $item->unique_identifier . '"', 'loadResult');
+			$item->field_category = $this->common->getDataValues('#__categories', 'count(*)', 'extension = "' . $item->unique_identifier . '"', 'loadResult');
 		}
 
 		return $item;

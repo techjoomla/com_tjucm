@@ -15,24 +15,26 @@ JHtml::_('behavior.formvalidation');
 JHtml::_('formbehavior.chosen', 'select');
 JHtml::_('behavior.keepalive');
 
-// Import CSS
-$document = JFactory::getDocument();
-$document->addStyleSheet(JUri::root() . 'media/com_tjucm/css/form.css');
+echo"<pre>"; print_r($this->item); echo"</pre>";
+
+JHtml::script( JUri::root().'administrator/components/com_tjucm/assets/js/tjucm_type.js' );
 ?>
 <script type="text/javascript">
 	js = jQuery.noConflict();
 	js(document).ready(function () {
-		
+
 	});
 
 	Joomla.submitbutton = function (task) {
-		if (task == 'type.cancel') {
+		if (task == 'type.cancel')
+		{
 			Joomla.submitform(task, document.getElementById('type-form'));
 		}
-		else {
-			
+		else
+		{
+
 			if (task != 'type.cancel' && document.formvalidator.isValid(document.id('type-form'))) {
-				
+
 				Joomla.submitform(task, document.getElementById('type-form'));
 			}
 			else {
@@ -42,55 +44,53 @@ $document->addStyleSheet(JUri::root() . 'media/com_tjucm/css/form.css');
 	}
 </script>
 
-<form
-	action="<?php echo JRoute::_('index.php?option=com_tjucm&layout=edit&id=' . (int) $this->item->id); ?>"
-	method="post" enctype="multipart/form-data" name="adminForm" id="type-form" class="form-validate">
-
+<form action="<?php echo JRoute::_('index.php?option=com_tjucm&layout=edit&id=' . (int) $this->item->id); ?>" method="post" enctype="multipart/form-data" name="adminForm" id="type-form" class="form-validate">
 	<div class="form-horizontal">
 		<?php echo JHtml::_('bootstrap.startTabSet', 'myTab', array('active' => 'general')); ?>
 
-		<?php echo JHtml::_('bootstrap.addTab', 'myTab', 'general', JText::_('COM_TJUCM_TITLE_TYPE', true)); ?>
-		<div class="row-fluid">
-			<div class="span10 form-horizontal">
-				<fieldset class="adminform">
+			<?php echo JHtml::_('bootstrap.addTab', 'myTab', 'general', JText::_('COM_TJUCM_TITLE_TYPE', true)); ?>
+				<div class="row-fluid">
+					<div class="span10 form-horizontal">
+						<fieldset class="adminform">
+							<input type="hidden" name="jform[id]" value="<?php echo $this->item->id; ?>" />
+							<input type="hidden" name="jform[ordering]" value="<?php echo $this->item->ordering; ?>" />
+							<?php echo $this->form->renderField('title'); ?>
+							<?php
+							if ($this->item->field_group || $this->item->field_category) {
+								$this->form->setFieldAttribute('alias', 'readonly', 'true', $group = null);
+							} ?>
+							<?php echo $this->form->renderField('alias'); ?>
+							<?php echo $this->form->renderField('state'); ?>
+							<?php echo $this->form->renderField('type_description'); ?>
+							<?php echo $this->form->renderField('unique_identifier'); ?>
+							<?php echo $this->form->renderField('params'); ?>
+							<input type="hidden" name="jform[checked_out]" value="<?php echo $this->item->checked_out; ?>" />
+							<input type="hidden" name="jform[checked_out_time]" value="<?php echo $this->item->checked_out_time; ?>" />
+							<?php echo $this->form->renderField('created_by'); ?>
+							<?php echo $this->form->renderField('created_date'); ?>
+							<?php echo $this->form->renderField('modified_by'); ?>
+							<?php echo $this->form->renderField('modified_date'); ?>
 
-									<input type="hidden" name="jform[id]" value="<?php echo $this->item->id; ?>" />
-				<input type="hidden" name="jform[ordering]" value="<?php echo $this->item->ordering; ?>" />
-				<?php echo $this->form->renderField('title'); ?>
-				<?php echo $this->form->renderField('alias'); ?>
-				<?php echo $this->form->renderField('state'); ?>
-				<?php echo $this->form->renderField('type_description'); ?>
-				<?php echo $this->form->renderField('unique_identifier'); ?>
-				<?php echo $this->form->renderField('params'); ?>
-				<input type="hidden" name="jform[checked_out]" value="<?php echo $this->item->checked_out; ?>" />
-				<input type="hidden" name="jform[checked_out_time]" value="<?php echo $this->item->checked_out_time; ?>" />
-
-				<?php echo $this->form->renderField('created_by'); ?>
-				<?php echo $this->form->renderField('created_date'); ?>
-				<?php echo $this->form->renderField('modified_by'); ?>
-				<?php echo $this->form->renderField('modified_date'); ?>
-
-					<?php if ($this->state->params->get('save_history', 1)) : ?>
-					<div class="control-group">
-						<div class="control-label"><?php echo $this->form->getLabel('version_note'); ?></div>
-						<div class="controls"><?php echo $this->form->getInput('version_note'); ?></div>
+							<?php if ($this->state->params->get('save_history', 1)) : ?>
+								<div class="control-group">
+									<div class="control-label"><?php echo $this->form->getLabel('version_note'); ?></div>
+									<div class="controls"><?php echo $this->form->getInput('version_note'); ?></div>
+								</div>
+							<?php endif; ?>
+						</fieldset>
 					</div>
-					<?php endif; ?>
-				</fieldset>
-			</div>
-		</div>
-		<?php echo JHtml::_('bootstrap.endTab'); ?>
+				</div>
+			<?php echo JHtml::_('bootstrap.endTab'); ?>
 
-		<?php if (JFactory::getUser()->authorise('core.admin','tjucm')) : ?>
-	<?php echo JHtml::_('bootstrap.addTab', 'myTab', 'permissions', JText::_('JGLOBAL_ACTION_PERMISSIONS_LABEL', true)); ?>
-		<?php echo $this->form->getInput('rules'); ?>
-	<?php echo JHtml::_('bootstrap.endTab'); ?>
-<?php endif; ?>
+			<?php if (JFactory::getUser()->authorise('core.admin','tjucm')) : ?>
+				<?php echo JHtml::_('bootstrap.addTab', 'myTab', 'permissions', JText::_('JGLOBAL_ACTION_PERMISSIONS_LABEL', true)); ?>
+				<?php echo $this->form->getInput('rules'); ?>
+				<?php echo JHtml::_('bootstrap.endTab'); ?>
+			<?php endif; ?>
 
 		<?php echo JHtml::_('bootstrap.endTabSet'); ?>
 
 		<input type="hidden" name="task" value=""/>
 		<?php echo JHtml::_('form.token'); ?>
-
 	</div>
 </form>

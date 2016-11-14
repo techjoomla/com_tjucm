@@ -40,6 +40,9 @@ class TjucmViewItem extends JViewLegacy
 		$this->item  = $this->get('Item');
 		$this->form  = $this->get('Form');
 
+		// Get form for extra fields.
+		$this->form_extra = $this->get('FormExtra');
+
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{
@@ -96,7 +99,8 @@ class TjucmViewItem extends JViewLegacy
 		}
 
 		// Button for version control
-		if ($this->state->params->get('save_history', 1) && $user->authorise('core.edit')) {
+		if ($this->state->params->get('save_history', 1) && $user->authorise('core.edit'))
+		{
 			JToolbarHelper::versions('com_tjucm.item', $this->item->id);
 		}
 

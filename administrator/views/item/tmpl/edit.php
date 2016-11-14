@@ -17,12 +17,12 @@ JHtml::_('behavior.keepalive');
 
 // Import CSS
 $document = JFactory::getDocument();
-$document->addStyleSheet(JUri::root() . 'media/com_tjucm/css/form.css');
+//~ $document->addStyleSheet(JUri::root() . 'media/com_tjucm/css/form.css');
 ?>
 <script type="text/javascript">
 	js = jQuery.noConflict();
 	js(document).ready(function () {
-		
+
 	js('input:hidden.type_id').each(function(){
 		var name = js(this).attr('name');
 		if(name.indexOf('type_idhidden')){
@@ -37,9 +37,9 @@ $document->addStyleSheet(JUri::root() . 'media/com_tjucm/css/form.css');
 			Joomla.submitform(task, document.getElementById('item-form'));
 		}
 		else {
-			
+
 			if (task != 'item.cancel' && document.formvalidator.isValid(document.id('item-form'))) {
-				
+
 				Joomla.submitform(task, document.getElementById('item-form'));
 			}
 			else {
@@ -67,7 +67,7 @@ $document->addStyleSheet(JUri::root() . 'media/com_tjucm/css/form.css');
 				<?php echo $this->form->renderField('type_id'); ?>
 
 			<?php
-				foreach((array)$this->item->type_id as $value): 
+				foreach((array)$this->item->type_id as $value):
 					if(!is_array($value)):
 						echo '<input type="hidden" class="type_id" name="jform[type_idhidden]['.$value.']" value="'.$value.'" />';
 					endif;
@@ -90,6 +90,10 @@ $document->addStyleSheet(JUri::root() . 'media/com_tjucm/css/form.css');
 			</div>
 		</div>
 		<?php echo JHtml::_('bootstrap.endTab'); ?>
+
+		<?php if ($this->form_extra): ?>
+						<?php echo $this->loadTemplate('extrafields'); ?>
+		<?php endif; ?>
 
 		<?php if (JFactory::getUser()->authorise('core.admin','tjucm')) : ?>
 	<?php echo JHtml::_('bootstrap.addTab', 'myTab', 'permissions', JText::_('JGLOBAL_ACTION_PERMISSIONS_LABEL', true)); ?>
