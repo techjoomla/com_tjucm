@@ -47,10 +47,13 @@ class TjucmModelItem extends JModelAdmin
 	 */
 	public function __construct($config = array())
 	{
-		$app = JFactory::getApplication();
+		$this->common  = new TjucmFunList;
+		$this->client  = JFactory::getApplication()->input->get('client');
 
-		$this->common  = new TjucmFunlist;
-		$this->client  = $app->input->getSTRING('client');
+		if (empty($this->client))
+		{
+			$this->client  = JFactory::getApplication()->input->get('jform', array(), 'array')['client'];
+		}
 
 		parent::__construct($config);
 	}
@@ -483,7 +486,7 @@ class TjucmModelItem extends JModelAdmin
 			if (!empty($extra_jform_data))
 			{
 				// Save extra fields data.
-				$this->saveExtraFields($extra_jform_data, $id, $user->id);
+				$this->saveExtraFields($extra_jform_data, $id);
 			}
 
 			return true;

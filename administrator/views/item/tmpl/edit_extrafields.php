@@ -9,7 +9,7 @@
 
 // No direct access
 defined('_JEXEC') or die;
-echo "komal";
+
 ?>
 
 <?php if ($this->form_extra): ?>

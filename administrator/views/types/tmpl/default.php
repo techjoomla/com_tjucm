@@ -202,7 +202,7 @@ if (!empty($this->extra_sidebar))
 						$field_group_url = JRoute::_('index.php?option=com_tjfields&view=groups&client=' . $item->unique_identifier);
 						$fields_url      = JRoute::_('index.php?option=com_tjfields&view=fields&client=' . $item->unique_identifier);
 						$type_addnew_data_url   = JRoute::_('index.php?option=com_tjucm&view=item&layout=edit&client=' . $item->unique_identifier);
-						$type_data_url   = JRoute::_('index.php?option=com_tjucm&view=items&client' . $item->unique_identifier);
+						$type_data_url   = JRoute::_('index.php?option=com_tjucm&view=items&client=' . $item->unique_identifier);
 
 						$ordering   = ($listOrder == 'a.ordering');
 						$canCreate  = $user->authorise('core.create', 'com_tjucm');

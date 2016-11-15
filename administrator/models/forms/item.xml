@@ -2,6 +2,7 @@
 <form>
   <fieldset>
     <field name="id" type="text" readonly="true" class="readonly" default="0" description="JGLOBAL_FIELD_ID_DESC"/>
+    <field name="client" type="text" readonly="true" class="readonly" default="" description="JGLOBAL_FIELD_ID_DESC"/>
     <field name="ordering"/>
     <field name="state" default="1" type="list" label="JSTATUS" description="JFIELD_PUBLISHED_DESC" class="inputbox" size="1">
       <option value="1">JPUBLISHED</option>
