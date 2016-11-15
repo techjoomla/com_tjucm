@@ -120,10 +120,7 @@ class TjucmModelItem extends JModelAdmin
 	 */
 	public function getFormExtra($data = array(), $loadData = true)
 	{
-		$db     = JFactory::getDbo();
-		$query  = "SELECT DISTINCT id as category_id FROM #__categories where extension='" . $this->client . "'";
-		$db->setQuery($query);
-		$courseInfo = $db->loadObject();
+		$category_id = $this->common->getDataValues('#__categories', 'DISTINCT id as category_id', 'extension = "' . $this->client . '"', 'loadResult');
 
 		/* Explode client 1. Componet name 2.type */
 		$client = explode(".", $this->client);
@@ -133,9 +130,9 @@ class TjucmModelItem extends JModelAdmin
 
 		$filePath = JPATH_ADMINISTRATOR . '/components/com_tjucm/models/forms/' . $client[1] . '_extra.xml';
 
-		if (!empty($courseInfo))
+		if (!empty($category_id))
 		{
-			$filePath = JPATH_ADMINISTRATOR . '/components/com_tjucm/models/forms/' . $courseInfo->category_id . $client[1] . '_extra.xml';
+			$filePath = JPATH_ADMINISTRATOR . '/components/com_tjucm/models/forms/' . $category_id . $client[1] . '_extra.xml';
 		}
 
 		if (!JFile::exists($filePath))
@@ -146,11 +143,11 @@ class TjucmModelItem extends JModelAdmin
 		// Get the form.
 		$form = $this->loadForm($client[0] . '.' . $client[1] . '_extra', $client[1] . '_extra', array('control' => 'jform', 'load_data' => $loadData));
 
-		if (!empty($courseInfo))
+		if (!empty($category_id))
 		{
 			$form = $this->loadForm(
-				$client[0] . '.' . $courseInfo->category_id . $client[1] . '_extra',
-				$courseInfo->category_id . $client[1] . '_extra',
+				$client[0] . '.' . $category_id . $client[1] . '_extra',
+				$category_id . $client[1] . '_extra',
 				array('control' => 'jform', 'load_data' => $loadData)
 			);
 		}
@@ -478,6 +475,8 @@ class TjucmModelItem extends JModelAdmin
 	{
 		$input  = JFactory::getApplication()->input;
 		$filter = JFilterInput::getInstance();
+
+		$data['type_id'] = $this->common->getDataValues('#__tj_ucm_types', 'id AS type_id', 'unique_identifier = "' . $this->client . '"', 'loadResult');
 
 		if (parent::save($data))
 		{
