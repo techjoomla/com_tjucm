@@ -58,9 +58,10 @@ JHtml::script( JUri::root().'administrator/components/com_tjucm/assets/js/tjucm_
 								$this->form->setFieldAttribute('alias', 'readonly', 'true', $group = null);
 							}*/ ?>
 							<?php echo $this->form->renderField('alias'); ?>
+							<?php echo $this->form->renderField('unique_identifier'); ?>
 							<?php echo $this->form->renderField('state'); ?>
 							<?php echo $this->form->renderField('type_description'); ?>
-							<?php echo $this->form->renderField('unique_identifier'); ?>
+
 							<?php echo $this->form->renderField('params'); ?>
 							<input type="hidden" name="jform[checked_out]" value="<?php echo $this->item->checked_out; ?>" />
 							<input type="hidden" name="jform[checked_out_time]" value="<?php echo $this->item->checked_out_time; ?>" />
