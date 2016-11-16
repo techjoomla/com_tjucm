@@ -42,6 +42,8 @@ class TjucmModelItems extends JModelList
 			);
 		}
 
+		$this->client  = JFactory::getApplication()->input->get('client');
+
 		parent::__construct($config);
 	}
 
@@ -115,17 +117,20 @@ class TjucmModelItems extends JModelList
 		// Select the required fields from the table.
 		$query->select(
 			$this->getState(
-				'list.select', 'DISTINCT a.*'
+				'list.select', 'DISTINCT a.id, GROUP_CONCAT(CONCAT_WS("#:", fields.id, fieldValue.value)
+        SEPARATOR "#=>") AS field_values'
 			)
 		);
+
 		$query->from('`#__tj_ucm_data` AS a');
 
 		// Join over the users for the checked out user
 		$query->select("uc.name AS uEditor");
 		$query->join("LEFT", "#__users AS uc ON uc.id=a.checked_out");
+
 		// Join over the foreign key 'type_id'
-		$query->select('`#__tj_ucm_types_2546051`.`id` AS types_fk_value_2546051');
-		$query->join('LEFT', '#__tj_ucm_types AS #__tj_ucm_types_2546051 ON #__tj_ucm_types_2546051.`id` = a.`type_id`');
+		$query->select('types.id AS type_id');
+		$query->join('LEFT', '#__tj_ucm_types AS types ON types.`id` = a.`type_id`');
 
 		// Join over the user field 'created_by'
 		$query->select('`created_by`.name AS `created_by`');
@@ -134,6 +139,16 @@ class TjucmModelItems extends JModelList
 		// Join over the user field 'modified_by'
 		$query->select('`modified_by`.name AS `modified_by`');
 		$query->join('LEFT', '#__users AS `modified_by` ON `modified_by`.id = a.`modified_by`');
+
+		// Join over the tjfield
+		$query->join('INNER', '#__tjfields_fields AS fields ON a.client = fields.client');
+
+		// Join over the tjfield value
+		$query->join('INNER', '#__tjfields_fields_value AS fieldValue ON a.id = fieldValue.content_id');
+
+		$query->where('a.client = ' . $db->quote($db->escape($this->client)));
+		$query->where('fields.id = fieldValue.field_id');
+		$query->where('fields.showonlist =  1');
 
 		// Filter by published state
 		$published = $this->getState('filter.state');
@@ -159,9 +174,10 @@ class TjucmModelItems extends JModelList
 			else
 			{
 				$search = $db->Quote('%' . $db->escape($search, true) . '%');
-				
 			}
 		}
+
+		$query->group('fieldValue.content_id');
 
 		// Add the list ordering clause.
 		$orderCol  = $this->state->get('list.ordering');
@@ -180,35 +196,66 @@ class TjucmModelItems extends JModelList
 	 *
 	 * @return mixed Array of data items on success, false on failure.
 	 */
+	public function getColumn()
+	{
+		// Create a new query object.
+		$db    = $this->getDbo();
+		$query = $db->getQuery(true);
+
+		// Select the required fields from the table.
+		$query->select(
+			$this->getState(
+				'list.select', 'DISTINCT a.id, a.label'
+			)
+		);
+
+		$query->from('`#__tjfields_fields` AS a');
+		$query->where('a.client = ' . $db->quote($db->escape($this->client)));
+		$query->where('a.showonlist =  1');
+		$query->order($db->escape(' a.ordering, a.id ASC '));
+
+		$db->setQuery($query);
+
+		return $db->loadAssocList('id', 'label');
+	}
+
+	/**
+	 * Get an array of data items
+	 *
+	 * @return mixed Array of data items on success, false on failure.
+	 */
 	public function getItems()
 	{
 		$items = parent::getItems();
 
-		foreach ($items as $oneItem) {
-
+		foreach ($items as $oneItem)
+		{
 			if (isset($oneItem->type_id))
 			{
 				$values = explode(',', $oneItem->type_id);
-
 				$textValue = array();
-				foreach ($values as $value){
+
+				foreach ($values as $value)
+				{
 					$db = JFactory::getDbo();
 					$query = $db->getQuery(true);
 					$query
 							->select('`#__tj_ucm_types_2546051`.`id`')
 							->from($db->quoteName('#__tj_ucm_types', '#__tj_ucm_types_2546051'))
-							->where($db->quoteName('id') . ' = '. $db->quote($db->escape($value)));
+							->where($db->quoteName('id') . ' = ' . $db->quote($db->escape($value)));
 					$db->setQuery($query);
 					$results = $db->loadObject();
-					if ($results) {
+
+					if ($results)
+					{
 						$textValue[] = $results->id;
 					}
 				}
 
-			$oneItem->type_id = !empty($textValue) ? implode(', ', $textValue) : $oneItem->type_id;
-
+				$oneItem->type_id = !empty($textValue) ? implode(', ', $textValue) : $oneItem->type_id;
 			}
 		}
+
 		return $items;
 	}
 }

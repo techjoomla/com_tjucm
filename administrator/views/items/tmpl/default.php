@@ -176,6 +176,16 @@ if (!empty($this->extra_sidebar))
 					<th class='left'>
 						<?php echo JHtml::_('grid.sort',  'COM_TJUCM_ITEMS_ID', 'a.`id`', $listDirn, $listOrder); ?>
 					</th>
+					<?php
+					if (!empty($this->listcolumn))
+					{
+						foreach ($this->listcolumn as $col_name)
+						{ ?>
+							<th class='left'>
+								<?php echo $col_name; ?>
+							</th> <?php
+						}
+					}?>
 				</tr>
 			</thead>
 
@@ -234,6 +244,47 @@ if (!empty($this->extra_sidebar))
 						<td>
 							<a href="<?php echo $link;?>"><?php echo $item->id; ?></a>
 						</td>
+
+						<?php
+						if (!empty ($item->field_values))
+						{
+							$explode_field_values = explode('#=>', $item->field_values);
+
+							$colValue = array();
+
+							foreach ($explode_field_values as $field_values)
+							{
+								$explode_explode_field_values = explode("#:", $field_values);
+
+								$fieldId = $explode_explode_field_values[0];
+								$fieldValue = $explode_explode_field_values[1];
+
+								$colValue[$fieldId] = $fieldValue;
+
+							}
+
+							if (!empty($this->listcolumn))
+							{
+								foreach ($this->listcolumn as $col_id => $col_name)
+								{
+									if (array_key_exists($col_id, $colValue))
+									{
+										?>
+										<td>
+											<?php echo $colValue[$col_id]; ?>
+										</td><?php
+									}
+									else
+									{
+										echo '<td>&nbsp;</td>';
+									}
+								}
+							}
+
+						}
+						?>
+
+
 					</tr>
 				<?php endforeach; ?>
 			</tbody>
