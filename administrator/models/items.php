@@ -117,8 +117,7 @@ class TjucmModelItems extends JModelList
 		// Select the required fields from the table.
 		$query->select(
 			$this->getState(
-				'list.select', 'DISTINCT a.id, GROUP_CONCAT(CONCAT_WS("#:", fields.id, fieldValue.value)
-        SEPARATOR "#=>") AS field_values'
+				'list.select', 'DISTINCT a.id, GROUP_CONCAT(CONCAT_WS("#:", fields.id, fieldValue.value) SEPARATOR "#=>") AS field_values'
 			)
 		);
 

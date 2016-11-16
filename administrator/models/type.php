@@ -138,9 +138,6 @@ class TjucmModelType extends JModelAdmin
 		if ($item = parent::getItem($pk))
 		{
 			// Do any procesing on fields here if needed
-
-			$item->field_group = $this->common->getDataValues('#__tjfields_groups', 'count(*)', 'client = "' . $item->unique_identifier . '"', 'loadResult');
-			$item->field_category = $this->common->getDataValues('#__categories', 'count(*)', 'extension = "' . $item->unique_identifier . '"', 'loadResult');
 		}
 
 		return $item;
@@ -300,6 +297,21 @@ class TjucmModelType extends JModelAdmin
 					JFactory::getApplication()->enqueueMessage($msg, 'warning');
 				}
 			}
+		}
+
+		if (!empty($data['id']))
+		{
+			$field_group = $this->common->getDataValues('#__tjfields_groups', 'count(*)', 'client = "' . $data['unique_identifier'] . '"', 'loadResult');
+			$field_category = $this->common->getDataValues('#__categories', 'count(*)', 'extension = "' . $data['unique_identifier'] . '"', 'loadResult');
+
+			if ($field_group == 0 && $field_category == 0)
+			{
+				$data['unique_identifier'] = 'com_tjucm.' . $data['alias'];
+			}
+		}
+		else
+		{
+			$data['unique_identifier'] = 'com_tjucm.' . $data['alias'];
 		}
 
 		if (parent::save($data))

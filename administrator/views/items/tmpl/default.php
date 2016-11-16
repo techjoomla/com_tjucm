@@ -271,7 +271,7 @@ if (!empty($this->extra_sidebar))
 									{
 										?>
 										<td>
-											<?php echo $colValue[$col_id]; ?>
+											<a href="<?php echo $link;?>"><?php echo $colValue[$col_id]; ?></a>
 										</td><?php
 									}
 									else
