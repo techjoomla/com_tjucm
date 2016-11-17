@@ -200,7 +200,7 @@ if (!empty($this->extra_sidebar))
 
 						$category_url    = JRoute::_('index.php?option=com_categories&extension=' . $item->unique_identifier);
 						$field_group_url = JRoute::_('index.php?option=com_tjfields&view=groups&client=' . $item->unique_identifier);
-						$fields_url      = JRoute::_('index.php?option=com_tjfields&view=fields&client=' . $item->unique_identifier);
+						$fields_url      = JRoute::_('index.php?option=com_tjfields&view=fields&client=' . $item->unique_identifier . '&extension=' . $item->unique_identifier);
 						$type_addnew_data_url   = JRoute::_('index.php?option=com_tjucm&view=item&layout=edit&client=' . $item->unique_identifier);
 						$type_data_url   = JRoute::_('index.php?option=com_tjucm&view=items&client=' . $item->unique_identifier);
 

@@ -41,7 +41,27 @@ class TjucmViewItem extends JViewLegacy
 		$this->form  = $this->get('Form');
 
 		// Get form for extra fields.
-		$this->form_extra = $this->get('FormExtra');
+		//~ $this->form_extra = $this->get('FormExtra');
+
+		$this->client  = JFactory::getApplication()->input->get('client');
+		$id  = JFactory::getApplication()->input->get('id');
+
+		$input  = JFactory::getApplication()->input;
+		$input->set("content_id", $id);
+		$model = $this->getModel('item');
+
+		$view = explode('.', $this->client);
+
+		// Call to extra fields
+		$this->form_extra = $model->getFormExtra(
+		array(
+			"clientComponent" => 'com_tjucm',
+			"client" => $this->client,
+			"view" => $view[1],
+			"layout" => 'edit')
+			);
+
+		$this->form_extra = array_filter($this->form_extra);
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))

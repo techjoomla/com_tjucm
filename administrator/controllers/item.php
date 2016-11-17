@@ -273,7 +273,7 @@ class TjucmControllerItem extends JControllerForm
 		$validData = $model->validate($form, $data);
 
 		// Check for validation errors.
-		if ($data === false)
+		if ($validData === false)
 		{
 			// Get the validation messages.
 			$errors = $model->getErrors();
@@ -310,26 +310,23 @@ class TjucmControllerItem extends JControllerForm
 
 		// Check if form file is present.
 		jimport('joomla.filesystem.file');
-		$db     = JFactory::getDbo();
-		$query  = "SELECT DISTINCT id as category_id FROM #__categories where extension='" . $this->client . "'";
-		$db->setQuery($query);
-		$courseInfo = $db->loadObject();
-
 		/* Explode client 1. Componet name 2.type */
 		$client = explode(".", $this->client);
 		/* End */
 
 		$filePath = JPATH_ADMINISTRATOR . '/components/com_tjucm/models/forms/' . $client[1] . '_extra.xml';
 
-		if (!empty($courseInfo))
-		{
-			$filePath = JPATH_ADMINISTRATOR . '/components/com_tjucm/models/forms/' . $courseInfo->category_id . $client[1] . '_extra.xml';
-		}
-
 		if (JFile::exists($filePath))
 		{
+
 			// Validate the posted data.
-			$formExtra = $model->getFormExtra();
+			$formExtra = $model->getFormExtra(
+						array(
+							"clientComponent" => 'com_tjucm',
+							"client" => $this->client,
+							"view" => $client[1],
+							"layout" => 'edit')
+							);
 
 			if (!$formExtra)
 			{
@@ -338,8 +335,21 @@ class TjucmControllerItem extends JControllerForm
 				return false;
 			}
 
-			// Validate the posted extra data.
-			$extra_jform_data = $model->validateExtra($formExtra, $extra_jform_data);
+			$formExtra = array_filter($formExtra);
+
+			if (!empty($formExtra))
+			{
+				if (!empty($formExtra[0]))
+				{
+					// Validate the posted extra data.
+					$extra_jform_data = $model->validateExtra($formExtra[0], $extra_jform_data);
+				}
+				else
+				{
+					// Validate the posted extra data.
+					$extra_jform_data = $model->validateExtra($formExtra[1], $extra_jform_data);
+				}
+			}
 
 			// Check for errors.
 			if ($extra_jform_data === false)

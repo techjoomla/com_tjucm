@@ -12,6 +12,8 @@ defined('_JEXEC') or die;
 
 jimport('joomla.application.component.modeladmin');
 jimport('joomla.filesystem.file');
+
+require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
 /**
  * Tjucm model.
  *
@@ -36,6 +38,9 @@ class TjucmModelItem extends JModelAdmin
 	 * @since  1.6
 	 */
 	protected $item = null;
+
+	// Use imported Trait in model
+	use TjfieldsFilterField;
 
 	/**
 	 * Constructor.
@@ -106,67 +111,6 @@ class TjucmModelItem extends JModelAdmin
 	}
 
 	/**
-	 * Method to get the form for extra fields.
-	 * This form file will be created by field manager.
-	 *
-	 * The base form is loaded from XML
-	 *
-	 * @param   Array    $data      An optional array of data for the form to interogate.
-	 * @param   Boolean  $loadData  True if the form is to load its own data (default case), false if not.
-	 *
-	 * @return  JForm    A JForm    object on success, false on failure
-	 *
-	 * @since	1.6
-	 */
-	public function getFormExtra($data = array(), $loadData = true)
-	{
-		$category_id = $this->common->getDataValues('#__categories', 'DISTINCT id as category_id', 'extension = "' . $this->client . '"', 'loadResult');
-
-		/* Explode client 1. Componet name 2.type */
-		$client = explode(".", $this->client);
-		/* End */
-
-		// Check if form file is present.
-
-		$filePath = JPATH_ADMINISTRATOR . '/components/com_tjucm/models/forms/' . $client[1] . '_extra.xml';
-
-		if (!empty($category_id))
-		{
-			$filePath = JPATH_ADMINISTRATOR . '/components/com_tjucm/models/forms/' . $category_id . $client[1] . '_extra.xml';
-		}
-
-		if (!JFile::exists($filePath))
-		{
-			return false;
-		}
-
-		// Get the form.
-		$form = $this->loadForm($client[0] . '.' . $client[1] . '_extra', $client[1] . '_extra', array('control' => 'jform', 'load_data' => $loadData));
-
-		if (!empty($category_id))
-		{
-			$form = $this->loadForm(
-				$client[0] . '.' . $category_id . $client[1] . '_extra',
-				$category_id . $client[1] . '_extra',
-				array('control' => 'jform', 'load_data' => $loadData)
-			);
-		}
-
-		if (empty($form))
-		{
-			return false;
-		}
-
-		// Load form data for extra fields (needed for editing).
-		$dataExtra = $this->loadFormDataExtra();
-
-		// Bind the data for extra fields to this form.
-		$form->bind($dataExtra);
-
-		return $form;
-	}
-
-	/**
 	 * Method to get the data that should be injected in the form.
 	 *
 	 * @return   mixed  The data for the form.
@@ -192,28 +136,6 @@ class TjucmModelItem extends JModelAdmin
 	}
 
 	/**
-	 * Method to get the form for extra fields.
-	 * This form file will be created by field manager.
-	 *
-	 * The base form is loaded from XML
-	 *
-	 * @return  JForm    A JForm    object on success, false on failure
-	 *
-	 * @since	1.6
-	 */
-	protected function loadFormDataExtra()
-	{
-		$data = JFactory::getApplication()->getUserState('com_tjucm.edit.directory.data', array());
-
-		if (empty($data))
-		{
-			$data = $this->getDataExtraFields();
-		}
-
-		return $data;
-	}
-
-	/**
 	 * Method to get a single record.
 	 *
 	 * @param   integer  $pk  The id of the primary key.
@@ -230,134 +152,6 @@ class TjucmModelItem extends JModelAdmin
 		}
 
 		return $item;
-	}
-
-	/**
-	 * Method to get the extra fields information
-	 *
-	 * @param   array  $id  Id of the record
-	 *
-	 * @return	Extra field data
-	 *
-	 * @since	1.8.5
-	 */
-	public function getDataExtra($id = null)
-	{
-		if (empty($id))
-		{
-			$input = JFactory::getApplication()->input;
-			$id = $input->get('id', '', 'INT');
-		}
-
-		if (empty($id))
-		{
-			return false;
-		}
-
-		$TjfieldsHelperPath = JPATH_SITE . '/components/com_tjfields/helpers/tjfields.php';
-
-		if (!class_exists('TjfieldsHelper'))
-		{
-			JLoader::register('TjfieldsHelper', $TjfieldsHelperPath);
-			JLoader::load('TjfieldsHelper');
-		}
-
-		$tjFieldsHelper = new TjfieldsHelper;
-		$data               = array();
-		$data['client']     = $this->client;
-		$data['content_id'] = $id;
-		$extra_fields_data = $tjFieldsHelper->FetchDatavalue($data);
-
-		return $extra_fields_data;
-	}
-
-	/**
-	 * Method to get the data of extra form fields
-	 * This form file will be created by field manager.
-	 *
-	 * @param   INT  $id  Id of record
-	 *
-	 * @return  JForm    A JForm    object on success, false on failure
-	 *
-	 * @since	1.6
-	 */
-	public function getDataExtraFields($id = null)
-	{
-		$input = JFactory::getApplication()->input;
-		$user = JFactory::getUser();
-
-		if (empty($id))
-		{
-			$id = $input->get('id', '', 'INT');
-		}
-
-		if (empty($id))
-		{
-			return false;
-		}
-
-		$TjfieldsHelperPath = JPATH_SITE . '/components/com_tjfields/helpers/tjfields.php';
-
-		if (!class_exists('TjfieldsHelper'))
-		{
-			JLoader::register('TjfieldsHelper', $TjfieldsHelperPath);
-			JLoader::load('TjfieldsHelper');
-		}
-
-		$tjFieldsHelper = new TjfieldsHelper;
-
-		$data = array();
-		$data['client']      = $this->client;
-		$data['content_id']  = $id;
-		$data['user_id']     = JFactory::getUser()->id;
-
-		$extra_fields_data = $tjFieldsHelper->FetchDatavalue($data);
-
-		$extra_fields_data_formatted = array();
-
-		foreach ($extra_fields_data as $efd)
-		{
-			if (!is_array($efd->value))
-			{
-				$extra_fields_data_formatted[$efd->name] = $efd->value;
-			}
-			else
-			{
-				switch ($efd->type)
-				{
-					case 'multi_select':
-						foreach ($efd->value as $option)
-						{
-							$temp[] = $option->value;
-						}
-
-						if (!empty($temp))
-						{
-							$extra_fields_data_formatted[$efd->name] = $temp;
-						}
-					break;
-
-					case 'single_select':
-						foreach ($efd->value as $option)
-						{
-							$extra_fields_data_formatted[$efd->name] = $option->value;
-						}
-					break;
-
-					case 'radio':
-					default:
-						foreach ($efd->value as $option)
-						{
-							$extra_fields_data_formatted[$efd->name] = $option->value;
-						}
-					break;
-				}
-			}
-		}
-
-		$this->_item_extra_fields = $extra_fields_data_formatted;
-
-		return $this->_item_extra_fields;
 	}
 
 	/**
@@ -484,8 +278,13 @@ class TjucmModelItem extends JModelAdmin
 
 			if (!empty($extra_jform_data))
 			{
+				$data_extra = array();
+				$data_extra['content_id'] = $id;
+				$data_extra['client'] = $this->client;
+				$data_extra['fieldsvalue'] = $extra_jform_data;
+
 				// Save extra fields data.
-				$this->saveExtraFields($extra_jform_data, $id);
+				$this->saveExtraFields($data_extra);
 			}
 
 			return true;
@@ -495,56 +294,22 @@ class TjucmModelItem extends JModelAdmin
 	}
 
 	/**
-	 * Method to save the extra fields data.
+	 * Method to delete one or more records.
 	 *
-	 * @param   array  $extra_jform_data  Extra fields data
-	 * @param   INT    $id                Id of the record
+	 * @param   array  &$pks  An array of record primary keys.
 	 *
-	 * @return  JForm  A JForm object on success, false on failure
+	 * @return  boolean  True if successful, false if an error occurs.
 	 *
-	 * @since  1.6
-	 */
-	public function saveExtraFields($extra_jform_data, $id)
-	{
-		$TjfieldsHelperPath = JPATH_SITE . '/components/com_tjfields/helpers/tjfields.php';
-
-		if (!class_exists('TjfieldsHelper'))
-		{
-			JLoader::register('TjfieldsHelper', $TjfieldsHelperPath);
-			JLoader::load('TjfieldsHelper');
-		}
-
-		$tjFieldsHelper = new TjfieldsHelper;
-
-		$data = array();
-		$data['client']      = $this->client;
-		$data['content_id']  = $id;
-		$data['fieldsvalue'] = array();
-		$data['fieldsvalue'] = $extra_jform_data;
-		$data['user_id']     = JFactory::getUser()->id;
-
-		$tjFieldsHelper->saveFieldsValue($data);
-	}
-
-	/**
-	 * Method to validate the extraform data.
-	 *
-	 * Added by manoj.
-	 *
-	 * @param   JForm   $form   The form to validate against.
-	 * @param   array   $data   The data to validate.
-	 * @param   string  $group  The name of the field group to validate.
-	 *
-	 * @return  mixed  Array of filtered data if valid, false otherwise.
-	 *
-	 * @see     JFormRule
-	 * @see     JFilterInput
 	 * @since   12.2
 	 */
-	public function validateExtra($form, $data, $group = null)
+	public function delete(&$ids)
 	{
-		$data = parent::validate($form, $data);
-
-		return $data;
+		foreach ($ids as $id)
+		{
+			if (parent::delete($id))
+			{
+				$this->deleteExtraFieldsData($id[0], $this->client);
+			}
+		}
 	}
 }
