@@ -318,7 +318,6 @@ class TjucmControllerItem extends JControllerForm
 
 		if (JFile::exists($filePath))
 		{
-
 			// Validate the posted data.
 			$formExtra = $model->getFormExtra(
 						array(

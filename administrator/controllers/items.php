@@ -28,7 +28,7 @@ class TjucmControllerItems extends JControllerAdmin
 	 */
 	public function __construct()
 	{
-		//	$this->view_list = 'items';
+		// $this->view_list = 'items';
 
 		$this->client  = JFactory::getApplication()->input->get('client');
 
