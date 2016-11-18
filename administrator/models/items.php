@@ -227,34 +227,6 @@ class TjucmModelItems extends JModelList
 	{
 		$items = parent::getItems();
 
-		foreach ($items as $oneItem)
-		{
-			if (isset($oneItem->type_id))
-			{
-				$values = explode(',', $oneItem->type_id);
-				$textValue = array();
-
-				foreach ($values as $value)
-				{
-					$db = JFactory::getDbo();
-					$query = $db->getQuery(true);
-					$query
-							->select('`#__tj_ucm_types_2546051`.`id`')
-							->from($db->quoteName('#__tj_ucm_types', '#__tj_ucm_types_2546051'))
-							->where($db->quoteName('id') . ' = ' . $db->quote($db->escape($value)));
-					$db->setQuery($query);
-					$results = $db->loadObject();
-
-					if ($results)
-					{
-						$textValue[] = $results->id;
-					}
-				}
-
-				$oneItem->type_id = !empty($textValue) ? implode(', ', $textValue) : $oneItem->type_id;
-			}
-		}
-
 		return $items;
 	}
 }
