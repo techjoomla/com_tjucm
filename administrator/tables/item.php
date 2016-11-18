@@ -45,23 +45,6 @@ class TjucmTableitem extends JTable
 		$input = JFactory::getApplication()->input;
 		$task = $input->getString('task', '');
 
-		// Support for multiple or not foreign key field: type_id
-		if (!empty($array['type_id']))
-		{
-			if (is_array($array['type_id']))
-			{
-				$array['type_id'] = implode(',', $array['type_id']);
-			}
-			elseif (strrpos($array['type_id'], ',') != false)
-			{
-				$array['type_id'] = explode(',', $array['type_id']);
-			}
-		}
-		else
-		{
-			$array['type_id'] = '';
-		}
-
 		if ($array['id'] == 0)
 		{
 			$array['created_by'] = JFactory::getUser()->id;
