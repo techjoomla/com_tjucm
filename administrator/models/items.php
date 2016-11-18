@@ -44,6 +44,9 @@ class TjucmModelItems extends JModelList
 
 		$this->client  = JFactory::getApplication()->input->get('client');
 
+		$this->separator_IdValue = "#:";
+		$this->separator_NewRecord = "#=>";
+
 		parent::__construct($config);
 	}
 
@@ -114,10 +117,13 @@ class TjucmModelItems extends JModelList
 		$db    = $this->getDbo();
 		$query = $db->getQuery(true);
 
+		$group_concat = 'GROUP_CONCAT(CONCAT_WS("' . $this->separator_IdValue . '", fields.id, fieldValue.value)';
+		$group_concat .= 'SEPARATOR "' . $this->separator_NewRecord . '") AS field_values';
+
 		// Select the required fields from the table.
 		$query->select(
 			$this->getState(
-				'list.select', 'DISTINCT a.id, GROUP_CONCAT(CONCAT_WS("#:", fields.id, fieldValue.value) SEPARATOR "#=>") AS field_values'
+				'list.select', 'DISTINCT a.id, ' . $group_concat
 			)
 		);
 
@@ -227,6 +233,47 @@ class TjucmModelItems extends JModelList
 	public function getItems()
 	{
 		$items = parent::getItems();
+
+		foreach ($items as $item)
+		{
+			if (!empty ($item->field_values))
+			{
+				$explode_field_values = explode($this->separator_NewRecord, $item->field_values);
+
+				$colValue = array();
+
+				foreach ($explode_field_values as $field_values)
+				{
+					$explode_explode_field_values = explode($this->separator_IdValue, $field_values);
+
+					$fieldId = $explode_explode_field_values[0];
+					$fieldValue = $explode_explode_field_values[1];
+
+					$colValue[$fieldId] = $fieldValue;
+				}
+
+				$listcolumns = $this->getColumn();
+
+				if (!empty($listcolumns))
+				{
+					$fieldData = array();
+
+					foreach ($listcolumns as $col_id => $col_name)
+					{
+						if (array_key_exists($col_id, $colValue))
+						{
+							$fieldData[$col_id] = $colValue[$col_id];
+						}
+						else
+						{
+							$fieldData[$col_id] = "";
+						}
+
+						$item->field_values = $fieldData;
+					}
+				}
+			}
+		}
 
 		return $items;
 	}

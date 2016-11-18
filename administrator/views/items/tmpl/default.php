@@ -248,42 +248,14 @@ if (!empty($this->extra_sidebar))
 						<?php
 						if (!empty ($item->field_values))
 						{
-							$explode_field_values = explode('#=>', $item->field_values);
-
-							$colValue = array();
-
-							foreach ($explode_field_values as $field_values)
-							{
-								$explode_explode_field_values = explode("#:", $field_values);
-
-								$fieldId = $explode_explode_field_values[0];
-								$fieldValue = $explode_explode_field_values[1];
-
-								$colValue[$fieldId] = $fieldValue;
-
+							foreach ($item->field_values as $field_values)
+							{?>
+								<td>
+									<a href="<?php echo $link;?>"><?php echo $field_values; ?></a>
+								</td><?php
 							}
-
-							if (!empty($this->listcolumn))
-							{
-								foreach ($this->listcolumn as $col_id => $col_name)
-								{
-									if (array_key_exists($col_id, $colValue))
-									{
-										?>
-										<td>
-											<a href="<?php echo $link;?>"><?php echo $colValue[$col_id]; ?></a>
-										</td><?php
-									}
-									else
-									{
-										echo '<td>&nbsp;</td>';
-									}
-								}
-							}
-
 						}
 						?>
-
 
 					</tr>
 				<?php endforeach; ?>
