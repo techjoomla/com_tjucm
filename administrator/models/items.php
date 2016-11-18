@@ -129,7 +129,8 @@ class TjucmModelItems extends JModelList
 
 		// Join over the foreign key 'type_id'
 		$query->select('types.id AS type_id');
-		$query->join('LEFT', '#__tj_ucm_types AS types ON types.`id` = a.`type_id`');
+		$query->join('INNER', '#__tj_ucm_types AS types ON types.`id` = a.`type_id`');
+		$query->where('(types.state IN (1))');
 
 		// Join over the user field 'created_by'
 		$query->select('`created_by`.name AS `created_by`');
