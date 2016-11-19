@@ -44,8 +44,8 @@ class TjucmModelItems extends JModelList
 
 		$this->client  = JFactory::getApplication()->input->get('client');
 
-		$this->separator_IdValue = "#:";
-		$this->separator_NewRecord = "#=>";
+		$this->fields_separator = "#:";
+		$this->records_separator = "#=>";
 
 		parent::__construct($config);
 	}
@@ -117,8 +117,8 @@ class TjucmModelItems extends JModelList
 		$db    = $this->getDbo();
 		$query = $db->getQuery(true);
 
-		$group_concat = 'GROUP_CONCAT(CONCAT_WS("' . $this->separator_IdValue . '", fields.id, fieldValue.value)';
-		$group_concat .= 'SEPARATOR "' . $this->separator_NewRecord . '") AS field_values';
+		$group_concat = 'GROUP_CONCAT(CONCAT_WS("' . $this->fields_separator . '", fields.id, fieldValue.value)';
+		$group_concat .= 'SEPARATOR "' . $this->records_separator . '") AS field_values';
 
 		// Select the required fields from the table.
 		$query->select(
@@ -238,13 +238,13 @@ class TjucmModelItems extends JModelList
 		{
 			if (!empty ($item->field_values))
 			{
-				$explode_field_values = explode($this->separator_NewRecord, $item->field_values);
+				$explode_field_values = explode($this->records_separator, $item->field_values);
 
 				$colValue = array();
 
 				foreach ($explode_field_values as $field_values)
 				{
-					$explode_explode_field_values = explode($this->separator_IdValue, $field_values);
+					$explode_explode_field_values = explode($this->fields_separator, $field_values);
 
 					$fieldId = $explode_explode_field_values[0];
 					$fieldValue = $explode_explode_field_values[1];
