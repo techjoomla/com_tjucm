@@ -134,7 +134,7 @@ class TjucmModelItems extends JModelList
 		$query->join("LEFT", "#__users AS uc ON uc.id=a.checked_out");
 
 		// Join over the foreign key 'type_id'
-		$query->select('types.id AS type_id');
+
 		$query->join('INNER', '#__tj_ucm_types AS types ON types.`id` = a.`type_id`');
 		$query->where('(types.state IN (1))');
 
@@ -202,27 +202,22 @@ class TjucmModelItems extends JModelList
 	 *
 	 * @return mixed Array of data items on success, false on failure.
 	 */
-	public function getColumn()
+	public function getFields()
 	{
-		// Create a new query object.
-		$db    = $this->getDbo();
-		$query = $db->getQuery(true);
+		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
+		$items_model = JModelLegacy::getInstance('Fields', 'TjfieldsModel');
+		$items_model->setState('filter.showonlist', 1);
+		$items_model->setState('filter.client', $this->client);
+		$items = $items_model->getItems();
 
-		// Select the required fields from the table.
-		$query->select(
-			$this->getState(
-				'list.select', 'DISTINCT a.id, a.label'
-			)
-		);
+		$data = array();
 
-		$query->from('`#__tjfields_fields` AS a');
-		$query->where('a.client = ' . $db->quote($db->escape($this->client)));
-		$query->where('a.showonlist =  1');
-		$query->order($db->escape(' a.ordering, a.id ASC '));
+		foreach ($items as $item)
+		{
+			$data[$item->id] = $item->label;
+		}
 
-		$db->setQuery($query);
-
-		return $db->loadAssocList('id', 'label');
+		return $data;
 	}
 
 	/**
@@ -252,7 +247,7 @@ class TjucmModelItems extends JModelList
 					$colValue[$fieldId] = $fieldValue;
 				}
 
-				$listcolumns = $this->getColumn();
+				$listcolumns = $this->getFields();
 
 				if (!empty($listcolumns))
 				{
