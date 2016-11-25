@@ -42,30 +42,14 @@ class TjucmTableitem extends JTable
 	 */
 	public function bind($array, $ignore = '')
 	{
-		$input = JFactory::getApplication()->input;
-		$task = $input->getString('task', '');
-
 		if ($array['id'] == 0)
 		{
 			$array['created_by'] = JFactory::getUser()->id;
-		}
-
-		if ($array['id'] == 0)
-		{
 			$array['created_date'] = date('Y-m-d H:i:s');
 		}
 
-		if ($array['id'] == 0)
-		{
-			$array['modified_by'] = JFactory::getUser()->id;
-		}
-
-		$task = JFactory::getApplication()->input->get('task');
-
-		if ($task == 'apply' || $task == 'save')
-		{
-			$array['modified_date'] = date('Y-m-d H:i:s');
-		}
+		$array['modified_by'] = JFactory::getUser()->id;
+		$array['modified_date'] = date('Y-m-d H:i:s');
 
 		if (isset($array['params']) && is_array($array['params']))
 		{
