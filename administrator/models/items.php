@@ -18,6 +18,7 @@ jimport('joomla.application.component.modellist');
  */
 class TjucmModelItems extends JModelList
 {
+	private $client = '';
 /**
 	* Constructor.
 	*
@@ -41,6 +42,9 @@ class TjucmModelItems extends JModelList
 				'modified_date', 'a.`modified_date`',
 			);
 		}
+
+		$this->fields_separator = "#:";
+		$this->records_separator = "#=>";
 
 		parent::__construct($config);
 	}
@@ -112,20 +116,26 @@ class TjucmModelItems extends JModelList
 		$db    = $this->getDbo();
 		$query = $db->getQuery(true);
 
+		$group_concat = 'GROUP_CONCAT(CONCAT_WS("' . $this->fields_separator . '", fields.id, fieldValue.value)';
+		$group_concat .= 'SEPARATOR "' . $this->records_separator . '") AS field_values';
+
 		// Select the required fields from the table.
 		$query->select(
 			$this->getState(
-				'list.select', 'DISTINCT a.*'
+				'list.select', 'DISTINCT a.id, ' . $group_concat
 			)
 		);
+
 		$query->from('`#__tj_ucm_data` AS a');
 
 		// Join over the users for the checked out user
 		$query->select("uc.name AS uEditor");
 		$query->join("LEFT", "#__users AS uc ON uc.id=a.checked_out");
+
 		// Join over the foreign key 'type_id'
-		$query->select('`#__tj_ucm_types_2546051`.`id` AS types_fk_value_2546051');
-		$query->join('LEFT', '#__tj_ucm_types AS #__tj_ucm_types_2546051 ON #__tj_ucm_types_2546051.`id` = a.`type_id`');
+
+		$query->join('INNER', '#__tj_ucm_types AS types ON types.`id` = a.`type_id`');
+		$query->where('(types.state IN (1))');
 
 		// Join over the user field 'created_by'
 		$query->select('`created_by`.name AS `created_by`');
@@ -134,6 +144,16 @@ class TjucmModelItems extends JModelList
 		// Join over the user field 'modified_by'
 		$query->select('`modified_by`.name AS `modified_by`');
 		$query->join('LEFT', '#__users AS `modified_by` ON `modified_by`.id = a.`modified_by`');
+
+		// Join over the tjfield
+		$query->join('INNER', '#__tjfields_fields AS fields ON a.client = fields.client');
+
+		// Join over the tjfield value
+		$query->join('INNER', '#__tjfields_fields_value AS fieldValue ON a.id = fieldValue.content_id');
+
+		$query->where('a.client = ' . $db->quote($db->escape($this->client)));
+		$query->where('fields.id = fieldValue.field_id');
+		$query->where('fields.showonlist =  1');
 
 		// Filter by published state
 		$published = $this->getState('filter.state');
@@ -159,9 +179,10 @@ class TjucmModelItems extends JModelList
 			else
 			{
 				$search = $db->Quote('%' . $db->escape($search, true) . '%');
-				
 			}
 		}
+
+		$query->group('fieldValue.content_id');
 
 		// Add the list ordering clause.
 		$orderCol  = $this->state->get('list.ordering');
@@ -178,37 +199,98 @@ class TjucmModelItems extends JModelList
 	/**
 	 * Get an array of data items
 	 *
+	 * @param   string  $client  client value
+	 *
+	 * @return mixed Array of data items on success, false on failure.
+	 */
+	public function setClient($client)
+	{
+		$this->client = $client;
+	}
+
+	/**
+	 * Get an client value
+	 *
+	 * @return mixed Array of data items on success, false on failure.
+	 */
+	public function getClient()
+	{
+		return $this->client;
+	}
+
+	/**
+	 * Get an array of data items
+	 *
+	 * @return mixed Array of data items on success, false on failure.
+	 */
+	public function getFields()
+	{
+		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
+		$items_model = JModelLegacy::getInstance('Fields', 'TjfieldsModel');
+		$items_model->setState('filter.showonlist', 1);
+		$items_model->setState('filter.client', $this->client);
+		$items = $items_model->getItems();
+
+		$data = array();
+
+		foreach ($items as $item)
+		{
+			$data[$item->id] = $item->label;
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Get an array of data items
+	 *
 	 * @return mixed Array of data items on success, false on failure.
 	 */
 	public function getItems()
 	{
 		$items = parent::getItems();
 
-		foreach ($items as $oneItem) {
-
-			if (isset($oneItem->type_id))
+		foreach ($items as $item)
+		{
+			if (!empty ($item->field_values))
 			{
-				$values = explode(',', $oneItem->type_id);
+				$explode_field_values = explode($this->records_separator, $item->field_values);
 
-				$textValue = array();
-				foreach ($values as $value){
-					$db = JFactory::getDbo();
-					$query = $db->getQuery(true);
-					$query
-							->select('`#__tj_ucm_types_2546051`.`id`')
-							->from($db->quoteName('#__tj_ucm_types', '#__tj_ucm_types_2546051'))
-							->where($db->quoteName('id') . ' = '. $db->quote($db->escape($value)));
-					$db->setQuery($query);
-					$results = $db->loadObject();
-					if ($results) {
-						$textValue[] = $results->id;
-					}
+				$colValue = array();
+
+				foreach ($explode_field_values as $field_values)
+				{
+					$explode_explode_field_values = explode($this->fields_separator, $field_values);
+
+					$fieldId = $explode_explode_field_values[0];
+					$fieldValue = $explode_explode_field_values[1];
+
+					$colValue[$fieldId] = $fieldValue;
 				}
 
-			$oneItem->type_id = !empty($textValue) ? implode(', ', $textValue) : $oneItem->type_id;
+				$listcolumns = $this->getFields();
 
+				if (!empty($listcolumns))
+				{
+					$fieldData = array();
+
+					foreach ($listcolumns as $col_id => $col_name)
+					{
+						if (array_key_exists($col_id, $colValue))
+						{
+							$fieldData[$col_id] = $colValue[$col_id];
+						}
+						else
+						{
+							$fieldData[$col_id] = "";
+						}
+
+						$item->field_values = $fieldData;
+					}
+				}
 			}
 		}
+
 		return $items;
 	}
 }

@@ -15,8 +15,6 @@ JHtml::_('behavior.formvalidation');
 JHtml::_('formbehavior.chosen', 'select');
 JHtml::_('behavior.keepalive');
 
-echo"<pre>"; print_r($this->item); echo"</pre>";
-
 JHtml::script( JUri::root().'administrator/components/com_tjucm/assets/js/tjucm_type.js' );
 ?>
 <script type="text/javascript">
@@ -56,13 +54,14 @@ JHtml::script( JUri::root().'administrator/components/com_tjucm/assets/js/tjucm_
 							<input type="hidden" name="jform[ordering]" value="<?php echo $this->item->ordering; ?>" />
 							<?php echo $this->form->renderField('title'); ?>
 							<?php
-							if ($this->item->field_group || $this->item->field_category) {
+							/*if ($this->item->field_group || $this->item->field_category) {
 								$this->form->setFieldAttribute('alias', 'readonly', 'true', $group = null);
-							} ?>
+							}*/ ?>
 							<?php echo $this->form->renderField('alias'); ?>
+							<?php echo $this->form->renderField('unique_identifier'); ?>
 							<?php echo $this->form->renderField('state'); ?>
 							<?php echo $this->form->renderField('type_description'); ?>
-							<?php echo $this->form->renderField('unique_identifier'); ?>
+
 							<?php echo $this->form->renderField('params'); ?>
 							<input type="hidden" name="jform[checked_out]" value="<?php echo $this->item->checked_out; ?>" />
 							<input type="hidden" name="jform[checked_out_time]" value="<?php echo $this->item->checked_out_time; ?>" />

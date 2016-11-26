@@ -40,7 +40,7 @@
     </files>
     <media destination="com_tjucm" folder="media">
         <folder>js</folder>
-        <folder>css</folder>
+        <!--folder>css</folder-->
     </media>
     <languages folder="languages/site">
 
@@ -63,6 +63,7 @@
             <filename>tjucm.php</filename>
             <folder>controllers</folder>
             <folder>assets</folder>
+            <folder>classes</folder>
             <folder>helpers</folder>
             <folder>models</folder>
             <folder>sql</folder>

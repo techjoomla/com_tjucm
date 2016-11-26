@@ -103,8 +103,6 @@ class TjucmTabletype extends JTable
 			$array['modified_by'] = JFactory::getUser()->id;
 		}
 
-		$array['unique_identifier'] = 'com_tjucm.' . $array['alias'];
-
 		$task = JFactory::getApplication()->input->get('task');
 
 		if ($task == 'apply' || $task == 'save')

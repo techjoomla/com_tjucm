@@ -12,7 +12,7 @@
       <option value="-2">JTRASHED</option>
     </field>
     <field name="type_description" type="textarea" cols="5" rows="5" label="COM_TJUCM_FORM_LBL_TYPE_TYPE_DESCRIPTION" description="COM_TJUCM_FORM_DESC_TYPE_TYPE_DESCRIPTION" hint="COM_TJUCM_FORM_LBL_TYPE_TYPE_DESCRIPTION"/>
-    <field name="unique_identifier" type="hidden" label="COM_TJUCM_FORM_LBL_TYPE_UNIQUE_IDENTIFIER" description="COM_TJUCM_FORM_DESC_TYPE_UNIQUE_IDENTIFIER" hint="COM_TJUCM_FORM_LBL_TYPE_UNIQUE_IDENTIFIER"/>
+    <field name="unique_identifier" type="text" readonly="true" class="readonly" label="COM_TJUCM_FORM_LBL_TYPE_UNIQUE_IDENTIFIER" description="COM_TJUCM_FORM_DESC_TYPE_UNIQUE_IDENTIFIER" hint="COM_TJUCM_FORM_LBL_TYPE_UNIQUE_IDENTIFIER"/>
     <field name="params" type="hidden" label="COM_TJUCM_FORM_LBL_TYPE_PARAMS" description="COM_TJUCM_FORM_DESC_TYPE_PARAMS" hint="COM_TJUCM_FORM_LBL_TYPE_PARAMS"/>
     <field name="checked_out" type="hidden" filter="unset"/>
     <field name="checked_out_time" default="0000-00-00 00:00:00" type="hidden" filter="unset"/>

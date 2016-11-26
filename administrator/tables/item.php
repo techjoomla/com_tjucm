@@ -18,7 +18,6 @@ use Joomla\Utilities\ArrayHelper;
  */
 class TjucmTableitem extends JTable
 {
-	
 	/**
 	 * Constructor
 	 *
@@ -43,44 +42,14 @@ class TjucmTableitem extends JTable
 	 */
 	public function bind($array, $ignore = '')
 	{
-		$input = JFactory::getApplication()->input;
-		$task = $input->getString('task', '');
-
-		// Support for multiple or not foreign key field: type_id
-			if(!empty($array['type_id']))
-			{
-				if(is_array($array['type_id'])){
-					$array['type_id'] = implode(',',$array['type_id']);
-				}
-				else if(strrpos($array['type_id'], ',') != false){
-					$array['type_id'] = explode(',',$array['type_id']);
-				}
-			}
-			else {
-				$array['type_id'] = '';
-			}
-
 		if ($array['id'] == 0)
 		{
 			$array['created_by'] = JFactory::getUser()->id;
-		}
-
-		if ($array['id'] == 0)
-		{
 			$array['created_date'] = date('Y-m-d H:i:s');
 		}
 
-		if ($array['id'] == 0)
-		{
-			$array['modified_by'] = JFactory::getUser()->id;
-		}
-		$task = JFactory::getApplication()->input->get('task');
-
-		if ($task == 'apply' || $task == 'save')
-
-		{
-			$array['modified_date'] = date('Y-m-d H:i:s');
-		}
+		$array['modified_by'] = JFactory::getUser()->id;
+		$array['modified_date'] = date('Y-m-d H:i:s');
 
 		if (isset($array['params']) && is_array($array['params']))
 		{
@@ -141,7 +110,7 @@ class TjucmTableitem extends JTable
 			{
 				foreach ($jaccess->getData() as $group => $allow)
 				{
-					$actions[$group] = ((bool)$allow);
+					$actions[$group] = ((bool) $allow);
 				}
 			}
 
@@ -163,8 +132,6 @@ class TjucmTableitem extends JTable
 		{
 			$this->ordering = self::getNextOrder();
 		}
-		
-		
 
 		return parent::check();
 	}
@@ -305,7 +272,7 @@ class TjucmTableitem extends JTable
 	{
 		$this->load($pk);
 		$result = parent::delete($pk);
-		
+
 		return $result;
 	}
 }

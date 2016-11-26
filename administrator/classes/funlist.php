@@ -17,7 +17,7 @@ jimport('joomla.form.form');
  *
  * @since       1.0
  */
-class TjucmFunlist
+class TjucmFunList
 {
 	/**
 	 * Function to get data

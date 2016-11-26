@@ -37,8 +37,14 @@ class TjucmViewItems extends JViewLegacy
 	public function display($tpl = null)
 	{
 		$this->state = $this->get('State');
+		$model_items = $this->getModel('items');
+
+		// Set client value
+		$model_items->setClient(JFactory::getApplication()->input->get('client'));
+
 		$this->items = $this->get('Items');
 		$this->pagination = $this->get('Pagination');
+		$this->listcolumn = $this->get('Fields');
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
@@ -79,10 +85,10 @@ class TjucmViewItems extends JViewLegacy
 				JToolbarHelper::custom('items.duplicate', 'copy.png', 'copy_f2.png', 'JTOOLBAR_DUPLICATE', true);
 			}
 
-			if ($canDo->get('core.edit') && isset($this->items[0]))
+			/*if ($canDo->get('core.edit') && isset($this->items[0]))
 			{
 				JToolBarHelper::editList('item.edit', 'JTOOLBAR_EDIT');
-			}
+			}*/
 		}
 
 		if ($canDo->get('core.edit.state'))
@@ -147,9 +153,9 @@ class TjucmViewItems extends JViewLegacy
 	}
 
 	/**
-	 * Method to order fields 
+	 * Method to order fields
 	 *
-	 * @return void 
+	 * @return void
 	 */
 	protected function getSortFields()
 	{

@@ -2,6 +2,7 @@
 <form>
   <fieldset>
     <field name="id" type="text" readonly="true" class="readonly" default="0" description="JGLOBAL_FIELD_ID_DESC"/>
+    <field name="client" type="text" readonly="true" class="readonly" default="" description="JGLOBAL_FIELD_ID_DESC"/>
     <field name="ordering"/>
     <field name="state" default="1" type="list" label="JSTATUS" description="JFIELD_PUBLISHED_DESC" class="inputbox" size="1">
       <option value="1">JPUBLISHED</option>
@@ -9,6 +10,7 @@
       <option value="2">JARCHIVED</option>
       <option value="-2">JTRASHED</option>
     </field>
+    <field name="category_id" type="hidden" extension="com_tjucm" label="COM_TJUCM_FORM_LBL_ITEM_CATEGORY_ID" description="COM_TJUCM_FORM_DESC_ITEM_CATEGORY_ID" hint="COM_TJUCM_FORM_LBL_ITEM_CATEGORY_ID"/>
     <field name="type_id" type="foreignkey" label="COM_TJUCM_FORM_LBL_ITEM_TYPE_ID" description="COM_TJUCM_FORM_DESC_ITEM_TYPE_ID" class="inputbox" input_type="list" table="#__tj_ucm_types" key_field="id" value_field="id" default="0"/>
     <field name="checked_out" type="hidden" filter="unset"/>
     <field name="checked_out_time" default="0000-00-00 00:00:00" type="hidden" filter="unset"/>

@@ -21,11 +21,11 @@ jimport('joomla.application.component.controller');
 
 $path = JPATH_COMPONENT_ADMINISTRATOR . '/classes/' . 'funlist.php';
 
-if (!class_exists('TjucmFunlist'))
+if (!class_exists('TjucmFunList'))
 {
 	// Require_once $path;
-	JLoader::register('TjucmFunlist', $path);
-	JLoader::load('TjucmFunlist');
+	JLoader::register('TjucmFunList', $path);
+	JLoader::load('TjucmFunList');
 }
 
 JLoader::registerPrefix('Tjucm', JPATH_COMPONENT_ADMINISTRATOR);
