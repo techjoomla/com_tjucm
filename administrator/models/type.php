@@ -301,8 +301,12 @@ class TjucmModelType extends JModelAdmin
 
 		if (!empty($data['id']))
 		{
-			$field_group = $this->common->getDataValues('#__tjfields_groups', 'count(*)', 'client = "' . $data['unique_identifier'] . '"', 'loadResult');
+			$field_group = $this->getGroupCount($data['unique_identifier']);
+
+			// Not able to get count using getTotal method of category model
 			$field_category = $this->common->getDataValues('#__categories', 'count(*)', 'extension = "' . $data['unique_identifier'] . '"', 'loadResult');
+
+			// $field_category = $this->getCategoryCount($data['unique_identifier']);
 
 			if ($field_group == 0 && $field_category == 0)
 			{
@@ -320,6 +324,42 @@ class TjucmModelType extends JModelAdmin
 		}
 
 		return false;
+	}
+
+	/**
+	 * Method to get count of group.
+	 *
+	 * @param   string  $client  The client.
+	 *
+	 * @return	Int  Count of group
+	 *
+	 * @since	12.2
+	 */
+	public function getGroupCount($client)
+	{
+		JLoader::import('components.com_tjfields.models.groups', JPATH_ADMINISTRATOR);
+		$items_model = JModelLegacy::getInstance('Groups', 'TjfieldsModel');
+		$items_model->setState('filter.client', $client);
+
+		return $items_model->getTotal();
+	}
+
+	/**
+	 * Method to get count of category.
+	 *
+	 * @param   string  $client  The client.
+	 *
+	 * @return	Int  Count of category
+	 *
+	 * @since	12.2
+	 */
+	public function getCategoryCount($client)
+	{
+		JLoader::import('components.com_categories.models.categories', JPATH_ADMINISTRATOR);
+		$categories_model = JModelLegacy::getInstance('Categories', 'CategoriesModel');
+		$categories_model->setState('filter.extension', $client);
+
+		return $categories_model->getTotal();
 	}
 
 	/**
