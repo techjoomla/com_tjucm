@@ -54,6 +54,7 @@ class TjucmViewItem extends JViewLegacy
 		// Call to extra fields
 		$this->form_extra = $model->getFormExtra(
 		array(
+			"category" => $this->item->category_id,
 			"clientComponent" => 'com_tjucm',
 			"client" => $this->client,
 			"view" => $view[1],

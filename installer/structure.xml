@@ -8,6 +8,7 @@
     <field action="change" field_name="state" field_type="TINYINT" field_length="1" index="index" description=""/>
     <field field_name="type_description" field_type="TEXT" description=""/>
     <field field_name="unique_identifier" field_type="VARCHAR" field_length="255" description=""/>
+    <field field_name="parent_id" field_type="INT" field_length="11" description=""/>
     <field field_name="params" field_type="VARCHAR" field_length="255" description=""/>
     <field field_name="checked_out" field_type="INT" field_length="11" index="index" description=""/>
     <field field_name="checked_out_time" field_type="DATETIME" description=""/>

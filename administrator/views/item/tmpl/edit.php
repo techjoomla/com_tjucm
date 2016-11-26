@@ -57,6 +57,7 @@ $client  = JFactory::getApplication()->input->get('client');
 							<?php echo $this->form->renderField('created_date'); ?>
 							<?php echo $this->form->renderField('modified_by'); ?>
 							<?php echo $this->form->renderField('modified_date'); ?>
+							<?php echo $this->form->renderField('category_id'); ?>
 
 							<?php if ($this->state->params->get('save_history', 1)) : ?>
 								<div class="control-group">
