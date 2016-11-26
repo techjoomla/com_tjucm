@@ -34,7 +34,7 @@ if ($saveOrder)
 	$saveOrderingUrl = 'index.php?option=com_tjucm&task=items.saveOrderAjax&tmpl=component';
 	JHtml::_('sortablelist.sortable', 'itemList', 'adminForm', strtolower($listDirn), $saveOrderingUrl);
 }
-//~ echo"<pre>"; print_r($this->items); echo"</pre>";
+
 $sortFields = $this->getSortFields();
 ?>
 <script type="text/javascript">

@@ -18,6 +18,7 @@ jimport('joomla.application.component.modellist');
  */
 class TjucmModelItems extends JModelList
 {
+	private $client = '';
 /**
 	* Constructor.
 	*
@@ -41,8 +42,6 @@ class TjucmModelItems extends JModelList
 				'modified_date', 'a.`modified_date`',
 			);
 		}
-
-		$this->client  = JFactory::getApplication()->input->get('client');
 
 		$this->fields_separator = "#:";
 		$this->records_separator = "#=>";
@@ -195,6 +194,28 @@ class TjucmModelItems extends JModelList
 		}
 
 		return $query;
+	}
+
+	/**
+	 * Get an array of data items
+	 *
+	 * @param   string  $client  client value
+	 *
+	 * @return mixed Array of data items on success, false on failure.
+	 */
+	public function setClient($client)
+	{
+		$this->client = $client;
+	}
+
+	/**
+	 * Get an client value
+	 *
+	 * @return mixed Array of data items on success, false on failure.
+	 */
+	public function getClient()
+	{
+		return $this->client;
 	}
 
 	/**

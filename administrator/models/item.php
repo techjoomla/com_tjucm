@@ -39,6 +39,8 @@ class TjucmModelItem extends JModelAdmin
 	 */
 	protected $item = null;
 
+	private $client = '';
+
 	// Use imported Trait in model
 	use TjfieldsFilterField;
 
@@ -53,14 +55,30 @@ class TjucmModelItem extends JModelAdmin
 	public function __construct($config = array())
 	{
 		$this->common  = new TjucmFunList;
-		$this->client  = JFactory::getApplication()->input->get('client');
-
-		if (empty($this->client))
-		{
-			$this->client  = JFactory::getApplication()->input->get('jform', array(), 'array')['client'];
-		}
 
 		parent::__construct($config);
+	}
+
+	/**
+	 * Get an array of data items
+	 *
+	 * @param   string  $client  client value
+	 *
+	 * @return mixed Array of data items on success, false on failure.
+	 */
+	public function setClient($client)
+	{
+		$this->client = $client;
+	}
+
+	/**
+	 * Get an client value
+	 *
+	 * @return mixed Array of data items on success, false on failure.
+	 */
+	public function getClient()
+	{
+		return $this->client;
 	}
 
 	/**
@@ -279,6 +297,8 @@ class TjucmModelItem extends JModelAdmin
 			if (!empty($extra_jform_data))
 			{
 				$data_extra = array();
+
+				// $data_extra['category'] = $data['category_id'];
 				$data_extra['content_id'] = $id;
 				$data_extra['client'] = $this->client;
 				$data_extra['fieldsvalue'] = $extra_jform_data;

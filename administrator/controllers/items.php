@@ -148,6 +148,9 @@ class TjucmControllerItems extends JControllerAdmin
 			// Get the model.
 			$model = $this->getModel();
 
+			// Set client value
+			$model->setClient($this->client);
+
 			// Make sure the item ids are integers
 			jimport('joomla.utilities.arrayhelper');
 			JArrayHelper::toInteger($cid);

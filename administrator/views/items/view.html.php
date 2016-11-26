@@ -37,6 +37,11 @@ class TjucmViewItems extends JViewLegacy
 	public function display($tpl = null)
 	{
 		$this->state = $this->get('State');
+		$model_items = $this->getModel('items');
+
+		// Set client value
+		$model_items->setClient(JFactory::getApplication()->input->get('client'));
+
 		$this->items = $this->get('Items');
 		$this->pagination = $this->get('Pagination');
 		$this->listcolumn = $this->get('Fields');
