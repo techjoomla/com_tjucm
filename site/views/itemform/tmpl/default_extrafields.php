@@ -14,7 +14,7 @@ defined('_JEXEC') or die;
 <?php
 	if ($this->form_extra):
 		//~ echo $this->form_extra->getFieldsets(0)->name;
-		echo JHtml::_('bootstrap.startTabSet', 'myTab', array('active' => 'personal-information'));
+		echo JHtml::_('bootstrap.startTabSet', 'tjucm_myTab', array('active' => 'personal-information'));
 	endif;
 ?>
 
@@ -25,17 +25,17 @@ defined('_JEXEC') or die;
 			<!-- Fields go here -->
 				<?php
 				$tabName = JFilterOutput::stringURLUnicodeSlug(trim($fieldset->name));
-				echo JHtml::_("bootstrap.addTab", "myTab", $tabName, $fieldset->name);
+				echo JHtml::_("bootstrap.addTab", "tjucm_myTab", $tabName, $fieldset->name);
 				?>
 				<!-- Iterate through the fields and display them. -->
-					<?php foreach($this->form_extra as $field1): ?>
-						<?php foreach($field1->getFieldset($fieldset->name) as $field): ?>
+					<?php foreach($this->form_extra as $fieldKeyArray): ?>
+						<?php foreach($fieldKeyArray->getFieldset($fieldset->name) as $field): ?>
 							<!-- If the field is hidden, only use the input. -->
 							<?php if ($field->hidden): ?>
 								<?php echo $field->input; ?>
 							<?php else: ?>
 									<div class="form-group">
-										<div class="col-lg-2 col-md-2 col-sm-3 col-xs-12 control-label">
+										<div class="control-label col-lg-2 col-md-2 col-sm-3 col-xs-12">
 											<?php echo $field->label; ?>
 										</div>
 										<div class="form-control col-lg-10 col-md-10 col-sm-9 col-xs-12">

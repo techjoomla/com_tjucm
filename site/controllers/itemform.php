@@ -7,8 +7,11 @@
  * @copyright  2016 Techjoomla
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
+
 // No direct access
 defined('_JEXEC') or die;
+
+require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
 
 /**
  * Item controller class.
@@ -17,6 +20,82 @@ defined('_JEXEC') or die;
  */
 class TjucmControllerItemForm extends JControllerForm
 {
+	// Use imported Trait in model
+	use TjfieldsFilterField;
+
+	/**
+	 * Constructor
+	 *
+	 * @throws Exception
+	 */
+	public function __construct()
+	{
+		$this->view_list = 'items';
+
+		$this->client  = JFactory::getApplication()->input->get('client');
+
+		if (empty($this->client))
+		{
+			$this->client  = JFactory::getApplication()->input->get('jform', array(), 'array')['client'];
+		}
+
+		parent::__construct();
+	}
+
+
+	/**
+	 * Method to add a new record.
+	 *
+	 * @return  boolean  True if the record can be added, false if not.
+	 *
+	 * @since   12.2
+	 */
+	public function add()
+	{
+		$context = "$this->option.edit.$this->context";
+
+		// Access check.
+		if (!$this->allowAdd())
+		{
+			// Set the internal error and also the redirect error.
+			$this->setError(JText::_('JLIB_APPLICATION_ERROR_CREATE_RECORD_NOT_PERMITTED'));
+			$this->setMessage($this->getError(), 'error');
+
+			$this->setRedirect(
+				JRoute::_(
+					'index.php?option=' . $this->option . '&view=' . $this->view_list . '&client=' . $this->client
+					. $this->getRedirectToListAppend(), false
+				)
+			);
+
+			return false;
+		}
+
+		// Clear the record edit information from the session.
+		JFactory::getApplication()->setUserState($context . '.data', null);
+
+		// Redirect to the edit screen.
+		$this->setRedirect(
+			JRoute::_(
+				'index.php?option=' . $this->option . '&view=' . $this->view_item . '&client=' . $this->client
+				. $this->getRedirectToItemAppend(), false
+			)
+		);
+
+		return true;
+	}
+
+
+	/**
+	 * Function to apply field data changes
+	 *
+	 * @return  void
+	 */
+	public function apply()
+	{
+		$this->save();
+	}
+
 	/**
 	 * Method to check out an item for editing and redirect to the edit form.
 	 *
@@ -55,38 +134,96 @@ class TjucmControllerItemForm extends JControllerForm
 	}
 
 	/**
-	 * Method to save a user's profile data.
+	 * Method to save a record.
 	 *
-	 * @return void
+	 * @param   string  $key     The name of the primary key of the URL variable.
+	 * @param   string  $urlVar  The name of the URL variable if different from the primary key (sometimes required to avoid router collisions).
 	 *
-	 * @throws Exception
-	 * @since  1.6
+	 * @return  boolean  True if successful, false otherwise.
+	 *
+	 * @since   12.2
 	 */
-	public function save($key = NULL, $urlVar = NULL)
+	public function save($key = null, $urlVar = null)
 	{
 		// Check for request forgeries.
 		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
-
-		// Initialise variables.
 		$app   = JFactory::getApplication();
-		$model = $this->getModel('ItemForm', 'TjucmModel');
+		$lang  = JFactory::getLanguage();
+		$model = $this->getModel();
+
+		// Set client value
+		$model->setClient($this->client);
+
+		$table = $model->getTable();
 
 		// Get the user data.
 		$data = JFactory::getApplication()->input->get('jform', array(), 'array');
+		$all_jform_data = $data;
 
-		// Validate the posted data.
-		$form = $model->getForm();
+		// Jform tweak - Get all posted data.
+		$post = JFactory::getApplication()->input->post;
 
-		if (!$form)
+		// Populate the row id from the session.
+		//$data[$key] = $recordId;
+
+		// The save2copy task needs to be handled slightly differently.
+		if ($task == 'save2copy')
 		{
-			throw new Exception($model->getError(), 500);
+			// Check-in the original row.
+			if ($checkin && $model->checkin($data[$key]) === false)
+			{
+				// Check-in failed. Go back to the item and display a notice.
+				$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
+				$this->setMessage($this->getError(), 'error');
+
+				$this->setRedirect(
+					JRoute::_(
+						'index.php?option=' . $this->option . '&view=' . $this->view_item . '&client=' . $this->client
+						. $this->getRedirectToItemAppend($recordId, $urlVar), false
+					)
+				);
+
+				return false;
+			}
+
+			// Reset the ID, the multilingual associations and then treat the request as for Apply.
+			$data[$key] = 0;
+			$data['associations'] = array();
+			$task = 'apply';
+		}
+
+		// Access check.
+		if (!$this->allowSave($data, $key))
+		{
+			$this->setError(JText::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'));
+			$this->setMessage($this->getError(), 'error');
+
+			$this->setRedirect(
+				JRoute::_(
+					'index.php?option=' . $this->option . '&view=' . $this->view_list
+					. $this->getRedirectToListAppend(), false
+				)
+			);
+
+			return false;
 		}
 
 		// Validate the posted data.
-		$data = $model->validate($form, $data);
+		// Sometimes the form needs some posted data, such as for plugins and modules.
+		$form = $model->getForm($data, false);
 
-		// Check for errors.
-		if ($data === false)
+		if (!$form)
+		{
+			$app->enqueueMessage($model->getError(), 'error');
+
+			return false;
+		}
+
+		// Test whether the data is valid.
+		$validData = $model->validate($form, $data);
+
+		// Check for validation errors.
+		if ($validData === false)
 		{
 			// Get the validation messages.
 			$errors = $model->getErrors();
@@ -104,80 +241,282 @@ class TjucmControllerItemForm extends JControllerForm
 				}
 			}
 
-			$input = $app->input;
-			$jform = $input->get('jform', array(), 'ARRAY');
-
 			// Save the data in the session.
-			$app->setUserState('com_tjucm.edit.item.data', $jform);
+			$app->setUserState($context . '.data', $data);
 
 			// Redirect back to the edit screen.
-			$id = (int) $app->getUserState('com_tjucm.edit.item.id');
-			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&layout=edit&id=' . $id, false));
+			$this->setRedirect(
+				JRoute::_(
+					'index.php?option=' . $this->option . '&view=' . $this->view_item . '&client=' . $this->client
+					. $this->getRedirectToItemAppend($recordId, $urlVar), false
+				)
+			);
+
+			return false;
+		}
+
+		// Jform tweaking - get data for extra fields jform.
+		$extra_jform_data = array_diff_key($all_jform_data, $validData);
+
+		// Check if form file is present.
+		jimport('joomla.filesystem.file');
+		/* Explode client 1. Componet name 2.type */
+		$client = explode(".", $this->client);
+		/* End */
+
+		$filePath = JPATH_ADMINISTRATOR . '/components/com_tjucm/models/forms/' . $client[1] . '_extra.xml';
+
+		if (JFile::exists($filePath))
+		{
+			// Validate the posted data.
+			$formExtra = $model->getFormExtra(
+						array(
+							"category" => $data['category_id'],
+							"clientComponent" => 'com_tjucm',
+							"client" => $this->client,
+							"view" => $client[1],
+							"layout" => 'edit')
+							);
+
+			if (!$formExtra)
+			{
+				JError::raiseWarning(500, $model->getError());
+
+				return false;
+			}
+
+			$formExtra = array_filter($formExtra);
+
+			if (!empty($formExtra))
+			{
+				if (!empty($formExtra[0]))
+				{
+					// Validate the posted extra data.
+					// $extra_jform_data = $model->validateExtra($formExtra[0], $extra_jform_data);
+				}
+				else
+				{
+					// Validate the posted extra data.
+					// $extra_jform_data = $model->validateExtra($formExtra[1], $extra_jform_data);
+				}
+			}
+
+			// Check for errors.
+			if ($extra_jform_data === false)
+			{
+				// Get the validation messages.
+				$errors = $model->getErrors();
+
+				// Push up to three validation messages out to the user.
+				for ($i = 0, $n = count($errors); $i < $n && $i < 3; $i++)
+				{
+					if ($errors[$i] instanceof Exception)
+					{
+						$app->enqueueMessage($errors[$i]->getMessage(), 'warning');
+					}
+					else
+					{
+						$app->enqueueMessage($errors[$i], 'warning');
+					}
+				}
+
+				// Save the data in the session.
+				// Tweak.
+				$app->setUserState('com_tjucm.edit.item.data', $all_jform_data);
+
+				// Tweak *important
+				$app->setUserState('com_tjucm.edit.item.data', $all_jform_data['id']);
+
+				// Redirect back to the edit screen.
+				$id = (int) $app->getUserState('com_tjucm.edit.item.id');
+				$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&layout=edit&client=' . $this->client . '&id=' . $id, false));
+
+				return false;
+			}
+		}
+
+		if (!isset($validData['tags']))
+		{
+			$validData['tags'] = null;
+		}
+
+		$recordId = $model->save($validData, $extra_jform_data, $post);
+
+		if (isset($recordId))
+		{
+			$result = 1;
+			$msg = "Saved";
+
+			$ret['OUTPUT'][0] = $result;
+			$ret['OUTPUT'][1] = $msg;
+			$ret['OUTPUT'][2] = $recordId;
+
+			echo json_encode($ret);
+			jexit();
 		}
 
 		// Attempt to save the data.
-		$return = $model->save($data);
-
-		// Check for errors.
-		if ($return === false)
+		if (!$model->save($validData, $extra_jform_data, $post))
 		{
 			// Save the data in the session.
-			$app->setUserState('com_tjucm.edit.item.data', $data);
+			$app->setUserState($context . '.data', $validData);
 
 			// Redirect back to the edit screen.
-			$id = (int) $app->getUserState('com_tjucm.edit.item.id');
-			$this->setMessage(JText::sprintf('Save failed', $model->getError()), 'warning');
-			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&layout=edit&id=' . $id, false));
+			$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_SAVE_FAILED', $model->getError()));
+			$this->setMessage($this->getError(), 'error');
+
+			$this->setRedirect(
+				JRoute::_(
+					'index.php?option=' . $this->option . '&view=' . $this->view_item . '&client=' . $this->client
+					. $this->getRedirectToItemAppend($recordId, $urlVar), false
+				)
+			);
+
+			return false;
 		}
 
-		// Check in the profile.
-		if ($return)
+		// Save succeeded, so check-in the record.
+		if ($checkin && $model->checkin($validData[$key]) === false)
 		{
-			$model->checkin($return);
+			// Save the data in the session.
+			$app->setUserState($context . '.data', $validData);
+
+			// Check-in failed, so go back to the record and display a notice.
+			$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
+			$this->setMessage($this->getError(), 'error');
+
+			$this->setRedirect(
+				JRoute::_(
+					'index.php?option=' . $this->option . '&view=' . $this->view_item . '&client=' . $this->client
+					. $this->getRedirectToItemAppend($recordId, $urlVar), false
+				)
+			);
+
+			return false;
 		}
 
-		// Clear the profile id from the session.
-		$app->setUserState('com_tjucm.edit.item.id', null);
+		$langKey = $this->text_prefix . ($recordId == 0 && $app->isSite() ? '_SUBMIT' : '') . '_SAVE_SUCCESS';
+		$prefix  = JFactory::getLanguage()->hasKey($langKey) ? $this->text_prefix : 'JLIB_APPLICATION';
 
-		// Redirect to the list screen.
-		$this->setMessage(JText::_('COM_TJUCM_ITEM_SAVED_SUCCESSFULLY'));
-		$menu = JFactory::getApplication()->getMenu();
-		$item = $menu->getActive();
-		$url  = (empty($item->link) ? 'index.php?option=com_tjucm&view=items' : $item->link);
-		$this->setRedirect(JRoute::_($url, false));
+		$this->setMessage(JText::_($prefix . ($recordId == 0 && $app->isSite() ? '_SUBMIT' : '') . '_SAVE_SUCCESS'));
 
-		// Flush the data from the session.
-		$app->setUserState('com_tjucm.edit.item.data', null);
+		// Redirect the user and adjust session state based on the chosen task.
+		switch ($task)
+		{
+			case 'apply':
+				// Set the record data in the session.
+				$recordId = $model->getState($this->context . '.id');
+				$this->holdEditId($context, $recordId);
+				$app->setUserState($context . '.data', null);
+				$model->checkout($recordId);
+
+				// Redirect back to the edit screen.
+				$this->setRedirect(
+					JRoute::_(
+						'index.php?option=' . $this->option . '&view=' . $this->view_item . '&client=' . $this->client
+						. $this->getRedirectToItemAppend($recordId, $urlVar), false
+					)
+				);
+
+				break;
+
+			case 'save2new':
+				// Clear the record id and data from the session.
+				$this->releaseEditId($context, $recordId);
+				$app->setUserState($context . '.data', null);
+
+				// Redirect back to the edit screen.
+				$this->setRedirect(
+					JRoute::_(
+						'index.php?option=' . $this->option . '&view=' . $this->view_item . '&client=' . $this->client
+						. $this->getRedirectToItemAppend(null, $urlVar), false
+					)
+				);
+
+				break;
+
+			default:
+				// Clear the record id and data from the session.
+				$this->releaseEditId($context, $recordId);
+				$app->setUserState($context . '.data', null);
+
+				// Redirect to the list screen.
+				$this->setRedirect(
+					JRoute::_(
+						'index.php?option=' . $this->option . '&view=' . $this->view_list . '&client=' . $this->client
+						. $this->getRedirectToListAppend(), false
+					)
+				);
+				break;
+		}
+
+		// Invoke the postSave method to allow for the child class to access the model.
+		$this->postSaveHook($model, $validData);
+
+		return true;
 	}
 
 	/**
-	 * Method to abort current operation
+	 * Method to cancel an edit.
 	 *
-	 * @return void
+	 * @param   string  $key  The name of the primary key of the URL variable.
 	 *
-	 * @throws Exception
+	 * @return  boolean  True if access level checks pass, false otherwise.
+	 *
+	 * @since   12.2
 	 */
-	public function cancel($key = NULL)
+	public function cancel($key = null)
 	{
-		$app = JFactory::getApplication();
+		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
-		// Get the current edit id.
-		$editId = (int) $app->getUserState('com_tjucm.edit.item.id');
+		$model = $this->getModel();
+		$table = $model->getTable();
+		$context = "$this->option.edit.$this->context";
 
-		// Get the model.
-		$model = $this->getModel('ItemForm', 'TjucmModel');
-
-		// Check in the item
-		if ($editId)
+		if (empty($key))
 		{
-			$model->checkin($editId);
+			$key = $table->getKeyName();
 		}
 
-		$menu = JFactory::getApplication()->getMenu();
-		$item = $menu->getActive();
-		$url  = (empty($item->link) ? 'index.php?option=com_tjucm&view=items' : $item->link);
-		$this->setRedirect(JRoute::_($url, false));
+		$recordId = $this->input->getInt($key);
+
+		// Attempt to check-in the current record.
+		if ($recordId)
+		{
+			if (property_exists($table, 'checked_out'))
+			{
+				if ($model->checkin($recordId) === false)
+				{
+					// Check-in failed, go back to the record and display a notice.
+					$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
+					$this->setMessage($this->getError(), 'error');
+
+					$this->setRedirect(
+						JRoute::_(
+							'index.php?option=' . $this->option . '&view=' . $this->view_item . '&client=' . $this->client
+							. $this->getRedirectToItemAppend($recordId, $key), false
+						)
+					);
+
+					return false;
+				}
+			}
+		}
+
+		// Clean the session data and redirect.
+		$this->releaseEditId($context, $recordId);
+		JFactory::getApplication()->setUserState($context . '.data', null);
+
+		$this->setRedirect(
+			JRoute::_(
+				'index.php?option=' . $this->option . '&view=' . $this->view_list . '&client=' . $this->client
+				. $this->getRedirectToListAppend(), false
+			)
+		);
+
+		return true;
 	}
+
 
 	/**
 	 * Method to remove data
