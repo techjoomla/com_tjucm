@@ -150,6 +150,7 @@ class TjucmControllerItemForm extends JControllerForm
 		$app   = JFactory::getApplication();
 		$lang  = JFactory::getLanguage();
 		$model = $this->getModel();
+		$task = $this->getTask();
 
 		// Set client value
 		$model->setClient($this->client);
@@ -271,7 +272,7 @@ class TjucmControllerItemForm extends JControllerForm
 			// Validate the posted data.
 			$formExtra = $model->getFormExtra(
 						array(
-							"category" => $data['category_id'],
+							"category" => isset($data['category_id']) ? $data['category_id'] : '',
 							"clientComponent" => 'com_tjucm',
 							"client" => $this->client,
 							"view" => $client[1],

@@ -45,6 +45,7 @@ class TjucmViewItemform extends JViewLegacy
 
 		$this->state   = $this->get('State');
 		$this->item    = $this->get('Data');
+
 		$this->params  = $app->getParams('com_tjucm');
 		$this->canSave = $this->get('CanSave');
 		$this->form		= $this->get('Form');

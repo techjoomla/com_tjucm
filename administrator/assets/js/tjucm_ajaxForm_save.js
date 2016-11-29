@@ -4,6 +4,10 @@
 		jQuery("#finalSave").prop('disabled', true);
 		jQuery("#previous_button").addClass('hidden');
 
+		//jQuery('#tjucm_myTabTabs li').removeClass('active');
+		//jQuery('#tjucm_myTabTabs li:first-child').addClass('active');
+		//$("#tjucm_myTabTabs li:first-child").tab('show');
+		jQuery("#tjucm_myTabTabs li:eq(0) a").tab('show');
 
 		jQuery("#tjucm_myTabTabs li").click(function(e) {
 			var isFirstChild = jQuery(this).is(':first-child');

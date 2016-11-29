@@ -127,14 +127,15 @@ class TjucmModelItemForm extends JModelForm
 
 				if ($id)
 				{
-					$canEdit = $user->authorise('core.edit', 'com_tjucm.item.' . $id) || $user->authorise('core.create', 'com_tjucm.item.' . $id);
+					$canEdit = $user->authorise('core.edit', 'com_tjucm.type.2');
 				}
 				else
 				{
-					$canEdit = $user->authorise('core.edit', 'com_tjucm') || $user->authorise('core.create', 'com_tjucm');
+					//die('sd');
+					$canEdit = $user->authorise('core.create', 'com_tjucm.type.2');
 				}
 
-				if (!$canEdit && $user->authorise('core.edit.own', 'com_tjucm.item.' . $id))
+				if (!$canEdit && $id && $user->authorise('core.edit.own', 'com_tjucm.type.2'))
 				{
 					$canEdit = $user->id == $table->created_by;
 				}
@@ -357,7 +358,6 @@ class TjucmModelItemForm extends JModelForm
 	{
 		$id    = (!empty($data['id'])) ? $data['id'] : (int) $this->getState('item.id');
 		$state = (!empty($data['state'])) ? 1 : 0;
-
 		$user  = JFactory::getUser();
 
 		if ($id)
@@ -379,6 +379,12 @@ class TjucmModelItemForm extends JModelForm
 		$data['type_id'] = $this->common->getDataValues('#__tj_ucm_types', 'id AS type_id', 'unique_identifier = "' . $this->client . '"', 'loadResult');
 
 		$table = $this->getTable();
+
+		if ($id == 0)
+		{
+			$data['state'] = 0;
+		}
+
 		if ($table->save($data) === true)
 		{
 			$id = (int) $this->getState($this->getName() . '.id');

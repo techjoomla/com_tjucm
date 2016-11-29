@@ -53,18 +53,19 @@ $client  = JFactory::getApplication()->input->get('client');
 </script>
 
 <form action="<?php echo JRoute::_('index.php?option=com_tjucm&view=itemform&layout=' . $layout . '&id=' . (int) $this->item->id); ?>" method="post" enctype="multipart/form-data" name="adminForm" id="item-form" class="form-validate">
-	<div class="form-horizontal">
+	<div class="">
 		<?php // Add active calass?>
-		<?php if (!$this->form_extra): ?>
+		<?php echo JHtml::_('bootstrap.startTabSet', 'tjucm_myTab', array('active' => 'personal-information')); ?>
+		<?php /*if (!$this->form_extra): ?>
 			<?php echo JHtml::_('bootstrap.startTabSet', 'tjucm_myTab', array('active' => 'personal-information')); ?>
-				<?php echo JHtml::_('bootstrap.addTab', 'tjucm_myTab', 'general', JText::_('COM_TJUCM_TITLE_ITEM', true)); ?>
-		<?php endif; ?>
+				<?php //echo JHtml::_('bootstrap.addTab', 'tjucm_myTab', 'general', JText::_('COM_TJUCM_TITLE_ITEM', true)); ?>
+		<?php endif; */?>
 					<div class="row-fluid">
 						<div class="span10 form-horizontal">
 							<fieldset class="adminform">
 								<input type="hidden" name="jform[id]" id="recordId" value="<?php echo $this->item->id; ?>" />
 								<input type="hidden" name="jform[ordering]" value="<?php echo $this->item->ordering; ?>" />
-								<input type="hidden" name="jform[state]" value="<?php echo $this->item->state; ?>" />
+								<input type="hidden" name="jform[state]" value="<?php echo $this->item->state;?>" />
 								<input type="hidden" name="jform[client]" value="<?php echo $client;?>" />
 								<input type="hidden" name="jform[checked_out]" value="<?php echo $this->item->checked_out; ?>" />
 								<input type="hidden" name="jform[checked_out_time]" value="<?php echo $this->item->checked_out_time; ?>" />
@@ -88,9 +89,9 @@ $client  = JFactory::getApplication()->input->get('client');
 					<?php echo $this->loadTemplate('extrafields'); ?>
 				<?php endif; ?>
 
-			<?php if (!$this->form_extra): ?>
+			<?php /*if (!$this->form_extra): ?>
 						<?php echo JHtml::_('bootstrap.endTab'); ?>
-			<?php endif; ?>
+			<?php endif; */?>
 
 
 
@@ -125,6 +126,8 @@ $client  = JFactory::getApplication()->input->get('client');
                     });
                 </script>
              <?php endif; ?>
+
+
 		<div class="alert alert-success" style="display: block;">
 			<div class="msg">
 				<div>
@@ -132,6 +135,7 @@ $client  = JFactory::getApplication()->input->get('client');
 				</div>
 			</div>
 		</div>
+
 
 		<div class="form-actions">
 
