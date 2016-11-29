@@ -52,8 +52,6 @@ class TjucmViewItemform extends JViewLegacy
 
 		/* Get model instance here */
 		$model = $this->getModel();
-		//~ $model = $this->getModel('Itemform', 'TjucmModel');
-		//~ $TjucmModelItem = new TjucmModelItem;
 
 		$this->client  = JFactory::getApplication()->input->get('client');
 		$id  = JFactory::getApplication()->input->get('id');

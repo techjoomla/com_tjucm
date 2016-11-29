@@ -131,7 +131,6 @@ class TjucmModelItemForm extends JModelForm
 				}
 				else
 				{
-					//die('sd');
 					$canEdit = $user->authorise('core.create', 'com_tjucm.type.2');
 				}
 
@@ -286,7 +285,6 @@ class TjucmModelItemForm extends JModelForm
 		return $this->client;
 	}
 
-
 	/**
 	 * Method to get the record form.
 	 *
@@ -392,7 +390,7 @@ class TjucmModelItemForm extends JModelForm
 			if (!empty($extra_jform_data))
 			{
 				$data_extra = array();
-				$data_extra['content_id'] = $table->id;;
+				$data_extra['content_id'] = $table->id;
 				$data_extra['client'] = $this->client;
 				$data_extra['fieldsvalue'] = $extra_jform_data;
 
@@ -513,6 +511,16 @@ class TjucmModelItemForm extends JModelForm
 
 		return $table !== false;
 	}
+
+	/**
+	 * Method to getAliasFieldNameByView
+	 *
+	 * @param   array  $view  An array of record primary keys.
+	 *
+	 * @return  boolean  True if successful, false if an error occurs.
+	 *
+	 * @since   12.2
+	 */
 	public function getAliasFieldNameByView($view)
 	{
 		switch ($view)

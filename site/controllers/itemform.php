@@ -42,7 +42,6 @@ class TjucmControllerItemForm extends JControllerForm
 		parent::__construct();
 	}
 
-
 	/**
 	 * Method to add a new record.
 	 *
@@ -85,7 +84,6 @@ class TjucmControllerItemForm extends JControllerForm
 		return true;
 	}
 
-
 	/**
 	 * Function to apply field data changes
 	 *
@@ -99,11 +97,14 @@ class TjucmControllerItemForm extends JControllerForm
 	/**
 	 * Method to check out an item for editing and redirect to the edit form.
 	 *
+	 * @param   string  $key     The name of the primary key of the URL variable.
+	 * @param   string  $urlVar  The name of the URL variable if different from the primary key (sometimes required to avoid router collisions).
+	 *
 	 * @return void
 	 *
 	 * @since    1.6
 	 */
-	public function edit($key = NULL, $urlVar = NULL)
+	public function edit($key = null, $urlVar = null)
 	{
 		$app = JFactory::getApplication();
 
@@ -165,7 +166,8 @@ class TjucmControllerItemForm extends JControllerForm
 		$post = JFactory::getApplication()->input->post;
 
 		// Populate the row id from the session.
-		//$data[$key] = $recordId;
+
+		// $data[$key] = $recordId;
 
 		// The save2copy task needs to be handled slightly differently.
 		if ($task == 'save2copy')
@@ -518,49 +520,48 @@ class TjucmControllerItemForm extends JControllerForm
 		return true;
 	}
 
-
 	/**
 	 * Method to remove data
 	 *
 	 * @return void
 	 *
 	 * @throws Exception
-     *
-     * @since 1.6
+	 *
+	 * @since 1.6
 	 */
 	public function remove()
-    {
-        $app   = JFactory::getApplication();
-        $model = $this->getModel('ItemForm', 'TjucmModel');
-        $pk    = $app->input->getInt('id');
+	{
+		$app   = JFactory::getApplication();
+		$model = $this->getModel('ItemForm', 'TjucmModel');
+		$pk    = $app->input->getInt('id');
 
-        // Attempt to save the data
-        try
-        {
-            $return = $model->delete($pk);
+		// Attempt to save the data
+		try
+		{
+			$return = $model->delete($pk);
 
-            // Check in the profile
-            $model->checkin($return);
+			// Check in the profile
+			$model->checkin($return);
 
-            // Clear the profile id from the session.
-            $app->setUserState('com_tjucm.edit.item.id', null);
+			// Clear the profile id from the session.
+			$app->setUserState('com_tjucm.edit.item.id', null);
 
-            $menu = $app->getMenu();
-            $item = $menu->getActive();
-            $url = (empty($item->link) ? 'index.php?option=com_tjucm&view=items' : $item->link);
+			$menu = $app->getMenu();
+			$item = $menu->getActive();
+			$url = (empty($item->link) ? 'index.php?option=com_tjucm&view=items' : $item->link);
 
-            // Redirect to the list screen
-            $this->setMessage(JText::_('COM_EXAMPLE_ITEM_DELETED_SUCCESSFULLY'));
-            $this->setRedirect(JRoute::_($url, false));
+			// Redirect to the list screen
+			$this->setMessage(JText::_('COM_EXAMPLE_ITEM_DELETED_SUCCESSFULLY'));
+			$this->setRedirect(JRoute::_($url, false));
 
-            // Flush the data from the session.
-            $app->setUserState('com_tjucm.edit.item.data', null);
-        }
-        catch (Exception $e)
-        {
-            $errorType = ($e->getCode() == '404') ? 'error' : 'warning';
-            $this->setMessage($e->getMessage(), $errorType);
-            $this->setRedirect('index.php?option=com_tjucm&view=items');
-        }
-    }
+			// Flush the data from the session.
+			$app->setUserState('com_tjucm.edit.item.data', null);
+		}
+		catch (Exception $e)
+		{
+			$errorType = ($e->getCode() == '404') ? 'error' : 'warning';
+			$this->setMessage($e->getMessage(), $errorType);
+			$this->setRedirect('index.php?option=com_tjucm&view=items');
+		}
+	}
 }
