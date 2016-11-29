@@ -18,51 +18,92 @@ JHtml::_('formbehavior.chosen', 'select');
 $lang = JFactory::getLanguage();
 $lang->load('com_tjucm', JPATH_SITE);
 $doc = JFactory::getDocument();
+
+$doc->addScript(JUri::base() . '/administrator/components/com_tjucm/assets/js/jquery.form.js');
+$doc->addScript(JUri::base() . '/administrator/components/com_tjucm/assets/js/tjucm_ajaxForm_save.js');
 $doc->addScript(JUri::base() . '/media/com_tjucm/js/form.js');
 
-$user    = JFactory::getUser();
-$canEdit = TjucmHelpersTjucm::canUserEdit($this->item, $user);
-
+$jinput = JFactory::getApplication();
+$baseUrl = $jinput->input->server->get('REQUEST_URI', '', 'STRING');
+$calledFrom = (strpos($baseUrl, 'administrator')) ? 'backend' : 'frontend';
+$layout = ($calledFrom == 'frontend') ? 'default' : 'edit';
+$client  = JFactory::getApplication()->input->get('client');
 
 ?>
+<script type="text/javascript">
+	js = jQuery.noConflict();
+	js(document).ready(function () {
+	});
 
-<div class="item-edit front-end-edit">
-	<?php if (!$canEdit) : ?>
-		<h3>
-			<?php throw new Exception(JText::_('COM_TJUCM_ERROR_MESSAGE_NOT_AUTHORISED'), 403); ?>
-		</h3>
-	<?php else : ?>
-		<?php if (!empty($this->item->id)): ?>
-			<h1>Edit <?php echo $this->item->id; ?></h1>
-		<?php else: ?>
-			<h1>Add</h1>
-		<?php endif; ?>
+	Joomla.submitbutton = function (task) {
+		if (task == 'itemform.cancel') {
+			Joomla.submitform(task, document.getElementById('item-form'));
+		}
+		else {
 
-		<form id="form-item"
-			  action="<?php echo JRoute::_('index.php?option=com_tjucm&task=item.save'); ?>"
-			  method="post" class="form-validate form-horizontal" enctype="multipart/form-data">
-			
-	<input type="hidden" name="jform[id]" value="<?php echo $this->item->id; ?>" />
+			if (task != 'itemform.cancel' && document.formvalidator.isValid(document.id('item-form'))) {
 
-	<input type="hidden" name="jform[ordering]" value="<?php echo $this->item->ordering; ?>" />
+				Joomla.submitform(task, document.getElementById('item-form'));
+			}
+			else {
+				alert('<?php echo $this->escape(JText::_('JGLOBAL_VALIDATION_FORM_FAILED')); ?>');
+			}
+		}
+	}
+</script>
 
-	<input type="hidden" name="jform[state]" value="<?php echo $this->item->state; ?>" />
+<form action="<?php echo JRoute::_('index.php?option=com_tjucm&view=itemform&layout=' . $layout . '&id=' . (int) $this->item->id); ?>" method="post" enctype="multipart/form-data" name="adminForm" id="item-form" class="form-validate">
+	<div class="">
+		<?php // Add active calass?>
+		<?php echo JHtml::_('bootstrap.startTabSet', 'tjucm_myTab', array('active' => 'personal-information')); ?>
+		<?php /*if (!$this->form_extra): ?>
+			<?php echo JHtml::_('bootstrap.startTabSet', 'tjucm_myTab', array('active' => 'personal-information')); ?>
+				<?php //echo JHtml::_('bootstrap.addTab', 'tjucm_myTab', 'general', JText::_('COM_TJUCM_TITLE_ITEM', true)); ?>
+		<?php endif; */?>
+					<div class="row-fluid">
+						<div class="span10 form-horizontal">
+							<fieldset class="adminform">
+								<input type="hidden" name="jform[id]" id="recordId" value="<?php echo $this->item->id; ?>" />
+								<input type="hidden" name="jform[ordering]" value="<?php echo $this->item->ordering; ?>" />
+								<input type="hidden" name="jform[state]" value="<?php echo $this->item->state;?>" />
+								<input type="hidden" name="jform[client]" value="<?php echo $client;?>" />
+								<input type="hidden" name="jform[checked_out]" value="<?php echo $this->item->checked_out; ?>" />
+								<input type="hidden" name="jform[checked_out_time]" value="<?php echo $this->item->checked_out_time; ?>" />
+								<?php echo $this->form->renderField('created_by'); ?>
+								<?php echo $this->form->renderField('created_date'); ?>
+								<?php echo $this->form->renderField('modified_by'); ?>
+								<?php echo $this->form->renderField('modified_date'); ?>
 
-	<?php echo $this->form->renderField('type_id'); ?>
+								<?php if ($this->state->params->get('save_history', 1)) : ?>
+									<div class="control-group">
+										<div class="control-label"><?php echo $this->form->getLabel('version_note'); ?></div>
+										<div class="controls"><?php echo $this->form->getInput('version_note'); ?></div>
+									</div>
+								<?php endif; ?>
+							</fieldset>
+						</div>
+					</div>
 
-	<?php foreach((array)$this->item->type_id as $value): ?>
-		<?php if(!is_array($value)): ?>
-			<input type="hidden" class="type_id" name="jform[type_idhidden][<?php echo $value; ?>]" value="<?php echo $value; ?>" />
-		<?php endif; ?>
-	<?php endforeach; ?>
-	<input type="hidden" name="jform[checked_out]" value="<?php echo $this->item->checked_out; ?>" />
 
-	<input type="hidden" name="jform[checked_out_time]" value="<?php echo $this->item->checked_out_time; ?>" />
+				<?php if ($this->form_extra): ?>
+					<?php echo $this->loadTemplate('extrafields'); ?>
+				<?php endif; ?>
 
-				<?php echo $this->form->getInput('created_by'); ?>
-				<?php echo $this->form->getInput('created_date'); ?>
-				<?php echo $this->form->getInput('modified_by'); ?>
-				<?php echo $this->form->getInput('modified_date'); ?>				<div class="fltlft" <?php if (!JFactory::getUser()->authorise('core.admin','tjucm')): ?> style="display:none;" <?php endif; ?> >
+			<?php /*if (!$this->form_extra): ?>
+						<?php echo JHtml::_('bootstrap.endTab'); ?>
+			<?php endif; */?>
+
+
+
+
+			<?php if (JFactory::getUser()->authorise('core.admin','tjucm')) : ?>
+				<?php echo JHtml::_('bootstrap.addTab', 'tjucm_myTab', 'permissions', JText::_('JGLOBAL_ACTION_PERMISSIONS_LABEL', true)); ?>
+					<?php echo $this->form->getInput('rules'); ?>
+				<?php echo JHtml::_('bootstrap.endTab'); ?>
+			<?php endif; ?>
+		<?php echo JHtml::_('bootstrap.endTabSet'); ?>
+
+<div class="fltlft" <?php if (!JFactory::getUser()->authorise('core.admin','tjucm')): ?> style="display:none;" <?php endif; ?> >
                 <?php echo JHtml::_('sliders.start', 'permissions-sliders-'.$this->item->id, array('useCookie'=>1)); ?>
                 <?php echo JHtml::_('sliders.panel', JText::_('ACL Configuration'), 'access-rules'); ?>
                 <fieldset class="panelform">
@@ -80,30 +121,47 @@ $canEdit = TjucmHelpersTjucm::canUserEdit($this->item, $user);
                        input.setAttribute("type", "hidden");
                        input.setAttribute("name", jQuery(this).attr('name'));
                        input.setAttribute("value", option_selected.val());
-                       document.getElementById("form-item").appendChild(input);
+                       //~ document.getElementById("form-item").appendChild(input);
+                       document.getElementById("item-form").appendChild(input);
                     });
                 </script>
              <?php endif; ?>
-			<div class="control-group">
-				<div class="controls">
 
-					<?php if ($this->canSave): ?>
-						<button type="submit" class="validate btn btn-primary">
-							<?php echo JText::_('JSUBMIT'); ?>
-						</button>
-					<?php endif; ?>
-					<a class="btn"
-					   href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.cancel'); ?>"
-					   title="<?php echo JText::_('JCANCEL'); ?>">
-						<?php echo JText::_('JCANCEL'); ?>
-					</a>
+
+		<div class="alert alert-success" style="display: block;">
+			<div class="msg">
+				<div>
+				<?php echo JText::_("COM_TJUCM_NOTE_ON_FORM"); ?>
 				</div>
 			</div>
+		</div>
 
-			<input type="hidden" name="option" value="com_tjucm"/>
-			<input type="hidden" name="task"
-				   value="itemform.save"/>
-			<?php echo JHtml::_('form.token'); ?>
-		</form>
-	<?php endif; ?>
-</div>
+
+		<div class="form-actions">
+
+<!--
+			<img class="loading" src="<?php //echo JUri::root() . 'administrator/components/com_tjucm/assets/images/loading_squares.gif1';?>">
+-->
+
+			<button type="button" class="btn btn-primary" id="previous_button" onclick="itemformactions('tjucm_myTab','prev')"><?php echo JText::_('COM_TJUCM_PREVIOUS_BUTTON'); ?><i class="fa fa-arrow-circle-o-right"></i></button>
+
+			<button type="button" class="btn btn-primary" id="next_button" onclick="itemformactions('tjucm_myTab','next')"><?php echo JText::_('COM_TJUCM_NEXT_BUTTON'); ?><i class="fa fa-arrow-circle-o-right"></i></button>
+
+			<?php
+			if ($calledFrom == 'frontend')
+			{
+			?>
+				<input type="button" class="btn btn-success" value="<?php echo JText::_("COM_TJUCM_SAVE_ITEM"); ?>" id="finalSave" onclick="finalsave('item-form');">
+				<input type="button" class="btn btn-success" value="<?php echo JText::_("COM_TJUCM_SAVE_AS_DRAFT_ITEM"); ?>" onclick="saveAsDraft('item-form');">
+				<input type="button" class="btn btn-danger" value="<?php echo JText::_("COM_TJUCM_CANCEL_BUTTON"); ?>" onclick="Joomla.submitbutton('itemform.cancel');">
+			<?php
+			}
+			?>
+		</div>
+
+		<input type="hidden" name="layout" value="<?php echo $layout ?>"/>
+		<input type="hidden" name="task" value="itemform.save"/>
+		<?php echo JHtml::_('form.token'); ?>
+
+	</div>
+</form>

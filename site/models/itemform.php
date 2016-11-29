@@ -13,6 +13,9 @@ defined('_JEXEC') or die;
 jimport('joomla.application.component.modelform');
 jimport('joomla.event.dispatcher');
 
+require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
+require_once JPATH_COMPONENT_ADMINISTRATOR . '/classes/' . 'funlist.php';
+
 use Joomla\Utilities\ArrayHelper;
 /**
  * Tjucm model.
@@ -22,6 +25,38 @@ use Joomla\Utilities\ArrayHelper;
 class TjucmModelItemForm extends JModelForm
 {
 	private $item = null;
+
+	/**
+	 * @var      string    The prefix to use with controller messages.
+	 * @since    1.6
+	 */
+	protected $text_prefix = 'COM_TJUCM';
+
+	/**
+	 * @var   	string  	Alias to manage history control
+	 * @since   3.2
+	 */
+	public $typeAlias = 'com_tjucm.item';
+
+	private $client = '';
+
+	// Use imported Trait in model
+	use TjfieldsFilterField;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param   array  $config  An optional associative array of configuration settings.
+	 *
+	 * @see        JController
+	 * @since      1.6
+	 */
+	public function __construct($config = array())
+	{
+		$this->common  = new TjucmFunList;
+
+		parent::__construct($config);
+	}
 
 	/**
 	 * Method to auto-populate the model state.
@@ -89,17 +124,17 @@ class TjucmModelItemForm extends JModelForm
 			{
 				$user = JFactory::getUser();
 				$id   = $table->id;
-				
+
 				if ($id)
 				{
-					$canEdit = $user->authorise('core.edit', 'com_tjucm.item.' . $id) || $user->authorise('core.create', 'com_tjucm.item.' . $id);
+					$canEdit = $user->authorise('core.edit', 'com_tjucm.type.2');
 				}
 				else
 				{
-					$canEdit = $user->authorise('core.edit', 'com_tjucm') || $user->authorise('core.create', 'com_tjucm');
+					$canEdit = $user->authorise('core.create', 'com_tjucm.type.2');
 				}
 
-				if (!$canEdit && $user->authorise('core.edit.own', 'com_tjucm.item.' . $id))
+				if (!$canEdit && $id && $user->authorise('core.edit.own', 'com_tjucm.type.2'))
 				{
 					$canEdit = $user->id == $table->created_by;
 				}
@@ -128,13 +163,15 @@ class TjucmModelItemForm extends JModelForm
 	}
 
 	/**
-	 * Method to get the table
+	 * Returns a reference to the a Table object, always creating it.
 	 *
-	 * @param   string  $type    Name of the JTable class
-	 * @param   string  $prefix  Optional prefix for the table class name
-	 * @param   array   $config  Optional configuration array for JTable object
+	 * @param   string  $type    The table type to instantiate
+	 * @param   string  $prefix  A prefix for the table class name. Optional.
+	 * @param   array   $config  Configuration array for model. Optional.
 	 *
-	 * @return  JTable|boolean JTable if found, boolean false on failure
+	 * @return    JTable    A database object
+	 *
+	 * @since    1.6
 	 */
 	public function getTable($type = 'Item', $prefix = 'TjucmTable', $config = array())
 	{
@@ -227,23 +264,47 @@ class TjucmModelItemForm extends JModelForm
 	}
 
 	/**
-	 * Method to get the profile form.
+	 * Get an array of data items
 	 *
-	 * The base form is loaded from XML
+	 * @param   string  $client  client value
+	 *
+	 * @return mixed Array of data items on success, false on failure.
+	 */
+	public function setClient($client)
+	{
+		$this->client = $client;
+	}
+
+	/**
+	 * Get an client value
+	 *
+	 * @return mixed Array of data items on success, false on failure.
+	 */
+	public function getClient()
+	{
+		return $this->client;
+	}
+
+	/**
+	 * Method to get the record form.
 	 *
 	 * @param   array    $data      An optional array of data for the form to interogate.
 	 * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not.
 	 *
-	 * @return    JForm    A JForm object on success, false on failure
+	 * @return  JForm  A JForm object on success, false on failure
 	 *
 	 * @since    1.6
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
+		// Initialise variables.
+		$app = JFactory::getApplication();
+
 		// Get the form.
-		$form = $this->loadForm('com_tjucm.item', 'itemform', array(
-			'control'   => 'jform',
-			'load_data' => $loadData
+		$form = $this->loadForm(
+			'com_tjucm.itemform', 'itemform',
+			array('control' => 'jform',
+				'load_data' => $loadData
 			)
 		);
 
@@ -258,20 +319,24 @@ class TjucmModelItemForm extends JModelForm
 	/**
 	 * Method to get the data that should be injected in the form.
 	 *
-	 * @return    mixed    The data for the form.
+	 * @return   mixed  The data for the form.
 	 *
 	 * @since    1.6
 	 */
 	protected function loadFormData()
 	{
+		// Check the session for previously entered form data.
 		$data = JFactory::getApplication()->getUserState('com_tjucm.edit.item.data', array());
 
 		if (empty($data))
 		{
-			$data = $this->getData();
-		}
+			if ($this->item === null)
+			{
+				$this->item = $this->getItem();
+			}
 
-		
+			$data = $this->item;
+		}
 
 		return $data;
 	}
@@ -279,14 +344,15 @@ class TjucmModelItemForm extends JModelForm
 	/**
 	 * Method to save the form data.
 	 *
-	 * @param   array  $data  The form data
+	 * @param   array  $data              The form data.
+	 * @param   array  $extra_jform_data  Exra field data.
+	 * @param   array  $post              all form field data.
 	 *
-	 * @return bool
+	 * @return  boolean  True on success.
 	 *
-	 * @throws Exception
-	 * @since 1.6
+	 * @since   1.6
 	 */
-	public function save($data)
+	public function save($data, $extra_jform_data = '', $post = '')
 	{
 		$id    = (!empty($data['id'])) ? $data['id'] : (int) $this->getState('item.id');
 		$state = (!empty($data['state'])) ? 1 : 0;
@@ -308,10 +374,30 @@ class TjucmModelItemForm extends JModelForm
 			throw new Exception(JText::_('JERROR_ALERTNOAUTHOR'), 403);
 		}
 
+		$data['type_id'] = $this->common->getDataValues('#__tj_ucm_types', 'id AS type_id', 'unique_identifier = "' . $this->client . '"', 'loadResult');
+
 		$table = $this->getTable();
+
+		if ($id == 0)
+		{
+			$data['state'] = 0;
+		}
 
 		if ($table->save($data) === true)
 		{
+			$id = (int) $this->getState($this->getName() . '.id');
+
+			if (!empty($extra_jform_data))
+			{
+				$data_extra = array();
+				$data_extra['content_id'] = $table->id;
+				$data_extra['client'] = $this->client;
+				$data_extra['fieldsvalue'] = $extra_jform_data;
+
+				// Save extra fields data.
+				$this->saveExtraFields($data_extra);
+			}
+
 			return $table->id;
 		}
 		else
@@ -320,44 +406,98 @@ class TjucmModelItemForm extends JModelForm
 		}
 	}
 
-    /**
-     * Method to delete data
-     *
-     * @param   int  $pk  Item primary key
-     *
-     * @return  int  The id of the deleted item
-     *
-     * @throws Exception
-     *
-     * @since 1.6
-     */
-	public function delete($pk)
+	/**
+	 * Method to duplicate an Item
+	 *
+	 * @param   array  &$pks  An array of primary key IDs.
+	 *
+	 * @return  boolean  True if successful.
+	 *
+	 * @throws  Exception
+	 */
+	public function duplicate(&$pks)
 	{
-        $user = JFactory::getUser();
+		$user = JFactory::getUser();
 
-        if (empty($pk))
-        {
-            $pk = (int) $this->getState('item.id');
-        }
-
-        if ($pk == 0 || $this->getData($pk) == null)
-        {
-            throw new Exception(JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'), 404);
-        }
-
-		if ($user->authorise('core.delete', 'com_tjucm.item.' . $id) !== true)
+		// Access checks.
+		if (!$user->authorise('core.create', 'com_tjucm'))
 		{
-			throw new Exception(JText::_('JERROR_ALERTNOAUTHOR'), 403);
+			throw new Exception(JText::_('JERROR_CORE_CREATE_NOT_PERMITTED'));
 		}
+
+		$dispatcher = JEventDispatcher::getInstance();
+		$context    = $this->option . '.' . $this->name;
+
+		// Include the plugins for the save events.
+		JPluginHelper::importPlugin($this->events_map['save']);
 
 		$table = $this->getTable();
 
-		if ($table->delete($pk) !== true)
+		foreach ($pks as $pk)
 		{
-            throw new Exception(JText::_('JERROR_FAILED'), 501);
+			if ($table->load($pk, true))
+			{
+				// Reset the id to create a new record.
+				$table->id = 0;
+
+				if (!$table->check())
+				{
+					throw new Exception($table->getError());
+				}
+
+				if (!empty($table->type_id))
+				{
+					if (is_array($table->type_id))
+					{
+						$table->type_id = implode(',', $table->type_id);
+					}
+				}
+				else
+				{
+					$table->type_id = '';
+				}
+
+				// Trigger the before save event.
+				$result = $dispatcher->trigger($this->event_before_save, array($context, &$table, true));
+
+				if (in_array(false, $result, true) || !$table->store())
+				{
+					throw new Exception($table->getError());
+				}
+
+				// Trigger the after save event.
+				$dispatcher->trigger($this->event_after_save, array($context, &$table, true));
+			}
+			else
+			{
+				throw new Exception($table->getError());
+			}
 		}
 
-		return $pk;
+		// Clean cache
+		$this->cleanCache();
+
+		return true;
+	}
+
+	/**
+	 * Method to delete one or more records.
+	 *
+	 * @param   array  &$ids  An array of record primary keys.
+	 *
+	 * @return  boolean  True if successful, false if an error occurs.
+	 *
+	 * @since   12.2
+	 */
+	public function delete(&$ids)
+	{
+		foreach ($ids as $id)
+		{
+			if (parent::delete($id))
+			{
+				$this->deleteExtraFieldsData($id[0], $this->client);
+			}
+		}
 	}
 
 	/**
@@ -371,6 +511,16 @@ class TjucmModelItemForm extends JModelForm
 
 		return $table !== false;
 	}
+
+	/**
+	 * Method to getAliasFieldNameByView
+	 *
+	 * @param   array  $view  An array of record primary keys.
+	 *
+	 * @return  boolean  True if successful, false if an error occurs.
+	 *
+	 * @since   12.2
+	 */
 	public function getAliasFieldNameByView($view)
 	{
 		switch ($view)

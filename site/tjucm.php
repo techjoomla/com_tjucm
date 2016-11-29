@@ -18,5 +18,6 @@ JLoader::register('TjucmController', JPATH_COMPONENT . '/controller.php');
 
 // Execute the task.
 $controller = JControllerLegacy::getInstance('Tjucm');
-$controller->execute(JFactory::getApplication()->input->get('task'));
+
+$controller->execute(JFactory::getApplication()->input->getCmd('task'));
 $controller->redirect();
