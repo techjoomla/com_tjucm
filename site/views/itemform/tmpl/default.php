@@ -161,6 +161,7 @@ $client  = JFactory::getApplication()->input->get('client');
 
 		<input type="hidden" name="layout" value="<?php echo $layout ?>"/>
 		<input type="hidden" name="task" value="itemform.save"/>
+		<input type="hidden" name="form_status" id="form_status" value=""/>
 		<?php echo JHtml::_('form.token'); ?>
 
 	</div>

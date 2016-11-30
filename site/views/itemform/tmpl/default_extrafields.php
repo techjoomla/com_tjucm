@@ -57,4 +57,3 @@ defined('_JEXEC') or die;
 		<?php echo JText::_('COM_TJLMS_NO_EXTRA_FIELDS_FOUND');?>
 	</div>
 <?php endif; ?>
-
