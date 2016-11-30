@@ -347,6 +347,12 @@ class TjucmControllerItemForm extends JControllerForm
 
 		if (isset($recordId))
 		{
+			//~ print_r($recordId);
+			// Note JDispatcher is deprecated in favour of JEventDispatcher in Joomla 3.x however still works.
+			//~ $dispatcher        = JDispatcher::getInstance();
+			//~ JPluginHelper::importPlugin("content", "jlike_tjucm");
+			//~ $dispatcher->trigger('jlike_tjucmOnAfterSave', array($validData));
+
 			$result = 1;
 			$msg = "Saved";
 

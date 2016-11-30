@@ -127,10 +127,13 @@
 
 		confirm("Do you want to proceed further!");
 
+		jQuery('#form_status').val("save");
+
 		if (steppedFormSave(form_id))
 		{
 			/* SEt redirection to List view, once done*/
 			window.location.reload();
+
 		}
 
 	}
@@ -139,11 +142,12 @@
 	function saveAsDraft(form_id)
 	{
 		var item_basic_form = jQuery('#' + form_id);
+		jQuery('#form_status').val("drafts");
 
 		if (steppedFormSave(form_id))
 		{
 			/* SEt redirection to List view, once done*/
-			window.location.reload();
+			//~ window.location.reload();
 		}
 
 	}
