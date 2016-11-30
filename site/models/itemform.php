@@ -435,7 +435,8 @@ class TjucmModelItemForm extends JModelForm
 		$insert_xrefobj = new stdClass;
 		$insert_xrefobj->item_id   = $data['item_id'];
 
-		//~ $if_edit_id = $this->checkIfAlreadyExistsWorkflow($data['item_id']);
+		// $if_edit_id = $this->checkIfAlreadyExistsWorkflow($data['item_id']);
+
 		$if_edit_id = '';
 
 		$workflowStatusId = $this->findWorkflowStatusForItemForm($data);
@@ -459,7 +460,7 @@ class TjucmModelItemForm extends JModelForm
 	/**
 	 * check if the workflow entries are already added in db
 	 *
-	 * @param   array  $item_id  id of workstatus
+	 * @param   array  $data  workstatus data
 	 *
 	 * @return  boolean  True if successful.
 	 */
