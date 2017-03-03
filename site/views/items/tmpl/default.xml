@@ -5,4 +5,20 @@
                         <![CDATA[COM_TJUCM_TITLE_LIST_VIEW_ITEMS_DESC]]>
         </message>
 	</layout>
+	<fields name="params">
+        <fieldset
+            name="basic"
+            label="UCM config">
+            <field
+                name="ucm_type"
+                query="SELECT `alias`, `title` FROM #__tj_ucm_types ORDER BY `id`"
+                type="sql"
+                key_field="alias"
+                value_field="title"
+                label="Select UCM Type"
+                require="true"
+                description="JGLOBAL_SHOW_TITLE_DESC">
+            </field>
+        </fieldset>
+    </fields>
 </metadata>

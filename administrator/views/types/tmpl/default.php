@@ -177,6 +177,9 @@ if (!empty($this->extra_sidebar))
 
 						<th class='left'>
 							<?php echo JHtml::_('grid.sort',  'COM_TJUCM_TYPES_TITLE', 'a.`title`', $listDirn, $listOrder); ?>
+
+						<th class='left'>
+							<?php echo JHtml::_('grid.sort',  'COM_TJUCM_TYPES_ALIAS', 'a.`alias`', $listDirn, $listOrder); ?>
 						</th>
 
 						<th class='center'>
@@ -261,6 +264,10 @@ if (!empty($this->extra_sidebar))
 							<?php else : ?>
 								<?php echo $this->escape($item->title); ?>
 							<?php endif; ?>
+						</td>
+
+						<td>
+							<?php echo $this->escape($item->alias); ?>
 						</td>
 
 						<td class='center'>

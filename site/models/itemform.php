@@ -14,7 +14,7 @@ jimport('joomla.application.component.modelform');
 jimport('joomla.event.dispatcher');
 
 require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
-require_once JPATH_COMPONENT_ADMINISTRATOR . '/classes/' . 'funlist.php';
+require_once JPATH_ADMINISTRATOR . '/components/com_tjucm/classes/funlist.php';
 
 use Joomla\Utilities\ArrayHelper;
 /**
@@ -399,102 +399,13 @@ class TjucmModelItemForm extends JModelForm
 				$this->saveExtraFields($data_extra);
 			}
 
-			$workflowData = array();
-			$workflowData['status_title'] = $status_title;
-			$workflowData['client'] = $this->client;
-			$workflowData['item_id'] = $table->id;
-
-			$this->saveInWorkflow($workflowData);
-
 			return $table->id;
 		}
 		else
 		{
-			return false;
-		}
-	}
-
-	/**
-	 * Method to save in workflow once form is saved
-	 *
-	 * @param   array  $data  Array with workflow details
-	 *
-	 * @return  boolean  True if successful.
-	 *
-	 * @throws  Exception
-	 */
-	public function saveInWorkflow($data)
-	{
-		if (empty($data))
-		{
-			return false;
+			throw new Exception($table->getError());
 		}
 
-		// Get field Id and field type.
-		$db         = JFactory::getDbo();
-		$insert_xrefobj = new stdClass;
-		$insert_xrefobj->item_id   = $data['item_id'];
-
-		// $if_edit_id = $this->checkIfAlreadyExistsWorkflow($data['item_id']);
-
-		$if_edit_id = '';
-
-		$workflowStatusId = $this->findWorkflowStatusForItemForm($data);
-
-		if ($if_edit_id)
-		{
-			/* Yet to work on edit*/
-			$insert_xrefobj->id = $if_edit_id;
-			$db->updateObject('#__workflow_item_status', $insert_xrefobj, 'id');
-		}
-		else
-		{
-			$insert_xrefobj->status_id = $workflowStatusId;
-			$insert_xrefobj->id = '';
-			$db->insertObject('#__workflow_item_status', $insert_xrefobj, 'id');
-		}
-
-		return true;
-	}
-
-	/**
-	 * check if the workflow entries are already added in db
-	 *
-	 * @param   array  $data  workstatus data
-	 *
-	 * @return  boolean  True if successful.
-	 */
-	public function findWorkflowStatusForItemForm($data)
-	{
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('id FROM #__workflow_status');
-		$query->where('title = "' . $data['status_title'] . '" AND client="' . $data['client'] . '"');
-
-		$db->setQuery($query);
-		$statusId = $db->loadresult();
-
-		return $statusId;
-	}
-
-	/**
-	 * check if the workflow entries are already added in db
-	 *
-	 * @param   array  $item_id  id of workstatus
-	 *
-	 * @return  boolean  True if successful.
-	 */
-	public function checkIfAlreadyExistsWorkflow($item_id)
-	{
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('id FROM #__workflow_item_status');
-		$query->where('item_id = ' . $item_id);
-
-		$db->setQuery($query);
-		$is_edit = $db->loadresult();
-
-		return $is_edit;
 	}
 
 	/**

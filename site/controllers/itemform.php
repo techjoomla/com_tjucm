@@ -39,6 +39,8 @@ class TjucmControllerItemForm extends JControllerForm
 			$this->client  = JFactory::getApplication()->input->get('jform', array(), 'array')['client'];
 		}
 
+		$this->isajax = ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') ? true : false;
+
 		parent::__construct();
 	}
 
@@ -161,6 +163,11 @@ class TjucmControllerItemForm extends JControllerForm
 		// Get the user data.
 		$data = JFactory::getApplication()->input->get('jform', array(), 'array');
 		$all_jform_data = $data;
+
+		// Added By KOMAL TEMP
+		$files           = $app->input->files->get('jform');
+
+		// END
 
 		// Jform tweak - Get all posted data.
 		$post = JFactory::getApplication()->input->post;
@@ -343,119 +350,41 @@ class TjucmControllerItemForm extends JControllerForm
 			$validData['tags'] = null;
 		}
 
-		$recordId = $model->save($validData, $extra_jform_data, $post);
-
-		if (isset($recordId))
+		try
 		{
-/*
+			$status_title = JFactory::getApplication()->input->get('form_status');
+			$validData['status'] = $status_title;
+
+			// Added By KOMAL TEMP
+			if (!empty($files))
+			{
+				$extra_jform_data['tjFieldFileField'] = $files;
+			}
+
+			$recordId = $model->save($validData, $extra_jform_data, $post);
 			$dispatcher        = JDispatcher::getInstance();
-			JPluginHelper::importPlugin("content", "jlike_tjucm");
-			$dispatcher->trigger('jlike_tjucmOnAfterSave', array($validData));
-*/
-			$result = 1;
-			$msg = "Saved";
+			JPluginHelper::importPlugin("system", "jlike_tjucm");
+			$dispatcher->trigger('jlike_tjucmOnAfterSave', array($recordId,$validData));
+			$response = $recordId;
+			$redirect_url = '';
+			$redirect_msg = '';
+		}
 
-			$ret['OUTPUT'][0] = $result;
-			$ret['OUTPUT'][1] = $msg;
-			$ret['OUTPUT'][2] = $recordId;
+		catch (Exception $e)
+		{
+			$response = $e;
+			$redirect_url = '';
+			$redirect_msg = $e->getMsg();
+		}
 
-			echo json_encode($ret);
+		if ($this->isajax)
+		{
+			echo new JResponseJson($response);
 			jexit();
 		}
-
-		// Attempt to save the data.
-		if (!$model->save($validData, $extra_jform_data, $post))
+		else
 		{
-			// Save the data in the session.
-			$app->setUserState($context . '.data', $validData);
-
-			// Redirect back to the edit screen.
-			$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_SAVE_FAILED', $model->getError()));
-			$this->setMessage($this->getError(), 'error');
-
-			$this->setRedirect(
-				JRoute::_(
-					'index.php?option=' . $this->option . '&view=' . $this->view_item . '&client=' . $this->client
-					. $this->getRedirectToItemAppend($recordId, $urlVar), false
-				)
-			);
-
-			return false;
-		}
-
-		// Save succeeded, so check-in the record.
-		if ($checkin && $model->checkin($validData[$key]) === false)
-		{
-			// Save the data in the session.
-			$app->setUserState($context . '.data', $validData);
-
-			// Check-in failed, so go back to the record and display a notice.
-			$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
-			$this->setMessage($this->getError(), 'error');
-
-			$this->setRedirect(
-				JRoute::_(
-					'index.php?option=' . $this->option . '&view=' . $this->view_item . '&client=' . $this->client
-					. $this->getRedirectToItemAppend($recordId, $urlVar), false
-				)
-			);
-
-			return false;
-		}
-
-		$langKey = $this->text_prefix . ($recordId == 0 && $app->isSite() ? '_SUBMIT' : '') . '_SAVE_SUCCESS';
-		$prefix  = JFactory::getLanguage()->hasKey($langKey) ? $this->text_prefix : 'JLIB_APPLICATION';
-
-		$this->setMessage(JText::_($prefix . ($recordId == 0 && $app->isSite() ? '_SUBMIT' : '') . '_SAVE_SUCCESS'));
-
-		// Redirect the user and adjust session state based on the chosen task.
-		switch ($task)
-		{
-			case 'apply':
-				// Set the record data in the session.
-				$recordId = $model->getState($this->context . '.id');
-				$this->holdEditId($context, $recordId);
-				$app->setUserState($context . '.data', null);
-				$model->checkout($recordId);
-
-				// Redirect back to the edit screen.
-				$this->setRedirect(
-					JRoute::_(
-						'index.php?option=' . $this->option . '&view=' . $this->view_item . '&client=' . $this->client
-						. $this->getRedirectToItemAppend($recordId, $urlVar), false
-					)
-				);
-
-				break;
-
-			case 'save2new':
-				// Clear the record id and data from the session.
-				$this->releaseEditId($context, $recordId);
-				$app->setUserState($context . '.data', null);
-
-				// Redirect back to the edit screen.
-				$this->setRedirect(
-					JRoute::_(
-						'index.php?option=' . $this->option . '&view=' . $this->view_item . '&client=' . $this->client
-						. $this->getRedirectToItemAppend(null, $urlVar), false
-					)
-				);
-
-				break;
-
-			default:
-				// Clear the record id and data from the session.
-				$this->releaseEditId($context, $recordId);
-				$app->setUserState($context . '.data', null);
-
-				// Redirect to the list screen.
-				$this->setRedirect(
-					JRoute::_(
-						'index.php?option=' . $this->option . '&view=' . $this->view_list . '&client=' . $this->client
-						. $this->getRedirectToListAppend(), false
-					)
-				);
-				break;
+			$app->redirect($redirect_url, $redirect_msg);
 		}
 
 		// Invoke the postSave method to allow for the child class to access the model.
@@ -568,5 +497,116 @@ class TjucmControllerItemForm extends JControllerForm
 			$this->setMessage($e->getMessage(), $errorType);
 			$this->setRedirect('index.php?option=com_tjucm&view=items');
 		}
+	}
+
+	/**
+	 * Method to delete uploaded document.
+	 *
+	 * @return  boolean  True if access level check and checkout passes, false otherwise.
+	 *
+	 * @since   1.6
+	 */
+	public function delete_doc()
+	{
+		if (JFactory::getUser()->id)
+		{
+			$objx     = new stdClass;
+			$jinput   = JFactory::getApplication()->input;
+			$field_name  = $jinput->post->get('field_id', '', 'string');
+			$nameOfField = explode('jform_', $field_name);
+			$fileName = $jinput->post->get('fileName', '', 'string');
+
+			$db = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$conditions = array($db->quoteName('id') . ' IN (' . $fieldValueEntryId . ') ');
+
+			$query->select("*")
+			->from("#__tjfields_fields")
+			->where("name = '" . $nameOfField[1] . "'");
+			$db->setQuery($query);
+
+			$field_rs = $db->loadobject();
+
+			if ($field_rs->id)
+			{
+				$db    = JFactory::getDbo();
+				$query = $db->getQuery(true);
+
+				// Delete all custom keys for user 1001.
+				$conditions = array(
+					$db->quoteName('field_id') . ' = ' . $db->quote($field_rs->id),
+					$db->quoteName('user_id') . ' = ' . $db->quote(JFactory::getUser()->id)
+				);
+
+				$query->delete($db->quoteName('#__tjfields_fields_value'));
+				$query->where($conditions);
+
+				$db->setQuery($query);
+
+				if ($db->execute())
+				{
+					if ($fileName)
+					{
+						$full_client = explode('.', $field_rs->client);
+						$client = $full_client[0];
+						$client_type = $full_client[1];
+
+						// Get correct file path
+						$return = 0;
+						$filePath = 'media/' . $client . '/' . $client_type . DIRECTORY_SEPARATOR . $fileName;
+
+						// Remove file if it exists
+						if (file_exists($filePath) )
+						{
+							unlink($filePath);
+
+							$return = 1;
+
+							// H header('Location:index.php');
+						}
+						else
+						{
+							$return = 0;
+						}
+					}
+
+					$objx->success = 1;
+					$objx->data    = '';
+
+					// JText::_("COM_PIP_FISN_REPORT_DOCUMENT_DELETE_SUCCESSFULLY");
+					$objx->message = '';
+					$objx->error   = 0;
+				}
+				else
+				{
+					$objx->success = 0;
+					$objx->data    = '';
+
+					// JText::_("COM_PIP_FISN_REPORT_DOCUMENT_NOT_DELETE");
+					$objx->message = '';
+					$objx->error   = 1;
+				}
+			}
+			else
+			{
+				$objx->success = 0;
+				$objx->data    = "";
+
+				// JText::_("COM_PIP_FISN_REPORT_NOT_DELETE");
+				$objx->message = '';
+				$objx->error   = 1;
+			}
+		}
+		else
+		{
+			$objx->success = 0;
+			$objx->data    = '';
+			$objx->message = JText::_("Time Out");
+			$objx->error   = 1;
+		}
+
+		print_r(json_encode($objx));
+
+		jexit();
 	}
 }

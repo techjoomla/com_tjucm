@@ -44,7 +44,13 @@ class TjucmViewItems extends JViewLegacy
 		$this->items = $this->get('Items');
 		$this->pagination = $this->get('Pagination');
 		$this->params     = $app->getParams('com_tjucm');
-		
+		$this->listcolumn = $this->get('Fields');
+
+		// Get the active item
+		$menuitem   = $app->getMenu()->getActive();
+
+		// Get the params
+		$this->menuparams = $menuitem->params;
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
