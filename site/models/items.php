@@ -52,8 +52,6 @@ class TjucmModelItems extends JModelList
 		$this->ucm_type   = $this->menuparams->get('ucm_type');
 		$this->client     = 'com_tjucm.' . $this->ucm_type;
 
-
-
 		$this->fields_separator = "#:";
 		$this->records_separator = "#=>";
 
@@ -76,7 +74,6 @@ class TjucmModelItems extends JModelList
 	 */
 	protected function populateState($ordering = null, $direction = null)
 	{
-
 		$app  = JFactory::getApplication();
 		$list = $app->getUserState($this->context . '.list');
 
@@ -306,6 +303,7 @@ class TjucmModelItems extends JModelList
 	private function isValidDate($date)
 	{
 		$date = str_replace('/', '-', $date);
+
 		return (date_create($date)) ? JFactory::getDate($date)->format("Y-m-d") : null;
 	}
 }

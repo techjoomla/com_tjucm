@@ -405,7 +405,6 @@ class TjucmModelItemForm extends JModelForm
 		{
 			throw new Exception($table->getError());
 		}
-
 	}
 
 	/**
