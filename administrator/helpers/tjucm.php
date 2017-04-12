@@ -32,7 +32,7 @@ class TjucmHelpersTjucm
 			$vName == 'types'
 		);
 
-JHtmlSidebar::addEntry(
+		JHtmlSidebar::addEntry(
 			JText::_('COM_TJUCM_TITLE_ITEMS'),
 			'index.php?option=com_tjucm&view=items',
 			$vName == 'items'

@@ -50,10 +50,6 @@ $layout  = JFactory::getApplication()->input->get('layout');
 											<div class="col-sm-6 control-label">
 												<?php echo $field->input; ?>
 											</div>
-
-											<?php
-											// echo"<pre>"; print_r($field->value); echo"</pre>";
-											?>
 											<?php if ($field->type == 'File') { ?>
 												<script type="text/javascript">
 													jQuery(document).ready(function ()

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @version    CVS: 1.0.0
  * @package    Com_Tjucm
@@ -49,8 +48,14 @@ class TjucmModelItems extends JModelList
 
 		// Get the params
 		$this->menuparams = $menuitem->params;
-		$this->ucm_type   = $this->menuparams->get('ucm_type');
-		$this->client     = 'com_tjucm.' . $this->ucm_type;
+
+		if (!empty($this->menuparams))
+		{
+			$this->ucm_type   = $this->menuparams->get('ucm_type');
+			$this->client     = 'com_tjucm.' . $this->ucm_type;
+		}
+
+		$this->loginuserid = JFactory::getUser()->id;
 
 		$this->fields_separator = "#:";
 		$this->records_separator = "#=>";
@@ -101,7 +106,7 @@ class TjucmModelItems extends JModelList
 	 */
 	protected function getListQuery()
 	{
-// Create a new query object.
+		// Create a new query object.
 		$db    = $this->getDbo();
 		$query = $db->getQuery(true);
 
@@ -111,7 +116,7 @@ class TjucmModelItems extends JModelList
 		// Select the required fields from the table.
 		$query->select(
 			$this->getState(
-				'list.select', 'DISTINCT a.id, ' . $group_concat
+				'list.select', 'DISTINCT a.id, a.state, ' . $group_concat
 			)
 		);
 
@@ -128,7 +133,7 @@ class TjucmModelItems extends JModelList
 
 		// Join over the user field 'created_by'
 		$query->select('`created_by`.name AS `created_by`');
-		$query->join('LEFT', '#__users AS `created_by` ON `created_by`.id = a.`created_by`');
+		$query->join('INNER', '#__users AS `created_by` ON `created_by`.id = a.`created_by`');
 
 		// Join over the user field 'modified_by'
 		$query->select('`modified_by`.name AS `modified_by`');
@@ -182,7 +187,7 @@ class TjucmModelItems extends JModelList
 			$query->order($db->escape($orderCol . ' ' . $orderDirn));
 		}
 
-		echo $query;
+		// #echo $query;
 
 		return $query;
 	}
@@ -305,5 +310,36 @@ class TjucmModelItems extends JModelList
 		$date = str_replace('/', '-', $date);
 
 		return (date_create($date)) ? JFactory::getDate($date)->format("Y-m-d") : null;
+	}
+
+	/**
+	 * Temp Function added by KOMAL
+	 * Function that finds Joomla group id from group name
+	 * Move this function to pip helper
+	 *
+	 * @param   String  $groupName  groupName
+	 *
+	 * @return  group ID
+	 *
+	 * @since  1.0.0
+	 */
+	public function getUsersGroupId($groupName)
+	{
+		$db     = JFactory::getDBO();
+		$query  = $db->getQuery(true);
+		$query->select('*');
+		$query->from('#__usergroups');
+		$db->setQuery($query);
+		$groups = $db->loadRowList();
+
+		foreach ($groups as $group)
+		{
+			if ($group[4] == $groupName)
+			{
+				return $group[0];
+			}
+		}
+
+		return false;
 	}
 }
