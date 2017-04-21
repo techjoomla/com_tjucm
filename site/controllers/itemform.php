@@ -132,8 +132,16 @@ class TjucmControllerItemForm extends JControllerForm
 			$model->checkin($previousId);
 		}
 
+		// Get the active item
+		$menuitem   = $app->getMenu()->getActive();
+
+		// Get the params
+		$this->menuparams = $menuitem->params;
+		$this->ucm_type   = $this->menuparams->get('ucm_type');
+		$this->client     = 'com_tjucm.' . $this->ucm_type;
+
 		// Redirect to the edit screen.
-		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&layout=edit', false));
+		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&client=' . $this->client . '&id=' . $editId, false));
 	}
 
 	/**
@@ -469,10 +477,15 @@ class TjucmControllerItemForm extends JControllerForm
 		$model = $this->getModel('ItemForm', 'TjucmModel');
 		$pk    = $app->input->getInt('id');
 
+		// Get the user data.
+		$data       = array();
+		$data['id'] = $app->input->getInt('id');
+		$data['client'] = $this->client;
+
 		// Attempt to save the data
 		try
 		{
-			$return = $model->delete($pk);
+			$return = $model->delete($data);
 
 			// Check in the profile
 			$model->checkin($return);
@@ -485,7 +498,7 @@ class TjucmControllerItemForm extends JControllerForm
 			$url = (empty($item->link) ? 'index.php?option=com_tjucm&view=items' : $item->link);
 
 			// Redirect to the list screen
-			$this->setMessage(JText::_('COM_EXAMPLE_ITEM_DELETED_SUCCESSFULLY'));
+			$this->setMessage(JText::_('COM_TJUCM_ITEM_DELETED_SUCCESSFULLY'));
 			$this->setRedirect(JRoute::_($url, false));
 
 			// Flush the data from the session.

@@ -25,7 +25,6 @@ $canChange  = $user->authorise('core.edit.state', 'com_tjucm');
 $canDelete  = $user->authorise('core.delete', 'com_tjucm');
 
 
-echo"<pre>"; print_r($this->items); echo"</pre>";die('kom');
 ?>
 
 <form action="<?php echo JRoute::_('index.php?option=com_tjucm&view=items'); ?>" method="post" name="adminForm" id="adminForm">

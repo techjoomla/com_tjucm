@@ -490,7 +490,7 @@ class TjucmModelItemForm extends JModelForm
 	 *
 	 * @since   12.2
 	 */
-	public function delete(&$ids)
+	/*public function delete(&$ids)
 	{
 		foreach ($ids as $id)
 		{
@@ -498,6 +498,33 @@ class TjucmModelItemForm extends JModelForm
 			{
 				$this->deleteExtraFieldsData($id[0], $this->client);
 			}
+		}
+	}*/
+
+	/**
+	 * Method to delete data
+	 *
+	 * @param   array  $data  Data to be deleted
+	 *
+	 * @return bool|int If success returns the id of the deleted item, if not false
+	 *
+	 * @throws Exception
+	 */
+	public function delete($data)
+	{
+		$id = (!empty($data['id'])) ? $data['id'] : (int) $this->getState('item.id');
+
+		$table = $this->getTable();
+
+		if ($table->delete($data['id']) === true)
+		{
+			$this->deleteExtraFieldsData($data['id'], $data['client']);
+
+			return $id;
+		}
+		else
+		{
+			return false;
 		}
 	}
 

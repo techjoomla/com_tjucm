@@ -51,6 +51,8 @@ class TjucmViewItems extends JViewLegacy
 
 		// Get the params
 		$this->menuparams = $menuitem->params;
+		$this->ucm_type   = $this->menuparams->get('ucm_type');
+		$this->client     = 'com_tjucm.' . $this->ucm_type;
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
