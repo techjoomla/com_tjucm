@@ -46,7 +46,7 @@ class TjucmViewTypes extends JViewLegacy
 			throw new Exception(implode("\n", $errors));
 		}
 
-		TjucmHelpersTjucm::addSubmenu('types');
+		TjucmHelper::addSubmenu('types');
 
 		$this->addToolbar();
 
@@ -64,7 +64,7 @@ class TjucmViewTypes extends JViewLegacy
 	protected function addToolbar()
 	{
 		$state = $this->get('State');
-		$canDo = TjucmHelpersTjucm::getActions();
+		$canDo = TjucmHelper::getActions();
 
 		JToolBarHelper::title(JText::_('COM_TJUCM_TITLE_TYPES'), 'types.png');
 
@@ -147,9 +147,9 @@ class TjucmViewTypes extends JViewLegacy
 	}
 
 	/**
-	 * Method to order fields 
+	 * Method to order fields
 	 *
-	 * @return void 
+	 * @return void
 	 */
 	protected function getSortFields()
 	{

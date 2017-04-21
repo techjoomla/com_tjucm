@@ -73,7 +73,7 @@ class TjucmViewType extends JViewLegacy
 			$checkedOut = false;
 		}
 
-		$canDo = TjucmHelpersTjucm::getActions();
+		$canDo = TjucmHelper::getActions();
 
 		JToolBarHelper::title(JText::_('COM_TJUCM_TITLE_TYPE'), 'type.png');
 

@@ -28,6 +28,16 @@ if (!class_exists('TjucmFunList'))
 	JLoader::load('TjucmFunList');
 }
 
+
+// Load backend helper
+$path = JPATH_ADMINISTRATOR . '/components/com_tjucm/helpers/tjucm.php';
+
+if (!class_exists('TjucmHelper'))
+{
+	JLoader::register('TjucmHelper', $path);
+	JLoader::load('TjucmHelper');
+}
+
 JLoader::registerPrefix('Tjucm', JPATH_COMPONENT_ADMINISTRATOR);
 
 $controller = JControllerLegacy::getInstance('Tjucm');

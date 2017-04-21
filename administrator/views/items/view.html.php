@@ -52,7 +52,7 @@ class TjucmViewItems extends JViewLegacy
 			throw new Exception(implode("\n", $errors));
 		}
 
-		TjucmHelpersTjucm::addSubmenu('items');
+		TjucmHelper::addSubmenu('items');
 
 		$this->addToolbar();
 
@@ -70,7 +70,7 @@ class TjucmViewItems extends JViewLegacy
 	protected function addToolbar()
 	{
 		$state = $this->get('State');
-		$canDo = TjucmHelpersTjucm::getActions();
+		$canDo = TjucmHelper::getActions();
 
 		JToolBarHelper::title(JText::_('COM_TJUCM_TITLE_ITEMS'), 'items.png');
 

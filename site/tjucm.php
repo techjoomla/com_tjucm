@@ -15,6 +15,14 @@ jimport('joomla.application.component.controller');
 JLoader::registerPrefix('Tjucm', JPATH_COMPONENT);
 JLoader::register('TjucmController', JPATH_COMPONENT . '/controller.php');
 
+// Load backend helper
+$path = JPATH_ADMINISTRATOR . '/components/com_tjucm/helpers/tjucm.php';
+
+if (!class_exists('TjucmHelper'))
+{
+	JLoader::register('TjucmHelper', $path);
+	JLoader::load('TjucmHelper');
+}
 
 // Execute the task.
 $controller = JControllerLegacy::getInstance('Tjucm');
