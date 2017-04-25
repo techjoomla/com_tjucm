@@ -70,6 +70,7 @@ class TjucmModelItemForm extends JModelForm
 	protected function populateState()
 	{
 		$app = JFactory::getApplication('com_tjucm');
+		$user = JFactory::getUser();
 
 		// Load state from the request userState on edit or from the passed variable on default
 		if (JFactory::getApplication()->input->get('layout') == 'edit')
@@ -78,8 +79,7 @@ class TjucmModelItemForm extends JModelForm
 		}
 		else
 		{
-			$id = JFactory::getApplication()->input->get('id');
-			JFactory::getApplication()->setUserState('com_tjucm.edit.item.id', $id);
+			$id = $app->getUserStateFromRequest('com_tjucm.itemform.id', 'id');
 		}
 
 		$this->setState('item.id', $id);
@@ -92,6 +92,14 @@ class TjucmModelItemForm extends JModelForm
 		$ucmId = $tjUcmModelType->getTypeId($ucmType);
 
 		$this->setState('ucmType.id', $ucmId);
+
+		// Check published state
+		if ((!$user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmId))
+			&& (!$user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $ucmId)))
+		{
+			$this->setState('filter.published', 1);
+			$this->setState('fileter.archived', 2);
+		}
 
 		// Load the parameters.
 		$params       = $app->getParams();
@@ -139,11 +147,15 @@ class TjucmModelItemForm extends JModelForm
 			if ($table !== false && $table->load($id))
 			{
 				// Check published state.
-				if ($published = $this->getState('filter.published'))
+				$published = $this->getState('filter.published');
+				$archived = $this->getState('filter.archived');
+
+				if (is_numeric($published))
 				{
-					if ($table->state != $published)
+					// Check for published state if filter set.
+					if (((is_numeric($published)) || (is_numeric($archived))) && (($table->state != $published) && ($table->state != $archived)))
 					{
-						return $this->item;
+						return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
 					}
 				}
 
@@ -153,6 +165,10 @@ class TjucmModelItemForm extends JModelForm
 				$properties['params'] = clone $this->getState('params');
 
 				$this->item = ArrayHelper::toObject($properties, 'JObject');
+			}
+			else
+			{
+				return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
 			}
 		}
 

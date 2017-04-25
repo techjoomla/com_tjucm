@@ -61,8 +61,7 @@ class TjucmModelItem extends JModelItem
 		}
 		else
 		{
-			$id = JFactory::getApplication()->input->get('id');
-			JFactory::getApplication()->setUserState('com_tjucm.edit.item.id', $id);
+			$id = $app->getUserStateFromRequest('com_tjucm.itemform.id', 'id');
 		}
 
 		$this->setState('item.id', $id);
@@ -104,17 +103,25 @@ class TjucmModelItem extends JModelItem
 			if ($table->load($id))
 			{
 				// Check published state.
-				if ($published = $this->getState('filter.published'))
+				$published = $this->getState('filter.published');
+				$archived = $this->getState('filter.archived');
+
+				if (is_numeric($published))
 				{
-					if ($table->state != $published)
+					// Check for published state if filter set.
+					if (((is_numeric($published)) || (is_numeric($archived))) && (($table->state != $published) && ($table->state != $archived)))
 					{
-						throw new Exception(JText::_('COM_TJUCM_ITEM_NOT_LOADED'), 403);
+						return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
 					}
 				}
 
 				// Convert the JTable to a clean JObject.
 				$properties  = $table->getProperties(1);
 				$this->_item = ArrayHelper::toObject($properties, 'JObject');
+			}
+			else
+			{
+				return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
 			}
 		}
 
@@ -134,7 +141,7 @@ class TjucmModelItem extends JModelItem
 				$db = JFactory::getDbo();
 				$query = $db->getQuery(true);
 				$query->select($db->quoteName('id'));
-				$query->from($db->quoteName('#__tj_ucm_types', '#__tj_ucm_types_2546051'));
+				$query->from($db->quoteName('#__tj_ucm_types'));
 				$query->where($db->quoteName('id') . ' = ' . $db->quote($db->escape($value)));
 				$db->setQuery($query);
 				$results = $db->loadObject();

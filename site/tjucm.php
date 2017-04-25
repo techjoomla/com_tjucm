@@ -24,6 +24,15 @@ if (!class_exists('TjucmHelper'))
 	JLoader::load('TjucmHelper');
 }
 
+$path = JPATH_COMPONENT_ADMINISTRATOR . '/classes/' . 'funlist.php';
+
+if (!class_exists('TjucmFunList'))
+{
+	// Require_once $path;
+	JLoader::register('TjucmFunList', $path);
+	JLoader::load('TjucmFunList');
+}
+
 // Execute the task.
 $controller = JControllerLegacy::getInstance('Tjucm');
 
