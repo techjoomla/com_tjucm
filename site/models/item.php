@@ -1,12 +1,12 @@
 <?php
-
 /**
- * @version    CVS: 1.0.0
+ * @version    SVN: <svn_id>
  * @package    Com_Tjucm
- * @author     Parth Lawate <contact@techjoomla.com>
- * @copyright  2016 Techjoomla
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @author     Techjoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
+
 // No direct access.
 defined('_JEXEC') or die;
 
@@ -14,6 +14,7 @@ jimport('joomla.application.component.modelitem');
 jimport('joomla.event.dispatcher');
 
 use Joomla\Utilities\ArrayHelper;
+
 /**
  * Tjucm model.
  *
@@ -34,14 +35,24 @@ class TjucmModelItem extends JModelItem
 	protected function populateState()
 	{
 		$app  = JFactory::getApplication('com_tjucm');
-        $user = JFactory::getUser();
+		$user = JFactory::getUser();
 
-        // Check published state
-        if ((!$user->authorise('core.edit.state', 'com_tjucm')) && (!$user->authorise('core.edit', 'com_tjucm')))
-        {
-            $this->setState('filter.published', 1);
-            $this->setState('fileter.archived', 2);
-        }
+		// Get UCM type id from uniquue identifier
+		$ucmType = $app->getUserStateFromRequest('com_tjucm.itemform.client', 'client');
+
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		$ucmId = $tjUcmModelType->getTypeId($ucmType);
+
+		$this->setState('ucmType.id', $ucmId);
+
+		// Check published state
+		if ((!$user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmId))
+			&& (!$user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $ucmId)))
+		{
+			$this->setState('filter.published', 1);
+			$this->setState('fileter.archived', 2);
+		}
 
 		// Load state from the request userState on edit or from the passed variable on default
 		if (JFactory::getApplication()->input->get('layout') == 'edit')
@@ -107,37 +118,42 @@ class TjucmModelItem extends JModelItem
 			}
 		}
 
-		
+		if (isset($this->_item->type_id) && $this->_item->type_id != '')
+		{
+			if (is_object($this->_item->type_id))
+			{
+				$this->_item->type_id = \Joomla\Utilities\ArrayHelper::fromObject($this->_item->type_id);
+			}
 
-			if (isset($this->_item->type_id) && $this->_item->type_id != '') {
-				if (is_object($this->_item->type_id))
-				{
-					$this->_item->type_id = \Joomla\Utilities\ArrayHelper::fromObject($this->_item->type_id);
-				}
-				$values = (is_array($this->_item->type_id)) ? $this->_item->type_id : explode(',',$this->_item->type_id);
+			$values = (is_array($this->_item->type_id)) ? $this->_item->type_id : explode(',', $this->_item->type_id);
 
-				$textValue = array();
-				foreach ($values as $value)
+			$textValue = array();
+
+			foreach ($values as $value)
+			{
+				$db = JFactory::getDbo();
+				$query = $db->getQuery(true);
+				$query->select($db->quoteName('id'));
+				$query->from($db->quoteName('#__tj_ucm_types', '#__tj_ucm_types_2546051'));
+				$query->where($db->quoteName('id') . ' = ' . $db->quote($db->escape($value)));
+				$db->setQuery($query);
+				$results = $db->loadObject();
+
+				if ($results)
 				{
-					$db = JFactory::getDbo();
-					$query = $db->getQuery(true);
-					$query
-						->select('`#__tj_ucm_types_2546051`.`id`')
-						->from($db->quoteName('#__tj_ucm_types', '#__tj_ucm_types_2546051'))
-						->where($db->quoteName('id') . ' = ' . $db->quote($db->escape($value)));
-					$db->setQuery($query);
-					$results = $db->loadObject();
-					if ($results) {
-						$textValue[] = $results->id;
-					}
+					$textValue[] = $results->id;
 				}
+			}
 
 			$this->_item->type_id = !empty($textValue) ? implode(', ', $textValue) : $this->_item->type_id;
+		}
 
-			}if (isset($this->_item->created_by) )
+		if (isset($this->_item->created_by))
 		{
 			$this->_item->created_by_name = JFactory::getUser($this->_item->created_by)->name;
-		}if (isset($this->_item->modified_by) )
+		}
+
+		if (isset($this->_item->modified_by))
 		{
 			$this->_item->modified_by_name = JFactory::getUser($this->_item->modified_by)->name;
 		}
@@ -295,6 +311,15 @@ class TjucmModelItem extends JModelItem
 		return $table->delete($id);
 	}
 
+	/**
+	 * Method to getAliasFieldNameByView
+	 *
+	 * @param   array  $view  An array of record primary keys.
+	 *
+	 * @return  boolean  True if successful, false if an error occurs.
+	 *
+	 * @since   1.0
+	 */
 	public function getAliasFieldNameByView($view)
 	{
 		switch ($view)

@@ -84,8 +84,6 @@ $client  = JFactory::getApplication()->input->get('client');
 							</fieldset>
 						</div>
 					</div>
-
-
 				<?php if ($this->form_extra): ?>
 					<?php echo $this->loadTemplate('extrafields'); ?>
 				<?php endif; ?>

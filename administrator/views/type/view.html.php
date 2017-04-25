@@ -1,12 +1,12 @@
 <?php
-
 /**
- * @version    CVS: 1.0.0
+ * @version    SVN: <svn_id>
  * @package    Com_Tjucm
- * @author     Parth Lawate <contact@techjoomla.com>
- * @copyright  2016 Techjoomla
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @author     Techjoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
+
 // No direct access
 defined('_JEXEC') or die;
 
@@ -96,7 +96,8 @@ class TjucmViewType extends JViewLegacy
 		}
 
 		// Button for version control
-		if ($this->state->params->get('save_history', 1) && $user->authorise('core.edit')) {
+		if ($this->state->params->get('save_history', 1) && $user->authorise('core.edit'))
+		{
 			JToolbarHelper::versions('com_tjucm.type', $this->item->id);
 		}
 

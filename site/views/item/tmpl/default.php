@@ -9,9 +9,9 @@
 // No direct access
 defined('_JEXEC') or die;
 
-$canEdit = JFactory::getUser()->authorise('core.edit', 'com_tjucm.' . $this->item->id);
+$canEdit = JFactory::getUser()->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId);
 
-if (!$canEdit && JFactory::getUser()->authorise('core.edit.own', 'com_tjucm' . $this->item->id))
+if (!$canEdit && JFactory::getUser()->authorise('core.type.editownitem', 'com_tjucm.type.' . $this->ucmTypeId))
 {
 	$canEdit = JFactory::getUser()->id == $this->item->created_by;
 }
@@ -20,8 +20,6 @@ if (!$canEdit && JFactory::getUser()->authorise('core.edit.own', 'com_tjucm' . $
 <div class="item_fields">
 
 	<table class="table">
-		
-
 		<tr>
 			<th><?php echo JText::_('COM_TJUCM_FORM_LBL_ITEM_STATE'); ?></th>
 			<td>
@@ -63,7 +61,7 @@ if (!$canEdit && JFactory::getUser()->authorise('core.edit.own', 'com_tjucm' . $
 
 <?php endif; ?>
 
-<?php if (JFactory::getUser()->authorise('core.delete','com_tjucm.item.'.$this->item->id)) : ?>
+<?php if (JFactory::getUser()->authorise('core.type.deleteitem','com_tjucm.type.' . $this->ucmTypeId)) : ?>
 
 	<a class="btn" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=item.remove&id=' . $this->item->id, false, 2); ?>"><?php echo JText::_("COM_TJUCM_DELETE_ITEM"); ?></a>
 

@@ -1,12 +1,12 @@
 <?php
-
 /**
- * @version    CVS: 1.0.0
+ * @version    SVN: <svn_id>
  * @package    Com_Tjucm
- * @author     Parth Lawate <contact@techjoomla.com>
- * @copyright  2016 Techjoomla
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @author     Techjoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
+
 // No direct access
 defined('_JEXEC') or die;
 
@@ -43,7 +43,10 @@ class TjucmViewItem extends JViewLegacy
 
 		$this->state  = $this->get('State');
 		$this->item   = $this->get('Data');
+		$model   = $this->getModel("Item");
 		$this->params = $app->getParams('com_tjucm');
+
+		$this->ucmTypeId = $model->getState('ucmType.id');
 
 		if (!empty($this->item))
 		{
@@ -54,18 +57,6 @@ class TjucmViewItem extends JViewLegacy
 		if (count($errors = $this->get('Errors')))
 		{
 			throw new Exception(implode("\n", $errors));
-		}
-
-		
-
-		if ($this->_layout == 'edit')
-		{
-			$authorised = $user->authorise('core.create', 'com_tjucm');
-
-			if ($authorised !== true)
-			{
-				throw new Exception(JText::_('JERROR_ALERTNOAUTHOR'));
-			}
 		}
 
 		$this->_prepareDocument();

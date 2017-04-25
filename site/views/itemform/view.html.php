@@ -1,12 +1,12 @@
 <?php
-
 /**
- * @version    CVS: 1.0.0
+ * @version    SVN: <svn_id>
  * @package    Com_Tjucm
- * @author     Parth Lawate <contact@techjoomla.com>
- * @copyright  2016 Techjoomla
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @author     Techjoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
+
 // No direct access
 defined('_JEXEC') or die;
 
@@ -49,6 +49,15 @@ class TjucmViewItemform extends JViewLegacy
 		$this->params  = $app->getParams('com_tjucm');
 		$this->canSave = $this->get('CanSave');
 		$this->form		= $this->get('Form');
+
+		// Check the view access to the article (the model has already computed the values).
+		if ($this->item->params->get('access-view') == false)
+		{
+			$app->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
+			$app->setHeader('status', 403, true);
+
+			return;
+		}
 
 		/* Get model instance here */
 		$model = $this->getModel();

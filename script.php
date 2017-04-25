@@ -1,10 +1,10 @@
 <?php
-
 /**
+ * @version    SVN: <svn_id>
  * @package    Com_Tjucm
- * @author     Parth Lawate <contact@techjoomla.com>
- * @copyright  2016 Techjoomla
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @author     Techjoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
 
 define('MODIFIED', 1);
@@ -19,13 +19,13 @@ defined('_JEXEC') or die;
  * @author   Component Creator <support@component-creator.com>
  * @since    0.1b
  */
-class com_tjucmInstallerScript
+class Com_TjucmInstallerScript
 {
 	/**
 	 * Method called before install/update the component. Note: This method won't be called during uninstall process.
 	 *
-	 * @param   string $type   Type of process [install | update]
-	 * @param   mixed  $parent Object who called this method
+	 * @param   string  $type    Type of process [install | update]
+	 * @param   mixed   $parent  Object who called this method
 	 *
 	 * @return boolean True if the process should continue, false otherwise
 	 */
@@ -54,7 +54,7 @@ class com_tjucmInstallerScript
 	/**
 	 * Method to install the component
 	 *
-	 * @param   mixed $parent Object who called this method.
+	 * @param   mixed  $parent  Object who called this method.
 	 *
 	 * @return void
 	 *
@@ -70,7 +70,7 @@ class com_tjucmInstallerScript
 	/**
 	 * Method to update the DB of the component
 	 *
-	 * @param   mixed $parent Object who started the upgrading process
+	 * @param   mixed  $parent  Object who started the upgrading process
 	 *
 	 * @return void
 	 *
@@ -108,8 +108,8 @@ class com_tjucmInstallerScript
 	/**
 	 * Process a table
 	 *
-	 * @param   JApplicationCms  $app   Application object
-	 * @param   SimpleXMLElement $table Table to process
+	 * @param   JApplicationCms   $app    Application object
+	 * @param   SimpleXMLElement  $table  Table to process
 	 *
 	 * @return void
 	 *
@@ -143,7 +143,8 @@ class com_tjucmInstallerScript
 								)
 							);
 							$table_added = true;
-						} catch (Exception $ex)
+						}
+						catch (Exception $ex)
 						{
 							$app->enqueueMessage(
 								JText::sprintf(
@@ -170,7 +171,8 @@ class com_tjucmInstallerScript
 									$table['new_name']
 								)
 							);
-						} catch (Exception $ex)
+						}
+						catch (Exception $ex)
 						{
 							$app->enqueueMessage(
 								JText::sprintf(
@@ -196,7 +198,8 @@ class com_tjucmInstallerScript
 									JText::sprintf('Table `%s` has been successfully created', $table['table_name'])
 								);
 								$table_added = true;
-							} catch (Exception $ex)
+							}
+							catch (Exception $ex)
 							{
 								$app->enqueueMessage(
 									JText::sprintf(
@@ -218,7 +221,8 @@ class com_tjucmInstallerScript
 						$app->enqueueMessage(
 							JText::sprintf('Table `%s` was successfully deleted', $table['table_name'])
 						);
-					} catch (Exception $ex)
+					}
+					catch (Exception $ex)
 					{
 						$app->enqueueMessage(
 							JText::sprintf(
@@ -245,7 +249,7 @@ class com_tjucmInstallerScript
 	/**
 	 * Checks if a certain exists on the current database
 	 *
-	 * @param   string $table_name Name of the table
+	 * @param   string  $table_name  Name of the table
 	 *
 	 * @return boolean True if it exists, false if it does not.
 	 */
@@ -261,7 +265,7 @@ class com_tjucmInstallerScript
 	/**
 	 * Generates a 'CREATE TABLE' statement for the tables passed by argument.
 	 *
-	 * @param   SimpleXMLElement $table Table of the database
+	 * @param   SimpleXMLElement  $table  Table of the database
 	 *
 	 * @return string 'CREATE TABLE' statement
 	 */
@@ -315,7 +319,7 @@ class com_tjucmInstallerScript
 	/**
 	 * Generate a column declaration
 	 *
-	 * @param   SimpleXMLElement $field Field data
+	 * @param   SimpleXMLElement  $field  Field data
 	 *
 	 * @return string Column declaration
 	 */
@@ -350,7 +354,7 @@ class com_tjucmInstallerScript
 	/**
 	 * Generates SQL field type of a field.
 	 *
-	 * @param   SimpleXMLElement $field Field information
+	 * @param   SimpleXMLElement  $field  Field information
 	 *
 	 * @return  mixed SQL string data type, false on failure.
 	 */
@@ -369,7 +373,7 @@ class com_tjucmInstallerScript
 	/**
 	 * Check if a SQL type allows length values.
 	 *
-	 * @param   string $field_type SQL type
+	 * @param   string  $field_type  SQL type
 	 *
 	 * @return boolean True if it allows length values, false if it does not.
 	 */
@@ -396,8 +400,8 @@ class com_tjucmInstallerScript
 	/**
 	 * Updates all the fields related to a table.
 	 *
-	 * @param   JApplicationCms  $app   Application Object
-	 * @param   SimpleXMLElement $table Table information.
+	 * @param   JApplicationCms   $app    Application Object
+	 * @param   SimpleXMLElement  $table  Table information.
 	 *
 	 * @return void
 	 */
@@ -417,9 +421,9 @@ class com_tjucmInstallerScript
 	/**
 	 * Process a certain field.
 	 *
-	 * @param   JApplicationCms  $app        Application object
-	 * @param   string           $table_name The name of the table that contains the field.
-	 * @param   SimpleXMLElement $field      Field Information.
+	 * @param   JApplicationCms   $app         Application object
+	 * @param   string            $table_name  The name of the table that contains the field.
+	 * @param   SimpleXMLElement  $field       Field Information.
 	 *
 	 * @return void
 	 */
@@ -473,7 +477,8 @@ class com_tjucmInstallerScript
 								$app->enqueueMessage(
 									JText::sprintf('Field `%s` has been successfully modified', $field['old_name'])
 								);
-							} catch (Exception $ex)
+							}
+							catch (Exception $ex)
 							{
 								$app->enqueueMessage(
 									JText::sprintf(
@@ -550,7 +555,8 @@ class com_tjucmInstallerScript
 							$app->enqueueMessage(
 								JText::sprintf('Field `%s` has been successfully deleted', $field['field_name'])
 							);
-						} catch (Exception $ex)
+						}
+						catch (Exception $ex)
 						{
 							$app->enqueueMessage(
 								JText::sprintf(
@@ -593,8 +599,8 @@ class com_tjucmInstallerScript
 	/**
 	 * Add a field if it does not exists or modify it if it does.
 	 *
-	 * @param   string           $table_name Table name
-	 * @param   SimpleXMLElement $field      Field Information
+	 * @param   string            $table_name  Table name
+	 * @param   SimpleXMLElement  $field       Field Information
 	 *
 	 * @return mixed Constant on success(self::$MODIFIED | self::$NOT_MODIFIED), error message if an error occurred
 	 */
@@ -628,7 +634,8 @@ class com_tjucmInstallerScript
 				$db->execute();
 
 				return MODIFIED;
-			} catch (Exception $ex)
+			}
+			catch (Exception $ex)
 			{
 				return $ex->getMessage();
 			}
@@ -640,8 +647,8 @@ class com_tjucmInstallerScript
 	/**
 	 * Checks if a field exists on a table
 	 *
-	 * @param   string $table_name Table name
-	 * @param   string $field_name Field name
+	 * @param   string  $table_name  Table name
+	 * @param   string  $field_name  Field name
 	 *
 	 * @return boolean True if exists, false if it do
 	 */
@@ -655,8 +662,8 @@ class com_tjucmInstallerScript
 	/**
 	 * Check if a field needs to be updated.
 	 *
-	 * @param   string           $table_name Table name
-	 * @param   SimpleXMLElement $field      Field information
+	 * @param   string            $table_name  Table name
+	 * @param   SimpleXMLElement  $field       Field information
 	 *
 	 * @return boolean True if the field has to be updated, false otherwise
 	 */
@@ -684,8 +691,8 @@ class com_tjucmInstallerScript
 	/**
 	 * Generates an change column statement
 	 *
-	 * @param   string           $table_name Table name
-	 * @param   SimpleXMLElement $field      Field Information
+	 * @param   string            $table_name  Table name
+	 * @param   SimpleXMLElement  $field       Field Information
 	 *
 	 * @return string Change column statement
 	 */
@@ -699,8 +706,8 @@ class com_tjucmInstallerScript
 	/**
 	 * Generates an add column statement
 	 *
-	 * @param   string           $table_name Table name
-	 * @param   SimpleXMLElement $field      Field Information
+	 * @param   string            $table_name  Table name
+	 * @param   SimpleXMLElement  $field       Field Information
 	 *
 	 * @return string Add column statement
 	 */
@@ -714,7 +721,7 @@ class com_tjucmInstallerScript
 	/**
 	 * Installs plugins for this component
 	 *
-	 * @param   mixed $parent Object who called the install/update method
+	 * @param   mixed  $parent  Object who called the install/update method
 	 *
 	 * @return void
 	 */
@@ -777,9 +784,9 @@ class com_tjucmInstallerScript
 	/**
 	 * Check if an extension is already installed in the system
 	 *
-	 * @param   string $type   Extension type
-	 * @param   string $name   Extension name
-	 * @param   mixed  $folder Extension folder(for plugins)
+	 * @param   string  $type    Extension type
+	 * @param   string  $name    Extension name
+	 * @param   mixed   $folder  Extension folder(for plugins)
 	 *
 	 * @return boolean
 	 */
@@ -803,7 +810,7 @@ class com_tjucmInstallerScript
 	/**
 	 * Installs plugins for this component
 	 *
-	 * @param   mixed $parent Object who called the install/update method
+	 * @param   mixed  $parent  Object who called the install/update method
 	 *
 	 * @return void
 	 */
@@ -850,7 +857,7 @@ class com_tjucmInstallerScript
 	/**
 	 * Method to update the component
 	 *
-	 * @param   mixed $parent Object who called this method.
+	 * @param   mixed  $parent  Object who called this method.
 	 *
 	 * @return void
 	 */
@@ -864,7 +871,7 @@ class com_tjucmInstallerScript
 	/**
 	 * Method to uninstall the component
 	 *
-	 * @param   mixed $parent Object who called this method.
+	 * @param   mixed  $parent  Object who called this method.
 	 *
 	 * @return void
 	 */
@@ -877,7 +884,7 @@ class com_tjucmInstallerScript
 	/**
 	 * Uninstalls plugins
 	 *
-	 * @param   mixed $parent Object who called the uninstall method
+	 * @param   mixed  $parent  Object who called the uninstall method
 	 *
 	 * @return void
 	 */
@@ -931,7 +938,7 @@ class com_tjucmInstallerScript
 	/**
 	 * Uninstalls plugins
 	 *
-	 * @param   mixed $parent Object who called the uninstall method
+	 * @param   mixed  $parent  Object who called the uninstall method
 	 *
 	 * @return void
 	 */
