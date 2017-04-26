@@ -46,6 +46,9 @@ class TjucmViewItems extends JViewLegacy
 		$this->params     = $app->getParams('com_tjucm');
 		$this->listcolumn = $this->get('Fields');
 
+		$model   = $this->getModel("Items");
+		$this->ucmTypeId = $model->getState('ucmType.id');
+
 		// Get the active item
 		$menuitem   = $app->getMenu()->getActive();
 

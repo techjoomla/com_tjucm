@@ -79,7 +79,8 @@ class TjucmModelItemForm extends JModelForm
 		}
 		else
 		{
-			$id = $app->getUserStateFromRequest('com_tjucm.itemform.id', 'id');
+			// Load state from the request.
+			$id = $app->input->getInt('id');
 		}
 
 		$this->setState('item.id', $id);
@@ -126,56 +127,64 @@ class TjucmModelItemForm extends JModelForm
 	{
 		$user = JFactory::getUser();
 
-		if ($this->item === null)
+		$this->item = false;
+
+		if (empty($id))
 		{
-			$this->item = false;
-
-			if (empty($id))
-			{
-				$id = $this->getState('item.id');
-			}
-
-			// Get UCM type id (Get if user is autorised to edit the items for this UCM type)
-			$ucmTypeId = $this->getState('ucmType.id');
-			$canEdit = $user->authorise('core.type.editItem', 'com_tjucm.type.' . $ucmTypeId);
-			$canEditOwn = $user->authorise('core.type.editOwn', 'com_tjucm.type.' . $ucmTypeId);
-
-			// Get a level row instance.
-			$table = $this->getTable();
-
-			// Attempt to load the row.
-			if ($table !== false && $table->load($id))
-			{
-				// Check published state.
-				$published = $this->getState('filter.published');
-				$archived = $this->getState('filter.archived');
-
-				if (is_numeric($published))
-				{
-					// Check for published state if filter set.
-					if (((is_numeric($published)) || (is_numeric($archived))) && (($table->state != $published) && ($table->state != $archived)))
-					{
-						return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
-					}
-				}
-
-				// Convert the JTable to a clean JObject.
-				$properties  = $table->getProperties(1);
-
-				$properties['params'] = clone $this->getState('params');
-
-				$this->item = ArrayHelper::toObject($properties, 'JObject');
-			}
-			else
-			{
-				return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
-			}
+			$id = $this->getState('item.id');
 		}
 
-		// Set view access for logged in user
-		if ($this->item->created_by == JFactory::getUser()->id || $canEdit || $canEditOwn)
+		// Get UCM type id (Get if user is autorised to edit the items for this UCM type)
+		$ucmTypeId = $this->getState('ucmType.id');
+		$canEdit = $user->authorise('core.type.editItem', 'com_tjucm.type.' . $ucmTypeId);
+		$canEditOwn = $user->authorise('core.type.editOwn', 'com_tjucm.type.' . $ucmTypeId);
+		$canCreate = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $ucmTypeId);
+
+		// Get a level row instance.
+		$table = $this->getTable();
+
+		// Attempt to load the row.
+		if ($table !== false && $table->load($id))
 		{
-			$this->item->params->set('access-view', true);
+			// Check published state.
+			$published = $this->getState('filter.published');
+			$archived = $this->getState('filter.archived');
+
+			if (is_numeric($published))
+			{
+				// Check for published state if filter set.
+				if (((is_numeric($published)) || (is_numeric($archived))) && (($table->state != $published) && ($table->state != $archived)))
+				{
+					return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
+				}
+			}
+
+			// Convert the JTable to a clean JObject.
+			$properties  = $table->getProperties(1);
+
+			$properties['params'] = clone $this->getState('params');
+
+			$this->item = ArrayHelper::toObject($properties, 'JObject');
+
+			if (empty($table->id))
+			{
+				if (empty($canCreate))
+				{
+					$this->item->params->set('access-view', false);
+
+					return $this->item;
+				}
+			}
+
+			// Set view access for logged in user
+			if ($this->item->created_by == JFactory::getUser()->id || $canEdit || $canEditOwn)
+			{
+				$this->item->params->set('access-view', true);
+			}
+		}
+		else
+		{
+			return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
 		}
 
 		return $this->item;

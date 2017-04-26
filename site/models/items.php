@@ -81,6 +81,16 @@ class TjucmModelItems extends JModelList
 	protected function populateState($ordering = null, $direction = null)
 	{
 		$app  = JFactory::getApplication();
+
+		// Get UCM type id from uniquue identifier
+		$ucmType = $app->get('client', '', 'STRING');
+
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		$ucmId = $tjUcmModelType->getTypeId($ucmType);
+
+		$this->setState('ucmType.id', $ucmId);
+
 		$list = $app->getUserState($this->context . '.list');
 
 		$ordering  = isset($list['filter_order'])     ? $list['filter_order']     : null;

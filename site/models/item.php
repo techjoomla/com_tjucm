@@ -38,7 +38,7 @@ class TjucmModelItem extends JModelItem
 		$user = JFactory::getUser();
 
 		// Get UCM type id from uniquue identifier
-		$ucmType = $app->getUserStateFromRequest('com_tjucm.itemform.client', 'client');
+		$ucmType = $app->get('client', '', 'STRING');
 
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');

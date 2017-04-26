@@ -50,6 +50,11 @@ class TjucmViewItemform extends JViewLegacy
 		$this->canSave = $this->get('CanSave');
 		$this->form		= $this->get('Form');
 
+		if (empty($this->item->id))
+		{
+			$authorised = $user->authorise('core.type.createitem', 'com_tjucm.itemform.') || (count($user->getAuthorisedCategories('com_content', 'core.create')));
+		}
+
 		// Check the view access to the article (the model has already computed the values).
 		if ($this->item->params->get('access-view') == false)
 		{

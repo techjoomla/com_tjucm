@@ -18,15 +18,11 @@ $user       = JFactory::getUser();
 $userId     = $user->get('id');
 $listOrder  = $this->state->get('list.ordering');
 $listDirn   = $this->state->get('list.direction');
-$canCreate  = $user->authorise('core.create', 'com_tjucm') && file_exists(JPATH_COMPONENT . DIRECTORY_SEPARATOR . 'models' . DIRECTORY_SEPARATOR . 'forms' . DIRECTORY_SEPARATOR . 'itemform.xml');
-$canEdit    = $user->authorise('core.edit', 'com_tjucm') && file_exists(JPATH_COMPONENT . DIRECTORY_SEPARATOR . 'models' . DIRECTORY_SEPARATOR . 'forms' . DIRECTORY_SEPARATOR . 'itemform.xml');
-$canCheckin = $user->authorise('core.manage', 'com_tjucm');
-$canChange  = $user->authorise('core.edit.state', 'com_tjucm');
-$canDelete  = $user->authorise('core.delete', 'com_tjucm');
-
-
+$canCreate  = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $this->ucmTypeId) && file_exists(JPATH_COMPONENT . '/models/forms/itemform.xml');
+$canEdit    = $user->authorise('core.edit', 'com_tjucm.type.edititem' . $this->ucmTypeId) && file_exists(JPATH_COMPONENT . '/models/forms/itemform.xml');
+$canChange  = $user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $this->ucmTypeId);
+$canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this->ucmTypeId);
 ?>
-
 <form action="<?php echo JRoute::_('index.php?option=com_tjucm&view=items'); ?>" method="post" name="adminForm" id="adminForm">
 	<table class="table table-striped" id="itemList">
 		<thead>
@@ -88,10 +84,6 @@ $canDelete  = $user->authorise('core.delete', 'com_tjucm');
 					<?php endif; ?>
 
 					<td>
-						<?php if (isset($item->checked_out) && $item->checked_out) : ?>
-							<?php echo JHtml::_('jgrid.checkedout', $i, $item->uEditor, $item->checked_out_time, 'items.', $canCheckin); ?>
-						<?php endif; ?>
-
 						<a href="<?php echo JRoute::_('index.php?option=com_tjucm&view=item&id='.(int) $item->id); ?>">
 							<?php echo $this->escape($item->id); ?>
 						</a>
