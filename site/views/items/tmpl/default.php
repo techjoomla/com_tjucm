@@ -18,10 +18,10 @@ $user       = JFactory::getUser();
 $userId     = $user->get('id');
 $listOrder  = $this->state->get('list.ordering');
 $listDirn   = $this->state->get('list.direction');
-$canCreate  = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $this->ucmTypeId) && file_exists(JPATH_COMPONENT . '/models/forms/itemform.xml');
+$canCreate  = $user->authorise('core.createitem', 'com_tjucm.type.' . $this->ucmTypeId) && file_exists(JPATH_COMPONENT . '/models/forms/itemform.xml');
 $canEdit    = $user->authorise('core.edit', 'com_tjucm.type.edititem' . $this->ucmTypeId) && file_exists(JPATH_COMPONENT . '/models/forms/itemform.xml');
-$canChange  = $user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $this->ucmTypeId);
-$canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this->ucmTypeId);
+$canChange  = $user->authorise('core.edititemstate', 'com_tjucm.type.' . $this->ucmTypeId);
+$canDelete  = $user->authorise('core.deleteitem', 'com_tjucm.type.' . $this->ucmTypeId);
 ?>
 <form action="<?php echo JRoute::_('index.php?option=com_tjucm&view=items'); ?>" method="post" name="adminForm" id="adminForm">
 	<table class="table table-striped" id="itemList">

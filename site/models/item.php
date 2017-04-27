@@ -47,8 +47,8 @@ class TjucmModelItem extends JModelItem
 		$this->setState('ucmType.id', $ucmId);
 
 		// Check published state
-		if ((!$user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmId))
-			&& (!$user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $ucmId)))
+		if ((!$user->authorise('core.edititem', 'com_tjucm.type.' . $ucmId))
+			&& (!$user->authorise('core.edititemstate', 'com_tjucm.type.' . $ucmId)))
 		{
 			$this->setState('filter.published', 1);
 			$this->setState('fileter.archived', 2);

@@ -52,7 +52,7 @@ class TjucmViewItemform extends JViewLegacy
 
 		if (empty($this->item->id))
 		{
-			$authorised = $user->authorise('core.type.createitem', 'com_tjucm.itemform.') || (count($user->getAuthorisedCategories('com_content', 'core.create')));
+			$authorised = $user->authorise('core.createitem', 'com_tjucm.itemform.') || (count($user->getAuthorisedCategories('com_content', 'core.create')));
 		}
 
 		// Check the view access to the article (the model has already computed the values).
