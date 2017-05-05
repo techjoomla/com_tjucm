@@ -13,6 +13,8 @@ defined('_JEXEC') or die;
 jimport('joomla.application.component.modelitem');
 jimport('joomla.event.dispatcher');
 
+require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
+
 use Joomla\Utilities\ArrayHelper;
 
 /**
@@ -20,8 +22,13 @@ use Joomla\Utilities\ArrayHelper;
  *
  * @since  1.6
  */
-class TjucmModelItem extends JModelItem
+class TjucmModelItem extends JModelAdmin
 {
+	private $client = '';
+
+	// Use imported Trait in model
+	use TjfieldsFilterField;
+
 	/**
 	 * Method to auto-populate the model state.
 	 *
@@ -37,8 +44,13 @@ class TjucmModelItem extends JModelItem
 		$app  = JFactory::getApplication('com_tjucm');
 		$user = JFactory::getUser();
 
+		// Load state from the request.
+		$id = $app->input->getInt('id');
+
+		$this->setState('item.id', $id);
+
 		// Get UCM type id from uniquue identifier
-		$ucmType = $app->get('client', '', 'STRING');
+		$ucmType = $app->input->get('client', '');
 
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
@@ -47,27 +59,15 @@ class TjucmModelItem extends JModelItem
 		$this->setState('ucmType.id', $ucmId);
 
 		// Check published state
-		if ((!$user->authorise('core.edititem', 'com_tjucm.type.' . $ucmId))
-			&& (!$user->authorise('core.edititemstate', 'com_tjucm.type.' . $ucmId)))
+		if ((!$user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmId))
+			&& (!$user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $ucmId)))
 		{
 			$this->setState('filter.published', 1);
 			$this->setState('fileter.archived', 2);
 		}
 
-		// Load state from the request userState on edit or from the passed variable on default
-		if (JFactory::getApplication()->input->get('layout') == 'edit')
-		{
-			$id = JFactory::getApplication()->getUserState('com_tjucm.edit.item.id');
-		}
-		else
-		{
-			$id = $app->getUserStateFromRequest('com_tjucm.itemform.id', 'id');
-		}
-
-		$this->setState('item.id', $id);
-
 		// Load the parameters.
-		$params       = $app->getParams();
+		$params = $app->getParams();
 		$params_array = $params->toArray();
 
 		if (isset($params_array['item_id']))
@@ -87,6 +87,8 @@ class TjucmModelItem extends JModelItem
 	 */
 	public function &getData($id = null)
 	{
+		$user = JFactory::getUser();
+
 		if ($this->_item === null)
 		{
 			$this->_item = false;
@@ -95,6 +97,10 @@ class TjucmModelItem extends JModelItem
 			{
 				$id = $this->getState('item.id');
 			}
+
+			// Get UCM type id (Get if user is autorised to edit the items for this UCM type)
+			$ucmTypeId = $this->getState('ucmType.id');
+			$canView = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $ucmTypeId);
 
 			// Get a level row instance.
 			$table = $this->getTable();
@@ -117,52 +123,23 @@ class TjucmModelItem extends JModelItem
 
 				// Convert the JTable to a clean JObject.
 				$properties  = $table->getProperties(1);
+				$properties['params'] = clone $this->getState('params');
+
 				$this->_item = ArrayHelper::toObject($properties, 'JObject');
+				$this->_item->params->set('access-view', false);
+
+				if (!empty($this->_item->id))
+				{
+					if ($canView)
+					{
+						$this->_item->params->set('access-view', true);
+					}
+				}
 			}
 			else
 			{
 				return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
 			}
-		}
-
-		if (isset($this->_item->type_id) && $this->_item->type_id != '')
-		{
-			if (is_object($this->_item->type_id))
-			{
-				$this->_item->type_id = \Joomla\Utilities\ArrayHelper::fromObject($this->_item->type_id);
-			}
-
-			$values = (is_array($this->_item->type_id)) ? $this->_item->type_id : explode(',', $this->_item->type_id);
-
-			$textValue = array();
-
-			foreach ($values as $value)
-			{
-				$db = JFactory::getDbo();
-				$query = $db->getQuery(true);
-				$query->select($db->quoteName('id'));
-				$query->from($db->quoteName('#__tj_ucm_types'));
-				$query->where($db->quoteName('id') . ' = ' . $db->quote($db->escape($value)));
-				$db->setQuery($query);
-				$results = $db->loadObject();
-
-				if ($results)
-				{
-					$textValue[] = $results->id;
-				}
-			}
-
-			$this->_item->type_id = !empty($textValue) ? implode(', ', $textValue) : $this->_item->type_id;
-		}
-
-		if (isset($this->_item->created_by))
-		{
-			$this->_item->created_by_name = JFactory::getUser($this->_item->created_by)->name;
-		}
-
-		if (isset($this->_item->modified_by))
-		{
-			$this->_item->modified_by_name = JFactory::getUser($this->_item->modified_by)->name;
 		}
 
 		return $this->_item;

@@ -48,10 +48,33 @@ class TjucmViewItem extends JViewLegacy
 
 		$this->ucmTypeId = $model->getState('ucmType.id');
 
-		if (!empty($this->item))
+		// Check the view access to the article (the model has already computed the values).
+		if ($this->item->params->get('access-view') == false)
 		{
-			$this->form = $this->get('Form');
+			$app->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
+			$app->setHeader('status', 403, true);
+
+			return;
 		}
+
+		/* Get model instance here */
+		$model = $this->getModel();
+		$this->client  = JFactory::getApplication()->input->get('client');
+		$this->id = $id  = JFactory::getApplication()->input->get('id');
+		$input  = JFactory::getApplication()->input;
+		$input->set("content_id", $id);
+		$view = explode('.', $this->client);
+
+		// Call to extra fields
+		$this->form_extra = $model->getFormExtra(
+		array(
+			"clientComponent" => 'com_tjucm',
+			"client" => $this->client,
+			"view" => $view[1],
+			"layout" => 'edit')
+			);
+
+		$this->form_extra = array_filter($this->form_extra);
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))

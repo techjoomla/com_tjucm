@@ -86,7 +86,7 @@ class TjucmModelItemForm extends JModelForm
 		$this->setState('item.id', $id);
 
 		// Get UCM type id from uniquue identifier
-		$ucmType = $app->getUserStateFromRequest('com_tjucm.itemform.client', 'client');
+		$ucmType = $app->input->get('client', '');
 
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
@@ -95,8 +95,8 @@ class TjucmModelItemForm extends JModelForm
 		$this->setState('ucmType.id', $ucmId);
 
 		// Check published state
-		if ((!$user->authorise('core.edititem', 'com_tjucm.type.' . $ucmId))
-			&& (!$user->authorise('core.edititemstate', 'com_tjucm.type.' . $ucmId)))
+		if ((!$user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmId))
+			&& (!$user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $ucmId)))
 		{
 			$this->setState('filter.published', 1);
 			$this->setState('fileter.archived', 2);
@@ -136,9 +136,9 @@ class TjucmModelItemForm extends JModelForm
 
 		// Get UCM type id (Get if user is autorised to edit the items for this UCM type)
 		$ucmTypeId = $this->getState('ucmType.id');
-		$canEdit = $user->authorise('core.editItem', 'com_tjucm.type.' . $ucmTypeId);
-		$canEditOwn = $user->authorise('core.editOwn', 'com_tjucm.type.' . $ucmTypeId);
-		$canCreate = $user->authorise('core.createitem', 'com_tjucm.type.' . $ucmTypeId);
+		$canEdit = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmTypeId);
+		$canEditOwn = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $ucmTypeId);
+		$canCreate = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $ucmTypeId);
 
 		// Get a level row instance.
 		$table = $this->getTable();
@@ -166,20 +166,31 @@ class TjucmModelItemForm extends JModelForm
 
 			$this->item = ArrayHelper::toObject($properties, 'JObject');
 
-			if (empty($table->id))
-			{
-				if (empty($canCreate))
-				{
-					$this->item->params->set('access-view', false);
+			$this->item->params->set('access-view', false);
 
-					return $this->item;
+			if (empty($this->item->id))
+			{
+				if ($canCreate)
+				{
+					$this->item->params->set('access-view', true);
 				}
 			}
-
-			// Set view access for logged in user
-			if ($this->item->created_by == JFactory::getUser()->id || $canEdit || $canEditOwn)
+			else
 			{
-				$this->item->params->set('access-view', true);
+				if ($this->item->created_by == JFactory::getUser()->id)
+				{
+					if ($canEditOwn || $canEdit)
+					{
+						$this->item->params->set('access-view', true);
+					}
+				}
+				else
+				{
+					if ($canEdit)
+					{
+						$this->item->params->set('access-view', true);
+					}
+				}
 			}
 		}
 		else
@@ -382,29 +393,45 @@ class TjucmModelItemForm extends JModelForm
 	 */
 	public function save($data, $extra_jform_data = '', $post = '')
 	{
+		$app = JFactory::getApplication();
 		$id    = (!empty($data['id'])) ? $data['id'] : (int) $this->getState('item.id');
 		$state = (!empty($data['state'])) ? 1 : 0;
 		$user  = JFactory::getUser();
-		$status_title = JFactory::getApplication()->input->get('form_status');
+		$status_title = $app->input->get('form_status');
 
 		$ucmTypeId = $this->getState('ucmType.id');
+		$typeItemId = $this->getState('item.id');
+
+		if (empty($ucmTypeId))
+		{
+			// Get UCM type id from uniquue identifier
+			JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+			$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+			$ucmTypeId = $tjUcmModelType->getTypeId($this->client);
+		}
 
 		if ($ucmTypeId)
 		{
-			// Check the user can edit this item
-			$canEdit = $user->authorise('core.edititem', 'com_tjucm.type.' . $ucmTypeId);
-			$canEditOwn = $authorised = $user->authorise('core.editownitem', 'com_tjucm.type.' . $ucmTypeId);
+			if ($typeItemId)
+			{
+				// Check the user can edit this item
+				$canEdit = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmTypeId);
+				$canEditOwn = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $ucmTypeId);
 
-			$authorised = ($canEdit || $canEditOwn);
-		}
-		else
-		{
-			// Check the user can create new items in this section
-			$authorised = $user->authorise('core.createitem', 'com_tjucm.type.' . $ucmTypeId);
+				$authorised = ($canEdit || $canEditOwn);
+			}
+			else
+			{
+				// Check the user can create new items in this section
+				$authorised = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $ucmTypeId);
+			}
 		}
 
 		if ($authorised !== true)
 		{
+			$app->enqueueMessage(JText::_('COM_TJUCM_ERROR_MESSAGE_NOT_AUTHORISED'), 'error');
+			$app->setHeader('status', 403, true);
+
 			throw new Exception(JText::_('JERROR_ALERTNOAUTHOR'), 403);
 		}
 
@@ -455,7 +482,7 @@ class TjucmModelItemForm extends JModelForm
 		$ucmTypeId = $this->getState('ucmType.id');
 
 		// Access checks.
-		if (!$user->authorise('core.createitem', 'com_tjucm.type.' . $ucmTypeId))
+		if (!$user->authorise('core.type.createitem', 'com_tjucm.type.' . $ucmTypeId))
 		{
 			throw new Exception(JText::_('JERROR_CORE_CREATE_NOT_PERMITTED'));
 		}
@@ -514,26 +541,6 @@ class TjucmModelItemForm extends JModelForm
 
 		return true;
 	}
-
-	/**
-	 * Method to delete one or more records.
-	 *
-	 * @param   array  &$ids  An array of record primary keys.
-	 *
-	 * @return  boolean  True if successful, false if an error occurs.
-	 *
-	 * @since   12.2
-	 */
-	/*public function delete(&$ids)
-	{
-		foreach ($ids as $id)
-		{
-			if (parent::delete($id))
-			{
-				$this->deleteExtraFieldsData($id[0], $this->client);
-			}
-		}
-	}*/
 
 	/**
 	 * Method to delete data

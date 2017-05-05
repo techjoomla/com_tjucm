@@ -14,9 +14,7 @@ $full_client  = JFactory::getApplication()->input->get('client');
 $full_client =  explode('.',$full_client);
 $client = $full_client[0];
 $client_type = $full_client[1];
-
 ?>
-
 <?php if ($this->form_extra): ?>
 	<!-- Iterate through the normal form fieldsets and display each one. -->
 	<?php foreach ($this->form_extra as $fieldKey => $fieldArray): ?>

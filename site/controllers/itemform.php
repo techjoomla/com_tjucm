@@ -38,6 +38,11 @@ class TjucmControllerItemForm extends JControllerForm
 			$this->client  = JFactory::getApplication()->input->get('jform', array(), 'array')['client'];
 		}
 
+		// Get UCM type id from uniquue identifier
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		$this->ucmTypeId = $tjUcmModelType->getTypeId($this->client);
+
 		$this->isajax = ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') ? true : false;
 
 		parent::__construct();
@@ -376,7 +381,6 @@ class TjucmControllerItemForm extends JControllerForm
 			$redirect_url = '';
 			$redirect_msg = '';
 		}
-
 		catch (Exception $e)
 		{
 			$response = $e;
@@ -620,5 +624,40 @@ class TjucmControllerItemForm extends JControllerForm
 		print_r(json_encode($objx));
 
 		jexit();
+	}
+
+	/**
+	 * Method to check if you can add a new record.
+	 *
+	 * Extended classes can override this if necessary.
+	 *
+	 * @param   array  $data  An array of input data.
+	 *
+	 * @return  boolean
+	 *
+	 * @since   12.2
+	 */
+	protected function allowAdd($data = array())
+	{
+		$user = JFactory::getUser();
+
+		return $user->authorise('core.type.createitem', 'com_tjucm.type.' . $this->ucmTypeId);
+	}
+
+	/**
+	 * Method to check if you can edit an existing record.
+	 *
+	 * Extended classes can override this if necessary.
+	 *
+	 * @param   array   $data  An array of input data.
+	 * @param   string  $key   The name of the key for the primary key; default is id.
+	 *
+	 * @return  boolean
+	 *
+	 * @since   12.2
+	 */
+	protected function allowEdit($data = array(), $key = 'id')
+	{
+		return JFactory::getUser()->authorise('core.edit', $this->option);
 	}
 }
