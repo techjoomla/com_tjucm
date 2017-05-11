@@ -1,16 +1,19 @@
 <?php
-
 /**
- * @version    CVS: 1.0.0
+ * @version    SVN: <svn_id>
  * @package    Com_Tjucm
- * @author     Parth Lawate <contact@techjoomla.com>
- * @copyright  2016 Techjoomla
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @author     Techjoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
+
 // No direct access
 defined('_JEXEC') or die;
 
 JLoader::registerPrefix('Tjucm', JPATH_SITE . '/components/com_tjucm/');
+
+// Add Table Path
+JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
 
 /**
  * Class TjucmRouter
@@ -47,7 +50,7 @@ class TjucmRouter extends JComponentRouterBase
 		{
 			$segments[] = $query['view'];
 			$view = $query['view'];
-			
+
 			unset($query['view']);
 		}
 
@@ -56,10 +59,23 @@ class TjucmRouter extends JComponentRouterBase
 			if ($view !== null)
 			{
 				$model      = TjucmHelpersTjucm::getModel($view);
-				if($model !== null){
-					$item       = $model->getData($query['id']);
-					$alias      = $model->getAliasFieldNameByView($view);
-					$segments[] = (isset($alias)) ? $item->alias : $query['id'];
+
+				if ($model !== null)
+				{
+					if ($view == "items")
+					{
+						$db = JFactory::getDbo();
+						$table = JTable::getInstance('type', 'TjucmTable', array('dbo', $db));
+						$table->load(array('id' => $query['id']));
+
+						$segments[] = $table->alias;
+					}
+					else
+					{
+						$item       = $model->getData($query['id']);
+						$alias      = $model->getAliasFieldNameByView($view);
+						$segments[] = (isset($alias)) ? $item->alias : $query['id'];
+					}
 				}
 			}
 			else
@@ -104,6 +120,7 @@ class TjucmRouter extends JComponentRouterBase
 			else
 			{
 				$id = $model->getItemIdByAlias(str_replace(':', '-', $segment));
+
 				if (!empty($id))
 				{
 					$vars['id'] = $id;

@@ -1,11 +1,10 @@
 <?php
-
 /**
- * @version    CVS: 1.0.0
+ * @version    SVN: <svn_id>
  * @package    Com_Tjucm
- * @author     Parth Lawate <contact@techjoomla.com>
- * @copyright  2016 Techjoomla
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @author     Techjoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
 
 // No direct access
@@ -38,6 +37,11 @@ class TjucmControllerItemForm extends JControllerForm
 		{
 			$this->client  = JFactory::getApplication()->input->get('jform', array(), 'array')['client'];
 		}
+
+		// Get UCM type id from uniquue identifier
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		$this->ucmTypeId = $tjUcmModelType->getTypeId($this->client);
 
 		$this->isajax = ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') ? true : false;
 
@@ -133,7 +137,7 @@ class TjucmControllerItemForm extends JControllerForm
 		}
 
 		// Redirect to the edit screen.
-		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&layout=edit', false));
+		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&client=' . $this->client . '&id=' . $editId, false));
 	}
 
 	/**
@@ -369,7 +373,6 @@ class TjucmControllerItemForm extends JControllerForm
 			$redirect_url = '';
 			$redirect_msg = '';
 		}
-
 		catch (Exception $e)
 		{
 			$response = $e;
@@ -469,10 +472,15 @@ class TjucmControllerItemForm extends JControllerForm
 		$model = $this->getModel('ItemForm', 'TjucmModel');
 		$pk    = $app->input->getInt('id');
 
+		// Get the user data.
+		$data       = array();
+		$data['id'] = $app->input->getInt('id');
+		$data['client'] = $this->client;
+
 		// Attempt to save the data
 		try
 		{
-			$return = $model->delete($pk);
+			$return = $model->delete($data);
 
 			// Check in the profile
 			$model->checkin($return);
@@ -485,7 +493,7 @@ class TjucmControllerItemForm extends JControllerForm
 			$url = (empty($item->link) ? 'index.php?option=com_tjucm&view=items' : $item->link);
 
 			// Redirect to the list screen
-			$this->setMessage(JText::_('COM_EXAMPLE_ITEM_DELETED_SUCCESSFULLY'));
+			$this->setMessage(JText::_('COM_TJUCM_ITEM_DELETED_SUCCESSFULLY'));
 			$this->setRedirect(JRoute::_($url, false));
 
 			// Flush the data from the session.
@@ -608,5 +616,57 @@ class TjucmControllerItemForm extends JControllerForm
 		print_r(json_encode($objx));
 
 		jexit();
+	}
+
+	/**
+	 * Redirect user to items list view if user is not allowed to add mote items
+	 *
+	 * @param   INT  $typeId        Type id
+	 * @param   INT  $allowedCount  Allowed Count
+	 *
+	 * @return boolean
+	 */
+	public function redirectToListView($typeId, $allowedCount)
+	{
+		$user = JFactory::getUser();
+		$createdBy = $user->id;
+		$link = JRoute::_("index.php?option=com_tjucm&view=items&id=" . $typeId . "&created_by=" . $createdBy, false);
+
+		JFactory::getApplication()->redirect($link, sprintf(JText::_('COM_TJUCM_ALLOWED_COUNT_LIMIT'), $allowedCount), "Warning");
+	}
+
+	/**
+	 * Method to check if you can add a new record.
+	 *
+	 * Extended classes can override this if necessary.
+	 *
+	 * @param   array  $data  An array of input data.
+	 *
+	 * @return  boolean
+	 *
+	 * @since   12.2
+	 */
+	protected function allowAdd($data = array())
+	{
+		$user = JFactory::getUser();
+
+		return $user->authorise('core.type.createitem', 'com_tjucm.type.' . $this->ucmTypeId);
+	}
+
+	/**
+	 * Method to check if you can edit an existing record.
+	 *
+	 * Extended classes can override this if necessary.
+	 *
+	 * @param   array   $data  An array of input data.
+	 * @param   string  $key   The name of the key for the primary key; default is id.
+	 *
+	 * @return  boolean
+	 *
+	 * @since   12.2
+	 */
+	protected function allowEdit($data = array(), $key = 'id')
+	{
+		return JFactory::getUser()->authorise('core.edit', $this->option);
 	}
 }

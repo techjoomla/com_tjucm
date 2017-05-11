@@ -1,10 +1,10 @@
 <?php
 /**
- * @version    CVS: 1.0.0
+ * @version    SVN: <svn_id>
  * @package    Com_Tjucm
- * @author     Parth Lawate <contact@techjoomla.com>
- * @copyright  2016 Techjoomla
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @author     Techjoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
 
 // No direct access.
@@ -137,7 +137,13 @@ class TjucmModelType extends JModelAdmin
 	{
 		if ($item = parent::getItem($pk))
 		{
-			// Do any procesing on fields here if needed
+			// Get Params data
+			$params = $item->params;
+
+			if (array_key_exists("allowed_count", $params))
+			{
+				$item->allowed_count = $params["allowed_count"];
+			}
 		}
 
 		return $item;
@@ -318,6 +324,11 @@ class TjucmModelType extends JModelAdmin
 			$data['unique_identifier'] = 'com_tjucm.' . $data['alias'];
 		}
 
+		$params = array();
+		$params['allowed_count'] = $data['allowed_count'];
+
+		$data['params'] = json_encode($params);
+
 		if (parent::save($data))
 		{
 			return true;
@@ -383,5 +394,22 @@ class TjucmModelType extends JModelAdmin
 		}
 
 		return array($title, $alias);
+	}
+
+	/**
+	 * Method to get UCM type id
+	 *
+	 * @param   string  $client  The client.
+	 *
+	 * @return	INT  ucm type id
+	 *
+	 * @since	1.0
+	 */
+	public function getTypeId($client)
+	{
+		$table = $this->getTable();
+		$table->load(array('unique_identifier' => $client));
+
+		return $table->id;
 	}
 }

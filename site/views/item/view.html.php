@@ -1,12 +1,12 @@
 <?php
-
 /**
- * @version    CVS: 1.0.0
+ * @version    SVN: <svn_id>
  * @package    Com_Tjucm
- * @author     Parth Lawate <contact@techjoomla.com>
- * @copyright  2016 Techjoomla
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @author     Techjoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
+
 // No direct access
 defined('_JEXEC') or die;
 
@@ -43,29 +43,43 @@ class TjucmViewItem extends JViewLegacy
 
 		$this->state  = $this->get('State');
 		$this->item   = $this->get('Data');
+		$model   = $this->getModel("Item");
 		$this->params = $app->getParams('com_tjucm');
 
-		if (!empty($this->item))
+		$this->ucmTypeId = $model->getState('ucmType.id');
+
+		// Check the view access to the article (the model has already computed the values).
+		if ($this->item->params->get('access-view') == false)
 		{
-			$this->form = $this->get('Form');
+			$app->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
+			$app->setHeader('status', 403, true);
+
+			return;
 		}
+
+		/* Get model instance here */
+		$model = $this->getModel();
+		$this->client  = JFactory::getApplication()->input->get('client');
+		$this->id = $id  = JFactory::getApplication()->input->get('id');
+		$input  = JFactory::getApplication()->input;
+		$input->set("content_id", $id);
+		$view = explode('.', $this->client);
+
+		// Call to extra fields
+		$this->form_extra = $model->getFormExtra(
+		array(
+			"clientComponent" => 'com_tjucm',
+			"client" => $this->client,
+			"view" => $view[1],
+			"layout" => 'edit')
+			);
+
+		$this->form_extra = array_filter($this->form_extra);
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{
 			throw new Exception(implode("\n", $errors));
-		}
-
-		
-
-		if ($this->_layout == 'edit')
-		{
-			$authorised = $user->authorise('core.create', 'com_tjucm');
-
-			if ($authorised !== true)
-			{
-				throw new Exception(JText::_('JERROR_ALERTNOAUTHOR'));
-			}
 		}
 
 		$this->_prepareDocument();

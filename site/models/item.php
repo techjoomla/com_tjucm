@@ -1,26 +1,34 @@
 <?php
-
 /**
- * @version    CVS: 1.0.0
+ * @version    SVN: <svn_id>
  * @package    Com_Tjucm
- * @author     Parth Lawate <contact@techjoomla.com>
- * @copyright  2016 Techjoomla
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @author     Techjoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
+
 // No direct access.
 defined('_JEXEC') or die;
 
 jimport('joomla.application.component.modelitem');
 jimport('joomla.event.dispatcher');
 
+require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
+
 use Joomla\Utilities\ArrayHelper;
+
 /**
  * Tjucm model.
  *
  * @since  1.6
  */
-class TjucmModelItem extends JModelItem
+class TjucmModelItem extends JModelAdmin
 {
+	private $client = '';
+
+	// Use imported Trait in model
+	use TjfieldsFilterField;
+
 	/**
 	 * Method to auto-populate the model state.
 	 *
@@ -34,30 +42,32 @@ class TjucmModelItem extends JModelItem
 	protected function populateState()
 	{
 		$app  = JFactory::getApplication('com_tjucm');
-        $user = JFactory::getUser();
+		$user = JFactory::getUser();
 
-        // Check published state
-        if ((!$user->authorise('core.edit.state', 'com_tjucm')) && (!$user->authorise('core.edit', 'com_tjucm')))
-        {
-            $this->setState('filter.published', 1);
-            $this->setState('fileter.archived', 2);
-        }
-
-		// Load state from the request userState on edit or from the passed variable on default
-		if (JFactory::getApplication()->input->get('layout') == 'edit')
-		{
-			$id = JFactory::getApplication()->getUserState('com_tjucm.edit.item.id');
-		}
-		else
-		{
-			$id = JFactory::getApplication()->input->get('id');
-			JFactory::getApplication()->setUserState('com_tjucm.edit.item.id', $id);
-		}
+		// Load state from the request.
+		$id = $app->input->getInt('id');
 
 		$this->setState('item.id', $id);
 
+		// Get UCM type id from uniquue identifier
+		$ucmType = $app->input->get('client', '');
+
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		$ucmId = $tjUcmModelType->getTypeId($ucmType);
+
+		$this->setState('ucmType.id', $ucmId);
+
+		// Check published state
+		if ((!$user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmId))
+			&& (!$user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $ucmId)))
+		{
+			$this->setState('filter.published', 1);
+			$this->setState('fileter.archived', 2);
+		}
+
 		// Load the parameters.
-		$params       = $app->getParams();
+		$params = $app->getParams();
 		$params_array = $params->toArray();
 
 		if (isset($params_array['item_id']))
@@ -77,6 +87,8 @@ class TjucmModelItem extends JModelItem
 	 */
 	public function &getData($id = null)
 	{
+		$user = JFactory::getUser();
+
 		if ($this->_item === null)
 		{
 			$this->_item = false;
@@ -86,6 +98,10 @@ class TjucmModelItem extends JModelItem
 				$id = $this->getState('item.id');
 			}
 
+			// Get UCM type id (Get if user is autorised to edit the items for this UCM type)
+			$ucmTypeId = $this->getState('ucmType.id');
+			$canView = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $ucmTypeId);
+
 			// Get a level row instance.
 			$table = $this->getTable();
 
@@ -93,53 +109,37 @@ class TjucmModelItem extends JModelItem
 			if ($table->load($id))
 			{
 				// Check published state.
-				if ($published = $this->getState('filter.published'))
+				$published = $this->getState('filter.published');
+				$archived = $this->getState('filter.archived');
+
+				if (is_numeric($published))
 				{
-					if ($table->state != $published)
+					// Check for published state if filter set.
+					if (((is_numeric($published)) || (is_numeric($archived))) && (($table->state != $published) && ($table->state != $archived)))
 					{
-						throw new Exception(JText::_('COM_TJUCM_ITEM_NOT_LOADED'), 403);
+						return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
 					}
 				}
 
 				// Convert the JTable to a clean JObject.
 				$properties  = $table->getProperties(1);
+				$properties['params'] = clone $this->getState('params');
+
 				$this->_item = ArrayHelper::toObject($properties, 'JObject');
-			}
-		}
+				$this->_item->params->set('access-view', false);
 
-		
-
-			if (isset($this->_item->type_id) && $this->_item->type_id != '') {
-				if (is_object($this->_item->type_id))
+				if (!empty($this->_item->id))
 				{
-					$this->_item->type_id = \Joomla\Utilities\ArrayHelper::fromObject($this->_item->type_id);
-				}
-				$values = (is_array($this->_item->type_id)) ? $this->_item->type_id : explode(',',$this->_item->type_id);
-
-				$textValue = array();
-				foreach ($values as $value)
-				{
-					$db = JFactory::getDbo();
-					$query = $db->getQuery(true);
-					$query
-						->select('`#__tj_ucm_types_2546051`.`id`')
-						->from($db->quoteName('#__tj_ucm_types', '#__tj_ucm_types_2546051'))
-						->where($db->quoteName('id') . ' = ' . $db->quote($db->escape($value)));
-					$db->setQuery($query);
-					$results = $db->loadObject();
-					if ($results) {
-						$textValue[] = $results->id;
+					if ($canView)
+					{
+						$this->_item->params->set('access-view', true);
 					}
 				}
-
-			$this->_item->type_id = !empty($textValue) ? implode(', ', $textValue) : $this->_item->type_id;
-
-			}if (isset($this->_item->created_by) )
-		{
-			$this->_item->created_by_name = JFactory::getUser($this->_item->created_by)->name;
-		}if (isset($this->_item->modified_by) )
-		{
-			$this->_item->modified_by_name = JFactory::getUser($this->_item->modified_by)->name;
+			}
+			else
+			{
+				return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
+			}
 		}
 
 		return $this->_item;
@@ -295,6 +295,15 @@ class TjucmModelItem extends JModelItem
 		return $table->delete($id);
 	}
 
+	/**
+	 * Method to getAliasFieldNameByView
+	 *
+	 * @param   array  $view  An array of record primary keys.
+	 *
+	 * @return  boolean  True if successful, false if an error occurs.
+	 *
+	 * @since   1.0
+	 */
 	public function getAliasFieldNameByView($view)
 	{
 		switch ($view)

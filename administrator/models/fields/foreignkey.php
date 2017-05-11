@@ -1,12 +1,12 @@
 <?php
-
 /**
- * @version    CVS: 1.0.0
+ * @version    SVN: <svn_id>
  * @package    Com_Tjucm
- * @author     Parth Lawate <contact@techjoomla.com>
- * @copyright  2016 Techjoomla
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @author     Techjoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
+
 defined('JPATH_BASE') or die;
 
 jimport('joomla.form.formfield');
@@ -80,7 +80,7 @@ class JFormFieldForeignKey extends JFormField
 			{
 				$fk_value .= $db->quoteName($field) . ', \' \', ';
 			}
-			
+
 			$fk_value = substr($fk_value, 0, -7);
 			$fk_value .= ') AS ' . $db->quoteName($this->value_field);
 		}

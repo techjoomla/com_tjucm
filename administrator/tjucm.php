@@ -1,10 +1,10 @@
 <?php
 /**
- * @version    CVS: 1.0.0
+ * @version    SVN: <svn_id>
  * @package    Com_Tjucm
- * @author     Parth Lawate <contact@techjoomla.com>
- * @copyright  2016 Techjoomla
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @author     Techjoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
 
 // No direct access
@@ -26,6 +26,16 @@ if (!class_exists('TjucmFunList'))
 	// Require_once $path;
 	JLoader::register('TjucmFunList', $path);
 	JLoader::load('TjucmFunList');
+}
+
+
+// Load backend helper
+$path = JPATH_ADMINISTRATOR . '/components/com_tjucm/helpers/tjucm.php';
+
+if (!class_exists('TjucmHelper'))
+{
+	JLoader::register('TjucmHelper', $path);
+	JLoader::load('TjucmHelper');
 }
 
 JLoader::registerPrefix('Tjucm', JPATH_COMPONENT_ADMINISTRATOR);

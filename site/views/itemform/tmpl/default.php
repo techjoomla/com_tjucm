@@ -29,7 +29,7 @@ $baseUrl                   = $jinput->input->server->get('REQUEST_URI', '', 'STR
 $calledFrom                = (strpos($baseUrl, 'administrator')) ? 'backend' : 'frontend';
 $layout                    = ($calledFrom == 'frontend') ? 'default' : 'edit';
 $client                    = JFactory::getApplication()->input->get('client');
-$is_saved                  = $jinput->input->get("success", '', INT);
+$is_saved                  = $jinput->input->get("success", '', 'INT');
 $fieldsets_counter_deafult = 0;
 $app                       = JFactory::getApplication();
 $menu                      = $app->getMenu();

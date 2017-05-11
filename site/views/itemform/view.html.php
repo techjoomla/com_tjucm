@@ -1,16 +1,17 @@
 <?php
-
 /**
- * @version    CVS: 1.0.0
+ * @version    SVN: <svn_id>
  * @package    Com_Tjucm
- * @author     Parth Lawate <contact@techjoomla.com>
- * @copyright  2016 Techjoomla
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @author     Techjoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
+
 // No direct access
 defined('_JEXEC') or die;
 
 jimport('joomla.application.component.view');
+jimport('joomla.application.component.controller');
 
 /**
  * View to edit
@@ -50,6 +51,18 @@ class TjucmViewItemform extends JViewLegacy
 		$this->canSave = $this->get('CanSave');
 		$this->form		= $this->get('Form');
 
+		// Check the view access to the itemform (the model has already computed the values).
+		if ($this->item->params->get('access-view') == false)
+		{
+			$app->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
+			$app->setHeader('status', 403, true);
+
+			return;
+		}
+
+		// Include models
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+
 		/* Get model instance here */
 		$model = $this->getModel();
 
@@ -58,6 +71,33 @@ class TjucmViewItemform extends JViewLegacy
 
 		$input  = JFactory::getApplication()->input;
 		$input->set("content_id", $id);
+
+		// Get if user is allowed to save the content
+		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		$typeId = $tjUcmModelType->getTypeId($this->client);
+
+		$TypeData = $tjUcmModelType->getItem($typeId);
+
+		$allowedCount = $TypeData->allowed_count;
+		$user   = JFactory::getUser();
+		$userId = $user->id;
+
+		if (empty($this->id))
+		{
+			$this->allowedToAdd = $model->allowedToAddTypeData($userId, $this->client, $allowedCount);
+
+			if (!$this->allowedToAdd)
+			{
+				if (!class_exists('TjucmControllerItemForm'))
+				{
+					JLoader::register('TjucmControllerItemForm', JPATH_SITE . '/components/com_tjucm/controllers/itemform.php');
+					JLoader::load('TjucmControllerItemForm');
+				}
+
+				$itemFormController = new TjucmControllerItemForm;
+				$itemFormController->redirectToListView($typeId, $allowedCount);
+			}
+		}
 
 		$view = explode('.', $this->client);
 

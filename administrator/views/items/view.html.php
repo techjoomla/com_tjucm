@@ -1,12 +1,12 @@
 <?php
-
 /**
- * @version    CVS: 1.0.0
+ * @version    SVN: <svn_id>
  * @package    Com_Tjucm
- * @author     Parth Lawate <contact@techjoomla.com>
- * @copyright  2016 Techjoomla
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @author     Techjoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
+
 // No direct access
 defined('_JEXEC') or die;
 
@@ -39,8 +39,13 @@ class TjucmViewItems extends JViewLegacy
 		$this->state = $this->get('State');
 		$model_items = $this->getModel('items');
 
+		$client = JFactory::getApplication()->input->get('client');
+
 		// Set client value
-		$model_items->setClient(JFactory::getApplication()->input->get('client'));
+		$model_items->setClient($client);
+
+		// If there are no fields column to show in list view then dont allow to show data
+		$this->showList = $model_items->showListCheck($client);
 
 		$this->items = $this->get('Items');
 		$this->pagination = $this->get('Pagination');
@@ -52,7 +57,7 @@ class TjucmViewItems extends JViewLegacy
 			throw new Exception(implode("\n", $errors));
 		}
 
-		TjucmHelpersTjucm::addSubmenu('items');
+		TjucmHelper::addSubmenu('items');
 
 		$this->addToolbar();
 
@@ -70,7 +75,7 @@ class TjucmViewItems extends JViewLegacy
 	protected function addToolbar()
 	{
 		$state = $this->get('State');
-		$canDo = TjucmHelpersTjucm::getActions();
+		$canDo = TjucmHelper::getActions();
 
 		JToolBarHelper::title(JText::_('COM_TJUCM_TITLE_ITEMS'), 'items.png');
 

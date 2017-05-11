@@ -1,12 +1,12 @@
 <?php
-
 /**
- * @version    CVS: 1.0.0
+ * @version    SVN: <svn_id>
  * @package    Com_Tjucm
- * @author     Parth Lawate <contact@techjoomla.com>
- * @copyright  2016 Techjoomla
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @author     Techjoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
+
 defined('_JEXEC') or die;
 
 jimport('joomla.application.component.modellist');
@@ -18,6 +18,8 @@ jimport('joomla.application.component.modellist');
  */
 class TjucmModelItems extends JModelList
 {
+	private $client;
+
 	/**
 	 * Constructor.
 	 *
@@ -42,15 +44,7 @@ class TjucmModelItems extends JModelList
 			);
 		}
 
-		$app = JFactory::getApplication();
-
-		// Get the active item
-		$menuitem   = $app->getMenu()->getActive();
-
-		// Get the params
-		$this->menuparams = $menuitem->params;
-		$this->ucm_type   = $this->menuparams->get('ucm_type');
-		$this->client     = 'com_tjucm.' . $this->ucm_type;
+		$this->loginuserid = JFactory::getUser()->id;
 
 		$this->fields_separator = "#:";
 		$this->records_separator = "#=>";
@@ -75,6 +69,18 @@ class TjucmModelItems extends JModelList
 	protected function populateState($ordering = null, $direction = null)
 	{
 		$app  = JFactory::getApplication();
+		$input = $app->input;
+
+		// Get UCM type id from uniquue identifier
+		$ucmType = $input->get('client', '', 'STRING');
+
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		$ucmId = $tjUcmModelType->getTypeId($ucmType);
+
+		$this->setState('ucm.client', $ucmType);
+		$this->setState('ucmType.id', $ucmId);
+
 		$list = $app->getUserState($this->context . '.list');
 
 		$ordering  = isset($list['filter_order'])     ? $list['filter_order']     : null;
@@ -87,6 +93,11 @@ class TjucmModelItems extends JModelList
 
 		$app->setUserState($this->context . '.list', $list);
 		$app->input->set('list', null);
+		$type_id = $app->input->get('id', "", "INT");
+		$this->setState("type_id", $type_id);
+
+		$createdBy = $app->input->get('created_by', "", "INT");
+		$this->setState("created_by", $createdBy);
 
 		// List state information.
 		parent::populateState($ordering, $direction);
@@ -101,7 +112,7 @@ class TjucmModelItems extends JModelList
 	 */
 	protected function getListQuery()
 	{
-// Create a new query object.
+		// Create a new query object.
 		$db    = $this->getDbo();
 		$query = $db->getQuery(true);
 
@@ -111,7 +122,7 @@ class TjucmModelItems extends JModelList
 		// Select the required fields from the table.
 		$query->select(
 			$this->getState(
-				'list.select', 'DISTINCT a.id, ' . $group_concat
+				'list.select', 'DISTINCT a.id, a.state, ' . $group_concat
 			)
 		);
 
@@ -128,7 +139,7 @@ class TjucmModelItems extends JModelList
 
 		// Join over the user field 'created_by'
 		$query->select('`created_by`.name AS `created_by`');
-		$query->join('LEFT', '#__users AS `created_by` ON `created_by`.id = a.`created_by`');
+		$query->join('INNER', '#__users AS `created_by` ON `created_by`.id = a.`created_by`');
 
 		// Join over the user field 'modified_by'
 		$query->select('`modified_by`.name AS `modified_by`');
@@ -140,8 +151,29 @@ class TjucmModelItems extends JModelList
 		// Join over the tjfield value
 		$query->join('INNER', '#__tjfields_fields_value AS fieldValue ON a.id = fieldValue.content_id');
 
-		$query->where('a.client = ' . $db->quote($db->escape($this->client)));
+		$this->client = $this->getState('ucm.client');
+
+		if (!empty($this->client))
+		{
+			$query->where('a.client = ' . $db->quote($db->escape($this->client)));
+		}
+
 		$query->where('fields.id = fieldValue.field_id');
+
+		$ucmType = $this->getState('type_id', '', 'INT');
+
+		if (!empty($ucmType))
+		{
+			$query->where($db->quoteName('a.type_id') . "=" . (INT) $ucmType);
+		}
+
+		$createdBy = $this->getState('created_by', '', 'INT');
+
+		if (!empty($ucmType))
+		{
+			$query->where($db->quoteName('a.created_by') . "=" . (INT) $createdBy);
+		}
+
 		$query->where('fields.showonlist =  1');
 
 		// Filter by published state
@@ -182,8 +214,6 @@ class TjucmModelItems extends JModelList
 			$query->order($db->escape($orderCol . ' ' . $orderDirn));
 		}
 
-		echo $query;
-
 		return $query;
 	}
 
@@ -197,7 +227,13 @@ class TjucmModelItems extends JModelList
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
 		$items_model = JModelLegacy::getInstance('Fields', 'TjfieldsModel');
 		$items_model->setState('filter.showonlist', 1);
-		$items_model->setState('filter.client', $this->client);
+		$this->client = $this->getState('ucm.client');
+
+		if (!empty($this->client))
+		{
+			$items_model->setState('filter.client', $this->client);
+		}
+
 		$items = $items_model->getItems();
 
 		$data = array();
@@ -305,5 +341,70 @@ class TjucmModelItems extends JModelList
 		$date = str_replace('/', '-', $date);
 
 		return (date_create($date)) ? JFactory::getDate($date)->format("Y-m-d") : null;
+	}
+
+	/**
+	 * Method to getAliasFieldNameByView
+	 *
+	 * @param   array  $view  An array of record primary keys.
+	 *
+	 * @return  boolean  True if successful, false if an error occurs.
+	 *
+	 * @since   12.2
+	 */
+	public function getAliasFieldNameByView($view)
+	{
+		switch ($view)
+		{
+			case 'items':
+				return 'alias';
+			break;
+		}
+	}
+
+	/**
+	 * Get an item by alias
+	 *
+	 * @param   string  $alias  Alias string
+	 *
+	 * @return int Element id
+	 */
+	public function getItemIdByAlias($alias)
+	{
+		$db = JFactory::getDbo();
+		$table = JTable::getInstance('type', 'TjucmTable', array('dbo', $db));
+
+		$table->load(array('alias' => $alias));
+
+		return $table->id;
+	}
+
+	/**
+	 * Check if there are fields to show in list view
+	 *
+	 * @param   string  $client  Client
+	 *
+	 * @return boolean
+	 */
+	public function showListCheck($client)
+	{
+		if (!empty($client))
+		{
+			$db = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select("count(" . $db->quoteName('id') . ")");
+			$query->from($db->quoteName('#__tjfields_fields'));
+			$query->where($db->quoteName('client') . '=' . $db->quote($client));
+			$query->where($db->quoteName('showonlist') . '=1');
+			$db->setQuery($query);
+
+			$result = $db->loadResult();
+
+			return $result;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }

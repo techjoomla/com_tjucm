@@ -1,12 +1,12 @@
 <?php
-
 /**
- * @version    CVS: 1.0.0
+ * @version    SVN: <svn_id>
  * @package    Com_Tjucm
- * @author     Parth Lawate <contact@techjoomla.com>
- * @copyright  2016 Techjoomla
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @author     Techjoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
+
 defined('_JEXEC') or die;
 
 jimport('joomla.application.component.modellist');
@@ -139,7 +139,7 @@ class TjucmModelItems extends JModelList
 
 		// Join over the user field 'created_by'
 		$query->select('`created_by`.name AS `created_by`');
-		$query->join('LEFT', '#__users AS `created_by` ON `created_by`.id = a.`created_by`');
+		$query->join('INNER', '#__users AS `created_by` ON `created_by`.id = a.`created_by`');
 
 		// Join over the user field 'modified_by'
 		$query->select('`modified_by`.name AS `modified_by`');
@@ -151,9 +151,20 @@ class TjucmModelItems extends JModelList
 		// Join over the tjfield value
 		$query->join('INNER', '#__tjfields_fields_value AS fieldValue ON a.id = fieldValue.content_id');
 
-		$query->where('a.client = ' . $db->quote($db->escape($this->client)));
+		if (!empty($this->client))
+		{
+			$query->where('a.client = ' . $db->quote($db->escape($this->client)));
+		}
+
 		$query->where('fields.id = fieldValue.field_id');
 		$query->where('fields.showonlist =  1');
+
+		$ucmType = $this->getState('type_id', '', 'INT');
+
+		if (!empty($ucmType))
+		{
+			$query->where($db->quoteName('a.type_id') . "=" . (INT) $ucmType);
+		}
 
 		// Filter by published state
 		$published = $this->getState('filter.state');
@@ -228,7 +239,12 @@ class TjucmModelItems extends JModelList
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
 		$items_model = JModelLegacy::getInstance('Fields', 'TjfieldsModel');
 		$items_model->setState('filter.showonlist', 1);
-		$items_model->setState('filter.client', $this->client);
+
+		if (!empty($this->client))
+		{
+			$items_model->setState('filter.client', $this->client);
+		}
+
 		$items = $items_model->getItems();
 
 		$data = array();
@@ -292,5 +308,34 @@ class TjucmModelItems extends JModelList
 		}
 
 		return $items;
+	}
+
+	/**
+	 * Check if there are fields to show in list view
+	 *
+	 * @param   string  $client  Client
+	 *
+	 * @return boolean
+	 */
+	public function showListCheck($client)
+	{
+		if (!empty($client))
+		{
+			$db = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select("count(" . $db->quoteName('id') . ")");
+			$query->from($db->quoteName('#__tjfields_fields'));
+			$query->where($db->quoteName('client') . '=' . $db->quote($client));
+			$query->where($db->quoteName('showonlist') . '=1');
+			$db->setQuery($query);
+
+			$result = $db->loadResult();
+
+			return $result;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }

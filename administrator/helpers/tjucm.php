@@ -1,12 +1,12 @@
 <?php
-
 /**
- * @version    CVS: 1.0.0
+ * @version    SVN: <svn_id>
  * @package    Com_Tjucm
- * @author     Parth Lawate <contact@techjoomla.com>
- * @copyright  2016 Techjoomla
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @author     Techjoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
+
 // No direct access
 defined('_JEXEC') or die;
 
@@ -15,7 +15,7 @@ defined('_JEXEC') or die;
  *
  * @since  1.6
  */
-class TjucmHelpersTjucm
+class TjucmHelper extends JHelperContent
 {
 	/**
 	 * Configure the Linkbar.
@@ -32,12 +32,11 @@ class TjucmHelpersTjucm
 			$vName == 'types'
 		);
 
-JHtmlSidebar::addEntry(
+		JHtmlSidebar::addEntry(
 			JText::_('COM_TJUCM_TITLE_ITEMS'),
 			'index.php?option=com_tjucm&view=items',
 			$vName == 'items'
 		);
-
 	}
 
 	/**
@@ -69,32 +68,18 @@ JHtmlSidebar::addEntry(
 	/**
 	 * Gets a list of the actions that can be performed.
 	 *
-	 * @return    JObject
+	 * @param   string   $component  The component name.
+	 * @param   string   $section    The access section name.
+	 * @param   integer  $id         The item ID.
 	 *
-	 * @since    1.6
+	 * @return  JObject
+	 *
+	 * @since   3.2
 	 */
-	public static function getActions()
+	public static function getActions($component = 'com_tjucm', $section = '', $id = 0)
 	{
-		$user   = JFactory::getUser();
-		$result = new JObject;
-
-		$assetName = 'com_tjucm';
-
-		$actions = array(
-			'core.admin', 'core.manage', 'core.create', 'core.edit', 'core.edit.own', 'core.edit.state', 'core.delete'
-		);
-
-		foreach ($actions as $action)
-		{
-			$result->set($action, $user->authorise($action, $assetName));
-		}
+		$result = parent::getActions($component, $section, $id);
 
 		return $result;
 	}
-}
-
-
-class TjucmHelper extends TjucmHelpersTjucm
-{
-
 }

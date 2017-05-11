@@ -8,8 +8,15 @@ function steppedFormSave(form_id, status)
 	jQuery('#form_status').val(status);
 
 	if ('save' == status) {
-		if (!document.formvalidator.isValid('#item-form')) {
-				return false;
+		if(confirm(Joomla.JText._('COM_TJUCM_ITEMFORM_ALERT')) == true)
+		{
+			if (!document.formvalidator.isValid('#item-form')) {
+					return false;
+			}
+		}
+		else
+		{
+			return false;
 		}
 	}
 
@@ -20,13 +27,17 @@ function steppedFormSave(form_id, status)
 			success: function(data) {
 
 				var returnedData = JSON.parse(data);
+
 				if ('save' == status) {
-					/*var url= window.location.href.split('#')[0],
+					jQuery("#finalSave").attr("disabled", "disabled");
+					var url= window.location.href.split('#')[0],
 					separator = (url.indexOf("?")===-1)?"?":"&",
-					newParam=separator + "success=1";
+					newParam=separator + "success=1&layout=details";
+					//~ newParam=separator + "layout=details";
 					newUrl=url.replace(newParam,"");
 					newUrl+=newParam;
-					window.location.href =newUrl;*/
+					window.location.href =newUrl;
+
 					opener.location.reload();
 					window.close();
 				}

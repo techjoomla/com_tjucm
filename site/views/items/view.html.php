@@ -1,12 +1,12 @@
 <?php
-
 /**
- * @version    CVS: 1.0.0
+ * @version    SVN: <svn_id>
  * @package    Com_Tjucm
- * @author     Parth Lawate <contact@techjoomla.com>
- * @copyright  2016 Techjoomla
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @author     Techjoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
+
 // No direct access
 defined('_JEXEC') or die;
 
@@ -39,18 +39,19 @@ class TjucmViewItems extends JViewLegacy
 	public function display($tpl = null)
 	{
 		$app = JFactory::getApplication();
-
-		$this->state      = $this->get('State');
+		$input = $app->input;
+		$this->state  = $this->get('State');
 		$this->items = $this->get('Items');
 		$this->pagination = $this->get('Pagination');
 		$this->params     = $app->getParams('com_tjucm');
 		$this->listcolumn = $this->get('Fields');
 
-		// Get the active item
-		$menuitem   = $app->getMenu()->getActive();
+		$model   = $this->getModel("Items");
+		$this->ucmTypeId = $model->getState('ucmType.id');
+		$this->client = $model->getState('ucm.client');
 
-		// Get the params
-		$this->menuparams = $menuitem->params;
+		// If there are no fields column to show in list view then dont allow to show data
+		$this->showList = $model->showListCheck($client);
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
@@ -119,17 +120,5 @@ class TjucmViewItems extends JViewLegacy
 		{
 			$this->document->setMetadata('robots', $this->params->get('robots'));
 		}
-	}
-
-	/**
-	 * Check if state is set
-	 *
-	 * @param   mixed  $state  State
-	 *
-	 * @return bool
-	 */
-	public function getState($state)
-	{
-		return isset($this->state->{$state}) ? $this->state->{$state} : false;
 	}
 }

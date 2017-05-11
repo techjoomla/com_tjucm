@@ -153,114 +153,135 @@ if (!empty($this->extra_sidebar))
 			</div>
 		</div>
 		<div class="clearfix"></div>
+		<?php
+		if (!empty($this->showList))
+		{
+			if (!empty($this->items))
+			{
+			?>
+				<table class="table table-striped" id="itemList">
+					<thead>
+						<tr>
+							<?php if (isset($this->items[0]->ordering)): ?>
+								<th width="1%" class="nowrap center hidden-phone">
+									<?php echo JHtml::_('grid.sort', '<i class="icon-menu-2"></i>', 'a.`ordering`', $listDirn, $listOrder, null, 'asc', 'JGRID_HEADING_ORDERING'); ?>
+								</th>
+							<?php endif; ?>
 
-		<table class="table table-striped" id="itemList">
-			<thead>
-				<tr>
-					<?php if (isset($this->items[0]->ordering)): ?>
-						<th width="1%" class="nowrap center hidden-phone">
-							<?php echo JHtml::_('grid.sort', '<i class="icon-menu-2"></i>', 'a.`ordering`', $listDirn, $listOrder, null, 'asc', 'JGRID_HEADING_ORDERING'); ?>
-						</th>
-					<?php endif; ?>
+							<th width="1%" class="hidden-phone">
+								<input type="checkbox" name="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)"/>
+							</th>
 
-					<th width="1%" class="hidden-phone">
-						<input type="checkbox" name="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)"/>
-					</th>
+							<?php if (isset($this->items[0]->state)): ?>
+								<th width="1%" class="nowrap center">
+									<?php echo JHtml::_('grid.sort', 'JSTATUS', 'a.`state`', $listDirn, $listOrder); ?>
+								</th>
+							<?php endif; ?>
 
-					<?php if (isset($this->items[0]->state)): ?>
-						<th width="1%" class="nowrap center">
-							<?php echo JHtml::_('grid.sort', 'JSTATUS', 'a.`state`', $listDirn, $listOrder); ?>
-						</th>
-					<?php endif; ?>
-
-					<th class='left'>
-						<?php echo JHtml::_('grid.sort',  'COM_TJUCM_ITEMS_ID', 'a.`id`', $listDirn, $listOrder); ?>
-					</th>
-					<?php
-					if (!empty($this->listcolumn))
-					{
-						foreach ($this->listcolumn as $col_name)
-						{ ?>
 							<th class='left'>
-								<?php echo $col_name; ?>
-							</th> <?php
-						}
-					}?>
-				</tr>
-			</thead>
+								<?php echo JHtml::_('grid.sort',  'COM_TJUCM_ITEMS_ID', 'a.`id`', $listDirn, $listOrder); ?>
+							</th>
+							<?php
+							if (!empty($this->listcolumn))
+							{
+								foreach ($this->listcolumn as $col_name)
+								{ ?>
+									<th class='left'>
+										<?php echo $col_name; ?>
+									</th> <?php
+								}
+							}?>
+						</tr>
+					</thead>
 
-			<tfoot>
-				<tr>
-					<td colspan="<?php echo isset($this->items[0]) ? count(get_object_vars($this->items[0])) : 10; ?>">
-						<?php echo $this->pagination->getListFooter(); ?>
-					</td>
-				</tr>
-			</tfoot>
+					<tfoot>
+						<tr>
+							<td colspan="<?php echo isset($this->items[0]) ? count(get_object_vars($this->items[0])) : 10; ?>">
+								<?php echo $this->pagination->getListFooter(); ?>
+							</td>
+						</tr>
+					</tfoot>
 
-			<tbody>
-				<?php foreach ($this->items as $i => $item) :
-					$link = JRoute::_('index.php?option=com_tjucm&view=item&layout=edit&id=' . $item->id . '&client=' . $client, false);
-					$ordering   = ($listOrder == 'a.ordering');
-					$canCreate  = $user->authorise('core.create', 'com_tjucm');
-					$canEdit    = $user->authorise('core.edit', 'com_tjucm');
-					$canCheckin = $user->authorise('core.manage', 'com_tjucm');
-					$canChange  = $user->authorise('core.edit.state', 'com_tjucm');
-					?>
-					<tr class="row<?php echo $i % 2; ?>">
-						<?php if (isset($this->items[0]->ordering)) : ?>
-							<td class="order nowrap center hidden-phone">
-								<?php if ($canChange) :
-										$disableClassName = '';
-										$disabledLabel    = '';
+					<tbody>
+						<?php foreach ($this->items as $i => $item) :
+							$link = JRoute::_('index.php?option=com_tjucm&view=item&layout=edit&id=' . $item->id . '&client=' . $client, false);
+							$ordering   = ($listOrder == 'a.ordering');
+							$canCreate  = $user->authorise('core.create', 'com_tjucm');
+							$canEdit    = $user->authorise('core.edit', 'com_tjucm');
+							$canCheckin = $user->authorise('core.manage', 'com_tjucm');
+							$canChange  = $user->authorise('core.edit.state', 'com_tjucm');
+							?>
+							<tr class="row<?php echo $i % 2; ?>">
+								<?php if (isset($this->items[0]->ordering)) : ?>
+									<td class="order nowrap center hidden-phone">
+										<?php if ($canChange) :
+												$disableClassName = '';
+												$disabledLabel    = '';
 
-										if (!$saveOrder) :
-											$disabledLabel    = JText::_('JORDERINGDISABLED');
-											$disableClassName = 'inactive tip-top';
-										endif; ?>
+												if (!$saveOrder) :
+													$disabledLabel    = JText::_('JORDERINGDISABLED');
+													$disableClassName = 'inactive tip-top';
+												endif; ?>
 
-										<span class="sortable-handler hasTooltip <?php echo $disableClassName ?>" title="<?php echo $disabledLabel ?>">
-											<i class="icon-menu"></i>
-										</span>
+												<span class="sortable-handler hasTooltip <?php echo $disableClassName ?>" title="<?php echo $disabledLabel ?>">
+													<i class="icon-menu"></i>
+												</span>
 
-										<input type="text" style="display:none" name="order[]" size="5" value="<?php echo $item->ordering; ?>" class="width-20 text-area-order "/>
-								<?php else : ?>
-										<span class="sortable-handler inactive">
-											<i class="icon-menu"></i>
-										</span>
+												<input type="text" style="display:none" name="order[]" size="5" value="<?php echo $item->ordering; ?>" class="width-20 text-area-order "/>
+										<?php else : ?>
+												<span class="sortable-handler inactive">
+													<i class="icon-menu"></i>
+												</span>
+										<?php endif; ?>
+									</td>
 								<?php endif; ?>
-							</td>
-						<?php endif; ?>
 
-						<td class="hidden-phone">
-							<?php echo JHtml::_('grid.id', $i, $item->id); ?>
-						</td>
+								<td class="hidden-phone">
+									<?php echo JHtml::_('grid.id', $i, $item->id); ?>
+								</td>
 
-						<?php if (isset($this->items[0]->state)): ?>
-							<td class="center">
-								<?php echo JHtml::_('jgrid.published', $item->state, $i, 'items.', $canChange, 'cb'); ?>
-							</td>
-						<?php endif; ?>
+								<?php if (isset($this->items[0]->state)): ?>
+									<td class="center">
+										<?php echo JHtml::_('jgrid.published', $item->state, $i, 'items.', $canChange, 'cb'); ?>
+									</td>
+								<?php endif; ?>
 
-						<td>
-							<a href="<?php echo $link;?>"><?php echo $item->id; ?></a>
-						</td>
-
-						<?php
-						if (!empty ($item->field_values))
-						{
-							foreach ($item->field_values as $field_values)
-							{?>
 								<td>
-									<a href="<?php echo $link;?>"><?php echo $field_values; ?></a>
-								</td><?php
-							}
-						}
-						?>
+									<a href="<?php echo $link;?>"><?php echo $item->id; ?></a>
+								</td>
 
-					</tr>
-				<?php endforeach; ?>
-			</tbody>
-		</table>
+								<?php
+								if (!empty ($item->field_values))
+								{
+									foreach ($item->field_values as $field_values)
+									{?>
+										<td>
+											<a href="<?php echo $link;?>"><?php echo $field_values; ?></a>
+										</td><?php
+									}
+								}
+								?>
+
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+			<?php
+			}
+			else
+			{
+			?>
+				<div class="alert alert-warrning"><?php echo JText::_("COM_TJUCM_NO_DATA_FOUND");?></div>
+			<?php
+			}
+		}
+		else
+		{
+			?>
+			<div class="alert alert-warrning"><?php echo JText::_("COM_TJUCM_NO_FIELDS_TO_SHOW_ON_LIST_VIEW");?></div>
+			<?php
+		}
+		?>
 		<input type="hidden" name="jform[client]" value="<?php echo $client;?>" />
 		<input type="hidden" name="task" value=""/>
 		<input type="hidden" name="boxchecked" value="0"/>

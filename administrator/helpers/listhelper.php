@@ -1,12 +1,12 @@
 <?php
-
 /**
- * @version    CVS: 1.0.0
+ * @version    SVN: <svn_id>
  * @package    Com_Tjucm
- * @author     Parth Lawate <contact@techjoomla.com>
- * @copyright  2016 Techjoomla
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @author     Techjoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
+
 // No direct access
 defined('_JEXEC') or die;
 
@@ -17,7 +17,19 @@ defined('_JEXEC') or die;
  */
 abstract class JHtmlListhelper
 {
-	static function toggle($value = 0, $view, $field, $i)
+	/**
+	 * Function to toggle
+	 *
+	 * @param   string  $value  value
+	 * @param   string  $view   view
+	 * @param   string  $field  field
+	 * @param   string  $i      counter
+	 *
+	 * @return html
+	 *
+	 * @since 1.0
+	 * */
+	public static function toggle($value = 0, $view = '', $field = '', $i = '')
 	{
 		$states = array(
 			0 => array('icon-remove', JText::_('Toggle'), 'inactive btn-danger'),
@@ -27,7 +39,8 @@ abstract class JHtmlListhelper
 		$state  = \Joomla\Utilities\ArrayHelper::getValue($states, (int) $value, $states[0]);
 		$text   = '<span aria-hidden="true" class="' . $state[0] . '"></span>';
 		$html   = '<a href="#" class="btn btn-micro ' . $state[2] . '"';
-		$html  .= 'onclick="return toggleField(\'cb'.$i.'\',\'' . $view . '.toggle\',\'' . $field . '\')" title="' . JText::_($state[1]) . '">' . $text . '</a>';
+		$html  .= 'onclick="return toggleField(\'cb' . $i . '\',\''
+		. $view . '.toggle\',\'' . $field . '\')" title="' . JText::_($state[1]) . '">' . $text . '</a>';
 
 		return $html;
 	}

@@ -18,16 +18,11 @@ $user       = JFactory::getUser();
 $userId     = $user->get('id');
 $listOrder  = $this->state->get('list.ordering');
 $listDirn   = $this->state->get('list.direction');
-$canCreate  = $user->authorise('core.create', 'com_tjucm') && file_exists(JPATH_COMPONENT . DIRECTORY_SEPARATOR . 'models' . DIRECTORY_SEPARATOR . 'forms' . DIRECTORY_SEPARATOR . 'itemform.xml');
-$canEdit    = $user->authorise('core.edit', 'com_tjucm') && file_exists(JPATH_COMPONENT . DIRECTORY_SEPARATOR . 'models' . DIRECTORY_SEPARATOR . 'forms' . DIRECTORY_SEPARATOR . 'itemform.xml');
-$canCheckin = $user->authorise('core.manage', 'com_tjucm');
-$canChange  = $user->authorise('core.edit.state', 'com_tjucm');
-$canDelete  = $user->authorise('core.delete', 'com_tjucm');
-
-
-echo"<pre>"; print_r($this->items); echo"</pre>";die('kom');
+$canCreate  = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $this->ucmTypeId) && file_exists(JPATH_COMPONENT . '/models/forms/itemform.xml');
+$canEdit    = $user->authorise('core.edit', 'com_tjucm.type.edititem' . $this->ucmTypeId) && file_exists(JPATH_COMPONENT . '/models/forms/itemform.xml');
+$canChange  = $user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $this->ucmTypeId);
+$canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this->ucmTypeId);
 ?>
-
 <form action="<?php echo JRoute::_('index.php?option=com_tjucm&view=items'); ?>" method="post" name="adminForm" id="adminForm">
 	<table class="table table-striped" id="itemList">
 		<thead>
@@ -68,64 +63,91 @@ echo"<pre>"; print_r($this->items); echo"</pre>";die('kom');
 		</tfoot>
 
 		<tbody>
-			<?php foreach ($this->items as $i => $item) : ?>
-				<?php $canEdit = $user->authorise('core.edit', 'com_tjucm'); ?>
-				<?php if (!$canEdit && $user->authorise('core.edit.own', 'com_tjucm')): ?>
-					<?php $canEdit = JFactory::getUser()->id == $item->created_by; ?>
-				<?php endif; ?>
-
-				<tr class="row<?php echo $i % 2; ?>">
-					<?php if (isset($this->items[0]->state)) : ?>
-						<?php $class = ($canChange) ? 'active' : 'disabled'; ?>
-						<td class="center">
-							<a class="btn btn-micro <?php echo $class; ?>" href="<?php echo ($canChange) ? JRoute::_('index.php?option=com_tjucm&task=item.publish&id=' . $item->id . '&state=' . (($item->state + 1) % 2), false, 2) : '#'; ?>">
-							<?php if ($item->state == 1): ?>
-								<i class="icon-publish"></i>
-							<?php else: ?>
-								<i class="icon-unpublish"></i>
-							<?php endif; ?>
-							</a>
-						</td>
+		<?php
+		if(!empty($this->showList))
+		{
+			if(!empty($this->items))
+			{
+				foreach ($this->items as $i => $item) : ?>
+					<?php $link = JRoute::_('index.php?option=com_tjucm&view=itemform&layout=edit&id=' . $item->id . '&layout=details&client=' . $this->client, false); ?>
+					<?php $canEdit = $user->authorise('core.edit', 'com_tjucm'); ?>
+					<?php if (!$canEdit && $user->authorise('core.edit.own', 'com_tjucm')): ?>
+						<?php $canEdit = JFactory::getUser()->id == $item->created_by; ?>
 					<?php endif; ?>
 
-					<td>
-						<?php if (isset($item->checked_out) && $item->checked_out) : ?>
-							<?php echo JHtml::_('jgrid.checkedout', $i, $item->uEditor, $item->checked_out_time, 'items.', $canCheckin); ?>
+					<tr class="row<?php echo $i % 2; ?>">
+						<?php if (isset($this->items[0]->state)) : ?>
+							<?php $class = ($canChange) ? 'active' : 'disabled'; ?>
+							<td class="center">
+								<a class="btn btn-micro <?php echo $class; ?>" href="<?php echo ($canChange) ? JRoute::_('index.php?option=com_tjucm&task=item.publish&id=' . $item->id . '&state=' . (($item->state + 1) % 2), false, 2) : '#'; ?>">
+								<?php if ($item->state == 1): ?>
+									<i class="icon-publish"></i>
+								<?php else: ?>
+									<i class="icon-unpublish"></i>
+								<?php endif; ?>
+								</a>
+							</td>
 						<?php endif; ?>
 
-						<a href="<?php echo JRoute::_('index.php?option=com_tjucm&view=item&id='.(int) $item->id); ?>">
-							<?php echo $this->escape($item->id); ?>
-						</a>
-					</td>
-					<?php
-						if (!empty ($item->field_values))
-						{
-							foreach ($item->field_values as $field_values)
-							{?>
-								<td>
-									<a href="<?php echo $link;?>"><?php echo $field_values; ?></a>
-								</td><?php
-							}
-						}
-						?>
+						<td>
+							<?php if (isset($item->checked_out) && $item->checked_out) : ?>
+								<?php echo JHtml::_('jgrid.checkedout', $i, $item->uEditor, $item->checked_out_time, 'items.', $canCheckin); ?>
+							<?php endif; ?>
 
-					<?php if ($canEdit || $canDelete): ?>
-						<td class="center">
-							<?php if ($canEdit): ?>
-								<a href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit&id=' . $item->id, false, 2); ?>" class="btn btn-mini" type="button"><i class="icon-edit" ></i></a>
-							<?php endif; ?>
-							<?php if ($canDelete): ?>
-								<a href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.remove&id=' . $item->id, false, 2); ?>" class="btn btn-mini delete-button" type="button"><i class="icon-trash" ></i></a>
-							<?php endif; ?>
+							<a href="<?php echo JRoute::_('index.php?option=com_tjucm&view=item&id='.(int) $item->id); ?>">
+								<?php echo $this->escape($item->id); ?>
+							</a>
 						</td>
-					<?php endif; ?>
+						<?php
+							if (!empty ($item->field_values))
+							{
+								foreach ($item->field_values as $field_values)
+								{?>
+									<td>
+										<a href="<?php echo $link;?>"><?php echo $field_values; ?></a>
+									</td><?php
+								}
+							}
+							?>
+
+						<?php if ($canEdit || $canDelete): ?>
+							<td class="center">
+								<?php if ($canEdit): ?>
+									<a target="_blank" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit&id=' . $item->id, false, 2); ?>" class="btn btn-mini" type="button"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+								<?php endif; ?>
+								<?php if ($canDelete): ?>
+									<a href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.remove&client=' . $this->client . '&id=' . $item->id, false, 2); ?>" class="btn btn-mini delete-button" type="button"><i class="fa fa-trash" aria-hidden="true"></i></a>
+								<?php endif; ?>
+							</td>
+						<?php endif; ?>
+					</tr>
+				<?php endforeach; ?>
+			<?php
+			}
+			else
+			{ ?>
+				<tr>
+					<td>
+						<strong><?php echo JText::_('COM_TJUCM_ITEM_DOESNT_EXIST');?></strong>
+					</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
 				</tr>
-			<?php endforeach; ?>
+			<?php }
+		}
+		else
+		{
+		?>
+			<div class="alert alert-warrning"><?php echo JText::_("COM_TJUCM_NO_DATA_FOUND");?></div>
+		<?php
+		}
+		?>
 		</tbody>
 	</table>
 
-	<?php if ($canCreate) : ?>
-		<a href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit&id=0', false, 2); ?>" class="btn btn-success btn-small">
+
+	<?php if ($this->allowedToAdd) : ?>
+		<a target="_blank" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit&id=0&client=' . $this->client, false, 2); ?>" class="btn btn-success btn-small">
 			<i class="icon-plus"></i><?php echo JText::_('COM_TJUCM_ADD_ITEM'); ?>
 		</a>
 	<?php endif; ?>
