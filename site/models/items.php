@@ -103,6 +103,11 @@ class TjucmModelItems extends JModelList
 
 		$app->setUserState($this->context . '.list', $list);
 		$app->input->set('list', null);
+		$type_id = $app->input->get('id', "", "INT");
+		$this->setState("type_id", $type_id);
+
+		$createdBy = $app->input->get('created_by', "", "INT");
+		$this->setState("created_by", $createdBy);
 
 		// List state information.
 		parent::populateState($ordering, $direction);
@@ -156,8 +161,27 @@ class TjucmModelItems extends JModelList
 		// Join over the tjfield value
 		$query->join('INNER', '#__tjfields_fields_value AS fieldValue ON a.id = fieldValue.content_id');
 
-		$query->where('a.client = ' . $db->quote($db->escape($this->client)));
+		if (!empty($this->client))
+		{
+			$query->where('a.client = ' . $db->quote($db->escape($this->client)));
+		}
+
 		$query->where('fields.id = fieldValue.field_id');
+
+		$ucmType = $this->getState('type_id', '', 'INT');
+
+		if (!empty($ucmType))
+		{
+			$query->where($db->quoteName('a.type_id') . "=" . (INT) $ucmType);
+		}
+
+		$createdBy = $this->getState('created_by', '', 'INT');
+
+		if (!empty($ucmType))
+		{
+			$query->where($db->quoteName('a.created_by') . "=" . (INT) $createdBy);
+		}
+
 		$query->where('fields.showonlist =  1');
 
 		// Filter by published state
@@ -211,7 +235,12 @@ class TjucmModelItems extends JModelList
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
 		$items_model = JModelLegacy::getInstance('Fields', 'TjfieldsModel');
 		$items_model->setState('filter.showonlist', 1);
-		$items_model->setState('filter.client', $this->client);
+
+		if (!empty($this->client))
+		{
+			$items_model->setState('filter.client', $this->client);
+		}
+
 		$items = $items_model->getItems();
 
 		$data = array();
@@ -322,33 +351,67 @@ class TjucmModelItems extends JModelList
 	}
 
 	/**
-	 * Temp Function added by KOMAL
-	 * Function that finds Joomla group id from group name
-	 * Move this function to pip helper
+	 * Method to getAliasFieldNameByView
 	 *
-	 * @param   String  $groupName  groupName
+	 * @param   array  $view  An array of record primary keys.
 	 *
-	 * @return  group ID
+	 * @return  boolean  True if successful, false if an error occurs.
 	 *
-	 * @since  1.0.0
+	 * @since   12.2
 	 */
-	public function getUsersGroupId($groupName)
+	public function getAliasFieldNameByView($view)
 	{
-		$db     = JFactory::getDBO();
-		$query  = $db->getQuery(true);
-		$query->select('*');
-		$query->from('#__usergroups');
-		$db->setQuery($query);
-		$groups = $db->loadRowList();
-
-		foreach ($groups as $group)
+		switch ($view)
 		{
-			if ($group[4] == $groupName)
-			{
-				return $group[0];
-			}
+			case 'items':
+				return 'alias';
+			break;
 		}
+	}
 
-		return false;
+	/**
+	 * Get an item by alias
+	 *
+	 * @param   string  $alias  Alias string
+	 *
+	 * @return int Element id
+	 */
+	public function getItemIdByAlias($alias)
+	{
+		$db = JFactory::getDbo();
+		$table = JTable::getInstance('type', 'TjucmTable', array('dbo', $db));
+
+		$table->load(array('alias' => $alias));
+
+		return $table->id;
+	}
+
+	/**
+	 * Check if there are fields to show in list view
+	 *
+	 * @param   string  $client  Client
+	 *
+	 * @return boolean
+	 */
+	public function showListCheck($client)
+	{
+		if (!empty($client))
+		{
+			$db = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select("count(" . $db->quoteName('id') . ")");
+			$query->from($db->quoteName('#__tjfields_fields'));
+			$query->where($db->quoteName('client') . '=' . $db->quote($client));
+			$query->where($db->quoteName('showonlist') . '=1');
+			$db->setQuery($query);
+
+			$result = $db->loadResult();
+
+			return $result;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }

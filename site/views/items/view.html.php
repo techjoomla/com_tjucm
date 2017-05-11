@@ -57,6 +57,9 @@ class TjucmViewItems extends JViewLegacy
 		$this->ucm_type   = $this->menuparams->get('ucm_type');
 		$this->client     = 'com_tjucm.' . $this->ucm_type;
 
+		// If there are no fields column to show in list view then dont allow to show data
+		$this->showList = $model->showListCheck($client);
+
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{

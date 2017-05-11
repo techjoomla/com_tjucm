@@ -137,7 +137,13 @@ class TjucmModelType extends JModelAdmin
 	{
 		if ($item = parent::getItem($pk))
 		{
-			// Do any procesing on fields here if needed
+			// Get Params data
+			$params = $item->params;
+
+			if (array_key_exists("allowed_count", $params))
+			{
+				$item->allowed_count = $params["allowed_count"];
+			}
 		}
 
 		return $item;
@@ -317,6 +323,11 @@ class TjucmModelType extends JModelAdmin
 		{
 			$data['unique_identifier'] = 'com_tjucm.' . $data['alias'];
 		}
+
+		$params = array();
+		$params['allowed_count'] = $data['allowed_count'];
+
+		$data['params'] = json_encode($params);
 
 		if (parent::save($data))
 		{

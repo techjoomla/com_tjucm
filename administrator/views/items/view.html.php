@@ -39,8 +39,13 @@ class TjucmViewItems extends JViewLegacy
 		$this->state = $this->get('State');
 		$model_items = $this->getModel('items');
 
+		$client = JFactory::getApplication()->input->get('client');
+
 		// Set client value
-		$model_items->setClient(JFactory::getApplication()->input->get('client'));
+		$model_items->setClient($client);
+
+		// If there are no fields column to show in list view then dont allow to show data
+		$this->showList = $model_items->showListCheck($client);
 
 		$this->items = $this->get('Items');
 		$this->pagination = $this->get('Pagination');

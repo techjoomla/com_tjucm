@@ -627,6 +627,23 @@ class TjucmControllerItemForm extends JControllerForm
 	}
 
 	/**
+	 * Redirect user to items list view if user is not allowed to add mote items
+	 *
+	 * @param   INT  $typeId        Type id
+	 * @param   INT  $allowedCount  Allowed Count
+	 *
+	 * @return boolean
+	 */
+	public function redirectToListView($typeId, $allowedCount)
+	{
+		$user = JFactory::getUser();
+		$createdBy = $user->id;
+		$link = JRoute::_("index.php?option=com_tjucm&view=items&id=" . $typeId . "&created_by=" . $createdBy, false);
+
+		JFactory::getApplication()->redirect($link, sprintf(JText::_('COM_TJUCM_ALLOWED_COUNT_LIMIT'), $allowedCount), "Warning");
+	}
+
+	/**
 	 * Method to check if you can add a new record.
 	 *
 	 * Extended classes can override this if necessary.

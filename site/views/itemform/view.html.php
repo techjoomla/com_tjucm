@@ -11,6 +11,7 @@
 defined('_JEXEC') or die;
 
 jimport('joomla.application.component.view');
+jimport('joomla.application.component.controller');
 
 /**
  * View to edit
@@ -50,7 +51,7 @@ class TjucmViewItemform extends JViewLegacy
 		$this->canSave = $this->get('CanSave');
 		$this->form		= $this->get('Form');
 
-		// Check the view access to the article (the model has already computed the values).
+		// Check the view access to the itemform (the model has already computed the values).
 		if ($this->item->params->get('access-view') == false)
 		{
 			$app->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
@@ -58,6 +59,9 @@ class TjucmViewItemform extends JViewLegacy
 
 			return;
 		}
+		
+		// Include models
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 
 		/* Get model instance here */
 		$model = $this->getModel();
@@ -67,6 +71,33 @@ class TjucmViewItemform extends JViewLegacy
 
 		$input  = JFactory::getApplication()->input;
 		$input->set("content_id", $id);
+
+		// Get if user is allowed to save the content
+		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		$typeId = $tjUcmModelType->getTypeId($this->client);
+
+		$TypeData = $tjUcmModelType->getItem($typeId);
+
+		$allowedCount = $TypeData->allowed_count;
+		$user   = JFactory::getUser();
+		$userId = $user->id;
+
+		if (empty($this->id))
+		{
+			$this->allowedToAdd = $model->allowedToAddTypeData($userId, $this->client, $allowedCount);
+
+			if (!$this->allowedToAdd)
+			{
+				if (!class_exists('TjucmControllerItemForm'))
+				{
+					JLoader::register('TjucmControllerItemForm', JPATH_SITE . '/components/com_tjucm/controllers/itemform.php');
+					JLoader::load('TjucmControllerItemForm');
+				}
+
+				$itemFormController = new TjucmControllerItemForm;
+				$itemFormController->redirectToListView($typeId, $allowedCount);
+			}
+		}
 
 		$view = explode('.', $this->client);
 
