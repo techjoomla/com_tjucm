@@ -18,6 +18,8 @@ jimport('joomla.application.component.modellist');
  */
 class TjucmModelItems extends JModelList
 {
+	private $client;
+
 	/**
 	 * Constructor.
 	 *
@@ -40,20 +42,6 @@ class TjucmModelItems extends JModelList
 				'modified_by', 'a.modified_by',
 				'modified_date', 'a.modified_date',
 			);
-		}
-
-		$app = JFactory::getApplication();
-
-		// Get the active item
-		$menuitem   = $app->getMenu()->getActive();
-
-		// Get the params
-		$this->menuparams = $menuitem->params;
-
-		if (!empty($this->menuparams))
-		{
-			$this->ucm_type   = $this->menuparams->get('ucm_type');
-			$this->client     = 'com_tjucm.' . $this->ucm_type;
 		}
 
 		$this->loginuserid = JFactory::getUser()->id;
@@ -81,14 +69,16 @@ class TjucmModelItems extends JModelList
 	protected function populateState($ordering = null, $direction = null)
 	{
 		$app  = JFactory::getApplication();
+		$input = $app->input;
 
 		// Get UCM type id from uniquue identifier
-		$ucmType = $app->get('client', '', 'STRING');
+		$ucmType = $input->get('client', '', 'STRING');
 
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
 		$ucmId = $tjUcmModelType->getTypeId($ucmType);
 
+		$this->setState('ucm.client', $ucmType);
 		$this->setState('ucmType.id', $ucmId);
 
 		$list = $app->getUserState($this->context . '.list');
@@ -160,6 +150,8 @@ class TjucmModelItems extends JModelList
 
 		// Join over the tjfield value
 		$query->join('INNER', '#__tjfields_fields_value AS fieldValue ON a.id = fieldValue.content_id');
+
+		$this->client = $this->getState('ucm.client');
 
 		if (!empty($this->client))
 		{
@@ -235,6 +227,7 @@ class TjucmModelItems extends JModelList
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
 		$items_model = JModelLegacy::getInstance('Fields', 'TjfieldsModel');
 		$items_model->setState('filter.showonlist', 1);
+		$this->client = $this->getState('ucm.client');
 
 		if (!empty($this->client))
 		{

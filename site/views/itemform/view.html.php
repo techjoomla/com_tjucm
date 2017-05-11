@@ -59,7 +59,7 @@ class TjucmViewItemform extends JViewLegacy
 
 			return;
 		}
-		
+
 		// Include models
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 

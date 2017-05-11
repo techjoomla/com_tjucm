@@ -600,4 +600,41 @@ class TjucmModelItemForm extends JModelForm
 			break;
 		}
 	}
+
+	/**
+	 * Check if user is submit new type data or not
+	 *
+	 * @param   INT     $userId        User Id
+	 * @param   string  $client        Client
+	 * @param   INT     $allowedCount  Allowed Count
+	 *
+	 * @return boolean
+	 */
+	public function allowedToAddTypeData($userId, $client, $allowedCount)
+	{
+		if (!empty($userId) && !empty($client))
+		{
+			$db    = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select("count(" . $db->quoteName('id') . ")");
+			$query->from($db->quoteName('#__tj_ucm_data'));
+			$query->where($db->quoteName('created_by') . '=' . (int) $userId);
+			$query->where($db->quoteName('client') . '=' . $db->quote($client));
+			$db->setQuery($query);
+			$result = $db->loadResult();
+
+			if ($result < $allowedCount)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+	}
 }

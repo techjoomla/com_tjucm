@@ -136,14 +136,6 @@ class TjucmControllerItemForm extends JControllerForm
 			$model->checkin($previousId);
 		}
 
-		// Get the active item
-		$menuitem   = $app->getMenu()->getActive();
-
-		// Get the params
-		$this->menuparams = $menuitem->params;
-		$this->ucm_type   = $this->menuparams->get('ucm_type');
-		$this->client     = 'com_tjucm.' . $this->ucm_type;
-
 		// Redirect to the edit screen.
 		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&client=' . $this->client . '&id=' . $editId, false));
 	}

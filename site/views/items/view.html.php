@@ -39,8 +39,8 @@ class TjucmViewItems extends JViewLegacy
 	public function display($tpl = null)
 	{
 		$app = JFactory::getApplication();
-
-		$this->state      = $this->get('State');
+		$input = $app->input;
+		$this->state  = $this->get('State');
 		$this->items = $this->get('Items');
 		$this->pagination = $this->get('Pagination');
 		$this->params     = $app->getParams('com_tjucm');
@@ -48,14 +48,7 @@ class TjucmViewItems extends JViewLegacy
 
 		$model   = $this->getModel("Items");
 		$this->ucmTypeId = $model->getState('ucmType.id');
-
-		// Get the active item
-		$menuitem   = $app->getMenu()->getActive();
-
-		// Get the params
-		$this->menuparams = $menuitem->params;
-		$this->ucm_type   = $this->menuparams->get('ucm_type');
-		$this->client     = 'com_tjucm.' . $this->ucm_type;
+		$this->client = $model->getState('ucm.client');
 
 		// If there are no fields column to show in list view then dont allow to show data
 		$this->showList = $model->showListCheck($client);
@@ -127,17 +120,5 @@ class TjucmViewItems extends JViewLegacy
 		{
 			$this->document->setMetadata('robots', $this->params->get('robots'));
 		}
-	}
-
-	/**
-	 * Check if state is set
-	 *
-	 * @param   mixed  $state  State
-	 *
-	 * @return bool
-	 */
-	public function getState($state)
-	{
-		return isset($this->state->{$state}) ? $this->state->{$state} : false;
 	}
 }
