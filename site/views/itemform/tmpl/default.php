@@ -18,11 +18,10 @@ JHtml::_('formbehavior.chosen', 'select');
 $lang = JFactory::getLanguage();
 $lang->load('com_tjucm', JPATH_SITE);
 $doc = JFactory::getDocument();
-
-$doc->addScript(JUri::base() . 'administrator/components/com_tjucm/assets/js/jquery.form.js');
-$doc->addScript(JUri::base() . 'administrator/components/com_tjucm/assets/js/tjucm_ajaxForm_save.js');
-$doc->addScript(JUri::base() . 'administrator/components/com_tjucm/assets/js/tjfield.js');
-$doc->addScript(JUri::base() . 'media/com_tjucm/js/form.js');
+$doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/jquery.form.js');
+$doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/tjucm_ajaxForm_save.js');
+$doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/tjfield.js');
+$doc->addScript(JUri::root() . 'media/com_tjucm/js/form.js');
 
 $jinput                    = JFactory::getApplication();
 $baseUrl                   = $jinput->input->server->get('REQUEST_URI', '', 'STRING');
@@ -36,21 +35,26 @@ $menu                      = $app->getMenu();
 $setnavigation             = false;
 ?>
 <script type="text/javascript">
-	js = jQuery.noConflict();
-	js(document).ready(function () {
+
+	jQuery(window).load(function ()
+	{
+		jQuery('#item-form .nav-tabs li a').first().click();
 	});
 
-	Joomla.submitbutton = function (task) {
-		if (task == 'itemform.cancel') {
+	Joomla.submitbutton = function (task)
+	{
+		if (task == 'itemform.cancel')
+		{
 			Joomla.submitform(task, document.getElementById('item-form'));
 		}
-		else {
-
-			if (task != 'itemform.cancel' && document.formvalidator.isValid(document.id('item-form'))) {
-
+		else
+		{
+			if (task != 'itemform.cancel' && document.formvalidator.isValid(document.id('item-form')))
+			{
 				Joomla.submitform(task, document.getElementById('item-form'));
 			}
-			else {
+			else
+			{
 				alert('<?php echo $this->escape(JText::_('JGLOBAL_VALIDATION_FORM_FAILED')); ?>');
 			}
 		}
@@ -141,8 +145,8 @@ $setnavigation             = false;
 
 				if (isset($setnavigation) && $setnavigation == true):
 			?>
-					<button type="button" class="btn btn-primary" id="previous_button" onclick="itemformactions('tjucm_myTab','prev')"><?php echo JText::_('COM_TJUCM_PREVIOUS_BUTTON'); ?><i class="fa fa-arrow-circle-o-right"></i></button>
-					<button type="button" class="btn btn-primary" id="next_button" onclick="itemformactions('tjucm_myTab','next')"><?php echo JText::_('COM_TJUCM_NEXT_BUTTON'); ?><i class="fa fa-arrow-circle-o-right"></i></button>
+					<button type="button" class="btn btn-primary" id="previous_button" onclick="itemformactions('tjucm_myTab','prev')"><?php echo JText::_('COM_TJUCM_PREVIOUS_BUTTON'); ?><i class="icon-arrow-right-2"></i></button>
+					<button type="button" class="btn btn-primary" id="next_button" onclick="itemformactions('tjucm_myTab','next')"><?php echo JText::_('COM_TJUCM_NEXT_BUTTON'); ?><i class="icon-arrow-right-2"></i></button>
 			<?php
 				endif;
 

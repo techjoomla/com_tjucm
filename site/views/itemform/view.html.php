@@ -12,6 +12,7 @@ defined('_JEXEC') or die;
 
 jimport('joomla.application.component.view');
 jimport('joomla.application.component.controller');
+jimport('joomla.filesystem.file');
 
 /**
  * View to edit
@@ -42,6 +43,7 @@ class TjucmViewItemform extends JViewLegacy
 	public function display($tpl = null)
 	{
 		$app  = JFactory::getApplication();
+		$input = $app->input;
 		$user = JFactory::getUser();
 
 		$this->state   = $this->get('State');
@@ -49,7 +51,17 @@ class TjucmViewItemform extends JViewLegacy
 
 		$this->params  = $app->getParams('com_tjucm');
 		$this->canSave = $this->get('CanSave');
-		$this->form		= $this->get('Form');
+		$this->form = $this->get('Form');
+		$this->client  = $input->get('client');
+		$this->id = $id  = $input->get('id');
+
+		if (empty($this->client))
+		{
+			$app->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
+			$app->setHeader('status', 403, true);
+
+			return;
+		}
 
 		// Check the view access to the itemform (the model has already computed the values).
 		if ($this->item->params->get('access-view') == false)
@@ -65,9 +77,6 @@ class TjucmViewItemform extends JViewLegacy
 
 		/* Get model instance here */
 		$model = $this->getModel();
-
-		$this->client  = JFactory::getApplication()->input->get('client');
-		$this->id = $id  = JFactory::getApplication()->input->get('id');
 
 		$input  = JFactory::getApplication()->input;
 		$input->set("content_id", $id);

@@ -18,6 +18,38 @@ defined('_JEXEC') or die;
 class TjucmControllerItem extends JControllerLegacy
 {
 	/**
+	 * Constructor
+	 *
+	 * @throws Exception
+	 */
+	public function __construct()
+	{
+		$app = JFactory::getApplication();
+
+		$this->client  = JFactory::getApplication()->input->get('client');
+		$this->created_by  = JFactory::getApplication()->input->get('created_by');
+
+		$this->appendUrl = "";
+
+		if (!empty($this->created_by))
+		{
+			$this->appendUrl .= "&created_by=" . $this->created_by;
+		}
+
+		if (!empty($this->client))
+		{
+			$this->appendUrl .= "&client=" . $this->client;
+		}
+
+		// Get UCM type id from uniquue identifier
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		$this->ucmTypeId = $tjUcmModelType->getTypeId($this->client);
+
+		parent::__construct();
+	}
+
+	/**
 	 * Method to check out an item for editing and redirect to the edit form.
 	 *
 	 * @return void
@@ -51,7 +83,7 @@ class TjucmControllerItem extends JControllerLegacy
 		}
 
 		// Redirect to the edit screen.
-		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&layout=edit', false));
+		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&layout=edit' . $this->appendUrl, false));
 	}
 
 	/**
@@ -69,8 +101,10 @@ class TjucmControllerItem extends JControllerLegacy
 
 		// Checking if the user can remove object
 		$user = JFactory::getUser();
+		$canEdit    = $user->authorise('core.type.edititem', 'com_tjucm.type.edititem' . $this->ucmTypeId);
+		$canChange  = $user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $this->ucmTypeId);
 
-		if ($user->authorise('core.edit', 'com_tjucm') || $user->authorise('core.edit.state', 'com_tjucm'))
+		if ($canEdit || $canChange)
 		{
 			$model = $this->getModel('Item', 'TjucmModel');
 
@@ -95,18 +129,9 @@ class TjucmControllerItem extends JControllerLegacy
 
 			// Redirect to the list screen.
 			$this->setMessage(JText::_('COM_TJUCM_ITEM_SAVED_SUCCESSFULLY'));
-			$menu = JFactory::getApplication()->getMenu();
-			$item = $menu->getActive();
 
-			if (!$item)
-			{
-				// If there isn't any menu item active, redirect to list view
-				$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items', false));
-			}
-			else
-			{
-				$this->setRedirect(JRoute::_($item->link . $menuitemid, false));
-			}
+			// If there isn't any menu item active, redirect to list view
+			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
 		}
 		else
 		{
@@ -128,8 +153,9 @@ class TjucmControllerItem extends JControllerLegacy
 
 		// Checking if the user can remove object
 		$user = JFactory::getUser();
+		$canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this->ucmTypeId);
 
-		if ($user->authorise('core.delete', 'com_tjucm'))
+		if ($canDelete)
 		{
 			$model = $this->getModel('Item', 'TjucmModel');
 
@@ -160,11 +186,6 @@ class TjucmControllerItem extends JControllerLegacy
 
 				$this->setMessage(JText::_('COM_TJUCM_ITEM_DELETED_SUCCESSFULLY'));
 			}
-
-			// Redirect to the list screen.
-			$menu = JFactory::getApplication()->getMenu();
-			$item = $menu->getActive();
-			$this->setRedirect(JRoute::_($item->link, false));
 		}
 		else
 		{

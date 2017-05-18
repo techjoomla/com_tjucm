@@ -8,8 +8,12 @@
  */
 // No direct access
 defined('_JEXEC') or die;
+$user = JFactory::getUser();
 ?>
-<?php if ($this->form_extra): ?>
+<?php
+if ($this->form_extra)
+{
+	?>
 	<!-- Iterate through the normal form fieldsets and display each one. -->
 	<?php foreach ($this->form_extra as $fieldKey => $fieldArray): ?>
 		<?php foreach ($fieldArray->getFieldsets() as $fieldName => $fieldset): ?>
@@ -63,15 +67,10 @@ defined('_JEXEC') or die;
 											{
 												foreach ($val as $lab => $valu)
 												{
-													$db    = JFactory::getDbo();
-													$query = $db->getQuery(true);
-													$query->select('label FROM #__tjfields_fields');
-													$query->where('name="' . $lab . '"');
-													$db->setQuery($query);
-													$field_label = $db->loadObject();
+													$fieldData = $this->tjFieldsHelper->getFieldData($lab);
 
 													$html = '<div class="form-group">';
-														$html .= '<div class="col-sm-6 control-label">' . $field_label->label . '</div>';
+														$html .= '<div class="col-sm-6 control-label">' . $fieldData->label . '</div>';
 														$html .= '<div class="col-sm-6 control-label"> : ' . $valu . '</div>';
 													$html .= '</div>';
 
@@ -142,25 +141,27 @@ defined('_JEXEC') or die;
 				</div>
 		<?php endforeach; ?>
 	<?php endforeach; ?>
-<?php else: ?>
+<?php
+}
+else
+{
+	?>
 	<div class="alert alert-info">
-		<?php echo JText::_('There are no activities here yet');?>
+		<?php echo JText::_('COM_TJUCM_NO_ACTIVITIES');?>
 	</div>
-<?php endif; ?>
+	<?php
+}
 
-<?php
-	if(JFactory::getUser()->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId) && $this->item->checked_out == 0)
-	{
+if ($user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId) && $this->item->checked_out == 0)
+{
 	?>
-		<a class="btn" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=item.edit&id='.$this->item->id); ?>"><?php echo JText::_("COM_TJUCM_EDIT_ITEM"); ?></a>
-<?php
-	}
+	<a class="btn" href="<?php echo 'index.php?option=com_tjucm&task=item.edit&id='.$this->item->id; ?>"><?php echo JText::_("COM_TJUCM_EDIT_ITEM"); ?></a>
+	<?php
+}
+
+if ($user->authorise('core.type.deleteitem','com_tjucm.type.' . $this->ucmTypeId))
+{
 	?>
-<?php
-	if (JFactory::getUser()->authorise('core.type.deleteitem','com_tjucm.type.' . $this->ucmTypeId))
-	{
-	?>
-		<a class="btn" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=item.remove&id=' . $this->item->id, false, 2); ?>"><?php echo JText::_("COM_TJUCM_DELETE_ITEM"); ?></a>
-<?php
-	}
-	?>
+	<a class="btn" href="<?php echo 'index.php?option=com_tjucm&task=item.remove&id=' . $this->item->id; ?>"><?php echo JText::_("COM_TJUCM_DELETE_ITEM"); ?></a>
+	<?php
+}

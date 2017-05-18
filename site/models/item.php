@@ -26,6 +26,8 @@ class TjucmModelItem extends JModelAdmin
 {
 	private $client = '';
 
+	private $item = '';
+
 	// Use imported Trait in model
 	use TjfieldsFilterField;
 
@@ -89,9 +91,9 @@ class TjucmModelItem extends JModelAdmin
 	{
 		$user = JFactory::getUser();
 
-		if ($this->_item === null)
+		if ($this->item === null)
 		{
-			$this->_item = false;
+			$this->item = false;
 
 			if (empty($id))
 			{
@@ -117,7 +119,7 @@ class TjucmModelItem extends JModelAdmin
 					// Check for published state if filter set.
 					if (((is_numeric($published)) || (is_numeric($archived))) && (($table->state != $published) && ($table->state != $archived)))
 					{
-						return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
+						return JError::raiseError(404, JText::_('COM_TJUCMitem_DOESNT_EXIST'));
 					}
 				}
 
@@ -125,24 +127,24 @@ class TjucmModelItem extends JModelAdmin
 				$properties  = $table->getProperties(1);
 				$properties['params'] = clone $this->getState('params');
 
-				$this->_item = ArrayHelper::toObject($properties, 'JObject');
-				$this->_item->params->set('access-view', false);
+				$this->item = ArrayHelper::toObject($properties, 'JObject');
+				$this->item->params->set('access-view', false);
 
-				if (!empty($this->_item->id))
+				if (!empty($this->item->id))
 				{
 					if ($canView)
 					{
-						$this->_item->params->set('access-view', true);
+						$this->item->params->set('access-view', true);
 					}
 				}
 			}
 			else
 			{
-				return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
+				return JError::raiseError(404, JText::_('COM_TJUCMitem_DOESNT_EXIST'));
 			}
 		}
 
-		return $this->_item;
+		return $this->item;
 	}
 
 	/**
@@ -267,12 +269,12 @@ class TjucmModelItem extends JModelAdmin
 	/**
 	 * Publish the element
 	 *
-	 * @param   int  $id     Item id
+	 * @param   int  &$id    Item id
 	 * @param   int  $state  Publish state
 	 *
 	 * @return  boolean
 	 */
-	public function publish($id, $state)
+	public function publish(&$id, $state = 1)
 	{
 		$table = $this->getTable();
 		$table->load($id);
@@ -284,15 +286,31 @@ class TjucmModelItem extends JModelAdmin
 	/**
 	 * Method to delete an item
 	 *
-	 * @param   int  $id  Element id
+	 * @param   int  &$id  Element id
 	 *
 	 * @return  bool
 	 */
-	public function delete($id)
+	public function delete(&$id)
 	{
-		$table = $this->getTable();
+		$app = JFactory::getApplication('com_tjucm');
 
-		return $table->delete($id);
+		$ucmTypeId = $this->getState('ucmType.id');
+		$user = JFactory::getUser();
+		$canDelete = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $ucmTypeId);
+
+		if ($canDelete)
+		{
+			$table = $this->getTable();
+
+			return $table->delete($id);
+		}
+		else
+		{
+			$app->enqueueMessage(JText::_('COM_TJUCM_ERROR_MESSAGE_NOT_AUTHORISED'), 'error');
+			$app->setHeader('status', 403, true);
+
+			throw new Exception(JText::_('JERROR_ALERTNOAUTHOR'), 403);
+		}
 	}
 
 	/**

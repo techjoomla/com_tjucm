@@ -46,6 +46,17 @@ class TjucmViewItem extends JViewLegacy
 		$model   = $this->getModel("Item");
 		$this->params = $app->getParams('com_tjucm');
 
+		// Load tj-fields helper helper
+		$path = JPATH_SITE . '/components/com_tjfields/helpers/tjfields.php';
+
+		if (!class_exists('TjfieldsHelper'))
+		{
+			JLoader::register('TjfieldsHelper', $path);
+			JLoader::load('TjfieldsHelper');
+		}
+
+		$this->tjFieldsHelper = new TjfieldsHelper;
+
 		$this->ucmTypeId = $model->getState('ucmType.id');
 
 		// Check the view access to the article (the model has already computed the values).

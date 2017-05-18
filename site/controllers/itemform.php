@@ -10,6 +10,8 @@
 // No direct access
 defined('_JEXEC') or die;
 
+jimport('joomla.filesystem.file');
+
 require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
 
 /**
@@ -29,6 +31,8 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	public function __construct()
 	{
+		$app = JFactory::getApplication();
+
 		$this->view_list = 'items';
 
 		$this->client  = JFactory::getApplication()->input->get('client');
@@ -630,7 +634,7 @@ class TjucmControllerItemForm extends JControllerForm
 	{
 		$user = JFactory::getUser();
 		$createdBy = $user->id;
-		$link = JRoute::_("index.php?option=com_tjucm&view=items&id=" . $typeId . "&created_by=" . $createdBy, false);
+		$link = JRoute::_("index.php?option=com_tjucm&view=items&id=" . $typeId . "&created_by=" . $createdBy . "&client=" . $this->client, false);
 
 		JFactory::getApplication()->redirect($link, sprintf(JText::_('COM_TJUCM_ALLOWED_COUNT_LIMIT'), $allowedCount), "Warning");
 	}
@@ -667,6 +671,17 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	protected function allowEdit($data = array(), $key = 'id')
 	{
-		return JFactory::getUser()->authorise('core.edit', $this->option);
+		$user = JFactory::getUser();
+		$edit = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$editOwn = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $this->ucmTypeId);
+
+		if ($edit || $editOwn)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }

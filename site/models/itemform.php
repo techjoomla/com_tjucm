@@ -553,19 +553,33 @@ class TjucmModelItemForm extends JModelForm
 	 */
 	public function delete($data)
 	{
+		$app = JFactory::getApplication('com_tjucm');
 		$id = (!empty($data['id'])) ? $data['id'] : (int) $this->getState('item.id');
-
 		$table = $this->getTable();
 
-		if ($table->delete($data['id']) === true)
-		{
-			$this->deleteExtraFieldsData($data['id'], $data['client']);
+		$ucmTypeId = $this->getState('ucmType.id');
+		$user = JFactory::getUser();
+		$canDelete = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $ucmTypeId);
 
-			return $id;
+		if ($canDelete)
+		{
+			if ($table->delete($data['id']) === true)
+			{
+				$this->deleteExtraFieldsData($data['id'], $data['client']);
+
+				return $id;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		else
 		{
-			return false;
+			$app->enqueueMessage(JText::_('COM_TJUCM_ERROR_MESSAGE_NOT_AUTHORISED'), 'error');
+			$app->setHeader('status', 403, true);
+
+			throw new Exception(JText::_('JERROR_ALERTNOAUTHOR'), 403);
 		}
 	}
 
