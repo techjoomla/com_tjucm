@@ -67,10 +67,9 @@ if ($this->form_extra)
 											{
 												foreach ($val as $lab => $valu)
 												{
-													$fieldData = $this->tjFieldsHelper->getFieldData($lab);
-
+													// TODO : SubForm rendering
 													$html = '<div class="form-group">';
-														$html .= '<div class="col-sm-6 control-label">' . $fieldData->label . '</div>';
+														//$html .= '<div class="col-sm-6 control-label">' . $fieldData->label . '</div>';
 														$html .= '<div class="col-sm-6 control-label"> : ' . $valu . '</div>';
 													$html .= '</div>';
 
@@ -98,8 +97,6 @@ if ($this->form_extra)
 
 										<div class="col-sm-6 control-label">
 										<?php
-											// echo"<pre>"; print_r($field->value); echo"</pre>";
-
 											$checked = "";
 
 											if ($field->value = 1)
@@ -108,8 +105,6 @@ if ($this->form_extra)
 											}
 
 											echo '<input type="checkbox" disabled="disabled" value="1" ' . $checked . '>';
-
-
 										?>
 										</div>
 										<?php

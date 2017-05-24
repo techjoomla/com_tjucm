@@ -17,26 +17,6 @@ defined('_JEXEC') or die;
 class TjucmHelpersTjucm
 {
 	/**
-	 * Constructor
-	 *
-	 * @throws Exception
-	 */
-	public function __construct()
-	{
-		$app = JFactory::getApplication();
-
-
-		$this->client  = JFactory::getApplication()->input->get('client');
-
-		// Get UCM type id from uniquue identifier
-		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
-		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
-		$this->ucmTypeId = $tjUcmModelType->getTypeId($this->client);
-
-		parent::__construct();
-	}
-
-	/**
 	 * Get an instance of the named model
 	 *
 	 * @param   string  $name  Model name
@@ -81,39 +61,5 @@ class TjucmHelpersTjucm
 		$db->setQuery($query);
 
 		return explode(',', $db->loadResult());
-	}
-
-	/**
-	 * Gets the edit permission for an user
-	 *
-	 * @param   mixed  $item  The item
-	 *
-	 * @return  bool
-	 */
-	public static function canUserEdit($item)
-	{
-		$permission = false;
-		$user       = JFactory::getUser();
-
-		if ($user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId))
-		{
-			$permission = true;
-		}
-		else
-		{
-			if (isset($item->created_by))
-			{
-				if ($user->authorise('core.type.editownitem', 'com_tjucm.type.' . $this->ucmTypeId) && $item->created_by == $user->id)
-				{
-					$permission = true;
-				}
-			}
-			else
-			{
-				$permission = true;
-			}
-		}
-
-		return $permission;
 	}
 }

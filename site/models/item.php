@@ -74,7 +74,10 @@ class TjucmModelItem extends JModelAdmin
 
 		if (isset($params_array['item_id']))
 		{
-			$this->setState('item.id', $params_array['item_id']);
+			if ($params_array['item_id'])
+			{
+				$this->setState('item.id', $params_array['item_id']);
+			}
 		}
 
 		$this->setState('params', $params);
@@ -91,57 +94,54 @@ class TjucmModelItem extends JModelAdmin
 	{
 		$user = JFactory::getUser();
 
-		if ($this->item === null)
+		$this->item = false;
+
+		if (empty($id))
 		{
-			$this->item = false;
+			$id = $this->getState('item.id');
+		}
 
-			if (empty($id))
+		// Get UCM type id (Get if user is autorised to edit the items for this UCM type)
+		$ucmTypeId = $this->getState('ucmType.id');
+		$canView = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $ucmTypeId);
+
+		// Get a level row instance.
+		$table = $this->getTable();
+
+		// Attempt to load the row.
+		if ($table->load($id))
+		{
+			// Check published state.
+			$published = $this->getState('filter.published');
+			$archived = $this->getState('filter.archived');
+
+			if (is_numeric($published))
 			{
-				$id = $this->getState('item.id');
-			}
-
-			// Get UCM type id (Get if user is autorised to edit the items for this UCM type)
-			$ucmTypeId = $this->getState('ucmType.id');
-			$canView = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $ucmTypeId);
-
-			// Get a level row instance.
-			$table = $this->getTable();
-
-			// Attempt to load the row.
-			if ($table->load($id))
-			{
-				// Check published state.
-				$published = $this->getState('filter.published');
-				$archived = $this->getState('filter.archived');
-
-				if (is_numeric($published))
+				// Check for published state if filter set.
+				if (((is_numeric($published)) || (is_numeric($archived))) && (($table->state != $published) && ($table->state != $archived)))
 				{
-					// Check for published state if filter set.
-					if (((is_numeric($published)) || (is_numeric($archived))) && (($table->state != $published) && ($table->state != $archived)))
-					{
-						return JError::raiseError(404, JText::_('COM_TJUCMitem_DOESNT_EXIST'));
-					}
-				}
-
-				// Convert the JTable to a clean JObject.
-				$properties  = $table->getProperties(1);
-				$properties['params'] = clone $this->getState('params');
-
-				$this->item = ArrayHelper::toObject($properties, 'JObject');
-				$this->item->params->set('access-view', false);
-
-				if (!empty($this->item->id))
-				{
-					if ($canView)
-					{
-						$this->item->params->set('access-view', true);
-					}
+					return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
 				}
 			}
-			else
+
+			// Convert the JTable to a clean JObject.
+			$properties  = $table->getProperties(1);
+			$properties['params'] = clone $this->getState('params');
+
+			$this->item = ArrayHelper::toObject($properties, 'JObject');
+			$this->item->params->set('access-view', false);
+
+			if (!empty($this->item->id))
 			{
-				return JError::raiseError(404, JText::_('COM_TJUCMitem_DOESNT_EXIST'));
+				if ($canView)
+				{
+					$this->item->params->set('access-view', true);
+				}
 			}
+		}
+		else
+		{
+			return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
 		}
 
 		return $this->item;
@@ -310,6 +310,8 @@ class TjucmModelItem extends JModelAdmin
 			$app->setHeader('status', 403, true);
 
 			throw new Exception(JText::_('JERROR_ALERTNOAUTHOR'), 403);
+
+			return false;
 		}
 	}
 

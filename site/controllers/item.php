@@ -83,7 +83,7 @@ class TjucmControllerItem extends JControllerLegacy
 		}
 
 		// Redirect to the edit screen.
-		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&layout=edit' . $this->appendUrl, false));
+		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&layout=edit&client=' . $this->client, false));
 	}
 
 	/**
@@ -118,7 +118,7 @@ class TjucmControllerItem extends JControllerLegacy
 			// Check for errors.
 			if ($return === false)
 			{
-				$this->setMessage(JText::sprintf('Save failed: %s', $model->getError()), 'warning');
+				$this->setMessage(JText::sprintf('COM_TJUCM_SAVE_FAILED', $model->getError()), 'warning');
 			}
 
 			// Clear the profile id from the session.
@@ -168,7 +168,7 @@ class TjucmControllerItem extends JControllerLegacy
 			// Check for errors.
 			if ($return === false)
 			{
-				$this->setMessage(JText::sprintf('Delete failed', $model->getError()), 'warning');
+				$this->setMessage(JText::sprintf("COM_TJUCM_DELETE_FAILED", $model->getError()), 'warning');
 			}
 			else
 			{
@@ -186,10 +186,16 @@ class TjucmControllerItem extends JControllerLegacy
 
 				$this->setMessage(JText::_('COM_TJUCM_ITEM_DELETED_SUCCESSFULLY'));
 			}
+
+			// If there isn't any menu item active, redirect to list view
+			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+
 		}
 		else
 		{
 			throw new Exception(500);
+
+			return false;
 		}
 	}
 }

@@ -412,4 +412,21 @@ class TjucmModelType extends JModelAdmin
 
 		return $table->id;
 	}
+
+	/**
+	 * Method to get UCM type id
+	 *
+	 * @param   string  $client  The client.
+	 *
+	 * @return	INT  ucm type id
+	 *
+	 * @since	1.0
+	 */
+	public function getTypeUniqueIdentifier($id)
+	{
+		$table = $this->getTable();
+		$table->load(array('id' => $id));
+
+		return $table->unique_identifier;
+	}
 }

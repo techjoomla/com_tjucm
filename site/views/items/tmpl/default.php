@@ -88,9 +88,9 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 			if(!empty($this->items))
 			{
 				foreach ($this->items as $i => $item) : ?>
-					<?php $link = JRoute::_('index.php?option=com_tjucm&view=itemform&layout=edit&id=' . $item->id . '&layout=details' . $appendUrl, false); ?>
+					<?php $link = JRoute::_('index.php?option=com_tjucm&view=item&id=' . $item->id . "&client=" . $this->client, false); ?>
 					<?php $canEdit = $user->authorise('core.type.edititem', 'com_tjucm.type' . $this->ucmTypeId); ?>
-					<?php if (!$canEdit && $user->authorise('core.type.editownitem', 'com_tjucm.type' . $this->ucmTypeId);): ?>
+					<?php if (!$canEdit && $canEditOwn): ?>
 						<?php $canEdit = JFactory::getUser()->id == $item->created_by; ?>
 					<?php endif; ?>
 
@@ -113,7 +113,7 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 								<?php echo JHtml::_('jgrid.checkedout', $i, $item->uEditor, $item->checked_out_time, 'items.', $canCheckin); ?>
 							<?php endif; ?>
 
-							<a href="<?php echo JRoute::_('index.php?option=com_tjucm&view=item&id='.(int) $item->id) . $appendUrl; ?>">
+							<a href="<?php echo JRoute::_('index.php?option=com_tjucm&view=item&id='.(int) $item->id) . "&client=" . $this->client; ?>">
 								<?php echo $this->escape($item->id); ?>
 							</a>
 						</td>
@@ -128,7 +128,6 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 								}
 							}
 							?>
-
 						<?php if ($canEdit || $canDelete): ?>
 							<td class="center">
 								<?php if ($canEdit): ?>

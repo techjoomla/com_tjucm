@@ -86,7 +86,6 @@ class TjucmModelItems extends JModelList
 		$app->setUserState($this->context . '.list', $list);
 		$app->input->set('list', null);
 		$type_id = $app->input->get('id', "", "INT");
-		$this->setState("ucmType.id", $type_id);
 
 		$ucmType = $tjUcmModelType->getTypeUniqueIdentifier($type_id);
 

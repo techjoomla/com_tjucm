@@ -433,6 +433,8 @@ class TjucmModelItemForm extends JModelForm
 			$app->setHeader('status', 403, true);
 
 			throw new Exception(JText::_('JERROR_ALERTNOAUTHOR'), 403);
+
+			return false;
 		}
 
 		$data['type_id'] = $this->common->getDataValues('#__tj_ucm_types', 'id AS type_id', 'unique_identifier = "' . $this->client . '"', 'loadResult');
@@ -485,6 +487,8 @@ class TjucmModelItemForm extends JModelForm
 		if (!$user->authorise('core.type.createitem', 'com_tjucm.type.' . $ucmTypeId))
 		{
 			throw new Exception(JText::_('JERROR_CORE_CREATE_NOT_PERMITTED'));
+
+			return false;
 		}
 
 		$dispatcher = JEventDispatcher::getInstance();
@@ -505,6 +509,8 @@ class TjucmModelItemForm extends JModelForm
 				if (!$table->check())
 				{
 					throw new Exception($table->getError());
+
+					return false;
 				}
 
 				if (!empty($table->type_id))
@@ -533,6 +539,8 @@ class TjucmModelItemForm extends JModelForm
 			else
 			{
 				throw new Exception($table->getError());
+
+				return false;
 			}
 		}
 
@@ -563,9 +571,9 @@ class TjucmModelItemForm extends JModelForm
 
 		if ($canDelete)
 		{
-			if ($table->delete($data['id']) === true)
+			if ($table->delete($id) === true)
 			{
-				$this->deleteExtraFieldsData($data['id'], $data['client']);
+				$this->deleteExtraFieldsData($id, $data['client']);
 
 				return $id;
 			}
@@ -580,6 +588,8 @@ class TjucmModelItemForm extends JModelForm
 			$app->setHeader('status', 403, true);
 
 			throw new Exception(JText::_('JERROR_ALERTNOAUTHOR'), 403);
+
+			return false;
 		}
 	}
 

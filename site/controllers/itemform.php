@@ -33,13 +33,12 @@ class TjucmControllerItemForm extends JControllerForm
 	{
 		$app = JFactory::getApplication();
 
-		$this->view_list = 'items';
-
-		$this->client  = JFactory::getApplication()->input->get('client');
+		$this->client  = $app->input->get('client');
 
 		if (empty($this->client))
 		{
-			$this->client  = JFactory::getApplication()->input->get('jform', array(), 'array')['client'];
+			$data = $app->input->get('jform', array(), 'array');
+			$this->client  = $data['client'];
 		}
 
 		// Get UCM type id from uniquue identifier
@@ -61,7 +60,7 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	public function add()
 	{
-		$context = "$this->option.edit.$this->context";
+		$context = "com_tjucm.edit.itemform.data";
 
 		// Access check.
 		if (!$this->allowAdd())
@@ -72,7 +71,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 			$this->setRedirect(
 				JRoute::_(
-					'index.php?option=' . $this->option . '&view=' . $this->view_list . '&client=' . $this->client
+					'index.php?option=com_tjucm&view=items&client=' . $this->client
 					. $this->getRedirectToListAppend(), false
 				)
 			);
@@ -86,7 +85,7 @@ class TjucmControllerItemForm extends JControllerForm
 		// Redirect to the edit screen.
 		$this->setRedirect(
 			JRoute::_(
-				'index.php?option=' . $this->option . '&view=' . $this->view_item . '&client=' . $this->client
+				'index.php?option=com_tjucm&view=itemform&client=' . $this->client
 				. $this->getRedirectToItemAppend(), false
 			)
 		);
@@ -196,7 +195,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 				$this->setRedirect(
 					JRoute::_(
-						'index.php?option=' . $this->option . '&view=' . $this->view_item . '&client=' . $this->client
+						'index.php?option=com_tjucm&view=itemform&client=' . $this->client
 						. $this->getRedirectToItemAppend($recordId, $urlVar), false
 					)
 				);
@@ -218,7 +217,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 			$this->setRedirect(
 				JRoute::_(
-					'index.php?option=' . $this->option . '&view=' . $this->view_list
+					'index.php?option=com_tjucm&view=items'
 					. $this->getRedirectToListAppend(), false
 				)
 			);
@@ -265,7 +264,7 @@ class TjucmControllerItemForm extends JControllerForm
 			// Redirect back to the edit screen.
 			$this->setRedirect(
 				JRoute::_(
-					'index.php?option=' . $this->option . '&view=' . $this->view_item . '&client=' . $this->client
+					'index.php?option=com_tjucm&view=itemform&client=' . $this->client
 					. $this->getRedirectToItemAppend($recordId, $urlVar), false
 				)
 			);
@@ -415,7 +414,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 		$model = $this->getModel();
 		$table = $model->getTable();
-		$context = "$this->option.edit.$this->context";
+		$context = "com_tjucm.edit.itemform.data";
 
 		if (empty($key))
 		{
@@ -437,7 +436,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 					$this->setRedirect(
 						JRoute::_(
-							'index.php?option=' . $this->option . '&view=' . $this->view_item . '&client=' . $this->client
+							'index.php?option=com_tjucm&view=itemform&client=' . $this->client
 							. $this->getRedirectToItemAppend($recordId, $key), false
 						)
 					);
@@ -453,7 +452,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 		$this->setRedirect(
 			JRoute::_(
-				'index.php?option=' . $this->option . '&view=' . $this->view_list . '&client=' . $this->client
+				'index.php?option=com_tjucm&view=items&client=' . $this->client
 				. $this->getRedirectToListAppend(), false
 			)
 		);
