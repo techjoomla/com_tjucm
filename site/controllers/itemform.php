@@ -302,20 +302,10 @@ class TjucmControllerItemForm extends JControllerForm
 				return false;
 			}
 
-			$formExtra = array_filter($formExtra);
-
 			if (!empty($formExtra))
 			{
-				if (!empty($formExtra[0]))
-				{
-					// Validate the posted extra data.
-					// $extra_jform_data = $model->validateExtra($formExtra[0], $extra_jform_data);
-				}
-				else
-				{
-					// Validate the posted extra data.
-					// $extra_jform_data = $model->validateExtra($formExtra[1], $extra_jform_data);
-				}
+				// Validate the posted extra data.
+				$extra_jform_data = $model->validateExtra($formExtra, $extra_jform_data);
 			}
 
 			// Check for errors.

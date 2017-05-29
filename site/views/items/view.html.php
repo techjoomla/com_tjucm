@@ -53,6 +53,7 @@ class TjucmViewItems extends JViewLegacy
 
 		$user = JFactory::getUser();
 		$canCreate = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$canView = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $this->ucmTypeId);
 
 		// If did not get the client from url then get if from menu param
 		if (empty($this->client))
@@ -96,6 +97,20 @@ class TjucmViewItems extends JViewLegacy
 			{
 				$this->allowedToAdd = $itemFormModel->allowedToAddTypeData($userId, $this->client, $allowedCount);
 			}
+		}
+
+		if ($this->created_by == $userId)
+		{
+			$canView = true;
+		}
+
+		// Check the view access to the article (the model has already computed the values).
+		if (!$canView)
+		{
+			$app->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
+			$app->setHeader('status', 403, true);
+
+			return false;
 		}
 
 		// Check for errors.

@@ -85,8 +85,6 @@ class TjucmViewItem extends JViewLegacy
 			"layout" => 'edit')
 			);
 
-		$this->form_extra = array_filter($this->form_extra);
-
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{

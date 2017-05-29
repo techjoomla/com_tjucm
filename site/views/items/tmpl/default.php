@@ -41,34 +41,45 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 	<table class="table table-striped" id="itemList">
 		<thead>
 			<tr>
-				<?php if (isset($this->items[0]->state)): ?>
+				<?php
+				if (isset($this->items[0]->state))
+				{
+					?>
 					<th width="5%">
 						<?php echo JHtml::_('grid.sort', 'JPUBLISHED', 'a.state', $listDirn, $listOrder); ?>
 					</th>
-				<?php endif; ?>
-
+					<?php
+				}
+				?>
 				<th class=''>
 					<?php echo JHtml::_('grid.sort',  'COM_TJUCM_ITEMS_ID', 'a.id', $listDirn, $listOrder); ?>
 				</th>
 				<?php
-					if (!empty($this->listcolumn))
+				if (!empty($this->listcolumn))
+				{
+					foreach ($this->listcolumn as $col_name)
 					{
-						foreach ($this->listcolumn as $col_name)
-						{ ?>
-							<th class='left'>
-								<?php echo $col_name; ?>
-							</th> <?php
-						}
-					}?>
-				<?php if ($canEdit || $canDelete): ?>
+						?>
+						<th class='left'>
+							<?php echo $col_name; ?>
+						</th>
+						<?php
+					}
+				}
+
+				if ($canEdit || $canDelete)
+				{
+					?>
 					<th class="center">
 						<?php echo JText::_('COM_TJUCM_ITEMS_ACTIONS'); ?>
 					</th>
-				<?php endif; ?>
+				<?php
+				}
+				?>
 			</tr>
 		</thead>
 		<?php
-		if(!empty($this->items))
+		if (!empty($this->items))
 		{
 		?>
 		<tfoot>
@@ -83,36 +94,49 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 		?>
 		<tbody>
 		<?php
-		if(!empty($this->showList))
+		if (!empty($this->showList))
 		{
-			if(!empty($this->items))
+			if (!empty($this->items))
 			{
-				foreach ($this->items as $i => $item) : ?>
-					<?php $link = JRoute::_('index.php?option=com_tjucm&view=item&id=' . $item->id . "&client=" . $this->client, false); ?>
-					<?php $canEdit = $user->authorise('core.type.edititem', 'com_tjucm.type' . $this->ucmTypeId); ?>
-					<?php if (!$canEdit && $canEditOwn): ?>
-						<?php $canEdit = JFactory::getUser()->id == $item->created_by; ?>
-					<?php endif; ?>
+				foreach ($this->items as $i => $item)
+				{
+					 $link = JRoute::_('index.php?option=com_tjucm&view=item&id=' . $item->id . "&client=" . $this->client, false);
+					 $canEdit = $user->authorise('core.type.edititem', 'com_tjucm.type' . $this->ucmTypeId);
 
+					if (!$canEdit && $canEditOwn)
+					{
+						$canEdit = JFactory::getUser()->id == $item->created_by;
+					}
+					?>
 					<tr class="row<?php echo $i % 2; ?>">
-						<?php if (isset($this->items[0]->state)) : ?>
-							<?php $class = ($canChange) ? 'active' : 'disabled'; ?>
+						<?php
+						if (isset($this->items[0]->state))
+						{
+							$class = ($canChange) ? 'active' : 'disabled'; ?>
 							<td class="center">
 								<a class="<?php echo $class; ?>" href="<?php echo ($canChange) ? 'index.php?option=com_tjucm&task=item.publish&id=' . $item->id . '&state=' . (($item->state + 1) % 2) . $appendUrl : '#'; ?>">
-								<?php if ($item->state == 1): ?>
-									<i class="icon-publish"></i>
-								<?php else: ?>
-									<i class="icon-unpublish"></i>
-								<?php endif; ?>
+								<?php
+								if ($item->state == 1)
+								{
+									?><i class="icon-publish"></i><?php
+								}
+								else
+								{
+									?><i class="icon-unpublish"></i><?php
+								}
+								?>
 								</a>
 							</td>
-						<?php endif; ?>
-
+						<?php
+						}
+						?>
 						<td>
-							<?php if (isset($item->checked_out) && $item->checked_out) : ?>
-								<?php echo JHtml::_('jgrid.checkedout', $i, $item->uEditor, $item->checked_out_time, 'items.', $canCheckin); ?>
-							<?php endif; ?>
-
+							<?php
+							if (isset($item->checked_out) && $item->checked_out)
+							{
+								echo JHtml::_('jgrid.checkedout', $i, $item->uEditor, $item->checked_out_time, 'items.', $canCheckin);
+							}
+							?>
 							<a href="<?php echo JRoute::_('index.php?option=com_tjucm&view=item&id='.(int) $item->id) . "&client=" . $this->client; ?>">
 								<?php echo $this->escape($item->id); ?>
 							</a>
@@ -121,29 +145,44 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 							if (!empty ($item->field_values))
 							{
 								foreach ($item->field_values as $field_values)
-								{?>
+								{
+									?>
 									<td>
 										<a href="<?php echo $link;?>"><?php echo $field_values; ?></a>
 									</td><?php
 								}
 							}
-							?>
-						<?php if ($canEdit || $canDelete): ?>
-							<td class="center">
-								<?php if ($canEdit): ?>
+
+							if ($canEdit || $canDelete)
+							{
+								?>
+								<td class="center">
+								<?php
+								if ($canEdit)
+								{
+									 ?>
 									<a target="_blank" href="<?php echo 'index.php?option=com_tjucm&task=itemform.edit&id=' . $item->id . $appendUrl; ?>" class="btn btn-mini" type="button"><i class="icon-apply" aria-hidden="true"></i></a>
-								<?php endif; ?>
-								<?php if ($canDelete): ?>
+								<?php
+								}
+
+								if ($canDelete)
+								{
+									?>
 									<a href="<?php echo 'index.php?option=com_tjucm&task=itemform.remove' . '&id=' . $item->id . $appendUrl; ?>" class="btn btn-mini delete-button" type="button"><i class="icon-delete" aria-hidden="true"></i></a>
-								<?php endif; ?>
-							</td>
-						<?php endif; ?>
+									<?php
+								}
+								?>
+								</td>
+							<?php
+							}
+							?>
 					</tr>
-				<?php endforeach; ?>
-			<?php
+				<?php
+				}
 			}
 			else
-			{ ?>
+			{
+				?>
 				<tr>
 					<td>
 						<strong><?php echo JText::_('COM_TJUCM_ITEM_DOESNT_EXIST');?></strong>
@@ -151,7 +190,8 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 					<td>&nbsp;</td>
 					<td>&nbsp;</td>
 				</tr>
-			<?php }
+			<?php
+			}
 		}
 		else
 		{
@@ -162,13 +202,16 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 		?>
 		</tbody>
 	</table>
-
-	<?php if ($this->allowedToAdd) : ?>
+	<?php
+	if ($this->allowedToAdd)
+	{
+		?>
 		<a target="_blank" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit&id=0' . $appendUrl, false, 2); ?>" class="btn btn-success btn-small">
 			<i class="icon-plus"></i><?php echo JText::_('COM_TJUCM_ADD_ITEM'); ?>
 		</a>
-	<?php endif; ?>
-
+		<?php
+	}
+	?>
 	<input type="hidden" name="task" value=""/>
 	<input type="hidden" name="boxchecked" value="0"/>
 	<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>"/>
@@ -176,16 +219,22 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 	<?php echo JHtml::_('form.token'); ?>
 </form>
 
-<?php if($canDelete) : ?>
+<?php
+if ($canDelete)
+{
+	?>
 	<script type="text/javascript">
 	jQuery(document).ready(function () {
 		jQuery('.delete-button').click(deleteItem);
 	});
 
-	function deleteItem() {
-		if (!confirm("<?php echo JText::_('COM_TJUCM_DELETE_MESSAGE'); ?>")) {
+	function deleteItem()
+	{
+		if (!confirm("<?php echo JText::_('COM_TJUCM_DELETE_MESSAGE'); ?>"))
+		{
 			return false;
 		}
 	}
 	</script>
-<?php endif; ?>
+<?php
+}
