@@ -1,11 +1,12 @@
 <?php
 /**
-* @version    CVS: 1.0.0
-* @package    Com_Tjucm
-* @author     Parth Lawate <contact@techjoomla.com>
-* @copyright  2016 Techjoomla
-* @license    GNU General Public License version 2 or later; see LICENSE.txt
-*/
+ * @version    SVN: <svn_id>
+ * @package    Com_Tjucm
+ * @author     Techjoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
+ */
+
 // No direct access
 defined('_JEXEC') or die;
 
@@ -218,7 +219,6 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>"/>
 	<?php echo JHtml::_('form.token'); ?>
 </form>
-
 <?php
 if ($canDelete)
 {
