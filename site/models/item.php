@@ -133,7 +133,7 @@ class TjucmModelItem extends JModelAdmin
 
 			if (!empty($this->item->id))
 			{
-				if ($canView)
+				if ($canView || ($this->item->created_by == $user->id))
 				{
 					$this->item->params->set('access-view', true);
 				}
