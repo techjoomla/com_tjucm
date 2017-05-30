@@ -306,9 +306,6 @@ class TjucmModelItem extends JModelAdmin
 		}
 		else
 		{
-			$app->enqueueMessage(JText::_('COM_TJUCM_ERROR_MESSAGE_NOT_AUTHORISED'), 'error');
-			$app->setHeader('status', 403, true);
-
 			throw new Exception(JText::_('JERROR_ALERTNOAUTHOR'), 403);
 
 			return false;

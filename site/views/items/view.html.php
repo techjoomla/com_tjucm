@@ -58,8 +58,11 @@ class TjucmViewItems extends JViewLegacy
 		// If did not get the client from url then get if from menu param
 		if (empty($this->client))
 		{
+			// Get the active item
+			$menuItem = $app->getMenu()->getActive();
+
 			// Get the params
-			$this->menuparams = $menuitem->params;
+			$this->menuparams = $menuItem->params;
 
 			if (!empty($this->menuparams))
 			{

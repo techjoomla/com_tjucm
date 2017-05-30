@@ -75,10 +75,6 @@ class TjucmModelItemForm extends JModelForm
 		// Load state from the request userState on edit or from the passed variable on default
 		if (JFactory::getApplication()->input->get('layout') == 'edit')
 		{
-			$id = JFactory::getApplication()->getUserState('com_tjucm.edit.item.id');
-		}
-		else
-		{
 			// Load state from the request.
 			$id = $app->input->getInt('id');
 		}
@@ -429,10 +425,7 @@ class TjucmModelItemForm extends JModelForm
 
 		if ($authorised !== true)
 		{
-			$app->enqueueMessage(JText::_('COM_TJUCM_ERROR_MESSAGE_NOT_AUTHORISED'), 'error');
-			$app->setHeader('status', 403, true);
-
-			throw new Exception(JText::_('JERROR_ALERTNOAUTHOR'), 403);
+			throw new Exception(JText::_('COM_TJUCM_ERROR_MESSAGE_NOT_AUTHORISED'), 403);
 
 			return false;
 		}
@@ -584,10 +577,7 @@ class TjucmModelItemForm extends JModelForm
 		}
 		else
 		{
-			$app->enqueueMessage(JText::_('COM_TJUCM_ERROR_MESSAGE_NOT_AUTHORISED'), 'error');
-			$app->setHeader('status', 403, true);
-
-			throw new Exception(JText::_('JERROR_ALERTNOAUTHOR'), 403);
+			throw new Exception(JText::_('COM_TJUCM_ITEM_SAVED_STATE_ERROR'), 403);
 
 			return false;
 		}

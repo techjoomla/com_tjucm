@@ -57,10 +57,7 @@ class TjucmViewItemform extends JViewLegacy
 
 		if (empty($this->client))
 		{
-			$app->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
-			$app->setHeader('status', 403, true);
-
-			return;
+			return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
 		}
 
 		// Check the view access to the itemform (the model has already computed the values).

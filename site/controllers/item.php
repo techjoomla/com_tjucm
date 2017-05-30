@@ -62,7 +62,7 @@ class TjucmControllerItem extends JControllerLegacy
 
 		// Get the previous edit id (if any) and the current edit id.
 		$previousId = (int) $app->getUserState('com_tjucm.edit.item.id');
-		$editId     = $app->input->getInt('id', 0);
+		$editId = $app->input->getInt('id', 0);
 
 		// Set the user id for the user to edit in the session.
 		$app->setUserState('com_tjucm.edit.item.id', $editId);
@@ -83,7 +83,7 @@ class TjucmControllerItem extends JControllerLegacy
 		}
 
 		// Redirect to the edit screen.
-		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&layout=edit&client=' . $this->client, false));
+		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&layout=edit&id=' . $editId . '&client=' . $this->client, false));
 	}
 
 	/**

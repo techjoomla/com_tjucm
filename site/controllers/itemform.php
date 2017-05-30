@@ -32,8 +32,8 @@ class TjucmControllerItemForm extends JControllerForm
 	public function __construct()
 	{
 		$app = JFactory::getApplication();
-
 		$this->client  = $app->input->get('client');
+		$this->created_by  = $app->input->get('created_by');
 
 		if (empty($this->client))
 		{
@@ -45,6 +45,18 @@ class TjucmControllerItemForm extends JControllerForm
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
 		$this->ucmTypeId = $tjUcmModelType->getTypeId($this->client);
+
+		$this->appendUrl = "";
+
+		if (!empty($this->created_by))
+		{
+			$this->appendUrl .= "&created_by=" . $this->created_by;
+		}
+
+		if (!empty($this->client))
+		{
+			$this->appendUrl .= "&client=" . $this->client;
+		}
 
 		$this->isajax = ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') ? true : false;
 
@@ -71,7 +83,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 			$this->setRedirect(
 				JRoute::_(
-					'index.php?option=com_tjucm&view=items&client=' . $this->client
+					'index.php?option=com_tjucm&view=items' . $this->appendUrl
 					. $this->getRedirectToListAppend(), false
 				)
 			);
@@ -217,7 +229,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 			$this->setRedirect(
 				JRoute::_(
-					'index.php?option=com_tjucm&view=items'
+					'index.php?option=com_tjucm&view=items' . $this->appendUrl
 					. $this->getRedirectToListAppend(), false
 				)
 			);
@@ -442,7 +454,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 		$this->setRedirect(
 			JRoute::_(
-				'index.php?option=com_tjucm&view=items&client=' . $this->client
+				'index.php?option=com_tjucm&view=items' . $this->appendUrl
 				. $this->getRedirectToListAppend(), false
 			)
 		);
@@ -473,6 +485,7 @@ class TjucmControllerItemForm extends JControllerForm
 		// Attempt to save the data
 		try
 		{
+			$model->setState('ucmType.id', $this->ucmTypeId);
 			$return = $model->delete($data);
 
 			// Check in the profile
@@ -487,16 +500,16 @@ class TjucmControllerItemForm extends JControllerForm
 
 			// Redirect to the list screen
 			$this->setMessage(JText::_('COM_TJUCM_ITEM_DELETED_SUCCESSFULLY'));
-			$this->setRedirect(JRoute::_($url, false));
+			$this->setRedirect(JRoute::_($url . $this->appendUrl, false));
 
 			// Flush the data from the session.
 			$app->setUserState('com_tjucm.edit.item.data', null);
 		}
 		catch (Exception $e)
 		{
-			$errorType = ($e->getCode() == '404') ? 'error' : 'warning';
+			$errorType = ($e->getCode() == '404' || '403') ? 'error' : 'warning';
 			$this->setMessage($e->getMessage(), $errorType);
-			$this->setRedirect('index.php?option=com_tjucm&view=items');
+			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
 		}
 	}
 
@@ -623,7 +636,7 @@ class TjucmControllerItemForm extends JControllerForm
 	{
 		$user = JFactory::getUser();
 		$createdBy = $user->id;
-		$link = JRoute::_("index.php?option=com_tjucm&view=items&id=" . $typeId . "&created_by=" . $createdBy . "&client=" . $this->client, false);
+		$link = JRoute::_("index.php?option=com_tjucm&view=items&id=" . $typeId . $this->appendUrl, false);
 
 		JFactory::getApplication()->redirect($link, sprintf(JText::_('COM_TJUCM_ALLOWED_COUNT_LIMIT'), $allowedCount), "Warning");
 	}

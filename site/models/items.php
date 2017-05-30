@@ -194,7 +194,7 @@ class TjucmModelItems extends JModelList
 
 		$createdBy = $this->getState('created_by', '', 'INT');
 
-		if (!empty($ucmType))
+		if (!empty($createdBy))
 		{
 			$query->where($db->quoteName('a.created_by') . "=" . (INT) $createdBy);
 		}
@@ -206,7 +206,7 @@ class TjucmModelItems extends JModelList
 
 		if (is_numeric($published))
 		{
-			$query->where('a.state = ' . (int) $published);
+			$query->where('a.state = ' . (INT) $published);
 		}
 		elseif ($published === '')
 		{
