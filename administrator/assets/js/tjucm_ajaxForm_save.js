@@ -1,4 +1,3 @@
-js = jQuery.noConflict();
 
 /* This function carries stepped saving via ajax */
 function steppedFormSave(form_id, status)
