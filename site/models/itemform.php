@@ -79,7 +79,10 @@ class TjucmModelItemForm extends JModelForm
 			$id = $app->input->getInt('id');
 		}
 
-		$this->setState('item.id', $id);
+		if (!empty($id))
+		{
+			$this->setState('item.id', $id);
+		}
 
 		// Get UCM type id from uniquue identifier
 		$ucmType = $app->input->get('client', '');
@@ -636,6 +639,12 @@ class TjucmModelItemForm extends JModelForm
 			$query->where($db->quoteName('client') . '=' . $db->quote($client));
 			$db->setQuery($query);
 			$result = $db->loadResult();
+
+			// If Zero Allowed count means unlimited
+			if ($allowedCount == '0')
+			{
+				return true;
+			}
 
 			if ($result < $allowedCount)
 			{

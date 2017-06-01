@@ -13,6 +13,7 @@ defined('_JEXEC') or die;
 jimport('joomla.application.component.view');
 jimport('joomla.application.component.controller');
 jimport('joomla.filesystem.file');
+jimport('joomla.database.table');
 
 /**
  * View to edit
@@ -115,6 +116,17 @@ class TjucmViewItemform extends JViewLegacy
 			"view" => $view[1],
 			"layout" => 'edit')
 			);
+
+		// Check if draft save is enabled for the form
+		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/tables');
+		$tjUcmTypeTable = JTable::getInstance('Type', 'TjucmTable');
+		$tjUcmTypeTable->load(array('unique_identifier' => $this->client));
+		$typeParams = json_decode($tjUcmTypeTable->params);
+
+		if (!empty($typeParams->allow_draft_save))
+		{
+			$this->allow_draft_save = $typeParams->allow_draft_save;
+		}
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))

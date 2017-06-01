@@ -169,10 +169,11 @@ class TjucmControllerItemForm extends JControllerForm
 	{
 		// Check for request forgeries.
 		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
-		$app   = JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$lang  = JFactory::getLanguage();
 		$model = $this->getModel();
 		$task = $this->getTask();
+		$formStatus = $app->input->get('form_status', '', 'STRING');
 
 		// Set client value
 		$model->setClient($this->client);
@@ -180,7 +181,7 @@ class TjucmControllerItemForm extends JControllerForm
 		$table = $model->getTable();
 
 		// Get the user data.
-		$data = JFactory::getApplication()->input->get('jform', array(), 'array');
+		$data = $app->input->get('jform', array(), 'array');
 		$all_jform_data = $data;
 
 		// Added By KOMAL TEMP
@@ -189,7 +190,7 @@ class TjucmControllerItemForm extends JControllerForm
 		// END
 
 		// Jform tweak - Get all posted data.
-		$post = JFactory::getApplication()->input->post;
+		$post = $app->input->post;
 
 		// Populate the row id from the session.
 
@@ -316,6 +317,25 @@ class TjucmControllerItemForm extends JControllerForm
 
 			if (!empty($formExtra))
 			{
+				// Remove required attribute from fields if data is stored in draft mode
+				if ($formStatus == 'draft')
+				{
+					$validData['draft'] = 1;
+					$fieldSets = $formExtra->getFieldsets();
+
+					foreach ($fieldSets as $fieldset)
+					{
+						foreach ($formExtra->getFieldset($fieldset->name) as $field)
+						{
+							$formExtra->setFieldAttribute($field->fieldname, 'required', false);
+						}
+					}
+				}
+				else
+				{
+					$validData['draft'] = 0;
+				}
+
 				// Validate the posted extra data.
 				$extra_jform_data = $model->validateExtra($formExtra, $extra_jform_data);
 			}
