@@ -30,11 +30,11 @@ class TjucmControllerItems extends JControllerAdmin
 	{
 		// $this->view_list = 'items';
 
-		$this->client  = JFactory::getApplication()->input->get('client');
+		$this->client = JFactory::getApplication()->input->get('client');
 
 		if (empty($this->client))
 		{
-			$this->client  = JFactory::getApplication()->input->get('jform', array(), 'array')['client'];
+			$this->client = JFactory::getApplication()->input->get('jform', array(), 'array')['client'];
 		}
 
 		parent::__construct();
@@ -70,7 +70,7 @@ class TjucmControllerItems extends JControllerAdmin
 			JFactory::getApplication()->enqueueMessage($e->getMessage(), 'warning');
 		}
 
-		$this->setRedirect('index.php?option=com_tjucm&view=items');
+		$this->setRedirect('index.php?option=com_tjucm&view=items' . $this->client);
 	}
 
 	/**

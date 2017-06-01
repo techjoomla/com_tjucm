@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS `#__tj_ucm_data` (
 `checked_out` INT(11)  NOT NULL ,
 `checked_out_time` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
 `created_by` INT(11)  NOT NULL ,
+`draft` TINYINT(1)  NOT NULL ,
 `created_date` DATETIME NOT NULL ,
 `modified_by` INT(11)  NOT NULL ,
 `modified_date` DATETIME NOT NULL ,

@@ -45,13 +45,76 @@ class TjucmViewItems extends JViewLegacy
 		$this->pagination = $this->get('Pagination');
 		$this->params     = $app->getParams('com_tjucm');
 		$this->listcolumn = $this->get('Fields');
+		$this->allowedToAdd = false;
 
-		$model   = $this->getModel("Items");
-		$this->ucmTypeId = $model->getState('ucmType.id');
+		$model = $this->getModel("Items");
+		$this->ucmTypeId = $id = $model->getState('ucmType.id');
 		$this->client = $model->getState('ucm.client');
 
+		$user = JFactory::getUser();
+		$canCreate = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$canView = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $this->ucmTypeId);
+
+		// If did not get the client from url then get if from menu param
+		if (empty($this->client))
+		{
+			// Get the active item
+			$menuItem = $app->getMenu()->getActive();
+
+			// Get the params
+			$this->menuparams = $menuItem->params;
+
+			if (!empty($this->menuparams))
+			{
+				$this->ucm_type   = $this->menuparams->get('ucm_type');
+				$this->client     = 'com_tjucm.' . $this->ucm_type;
+			}
+		}
+
 		// If there are no fields column to show in list view then dont allow to show data
-		$this->showList = $model->showListCheck($client);
+		$this->showList = $model->showListCheck($this->client);
+
+		// Include models
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+
+		/* Get model instance here */
+		$itemFormModel = JModelLegacy::getInstance('itemForm', 'TjucmModel');
+
+		$input = JFactory::getApplication()->input;
+		$input->set("content_id", $id);
+		$this->created_by = $input->get("created_by", '', 'INT');
+
+		// Get if user is allowed to save the content
+		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		$typeId = $tjUcmModelType->getTypeId($this->client);
+
+		$TypeData = $tjUcmModelType->getItem($typeId);
+
+		$allowedCount = $TypeData->allowed_count;
+		$user   = JFactory::getUser();
+		$userId = $user->id;
+
+		if (empty($this->id))
+		{
+			if ($canCreate)
+			{
+				$this->allowedToAdd = $itemFormModel->allowedToAddTypeData($userId, $this->client, $allowedCount);
+			}
+		}
+
+		if ($this->created_by == $userId)
+		{
+			$canView = true;
+		}
+
+		// Check the view access to the article (the model has already computed the values).
+		if (!$canView)
+		{
+			$app->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
+			$app->setHeader('status', 403, true);
+
+			return false;
+		}
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))

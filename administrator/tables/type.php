@@ -137,7 +137,7 @@ class TjucmTabletype extends JTable
 
 			foreach ($actions as $action)
 			{
-				$array_jaccess[$action->name] = $default_actions[$action->name];
+				$array_jaccess[$action->name] = (!empty($default_actions[$action->name]))?$default_actions[$action->name]:'';
 			}
 
 			$array['rules'] = $this->JAccessRulestoArray($array_jaccess);

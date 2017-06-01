@@ -62,38 +62,4 @@ class TjucmHelpersTjucm
 
 		return explode(',', $db->loadResult());
 	}
-
-	/**
-	 * Gets the edit permission for an user
-	 *
-	 * @param   mixed  $item  The item
-	 *
-	 * @return  bool
-	 */
-	public static function canUserEdit($item)
-	{
-		$permission = false;
-		$user       = JFactory::getUser();
-
-		if ($user->authorise('core.edit', 'com_tjucm'))
-		{
-			$permission = true;
-		}
-		else
-		{
-			if (isset($item->created_by))
-			{
-				if ($user->authorise('core.edit.own', 'com_tjucm') && $item->created_by == $user->id)
-				{
-					$permission = true;
-				}
-			}
-			else
-			{
-				$permission = true;
-			}
-		}
-
-		return $permission;
-	}
 }

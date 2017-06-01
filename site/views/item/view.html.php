@@ -44,8 +44,19 @@ class TjucmViewItem extends JViewLegacy
 		$this->state  = $this->get('State');
 		$this->item   = $this->get('Data');
 		$model   = $this->getModel("Item");
+		$this->model   = $this->getModel("Item");
 		$this->params = $app->getParams('com_tjucm');
 
+		// Load tj-fields helper helper
+		$path = JPATH_SITE . '/components/com_tjfields/helpers/tjfields.php';
+
+		if (!class_exists('TjfieldsHelper'))
+		{
+			JLoader::register('TjfieldsHelper', $path);
+			JLoader::load('TjfieldsHelper');
+		}
+
+		$this->tjFieldsHelper = new TjfieldsHelper;
 		$this->ucmTypeId = $model->getState('ucmType.id');
 
 		// Check the view access to the article (the model has already computed the values).
@@ -54,7 +65,7 @@ class TjucmViewItem extends JViewLegacy
 			$app->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
 			$app->setHeader('status', 403, true);
 
-			return;
+			return false;
 		}
 
 		/* Get model instance here */
@@ -73,8 +84,6 @@ class TjucmViewItem extends JViewLegacy
 			"view" => $view[1],
 			"layout" => 'edit')
 			);
-
-		$this->form_extra = array_filter($this->form_extra);
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))

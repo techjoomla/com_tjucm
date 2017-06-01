@@ -18,6 +18,10 @@ JLoader::register('TjucmController', JPATH_COMPONENT . '/controller.php');
 // Load backend helper
 $path = JPATH_ADMINISTRATOR . '/components/com_tjucm/helpers/tjucm.php';
 
+// Load joomla icon media file
+$doc = JFactory::getDocument();
+$doc->addStyleSheet(JUri::root() . '/media/jui/css/icomoon.css');
+
 if (!class_exists('TjucmHelper'))
 {
 	JLoader::register('TjucmHelper', $path);

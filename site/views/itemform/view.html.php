@@ -12,6 +12,8 @@ defined('_JEXEC') or die;
 
 jimport('joomla.application.component.view');
 jimport('joomla.application.component.controller');
+jimport('joomla.filesystem.file');
+jimport('joomla.database.table');
 
 /**
  * View to edit
@@ -42,6 +44,7 @@ class TjucmViewItemform extends JViewLegacy
 	public function display($tpl = null)
 	{
 		$app  = JFactory::getApplication();
+		$input = $app->input;
 		$user = JFactory::getUser();
 
 		$this->state   = $this->get('State');
@@ -49,7 +52,14 @@ class TjucmViewItemform extends JViewLegacy
 
 		$this->params  = $app->getParams('com_tjucm');
 		$this->canSave = $this->get('CanSave');
-		$this->form		= $this->get('Form');
+		$this->form = $this->get('Form');
+		$this->client  = $input->get('client');
+		$this->id = $id  = $input->get('id');
+
+		if (empty($this->client))
+		{
+			return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
+		}
 
 		// Check the view access to the itemform (the model has already computed the values).
 		if ($this->item->params->get('access-view') == false)
@@ -65,9 +75,6 @@ class TjucmViewItemform extends JViewLegacy
 
 		/* Get model instance here */
 		$model = $this->getModel();
-
-		$this->client  = JFactory::getApplication()->input->get('client');
-		$this->id = $id  = JFactory::getApplication()->input->get('id');
 
 		$input  = JFactory::getApplication()->input;
 		$input->set("content_id", $id);
@@ -110,7 +117,16 @@ class TjucmViewItemform extends JViewLegacy
 			"layout" => 'edit')
 			);
 
-		$this->form_extra = array_filter($this->form_extra);
+		// Check if draft save is enabled for the form
+		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/tables');
+		$tjUcmTypeTable = JTable::getInstance('Type', 'TjucmTable');
+		$tjUcmTypeTable->load(array('unique_identifier' => $this->client));
+		$typeParams = json_decode($tjUcmTypeTable->params);
+
+		if (!empty($typeParams->allow_draft_save))
+		{
+			$this->allow_draft_save = $typeParams->allow_draft_save;
+		}
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
