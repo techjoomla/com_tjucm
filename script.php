@@ -733,50 +733,53 @@ class Com_TjucmInstallerScript
 		/* @var $plugins SimpleXMLElement */
 		$plugins = $parent->get("manifest")->plugins;
 
-		if (count($plugins->children()))
+		if (!empty($plugins->children()))
 		{
-			$db    = JFactory::getDbo();
-			$query = $db->getQuery(true);
-
-			foreach ($plugins->children() as $plugin)
+			if (count($plugins->children()))
 			{
-				$pluginName  = (string) $plugin['plugin'];
-				$pluginGroup = (string) $plugin['group'];
-				$path        = $installation_folder . '/plugins/' . $pluginGroup . '/' . $pluginName;
-				$installer   = new JInstaller;
+				$db    = JFactory::getDbo();
+				$query = $db->getQuery(true);
 
-				if (!$this->isAlreadyInstalled('plugin', $pluginName, $pluginGroup))
+				foreach ($plugins->children() as $plugin)
 				{
-					$result = $installer->install($path);
-				}
-				else
-				{
-					$result = $installer->update($path);
-				}
+					$pluginName  = (string) $plugin['plugin'];
+					$pluginGroup = (string) $plugin['group'];
+					$path        = $installation_folder . '/plugins/' . $pluginGroup . '/' . $pluginName;
+					$installer   = new JInstaller;
 
-				if ($result)
-				{
-					$app->enqueueMessage('Plugin ' . $pluginName . ' was installed successfully');
-				}
-				else
-				{
-					$app->enqueueMessage('There was an issue installing the plugin ' . $pluginName,
-						'error');
-				}
+					if (!$this->isAlreadyInstalled('plugin', $pluginName, $pluginGroup))
+					{
+						$result = $installer->install($path);
+					}
+					else
+					{
+						$result = $installer->update($path);
+					}
 
-				$query
-					->clear()
-					->update('#__extensions')
-					->set('enabled = 1')
-					->where(
-						array(
-							'type LIKE ' . $db->quote('plugin'),
-							'element LIKE ' . $db->quote($pluginName),
-							'folder LIKE ' . $db->quote($pluginGroup)
-						)
-					);
-				$db->setQuery($query);
-				$db->execute();
+					if ($result)
+					{
+						$app->enqueueMessage('Plugin ' . $pluginName . ' was installed successfully');
+					}
+					else
+					{
+						$app->enqueueMessage('There was an issue installing the plugin ' . $pluginName,
+							'error');
+					}
+
+					$query
+						->clear()
+						->update('#__extensions')
+						->set('enabled = 1')
+						->where(
+							array(
+								'type LIKE ' . $db->quote('plugin'),
+								'element LIKE ' . $db->quote($pluginName),
+								'folder LIKE ' . $db->quote($pluginGroup)
+							)
+						);
+					$db->setQuery($query);
+					$db->execute();
+				}
 			}
 		}
 	}
