@@ -53,8 +53,28 @@ class TjucmViewItemform extends JViewLegacy
 		$this->params  = $app->getParams('com_tjucm');
 		$this->canSave = $this->get('CanSave');
 		$this->form = $this->get('Form');
-		$this->client  = $input->get('client');
-		$this->id = $id  = $input->get('id');
+		$this->client = $input->get('client');
+		$this->id = $input->get('id');
+
+		// If did not get the client from url then get if from menu param
+		if (empty($this->client))
+		{
+			// Get the active item
+			$menuItem = $app->getMenu()->getActive();
+
+			// Get the params
+			$this->menuparams = $menuItem->params;
+
+			if (!empty($this->menuparams))
+			{
+				$this->ucm_type   = $this->menuparams->get('ucm_type');
+
+				if (!empty($this->ucm_type))
+				{
+					$this->client     = 'com_tjucm.' . $this->ucm_type;
+				}
+			}
+		}
 
 		if (empty($this->client))
 		{
@@ -75,9 +95,6 @@ class TjucmViewItemform extends JViewLegacy
 
 		/* Get model instance here */
 		$model = $this->getModel();
-
-		$input  = JFactory::getApplication()->input;
-		$input->set("content_id", $id);
 
 		// Get if user is allowed to save the content
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
@@ -114,7 +131,8 @@ class TjucmViewItemform extends JViewLegacy
 			"clientComponent" => 'com_tjucm',
 			"client" => $this->client,
 			"view" => $view[1],
-			"layout" => 'edit')
+			"layout" => 'edit',
+			"content_id" => $this->id)
 			);
 
 		// Check if draft save is enabled for the form

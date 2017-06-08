@@ -31,8 +31,7 @@ function steppedFormSave(form_id, status)
 					jQuery("#finalSave").attr("disabled", "disabled");
 					var url= window.location.href.split('#')[0],
 					separator = (url.indexOf("?")===-1)?"?":"&",
-					newParam=separator + "success=1&layout=details";
-					//~ newParam=separator + "layout=details";
+					newParam=separator + "id=" + returnedData.data;
 					newUrl=url.replace(newParam,"");
 					newUrl+=newParam;
 					window.location.href =newUrl;

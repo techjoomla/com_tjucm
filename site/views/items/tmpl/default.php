@@ -56,6 +56,7 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 					<?php echo JHtml::_('grid.sort',  'COM_TJUCM_ITEMS_ID', 'a.id', $listDirn, $listOrder); ?>
 				</th>
 				<?php
+
 				if (!empty($this->listcolumn))
 				{
 					foreach ($this->listcolumn as $col_name)

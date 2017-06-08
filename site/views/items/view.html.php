@@ -67,7 +67,11 @@ class TjucmViewItems extends JViewLegacy
 			if (!empty($this->menuparams))
 			{
 				$this->ucm_type   = $this->menuparams->get('ucm_type');
-				$this->client     = 'com_tjucm.' . $this->ucm_type;
+
+				if (!empty($this->ucm_type))
+				{
+					$this->client     = 'com_tjucm.' . $this->ucm_type;
+				}
 			}
 		}
 
