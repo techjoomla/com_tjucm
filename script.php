@@ -733,7 +733,7 @@ class Com_TjucmInstallerScript
 		/* @var $plugins SimpleXMLElement */
 		$plugins = $parent->get("manifest")->plugins;
 
-		if (!empty($plugins->children()))
+		if (!empty($plugins))
 		{
 			if (count($plugins->children()))
 			{
