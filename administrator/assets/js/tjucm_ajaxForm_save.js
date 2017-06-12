@@ -9,7 +9,8 @@ function steppedFormSave(form_id, status)
 	if ('save' == status) {
 		if(confirm(Joomla.JText._('COM_TJUCM_ITEMFORM_ALERT')) == true)
 		{
-			if (!document.formvalidator.isValid('#item-form')) {
+			if (!document.formvalidator.isValid('#item-form'))
+			{
 					return false;
 			}
 		}

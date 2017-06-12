@@ -94,7 +94,7 @@ class TjucmViewItems extends JViewLegacy
 
 		$TypeData = $tjUcmModelType->getItem($typeId);
 
-		$allowedCount = $TypeData->allowed_count;
+		$allowedCount = (!empty($TypeData->allowed_count))?$TypeData->allowed_count:'0';
 		$user   = JFactory::getUser();
 		$userId = $user->id;
 
