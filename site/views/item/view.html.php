@@ -41,6 +41,10 @@ class TjucmViewItem extends JViewLegacy
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 
+		// Load tj-fields language file
+		$lang = JFactory::getLanguage();
+		$lang->load('com_tjfields', JPATH_SITE);
+
 		$this->state  = $this->get('State');
 		$this->item   = $this->get('Data');
 		$model   = $this->getModel("Item");

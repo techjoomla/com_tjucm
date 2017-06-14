@@ -36,9 +36,9 @@ class JFormFieldUcmTypes extends JFormFieldList
 		$options = array();
 		$db	= JFactory::getDbo();
 		$query	= $db->getQuery(true);
-
 		$query->select($db->quoteName(array("title", "alias")));
 		$query->from($db->quoteName('#__tj_ucm_types'));
+		$query->where($db->quoteName('state') . '=1');
 
 		// Get the options.
 		$db->setQuery($query);
