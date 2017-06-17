@@ -53,8 +53,8 @@ class TjucmViewItemform extends JViewLegacy
 		$this->params  = $app->getParams('com_tjucm');
 		$this->canSave = $this->get('CanSave');
 		$this->form = $this->get('Form');
-		$this->client  = $input->get('client');
-		$this->id = $id  = $input->get('id');
+		$this->client = $input->get('client');
+		$this->id = (int) $input->get('id');
 
 		if (empty($this->client))
 		{
