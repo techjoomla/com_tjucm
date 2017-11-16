@@ -45,6 +45,7 @@ $sortFields = $this->getSortFields();
 	jQuery(document).ready(function () {
 		jQuery('#clear-search-button').on('click', function () {
 			jQuery('#filter_search').val('');
+			jQuery('#filter_isSubform').val('');
 			jQuery('#adminForm').submit();
 		});
 	});
@@ -107,6 +108,12 @@ if (!empty($this->extra_sidebar))
 					<button class="btn hasTooltip" id="clear-search-button" type="button" title="<?php echo JText::_('JSEARCH_FILTER_CLEAR'); ?>">
 						<i class="icon-remove"></i>
 					</button>
+				</div>
+				<div class="pull-left">
+				<?php
+					// Filter by Form is subform YES/NO
+					echo JHtml::_('select.genericlist', $this->isSubform, "filter_isSubform", 'class="" size="1" onchange="document.adminForm.submit();" name="filter_isSubform"', "value", "text", $this->state->get('filter.isSubform'));
+				?>
 				</div>
 				<div class="btn-group pull-right hidden-phone">
 					<label for="limit" class="element-invisible">

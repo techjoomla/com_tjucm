@@ -73,6 +73,9 @@ class TjucmModelTypes extends JModelList
 		$published = $app->getUserStateFromRequest($this->context . '.filter.state', 'filter_published', '', 'string');
 		$this->setState('filter.state', $published);
 
+		// Filter by Form is subform YES/NO
+		$this->setState('filter.isSubform', $app->getUserStateFromRequest($this->context . '.filter.isSubform', 'filter_isSubform', '', 'string'));
+
 		// Load the parameters.
 		$params = JComponentHelper::getParams('com_tjucm');
 		$this->setState('params', $params);
@@ -135,6 +138,18 @@ class TjucmModelTypes extends JModelList
 		// Join over the user field 'modified_by'
 		$query->select('`modified_by`.name AS `modified_by`');
 		$query->join('LEFT', '#__users AS `modified_by` ON `modified_by`.id = a.`modified_by`');
+
+		// Filter by Form is subform YES/NO
+		$isSubform = $this->getState('filter.isSubform');
+
+		if (is_numeric($isSubform))
+		{
+			$query->where('a.is_subform = ' . (int) $isSubform);
+		}
+		elseif ($isSubform === '')
+		{
+			$query->where('(a.is_subform IN (0, 1))');
+		}
 
 		// Filter by published state
 		$published = $this->getState('filter.state');
