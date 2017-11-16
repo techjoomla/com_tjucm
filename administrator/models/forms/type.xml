@@ -4,6 +4,10 @@
 		<field name="id" type="text" readonly="true" class="readonly" default="0" description="JGLOBAL_FIELD_ID_DESC" />
 		<field name="ordering" />
 		<field name="title" type="text" maxlength="255" filter="raw" required="true" label="COM_TJUCM_FORM_LBL_TYPE_TITLE" description="COM_TJUCM_FORM_DESC_TYPE_TITLE" hint="COM_TJUCM_FORM_LBL_TYPE_TITLE" />
+		<field name="is_subform" type="radio" class="btn-group" default="0" label="COM_TJUCM_FORM_LBL_TYPE_IS_SUBFORM" description="COM_TJUCM_FORM_DESC_TYPE_IS_SUBFORM" hint="COM_TJUCM_FORM_LBL_TYPE_IS_SUBFORM">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
 		<field name="alias" type="text" class="inputbox" generator="title" label="COM_TJUCM_FORM_LBL_TYPE_ALIAS" description="COM_TJUCM_FORM_DESC_TYPE_ALIAS" hint="COM_TJUCM_FORM_LBL_TYPE_ALIAS" />
 		<field name="state" default="1" type="list" label="JSTATUS" description="JFIELD_PUBLISHED_DESC" class="inputbox" size="1">
 			<option value="1">JPUBLISHED</option>

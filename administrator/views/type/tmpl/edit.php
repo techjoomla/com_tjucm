@@ -53,6 +53,7 @@ JHtml::script( JUri::root().'administrator/components/com_tjucm/assets/js/tjucm_
 							<input type="hidden" name="jform[id]" value="<?php echo $this->item->id; ?>" />
 							<input type="hidden" name="jform[ordering]" value="<?php echo $this->item->ordering; ?>" />
 							<?php echo $this->form->renderField('title'); ?>
+
 							<?php
 							/*if ($this->item->field_group || $this->item->field_category) {
 								$this->form->setFieldAttribute('alias', 'readonly', 'true', $group = null);
@@ -62,6 +63,7 @@ JHtml::script( JUri::root().'administrator/components/com_tjucm/assets/js/tjucm_
 							<?php echo $this->form->renderField('state'); ?>
 							<?php echo $this->form->renderField('allowed_count'); ?>
 							<?php echo $this->form->renderField('allow_draft_save'); ?>
+							<?php echo $this->form->renderField('is_subform'); ?>
 							<?php echo $this->form->renderField('type_description'); ?>
 
 							<?php echo $this->form->renderField('params'); ?>
