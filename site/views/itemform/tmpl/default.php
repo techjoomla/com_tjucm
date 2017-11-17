@@ -18,6 +18,7 @@ JHtml::_('formbehavior.chosen', 'select');
 // Load admin language file
 $lang = JFactory::getLanguage();
 $lang->load('com_tjucm', JPATH_SITE);
+JText::script('COM_TJUCM_ITEMFORM_ALERT');
 $doc = JFactory::getDocument();
 $doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/jquery.form.js');
 $doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/tjucm_ajaxForm_save.js');
