@@ -99,9 +99,10 @@ class TjucmModelItems extends JModelList
 
 			if (!empty($this->menuparams))
 			{
+				$this->ucm_type   = $this->menuparams->get('ucm_type');
+
 				if (!empty($this->ucm_type))
 				{
-					$this->ucm_type   = $this->menuparams->get('ucm_type');
 					$ucmType     = 'com_tjucm.' . $this->ucm_type;
 				}
 			}
@@ -250,22 +251,22 @@ class TjucmModelItems extends JModelList
 	public function getFields()
 	{
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
-		$items_model = JModelLegacy::getInstance('Fields', 'TjfieldsModel');
-		$items_model->setState('filter.showonlist', 1);
+		$Fields_model = JModelLegacy::getInstance('Fields', 'TjfieldsModel');
+		$Fields_model->setState('filter.showonlist', 1);
 		$this->client = $this->getState('ucm.client');
 
 		if (!empty($this->client))
 		{
-			$items_model->setState('filter.client', $this->client);
+			$Fields_model->setState('filter.client', $this->client);
 		}
 
-		$items = $items_model->getItems();
+		$Fields = $Fields_model->getItems();
 
 		$data = array();
 
-		foreach ($items as $item)
+		foreach ($Fields as $Field)
 		{
-			$data[$item->id] = $item->label;
+			$data[$Field->id] = $Field->label;
 		}
 
 		return $data;
