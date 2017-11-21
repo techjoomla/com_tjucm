@@ -10,10 +10,11 @@
 // No direct access
 defined('_JEXEC') or die;
 $user = JFactory::getUser();
+require_once JPATH_SITE . '/components/com_tjfields/helpers/tjfields.php';
 
 if ($this->form_extra)
 {
-$fieldSets = $this->form_extra->getFieldsets();
+	$fieldSets = $this->form_extra->getFieldsets();
 
 	// Iterate through the normal form fieldsets and display each one
 	foreach ($fieldSets as $fieldName => $fieldset)
@@ -29,37 +30,39 @@ $fieldSets = $this->form_extra->getFieldsets();
 				}
 				elseif ($field->type == 'File')
 				{
-					?>
-					<div class="form-group">
-						<?php
-						if ($field->value)
+					if ($field->value)
+					{
+						$tjFieldHelper = new TjfieldsHelper;
+						$mediaLink = $tjFieldHelper->getMediaUrl($field->value);
+						if (!empty($mediaLink))
 						{
 							?>
-							<div class="col-sm-3 control-label">
-								<?php echo $field->label; ?>
-							</div>
-							<div class="col-sm-6 control-label">
-								<a href="<?php echo JUri::root(true) . $field->value ?>" target="_blank" src="<?php echo JUri::root() . $field->value; ?>"><?php echo JText::_("JGLOBAL_PREVIEW");?></a>
+							<div class="form-group">
+								<div class="control-label col-sm-2">
+									<?php echo $field->label; ?>
+								</div>
+
+								<div class="col-sm-10">
+									<a href="<?php echo $mediaLink;?>">
+										<?php echo JText::_("COM_TJUCM_FILE_DOWNLOAD");?></a>
+								</div>
 							</div>
 							<?php
 						}
-						?>
-					</div>
-				<?php
+					}
 				}
 				elseif ($field->type == 'Subform')
 				{
-					?>
-					<div class="form-group">
-						<?php
-						if ($field->value)
-						{
-							?>
-							<div class="col-sm-3 control-label">
+					if ($field->value)
+					{
+						?>
+						<div class="form-group">
+							<div class="control-label col-sm-2">
 								<?php echo $field->label; ?>
 							</div>
-							<div class="col-sm-6 control-label">
-							<?php
+
+							<div class="col-sm-10">
+								<?php
 								foreach ($field->value as $val)
 								{
 									foreach ($val as $lab => $valu)
@@ -75,74 +78,67 @@ $fieldSets = $this->form_extra->getFieldsets();
 
 									echo '<hr>';
 								}
-							?>
+								?>
 							</div>
-							<?php
-						} ?>
-					</div>
-					<?php
+						</div>
+						<?php
 					}
-					elseif ($field->type == 'Checkbox')
+				}
+				elseif ($field->type == 'Checkbox')
+				{
+					if ($field->value)
 					{
 						?>
 						<div class="form-group">
-							<?php
-							if ($field->value)
-							{
-								?>
-								<div class="col-sm-3 control-label">
-									<?php echo $field->label; ?>
-								</div>
-								<div class="col-sm-6 control-label">
-								<?php
-									$checked = "";
+							<div class="control-label col-sm-2">
+								<?php echo $field->label; ?>
+							</div>
 
-									if ($field->value = 1)
-									{
-										$checked = ' checked="checked"';
-									}
-									?>
-									<input type="checkbox" disabled="disabled" value="1" <?php echo $checked;?> />
-								</div>
+							<div class="col-sm-10">
 								<?php
-							}
-							?>
+								$checked = "";
+
+								if ($field->value = 1)
+								{
+									$checked = ' checked="checked"';
+								}
+								?>
+								<input type="checkbox" disabled="disabled" value="1" <?php echo $checked;?> />
+							</div>
 						</div>
-					<?php
+						<?php
 					}
-					else
+				}
+				else
+				{
+					if ($field->value)
 					{
 						?>
 						<div class="form-group">
-							<?php
-							if ($field->value)
-							{
+							<div class="control-label col-sm-2">
+								<?php echo $field->label; ?>
+							</div>
+
+							<div class="col-sm-10">
+								<?php
+								if (is_array($field->value))
+								{
+									foreach($field->value as $eachFieldValue)
+									{
+										?>
+										<p><?php echo "-" . $eachFieldValue; ?></p>
+										<?php
+									}
+								}
+								else
+								{
+									echo $field->value;
+								}
 								?>
-								<div class="col-sm-3 control-label">
-									<?php echo $field->label; ?>
-								</div>
-								<div class="col-sm-6 control-label">
-									<?php
-									if (is_array($field->value))
-									{
-										foreach($field->value as $eachFieldValue)
-										{
-											?>
-											<p><?php echo "-" . $eachFieldValue; ?></p>
-											<?php
-										}
-									}
-									else
-									{
-										echo $field->value;
-									}
-									?>
-								</div>
-							<?php
-							}
-							?>
+							</div>
 						</div>
-				<?php
+						<?php
+					}
 				}
 			}
 		?>
