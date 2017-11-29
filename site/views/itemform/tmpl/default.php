@@ -24,38 +24,31 @@ $doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/tju
 $doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/tjfield.js');
 $doc->addScript(JUri::root() . 'media/com_tjucm/js/form.js');
 
-$jinput                    = JFactory::getApplication();
-$baseUrl                   = $jinput->input->server->get('REQUEST_URI', '', 'STRING');
+$app                       = JFactory::getApplication();
+$baseUrl                   = $app->input->server->get('REQUEST_URI', '', 'STRING');
 $calledFrom                = (strpos($baseUrl, 'administrator')) ? 'backend' : 'frontend';
 $layout                    = ($calledFrom == 'frontend') ? 'default' : 'edit';
-$client                    = JFactory::getApplication()->input->get('client');
-$is_saved                  = $jinput->input->get("success", '', 'INT');
-$fieldsets_counter_deafult = 0;
-$app                       = JFactory::getApplication();
+$client                    = $app->input->get('client', '', 'string');
+$id                        = $app->input->get('id');
+$isSaved                   = $app->input->get("success", '', 'INT');
+$fieldsetsCounterDeafult   = 0;
 $menu                      = $app->getMenu();
-$setnavigation             = false;
+$setNavigation             = false;
 ?>
 <script type="text/javascript">
-
-	jQuery(window).load(function ()
-	{
+	jQuery(window).load(function () {
 		jQuery('#item-form .nav-tabs li a').first().click();
 	});
 
-	Joomla.submitbutton = function (task)
-	{
-		if (task == 'itemform.cancel')
-		{
+	Joomla.submitbutton = function (task) {
+		if (task == 'itemform.cancel') {
 			Joomla.submitform(task, document.getElementById('item-form'));
 		}
-		else
-		{
-			if (task != 'itemform.cancel' && document.formvalidator.isValid(document.id('item-form')))
-			{
+		else {
+			if (task != 'itemform.cancel' && document.formvalidator.isValid(document.id('item-form'))) {
 				Joomla.submitform(task, document.getElementById('item-form'));
 			}
-			else
-			{
+			else {
 				alert('<?php echo $this->escape(JText::_('JGLOBAL_VALIDATION_FORM_FAILED')); ?>');
 			}
 		}
@@ -64,7 +57,7 @@ $setnavigation             = false;
 
 <form action="<?php echo JRoute::_('index.php'); ?>" method="post" enctype="multipart/form-data" name="adminForm" id="item-form" class="form-validate">
 	<?php
-	if ($is_saved)
+	if ($isSaved)
 	{
 		?>
 		<div id="success_msg" class="alert alert-success">
@@ -82,7 +75,7 @@ $setnavigation             = false;
 		<div class="row-fluid">
 			<div class="span10 form-horizontal">
 				<fieldset class="adminform">
-					<input type="hidden" name="jform[id]" id="recordId" value="<?php echo JFactory::getApplication()->input->get('id'); ?>" />
+					<input type="hidden" name="jform[id]" id="recordId" value="<?php echo $id; ?>" />
 					<input type="hidden" name="jform[ordering]" value="<?php echo $this->item->ordering; ?>" />
 					<input type="hidden" name="jform[state]" value="<?php echo $this->item->state;?>" />
 					<input type="hidden" name="jform[client]" value="<?php echo $client;?>" />
@@ -125,11 +118,11 @@ $setnavigation             = false;
 			{
 				if (count($fieldArray->getFieldsets()) > 1)
 				{
-					$setnavigation = true;
+					$setNavigation = true;
 				}
 			}
 
-			if (isset($setnavigation) && $setnavigation == true)
+			if (isset($setNavigation) && $setNavigation == true)
 			{
 				if (!empty($this->allow_draft_save))
 				{
