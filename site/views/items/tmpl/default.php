@@ -62,7 +62,7 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 					{
 						?>
 						<th class='left'>
-							<?php echo $col_name; ?>
+							<?php echo htmlspecialchars($col_name, ENT_COMPAT, 'UTF-8'); ?>
 						</th>
 						<?php
 					}
