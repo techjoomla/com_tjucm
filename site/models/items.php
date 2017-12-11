@@ -164,7 +164,7 @@ class TjucmModelItems extends JModelList
 		$query->where('(types.state IN (1))');
 
 		// Join over the user field 'created_by'
-		$query->select('`created_by`.name AS `created_by`');
+		$query->select('`created_by`.name AS `created_by_username`, `created_by`.id AS `created_by`');
 		$query->join('INNER', '#__users AS `created_by` ON `created_by`.id = a.`created_by`');
 
 		// Join over the user field 'modified_by'
@@ -251,22 +251,22 @@ class TjucmModelItems extends JModelList
 	public function getFields()
 	{
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
-		$Fields_model = JModelLegacy::getInstance('Fields', 'TjfieldsModel');
-		$Fields_model->setState('filter.showonlist', 1);
+		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel');
+		$fieldsModel->setState('filter.showonlist', 1);
 		$this->client = $this->getState('ucm.client');
 
 		if (!empty($this->client))
 		{
-			$Fields_model->setState('filter.client', $this->client);
+			$fieldsModel->setState('filter.client', $this->client);
 		}
 
-		$Fields = $Fields_model->getItems();
+		$fields = $fieldsModel->getItems();
 
 		$data = array();
 
-		foreach ($Fields as $Field)
+		foreach ($fields as $field)
 		{
-			$data[$Field->id] = $Field->label;
+			$data[$field->id] = $field->label;
 		}
 
 		return $data;

@@ -10,7 +10,7 @@
 // No direct access
 defined('_JEXEC') or die;
 $user = JFactory::getUser();
-require_once JPATH_SITE . '/components/com_tjfields/helpers/tjfields.php';
+JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
 
 if ($this->form_extra)
 {
@@ -65,12 +65,12 @@ if ($this->form_extra)
 								<?php
 								foreach ($field->value as $val)
 								{
-									foreach ($val as $lab => $valu)
+									foreach ($val as $label => $value)
 									{
 										// TODO : SubForm rendering
 										$html = '<div class="form-group">';
 											//$html .= '<div class="col-sm-6 control-label">' . $fieldData->label . '</div>';
-											$html .= '<div class="col-sm-6 control-label"> : ' . $valu . '</div>';
+											$html .= '<div class="col-sm-6 control-label"> : ' . $value . '</div>';
 										$html .= '</div>';
 
 										echo  $html;
