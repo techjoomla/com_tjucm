@@ -200,7 +200,7 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 			?>
 				<tr>
 					<td>
-						<div class="alert alert-warrning"><strong><?php echo JText::_('COM_TJUCM_ITEM_DOESNT_EXIST');?></strong></div>
+						<div class="alert alert-warrning"><strong><?php echo JText::_('COM_TJUCM_NO_FIELD_CONFIG_SET');?></strong></div>
 					</td>
 					<td>&nbsp;</td>
 					<td>&nbsp;</td>
