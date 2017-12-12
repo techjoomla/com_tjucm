@@ -106,6 +106,7 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 
 						if (!$canEdit && $canEditOwn)
 						{
+							// If login user id and created by id is same then mark 'canEdit' is one.
 							$canEdit = JFactory::getUser()->id == $item->created_by;
 						}
 						?>
