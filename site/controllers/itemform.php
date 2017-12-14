@@ -391,18 +391,22 @@ class TjucmControllerItemForm extends JControllerForm
 			}
 
 			$recordId = $model->save($validData, $extra_jform_data, $post);
-			$dispatcher        = JDispatcher::getInstance();
-			JPluginHelper::importPlugin("system", "jlike_tjucm");
-			$dispatcher->trigger('jlike_tjucmOnAfterSave', array($recordId,$validData));
-			$response = $recordId;
-			$redirect_url = '';
-			$redirect_msg = '';
+
+			if ($recordId)
+			{
+				$dispatcher        = JEventDispatcher::getInstance();
+				JPluginHelper::importPlugin("system", "jlike_tjucm");
+				$dispatcher->trigger('jlike_tjucmOnAfterSave', array($recordId, $validData));
+				$response = $recordId;
+				$redirect_url = '';
+				$redirect_msg = '';
+			}
 		}
 		catch (Exception $e)
 		{
 			$response = $e;
 			$redirect_url = '';
-			$redirect_msg = $e->getMsg();
+			$redirect_msg = $e->getMessage();
 		}
 
 		if ($this->isajax)

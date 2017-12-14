@@ -255,6 +255,7 @@ class TjucmModelType extends JModelAdmin
 	{
 		$input  = JFactory::getApplication()->input;
 		$filter = JFilterInput::getInstance();
+		$table = $this->getTable();
 
 		// Alter the title for save as copy
 		if ($input->get('task') == 'save2copy')
@@ -310,12 +311,21 @@ class TjucmModelType extends JModelAdmin
 			}
 		}
 
+		if (isset($data['alias']))
+		{
+			// Creating alias here because we have to create the unique identifier using the alias
+			$data['alias'] = $table->getColumnAlias($data['alias']);
+		}
+
 		if (!empty($data['id']))
 		{
+			$db = JFactory::getDbo();
+
 			$field_group = $this->getGroupCount($data['unique_identifier']);
 
 			// Not able to get count using getTotal method of category model
-			$field_category = $this->common->getDataValues('#__categories', 'count(*)', 'extension = "' . $data['unique_identifier'] . '"', 'loadResult');
+	$field_category = $this->common->getDataValues('#__categories', 'count(*)', 'extension = "' .
+			$db->quote($data['unique_identifier']) . '"', 'loadResult');
 
 			// $field_category = $this->getCategoryCount($data['unique_identifier']);
 
@@ -327,6 +337,30 @@ class TjucmModelType extends JModelAdmin
 		else
 		{
 			$data['unique_identifier'] = 'com_tjucm.' . $data['alias'];
+		}
+
+		if (!in_array($data['state'], array('1','0')))
+		{
+			$msg = JText::_('TJUCM_ERROR_INVALID_STATUS');
+			$this->setError($msg);
+
+			return false;
+		}
+
+		if (!in_array($data['allow_draft_save'], array('1','0')))
+		{
+			$msg = JText::_('TJUCM_ERROR_INVALID_ALLOW_DRAFT_SAVE');
+			$this->setError($msg);
+
+			return false;
+		}
+
+		if (!empty($data['allowed_count']) && !is_numeric($data['allowed_count']))
+		{
+			$msg = JText::_('TJUCM_ERROR_INVALID_ALLOW_COUNT');
+			$this->setError($msg);
+
+			return false;
 		}
 
 		$params = array();
