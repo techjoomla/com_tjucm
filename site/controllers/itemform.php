@@ -658,7 +658,6 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	public function redirectToListView($typeId, $allowedCount)
 	{
-		$user = JFactory::getUser();
 		$link = JRoute::_("index.php?option=com_tjucm&view=items&id=" . $typeId . $this->appendUrl, false);
 
 		JFactory::getApplication()->redirect($link, sprintf(JText::_('COM_TJUCM_ALLOWED_COUNT_LIMIT'), $allowedCount), "Warning");
