@@ -26,6 +26,8 @@ class TjucmModelItemForm extends JModelForm
 {
 	private $item = null;
 
+	protected $common;
+
 	/**
 	 * @var      string    The prefix to use with controller messages.
 	 * @since    1.6
@@ -118,7 +120,7 @@ class TjucmModelItemForm extends JModelForm
 	 *
 	 * @param   integer  $id  The id of the object to get.
 	 *
-	 * @return Object|boolean Object on success, false on failure.
+	 * @return Object|boolean|JException Object on success, false on failure.
 	 *
 	 * @throws Exception
 	 */
@@ -329,15 +331,12 @@ class TjucmModelItemForm extends JModelForm
 	 * @param   array    $data      An optional array of data for the form to interogate.
 	 * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not.
 	 *
-	 * @return  JForm  A JForm object on success, false on failure
+	 * @return  JForm|boolean  A JForm object on success, false on failure
 	 *
 	 * @since    1.6
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
-		// Initialise variables.
-		$app = JFactory::getApplication();
-
 		// Get the form.
 		$form = $this->loadForm(
 			'com_tjucm.itemform', 'itemform',
@@ -394,9 +393,8 @@ class TjucmModelItemForm extends JModelForm
 	{
 		$app = JFactory::getApplication();
 		$id    = (!empty($data['id'])) ? $data['id'] : (int) $this->getState('item.id');
-		$state = (!empty($data['state'])) ? 1 : 0;
 		$user  = JFactory::getUser();
-		$status_title = $app->input->get('form_status');
+		$authorised = false;
 
 		$ucmTypeId = $this->getState('ucmType.id');
 		$typeItemId = $this->getState('item.id');
@@ -444,8 +442,6 @@ class TjucmModelItemForm extends JModelForm
 
 		if ($table->save($data) === true)
 		{
-			$id = (int) $this->getState($this->getName() . '.id');
-
 			if (!empty($extra_jform_data))
 			{
 				$data_extra = array();
@@ -557,7 +553,6 @@ class TjucmModelItemForm extends JModelForm
 	 */
 	public function delete($data)
 	{
-		$app = JFactory::getApplication('com_tjucm');
 		$id = (!empty($data['id'])) ? $data['id'] : (int) $this->getState('item.id');
 		$table = $this->getTable();
 
@@ -603,7 +598,7 @@ class TjucmModelItemForm extends JModelForm
 	 *
 	 * @param   array  $view  An array of record primary keys.
 	 *
-	 * @return  boolean  True if successful, false if an error occurs.
+	 * @return  String  True if successful, false if an error occurs.
 	 *
 	 * @since   1.0
 	 */
@@ -614,7 +609,6 @@ class TjucmModelItemForm extends JModelForm
 			case 'type':
 			case 'typeform':
 				return 'alias';
-			break;
 		}
 	}
 
