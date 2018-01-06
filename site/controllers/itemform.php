@@ -21,6 +21,16 @@ require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
  */
 class TjucmControllerItemForm extends JControllerForm
 {
+	protected $client;
+
+	protected $created_by;
+
+	protected $ucmTypeId;
+
+	protected $appendUrl;
+
+	protected $isajax;
+
 	// Use imported Trait in model
 	use TjfieldsFilterField;
 
@@ -170,15 +180,12 @@ class TjucmControllerItemForm extends JControllerForm
 		// Check for request forgeries.
 		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 		$app = JFactory::getApplication();
-		$lang  = JFactory::getLanguage();
 		$model = $this->getModel();
 		$task = $this->getTask();
 		$formStatus = $app->input->get('form_status', '', 'STRING');
 
 		// Set client value
 		$model->setClient($this->client);
-
-		$table = $model->getTable();
 
 		// Get the user data.
 		$data = $app->input->get('jform', array(), 'array');
@@ -219,7 +226,6 @@ class TjucmControllerItemForm extends JControllerForm
 			// Reset the ID, the multilingual associations and then treat the request as for Apply.
 			$data[$key] = 0;
 			$data['associations'] = array();
-			$task = 'apply';
 		}
 
 		// Access check.
@@ -495,7 +501,6 @@ class TjucmControllerItemForm extends JControllerForm
 	{
 		$app   = JFactory::getApplication();
 		$model = $this->getModel('ItemForm', 'TjucmModel');
-		$pk    = $app->input->getInt('id');
 
 		// Get the user data.
 		$data       = array();
@@ -552,7 +557,6 @@ class TjucmControllerItemForm extends JControllerForm
 
 			$db = JFactory::getDbo();
 			$query = $db->getQuery(true);
-			$conditions = array($db->quoteName('id') . ' IN (' . $fieldValueEntryId . ') ');
 
 			$query->select("*")
 			->from("#__tjfields_fields")
@@ -655,7 +659,6 @@ class TjucmControllerItemForm extends JControllerForm
 	public function redirectToListView($typeId, $allowedCount)
 	{
 		$user = JFactory::getUser();
-		$createdBy = $user->id;
 		$link = JRoute::_("index.php?option=com_tjucm&view=items&id=" . $typeId . $this->appendUrl, false);
 
 		JFactory::getApplication()->redirect($link, sprintf(JText::_('COM_TJUCM_ALLOWED_COUNT_LIMIT'), $allowedCount), "Warning");
