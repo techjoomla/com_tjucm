@@ -155,21 +155,25 @@ class TjucmModelItems extends JModelList
 		$query->from('`#__tj_ucm_data` AS a');
 
 		// Join over the users for the checked out user
-		$query->select("uc.name AS uEditor");
-		$query->join("LEFT", "#__users AS uc ON uc.id=a.checked_out");
+	// # temp $query->select("uc.name AS uEditor");
+		$query->select('`uc`.name AS `created_by_username`, `uc`.id AS `created_by`');
+		$query->join("LEFT", "#__users AS uc ON uc.id=a.created_by");
 
 		// Join over the foreign key 'type_id'
 
 		$query->join('INNER', '#__tj_ucm_types AS types ON types.`id` = a.`type_id`');
-		$query->where('(types.state IN (1))');
+		$query->where('types.state IN (1)');
+		$query->where('a.created_by = 1017');
 
 		// Join over the user field 'created_by'
-		$query->select('`created_by`.name AS `created_by_username`, `created_by`.id AS `created_by`');
-		$query->join('INNER', '#__users AS `created_by` ON `created_by`.id = a.`created_by`');
+
+	// # temp $query->join('INNER', '#__users AS `created_by` ON `created_by`.id = a.`created_by`');
 
 		// Join over the user field 'modified_by'
-		$query->select('`modified_by`.name AS `modified_by`');
-		$query->join('LEFT', '#__users AS `modified_by` ON `modified_by`.id = a.`modified_by`');
+
+	// # temp $query->select('`modified_by`.name AS `modified_by`');
+
+	// # temp $query->join('LEFT', '#__users AS `modified_by` ON `modified_by`.id = a.`modified_by`');
 
 		// Join over the tjfield
 		$query->join('INNER', '#__tjfields_fields AS fields ON a.client = fields.client');
@@ -186,7 +190,7 @@ class TjucmModelItems extends JModelList
 
 		$query->where('fields.id = fieldValue.field_id');
 
-		$ucmType = $this->getState('ucmType.id', '', 'INT');
+		// # temp$ucmType = $this->getState('ucmType.id', '', 'INT');
 
 		if (!empty($ucmType))
 		{
@@ -200,7 +204,7 @@ class TjucmModelItems extends JModelList
 			$query->where($db->quoteName('a.created_by') . "=" . (INT) $createdBy);
 		}
 
-		$query->where('fields.showonlist =  1');
+		// # temp $query->where('fields.showonlist =  1');
 
 		// Filter by published state
 		$published = $this->getState('filter.state');
@@ -239,6 +243,8 @@ class TjucmModelItems extends JModelList
 		{
 			$query->order($db->escape($orderCol . ' ' . $orderDirn));
 		}
+
+		echo $query->dump();
 
 		return $query;
 	}
@@ -432,5 +438,31 @@ class TjucmModelItems extends JModelList
 		{
 			return false;
 		}
+	}
+
+	/**
+	 * Get Select list of all UCM types
+	 *
+	 * @return html
+	 */
+	public function getTypes()
+	{
+		// Include models
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$typesModel = JModelLegacy::getInstance('Types', 'TjucmModel');
+
+		$typesModel->setState('filter.state');
+		$types = $typesModel->getItems();
+
+		$options = array();
+
+		$options[] = JHtml::_('select.option', '', JText::_('COM_UCM_FORM_LBL_FIELD_SELECT_TARGET_UCM_TYPE'));
+
+		foreach ($types as $type)
+		{
+			$options[] = JHtml::_('select.option', $type->unique_identifier, $type->title);
+		}
+
+		return JHtml::_('select.genericlist', $options, 'target_client', 'class="inputbox required"', 'value', 'text', $this->value);
 	}
 }

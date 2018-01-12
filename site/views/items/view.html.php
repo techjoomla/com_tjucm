@@ -45,6 +45,7 @@ class TjucmViewItems extends JViewLegacy
 		$this->pagination = $this->get('Pagination');
 		$this->params     = $app->getParams('com_tjucm');
 		$this->listcolumn = $this->get('Fields');
+		$this->types = $this->get('Types');
 		$this->allowedToAdd = false;
 
 		$model = $this->getModel("Items");

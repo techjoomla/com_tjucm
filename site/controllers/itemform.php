@@ -706,4 +706,87 @@ class TjucmControllerItemForm extends JControllerForm
 			return false;
 		}
 	}
+
+	/**
+	 * Method to run batch operations.
+	 *
+	 * @param   object  $model  The model.
+	 *
+	 * @return  boolean  True if successful, false otherwise and internal error is set.
+	 *
+	 * @since   1.6
+	 */
+	public function batch($model = null)
+	{
+		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+
+		$app = JFactory::getApplication();
+		$post = $app->input->post;
+
+		$source_client = $post->get('source_client');
+		$source_fields = $this->getFieldsData($source_client);
+
+		$target_client = $post->get('target_client');
+		$target_fields = $this->getFieldsData($target_client);
+
+		$copyIds = $post->get('cid');
+
+		$fullDiff = array_merge(array_diff($source_fields, $target_fields), array_diff($target_fields, $source_fields));
+
+		die('komal');
+	}
+
+	/**
+	 * Method to run batch operations.
+	 *
+	 * @param   object  $client  The model.
+	 *
+	 * @return  boolean  True if successful, false otherwise and internal error is set.
+	 *
+	 * @since   1.6
+	 */
+	public function getFieldsData($client)
+	{
+		/* TODO - I am unable to use Fields model
+		 * Becoz - In model if in url the client is present the use this client in setstate so that when i pass the another client its not work.
+		 **/
+
+		/*
+			JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
+			$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel');
+
+			if (!empty($client))
+			{
+				$fieldsModel->setState('filter.client', $client);
+			}
+
+			$fields = $fieldsModel->getItems();
+		*/
+
+		$db    = JFactory::getDBO();
+		$query = $db->getQuery(true);
+
+		// Select the required fields from the table.
+		$query->select('a.*');
+		$query->from('`#__tjfields_fields` AS a');
+		$query->select('created_by.name AS created_by');
+		$query->join('LEFT', '#__users AS created_by ON created_by.id = a.created_by');
+		$query->where('a.state = 1');
+		$query->where('a.client = ' . $db->quote($client));
+		$db->setQuery($query);
+		$fields = $db->loadObjectlist();
+
+		$data = array();
+
+		foreach ($fields as $field)
+		{
+			$prefix = str_replace(".", "_", $client);
+			$field_name = explode($prefix . "_", $field->name);
+
+			$data[$field->id]->name = $field_name[1];
+			$data[$field->id]->type = $field->type;
+		}
+
+		return $data;
+	}
 }

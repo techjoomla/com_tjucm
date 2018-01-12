@@ -422,7 +422,7 @@ class TjucmModelType extends JModelAdmin
 	/**
 	 * Method to get UCM type id
 	 *
-	 * @param   string  $client  The client.
+	 * @param   string  $id  The client.
 	 *
 	 * @return	INT  ucm type id
 	 *

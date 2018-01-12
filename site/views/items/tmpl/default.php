@@ -15,6 +15,8 @@ JHtml::_('bootstrap.tooltip');
 JHtml::_('behavior.multiselect');
 JHtml::_('formbehavior.chosen', 'select');
 
+JText::script('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST');
+
 $user = JFactory::getUser();
 $userId = $user->get('id');
 $listOrder = $this->state->get('list.ordering');
@@ -42,6 +44,9 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 	<table class="table table-striped" id="itemList">
 		<thead>
 			<tr>
+				<th width="1%" class="hidden-phone">
+					<?php echo JHtml::_('grid.checkall'); ?>
+				</th>
 				<?php
 				if (isset($this->items[0]->state))
 				{
@@ -115,6 +120,9 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 							if (isset($this->items[0]->state))
 							{
 								$class = ($canChange) ? 'active' : 'disabled'; ?>
+								<td class="center">
+									<?php echo JHtml::_('grid.id', $i, $item->id); ?>
+								</td>
 								<td class="center">
 									<a class="<?php echo $class; ?>" href="<?php echo ($canChange) ? 'index.php?option=com_tjucm&task=item.publish&id=' . $item->id . '&state=' . (($item->state + 1) % 2) . $appendUrl : '#'; ?>">
 									<?php
@@ -217,9 +225,26 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 		<a target="_blank" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit&id=0' . $appendUrl, false, 2); ?>" class="btn btn-success btn-small">
 			<i class="icon-plus"></i><?php echo JText::_('COM_TJUCM_ADD_ITEM'); ?>
 		</a>
+		<button data-toggle="modal" onclick="if (document.adminForm.boxchecked.value==0){alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{jQuery( '#collapseModal' ).modal('show'); return true;}" class="btn btn-success btn-small">
+			<span class="icon-checkbox-partial marginr10" aria-hidden="true" title="Batch"></span>
+			<?php echo JText::_('COM_TJUCM_BATCH_ITEM'); ?>
+		</button>
 		<?php
 	}
 	?>
+			<?php // Load the batch processing form. ?>
+				<?php //if ($canCreate && $canEdit) : ?>
+				<?php echo JHtml::_(
+					'bootstrap.renderModal',
+					'collapseModal',
+					array(
+						'title'  => JText::_('COM_TJUCM_BATCH_OPTIONS'),
+						'footer' => $this->loadTemplate('batch_footer'),
+					),
+					$this->loadTemplate('batch_body')
+				); ?>
+			<?php //endif; ?>
+	<input type="hidden" name="source_client" value="<?php echo $this->client;?>"/>
 	<input type="hidden" name="task" value=""/>
 	<input type="hidden" name="boxchecked" value="0"/>
 	<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>"/>
