@@ -43,8 +43,8 @@ class TjucmControllerItemForm extends JControllerForm
 
 		// Get UCM type id from uniquue identifier
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
-		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
-		$this->ucmTypeId = $tjUcmModelType->getTypeId($this->client);
+		$this->tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		$this->ucmTypeId = $this->tjUcmModelType->getTypeId($this->client);
 
 		$this->appendUrl = "";
 
@@ -712,7 +712,7 @@ class TjucmControllerItemForm extends JControllerForm
 	 *
 	 * @param   object  $model  The model.
 	 *
-	 * @return  boolean  True if successful, false otherwise and internal error is set.
+	 * @return  void
 	 *
 	 * @since   1.6
 	 */
@@ -722,6 +722,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 		$app = JFactory::getApplication();
 		$post = $app->input->post;
+		$model = $this->getModel();
 
 		$source_client = $post->get('source_client');
 		$source_fields = $this->getFieldsData($source_client);
@@ -729,11 +730,117 @@ class TjucmControllerItemForm extends JControllerForm
 		$target_client = $post->get('target_client');
 		$target_fields = $this->getFieldsData($target_client);
 
-		$copyIds = $post->get('cid');
+		$commonElement = array_diff_assoc($source_fields, $target_fields);
 
-		$fullDiff = array_merge(array_diff($source_fields, $target_fields), array_diff($target_fields, $source_fields));
+		// Attempt to save the data
+		try
+		{
+			if (empty($commonElement))
+			{
+				$copyIds = $post->get('cid');
+				$model->setClient($target_client);
 
-		die('komal');
+				JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
+				$tjFieldsHelper = new TjfieldsHelper;
+
+				foreach ($copyIds as $content_id)
+				{
+					// UCM table Data
+					$ucmTable = $model->getTable();
+					$ucmTable->load($content_id);
+
+					$ucmData = array();
+					$ucmData['id'] = 0;
+					$ucmData['client'] = $target_client;
+					$ucmData['ordering'] = $ucmTable->ordering;
+					$ucmData['state'] = $ucmTable->state;
+					$ucmData['created_by'] = $ucmTable->created_by;
+					$ucmData['draft'] = $ucmTable->draft;
+
+					// Tjfield values
+					$data['content_id']  = $content_id;
+					$data['user_id']     = JFactory::getUser()->id;
+					$data['client']      = $source_client;
+
+					$extra_fields_data = $tjFieldsHelper->FetchDatavalue($data);
+
+					foreach ($extra_fields_data as $extraData)
+					{
+						$prefixSourceClient = str_replace(".", "_", $source_client);
+						$field_name = explode($prefixSourceClient . "_", $extraData->name);
+
+						$prefixTargetClient = str_replace(".", "_", $target_client);
+						$targetFieldName = $prefixTargetClient . '_' . $field_name[1];
+
+						$ucmExtraData[$targetFieldName] = new stdClass;
+
+						if (!is_array($extraData->value))
+						{
+							$ucmExtraData[$targetFieldName] = $extraData->value;
+						}
+						else
+						{
+							$temp = array();
+
+							switch ($extraData->type)
+							{
+								case 'multi_select':
+									foreach ($extraData->value as $option)
+									{
+										$temp[] = $option->value;
+									}
+
+									if (!empty($temp))
+									{
+										$ucmExtraData[$targetFieldName] = $temp;
+									}
+
+								break;
+
+								case 'single_select':
+									foreach ($extraData->value as $option)
+									{
+										$ucmExtraData[$targetFieldName] = $option->value;
+									}
+								break;
+
+								case 'radio':
+								default:
+									foreach ($extraData->value as $option)
+									{
+										$ucmExtraData[$targetFieldName] = $option->value;
+									}
+								break;
+							}
+						}
+					}
+
+					$recordId = $model->save($ucmData, $ucmExtraData);
+					$dispatcher = JDispatcher::getInstance();
+					JPluginHelper::importPlugin("system", "jlike_tjucm");
+					$dispatcher->trigger('jlike_tjucmOnAfterSave', array($recordId,$ucmData));
+				}
+
+				$menu = $app->getMenu();
+				$item = $menu->getActive();
+				$url = (empty($item->link) ? 'index.php?option=com_tjucm&view=items' : $item->link);
+
+				// Redirect to the list screen
+				$this->setMessage(JText::_('COM_TJUCM_ITEM_COPY_SUCCESSFULLY'));
+				$this->setRedirect(JRoute::_($url . $this->appendUrl, false));
+			}
+			else
+			{
+				$this->setMessage(JText::_('COM_TJUCM_ITEM_NOT_COPY_SUCCESSFULLY'), 'error');
+				$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+			}
+		}
+		catch (Exception $e)
+		{
+			$errorType = ($e->getCode() == '404' || '403') ? 'error' : 'warning';
+			$this->setMessage($e->getMessage(), $errorType);
+			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+		}
 	}
 
 	/**
@@ -741,40 +848,22 @@ class TjucmControllerItemForm extends JControllerForm
 	 *
 	 * @param   object  $client  The model.
 	 *
-	 * @return  boolean  True if successful, false otherwise and internal error is set.
+	 * @return  array  Field name and datatype array
 	 *
 	 * @since   1.6
 	 */
 	public function getFieldsData($client)
 	{
-		/* TODO - I am unable to use Fields model
-		 * Becoz - In model if in url the client is present the use this client in setstate so that when i pass the another client its not work.
-		 **/
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
+		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+		$fieldsModel->setState('filter.state', 1);
 
-		/*
-			JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
-			$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel');
+		if (!empty($client))
+		{
+			$fieldsModel->setState('filter.client', $client);
+		}
 
-			if (!empty($client))
-			{
-				$fieldsModel->setState('filter.client', $client);
-			}
-
-			$fields = $fieldsModel->getItems();
-		*/
-
-		$db    = JFactory::getDBO();
-		$query = $db->getQuery(true);
-
-		// Select the required fields from the table.
-		$query->select('a.*');
-		$query->from('`#__tjfields_fields` AS a');
-		$query->select('created_by.name AS created_by');
-		$query->join('LEFT', '#__users AS created_by ON created_by.id = a.created_by');
-		$query->where('a.state = 1');
-		$query->where('a.client = ' . $db->quote($client));
-		$db->setQuery($query);
-		$fields = $db->loadObjectlist();
+		$fields = $fieldsModel->getItems();
 
 		$data = array();
 
@@ -783,8 +872,8 @@ class TjucmControllerItemForm extends JControllerForm
 			$prefix = str_replace(".", "_", $client);
 			$field_name = explode($prefix . "_", $field->name);
 
-			$data[$field->id]->name = $field_name[1];
-			$data[$field->id]->type = $field->type;
+			$data[$field_name[1]] = new stdClass;
+			$data[$field_name[1]] = $field->type;
 		}
 
 		return $data;

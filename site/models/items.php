@@ -167,13 +167,13 @@ class TjucmModelItems extends JModelList
 
 		// Join over the user field 'created_by'
 
-	// # temp $query->join('INNER', '#__users AS `created_by` ON `created_by`.id = a.`created_by`');
+		$query->join('INNER', '#__users AS `created_by` ON `created_by`.id = a.`created_by`');
 
 		// Join over the user field 'modified_by'
 
-	// # temp $query->select('`modified_by`.name AS `modified_by`');
+		$query->select('`modified_by`.name AS `modified_by`');
 
-	// # temp $query->join('LEFT', '#__users AS `modified_by` ON `modified_by`.id = a.`modified_by`');
+		$query->join('LEFT', '#__users AS `modified_by` ON `modified_by`.id = a.`modified_by`');
 
 		// Join over the tjfield
 		$query->join('INNER', '#__tjfields_fields AS fields ON a.client = fields.client');
@@ -190,7 +190,7 @@ class TjucmModelItems extends JModelList
 
 		$query->where('fields.id = fieldValue.field_id');
 
-		// # temp$ucmType = $this->getState('ucmType.id', '', 'INT');
+		$ucmType = $this->getState('ucmType.id', '', 'INT');
 
 		if (!empty($ucmType))
 		{
@@ -204,7 +204,7 @@ class TjucmModelItems extends JModelList
 			$query->where($db->quoteName('a.created_by') . "=" . (INT) $createdBy);
 		}
 
-		// # temp $query->where('fields.showonlist =  1');
+		$query->where('fields.showonlist =  1');
 
 		// Filter by published state
 		$published = $this->getState('filter.state');
@@ -243,8 +243,6 @@ class TjucmModelItems extends JModelList
 		{
 			$query->order($db->escape($orderCol . ' ' . $orderDirn));
 		}
-
-		echo $query->dump();
 
 		return $query;
 	}

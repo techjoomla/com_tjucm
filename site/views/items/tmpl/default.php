@@ -116,13 +116,13 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 						}
 						?>
 						<tr class="row<?php echo $i % 2; ?>">
+							<td class="center">
+									<?php echo JHtml::_('grid.id', $i, $item->id); ?>
+								</td>
 							<?php
 							if (isset($this->items[0]->state))
 							{
 								$class = ($canChange) ? 'active' : 'disabled'; ?>
-								<td class="center">
-									<?php echo JHtml::_('grid.id', $i, $item->id); ?>
-								</td>
 								<td class="center">
 									<a class="<?php echo $class; ?>" href="<?php echo ($canChange) ? 'index.php?option=com_tjucm&task=item.publish&id=' . $item->id . '&state=' . (($item->state + 1) % 2) . $appendUrl : '#'; ?>">
 									<?php
