@@ -15,7 +15,9 @@ JHtml::_('bootstrap.tooltip');
 JHtml::_('behavior.multiselect');
 JHtml::_('formbehavior.chosen', 'select');
 
-JText::script('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST');
+JLoader::import('components.com_tjfields.helpers.tjucm', JPATH_SITE);
+$TjucmHelpersTjucm = new TjucmHelpersTjucm;
+$TjucmHelpersTjucm::getLanguageConstant();
 
 $user = JFactory::getUser();
 $userId = $user->get('id');
@@ -233,7 +235,7 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 	}
 	?>
 			<?php // Load the batch processing form. ?>
-				<?php //if ($canCreate && $canEdit) : ?>
+				<?php if ($canCreate && $canEdit) : ?>
 				<?php echo JHtml::_(
 					'bootstrap.renderModal',
 					'collapseModal',
@@ -243,7 +245,7 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 					),
 					$this->loadTemplate('batch_body')
 				); ?>
-			<?php //endif; ?>
+			<?php endif; ?>
 	<input type="hidden" name="source_client" value="<?php echo $this->client;?>"/>
 	<input type="hidden" name="task" value=""/>
 	<input type="hidden" name="boxchecked" value="0"/>

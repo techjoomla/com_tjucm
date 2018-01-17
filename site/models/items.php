@@ -163,7 +163,7 @@ class TjucmModelItems extends JModelList
 
 		$query->join('INNER', '#__tj_ucm_types AS types ON types.`id` = a.`type_id`');
 		$query->where('types.state IN (1)');
-		$query->where('a.created_by = 1017');
+		$query->where('a.created_by = ' . JFactory::getUser()->id);
 
 		// Join over the user field 'created_by'
 
@@ -441,7 +441,7 @@ class TjucmModelItems extends JModelList
 	/**
 	 * Get Select list of all UCM types
 	 *
-	 * @return html
+	 * @return Jhtml
 	 */
 	public function getTypes()
 	{

@@ -27,6 +27,8 @@ class TjucmViewItems extends JViewLegacy
 
 	protected $params;
 
+	protected $types;
+
 	/**
 	 * Display the view
 	 *

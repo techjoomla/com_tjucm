@@ -24,6 +24,8 @@ class TjucmControllerItemForm extends JControllerForm
 	// Use imported Trait in model
 	use TjfieldsFilterField;
 
+	public $tjUcmModelType;
+
 	/**
 	 * Constructor
 	 *
@@ -710,13 +712,11 @@ class TjucmControllerItemForm extends JControllerForm
 	/**
 	 * Method to run batch operations.
 	 *
-	 * @param   object  $model  The model.
-	 *
 	 * @return  void
 	 *
 	 * @since   1.6
 	 */
-	public function batch($model = null)
+	public function batch()
 	{
 		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
@@ -724,13 +724,13 @@ class TjucmControllerItemForm extends JControllerForm
 		$post = $app->input->post;
 		$model = $this->getModel();
 
-		$source_client = $post->get('source_client');
-		$source_fields = $this->getFieldsData($source_client);
+		$sourceClient = $post->get('source_client');
+		$sourceFields = $this->getFieldsData($sourceClient);
 
-		$target_client = $post->get('target_client');
-		$target_fields = $this->getFieldsData($target_client);
+		$targetClient = $post->get('target_client');
+		$targetFields = $this->getFieldsData($targetClient);
 
-		$commonElement = array_diff_assoc($source_fields, $target_fields);
+		$commonElement = array_diff_assoc($sourceFields, $targetFields);
 
 		// Attempt to save the data
 		try
@@ -738,45 +738,47 @@ class TjucmControllerItemForm extends JControllerForm
 			if (empty($commonElement))
 			{
 				$copyIds = $post->get('cid');
-				$model->setClient($target_client);
+				$model->setClient($targetClient);
 
 				JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
 				$tjFieldsHelper = new TjfieldsHelper;
 
-				foreach ($copyIds as $content_id)
+				foreach ($copyIds as $contentId)
 				{
 					// UCM table Data
 					$ucmTable = $model->getTable();
-					$ucmTable->load($content_id);
+					$ucmTable->load($contentId);
 
 					$ucmData = array();
 					$ucmData['id'] = 0;
-					$ucmData['client'] = $target_client;
+					$ucmData['client'] = $targetClient;
 					$ucmData['ordering'] = $ucmTable->ordering;
 					$ucmData['state'] = $ucmTable->state;
 					$ucmData['created_by'] = $ucmTable->created_by;
 					$ucmData['draft'] = $ucmTable->draft;
 
 					// Tjfield values
-					$data['content_id']  = $content_id;
+					$data['content_id']  = $contentId;
 					$data['user_id']     = JFactory::getUser()->id;
-					$data['client']      = $source_client;
+					$data['client']      = $sourceClient;
 
-					$extra_fields_data = $tjFieldsHelper->FetchDatavalue($data);
+					$extraFieldsData = $tjFieldsHelper->FetchDatavalue($data);
 
-					foreach ($extra_fields_data as $extraData)
+					$ucmExtraData = array();
+
+					foreach ($extraFieldsData as $extraData)
 					{
-						$prefixSourceClient = str_replace(".", "_", $source_client);
-						$field_name = explode($prefixSourceClient . "_", $extraData->name);
+						$prefixSourceClient = str_replace(".", "_", $sourceClient);
+						$fieldName = explode($prefixSourceClient . "_", $extraData->name);
 
-						$prefixTargetClient = str_replace(".", "_", $target_client);
-						$targetFieldName = $prefixTargetClient . '_' . $field_name[1];
+						$prefixTargetClient = str_replace(".", "_", $targetClient);
+						$targetFieldName = $prefixTargetClient . '_' . $fieldName[1];
 
 						$ucmExtraData[$targetFieldName] = new stdClass;
 
 						if (!is_array($extraData->value))
 						{
-							$ucmExtraData[$targetFieldName] = $extraData->value;
+							$ucmExtraData[$targetFieldName] = trim($extraData->value);
 						}
 						else
 						{
@@ -787,7 +789,7 @@ class TjucmControllerItemForm extends JControllerForm
 								case 'multi_select':
 									foreach ($extraData->value as $option)
 									{
-										$temp[] = $option->value;
+										$temp[] = trim($option->value);
 									}
 
 									if (!empty($temp))
@@ -800,7 +802,7 @@ class TjucmControllerItemForm extends JControllerForm
 								case 'single_select':
 									foreach ($extraData->value as $option)
 									{
-										$ucmExtraData[$targetFieldName] = $option->value;
+										$ucmExtraData[$targetFieldName] = trim($option->value);
 									}
 								break;
 
@@ -808,17 +810,18 @@ class TjucmControllerItemForm extends JControllerForm
 								default:
 									foreach ($extraData->value as $option)
 									{
-										$ucmExtraData[$targetFieldName] = $option->value;
+										$ucmExtraData[$targetFieldName] = trim($option->value);
 									}
 								break;
 							}
 						}
 					}
 
-					$recordId = $model->save($ucmData, $ucmExtraData);
-					$dispatcher = JDispatcher::getInstance();
-					JPluginHelper::importPlugin("system", "jlike_tjucm");
-					$dispatcher->trigger('jlike_tjucmOnAfterSave', array($recordId,$ucmData));
+					$model->save($ucmData, $ucmExtraData);
+
+					$dispatcher = JEventDispatcher::getInstance();
+					JPluginHelper::importPlugin('tjucm');
+					$dispatcher->trigger('onAfterUcmBatch', array($ucmData));
 				}
 
 				$menu = $app->getMenu();
@@ -838,13 +841,13 @@ class TjucmControllerItemForm extends JControllerForm
 		catch (Exception $e)
 		{
 			$errorType = ($e->getCode() == '404' || '403') ? 'error' : 'warning';
-			$this->setMessage($e->getMessage(), $errorType);
+			$this->setMessage(JText::_('COM_TJUCM_ITEM_NOT_COPY_SUCCESSFULLY'), $errorType);
 			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
 		}
 	}
 
 	/**
-	 * Method to run batch operations.
+	 * Method to get fields.
 	 *
 	 * @param   object  $client  The model.
 	 *
@@ -870,10 +873,10 @@ class TjucmControllerItemForm extends JControllerForm
 		foreach ($fields as $field)
 		{
 			$prefix = str_replace(".", "_", $client);
-			$field_name = explode($prefix . "_", $field->name);
+			$fieldName = explode($prefix . "_", $field->name);
 
-			$data[$field_name[1]] = new stdClass;
-			$data[$field_name[1]] = $field->type;
+			$data[$fieldName[1]] = new stdClass;
+			$data[$fieldName[1]] = $field->type;
 		}
 
 		return $data;
