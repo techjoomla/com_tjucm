@@ -70,7 +70,7 @@ if ($this->form_extra)
 										// TODO : SubForm rendering
 										$html = '<div class="form-group">';
 											//$html .= '<div class="col-sm-6 control-label">' . $fieldData->label . '</div>';
-											$html .= '<div class="col-sm-6 control-label"> : ' . $value . '</div>';
+											$html .= '<div class="col-sm-6 control-label"> : ' . htmlspecialchars($value, ENT_COMPAT, 'UTF-8') . '</div>';
 										$html .= '</div>';
 
 										echo  $html;
@@ -115,19 +115,27 @@ if ($this->form_extra)
 					{
 						?>
 						<div class="form-group">
-							<div class="control-label col-sm-2">
-								<?php echo $field->label; ?>
-							</div>
-
-							<div class="col-sm-10">
-								<?php
-								if (is_array($field->value))
-								{
-									foreach($field->value as $eachFieldValue)
+							<?php
+							if ($field->value)
+							{
+								?>
+								<div class="col-sm-3 control-label">
+									<?php echo $field->label; ?>
+								</div>
+								<div class="col-sm-6 control-label">
+									<?php
+									if (is_array($field->value))
 									{
-										?>
-										<p><?php echo "-" . $eachFieldValue; ?></p>
-										<?php
+										foreach($field->value as $eachFieldValue)
+										{
+											?>
+											<p><?php echo "-" . htmlspecialchars($eachFieldValue, ENT_COMPAT, 'UTF-8'); ?></p>
+											<?php
+										}
+									}
+									else
+									{
+										echo htmlspecialchars($field->value, ENT_COMPAT, 'UTF-8');
 									}
 								}
 								else

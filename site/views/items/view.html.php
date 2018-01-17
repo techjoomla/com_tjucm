@@ -11,6 +11,7 @@
 defined('_JEXEC') or die;
 
 jimport('joomla.application.component.view');
+JLoader::import('components.com_tjfields.helpers.tjucm', JPATH_SITE);
 
 /**
  * View class for a list of Tjucm.

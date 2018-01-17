@@ -15,7 +15,7 @@ JHtml::_('bootstrap.tooltip');
 JHtml::_('behavior.multiselect');
 JHtml::_('formbehavior.chosen', 'select');
 
-JLoader::import('components.com_tjfields.helpers.tjucm', JPATH_SITE);
+
 $TjucmHelpersTjucm = new TjucmHelpersTjucm;
 $TjucmHelpersTjucm::getLanguageConstant();
 
@@ -69,7 +69,7 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 					{
 						?>
 						<th class='left'>
-							<?php echo $col_name; ?>
+							<?php echo htmlspecialchars($col_name, ENT_COMPAT, 'UTF-8'); ?>
 						</th>
 						<?php
 					}
