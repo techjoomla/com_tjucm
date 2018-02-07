@@ -109,32 +109,23 @@ $fieldSets = $this->form_extra->getFieldsets();
 					{
 						?>
 						<div class="form-group">
-							<?php
-							if ($field->value)
-							{
-								?>
-								<div class="col-sm-3 control-label">
-									<?php echo $field->label; ?>
-								</div>
-								<div class="col-sm-6 control-label">
-									<?php
-									if (is_array($field->value))
+							<div class="col-sm-3 control-label">
+								<?php echo $field->label; ?>
+							</div>
+							<div class="col-sm-6 control-label">
+								<?php
+								if (is_array($field->value))
+								{
+									foreach($field->value as $eachFieldValue)
 									{
-										foreach($field->value as $eachFieldValue)
-										{
-											?>
-											<p><?php echo "-" . htmlspecialchars($eachFieldValue, ENT_COMPAT, 'UTF-8'); ?></p>
-											<?php
-										}
-									}
-									else
-									{
-										echo htmlspecialchars($field->value, ENT_COMPAT, 'UTF-8');
+										?>
+										<p><?php echo "-" . htmlspecialchars($eachFieldValue, ENT_COMPAT, 'UTF-8'); ?></p>
+										<?php
 									}
 								}
 								else
 								{
-									echo $field->value;
+									htmlspecialchars($field->value, ENT_COMPAT, 'UTF-8');
 								}
 								?>
 							</div>
