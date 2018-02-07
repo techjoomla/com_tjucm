@@ -29,32 +29,30 @@ $fieldSets = $this->form_extra->getFieldsets();
 				}
 				elseif ($field->type == 'File')
 				{
-					?>
-					<div class="form-group">
-						<?php
-						if ($field->value)
-						{
-							?>
+					if ($field->value)
+					{
+						?>
+						<div class="form-group">
 							<div class="col-sm-3 control-label">
 								<?php echo $field->label; ?>
 							</div>
 							<div class="col-sm-6 control-label">
-								<a href="<?php echo JUri::root(true) . $field->value ?>" target="_blank" src="<?php echo JUri::root() . $field->value; ?>"><?php echo JText::_("JGLOBAL_PREVIEW");?></a>
+								<?php
+								$tjFieldHelper = new TjfieldsHelper;
+								$mediaLink = $tjFieldHelper->getMediaUrl($field->value);
+								?>
+								<a href="<?php echo $mediaLink;?>"><?php echo JText::_("COM_TJFIELDS_FILE_DOWNLOAD");?></a>
 							</div>
-							<?php
-						}
-						?>
-					</div>
-				<?php
+						</div>
+						<?php
+					}
 				}
 				elseif ($field->type == 'Subform')
 				{
-					?>
-					<div class="form-group">
-						<?php
-						if ($field->value)
-						{
-							?>
+					if ($field->value)
+					{
+						?>
+						<div class="form-group">
 							<div class="col-sm-3 control-label">
 								<?php echo $field->label; ?>
 							</div>
@@ -77,40 +75,37 @@ $fieldSets = $this->form_extra->getFieldsets();
 								}
 							?>
 							</div>
-							<?php
-						} ?>
-					</div>
-					<?php
+						</div>
+						<?php
 					}
-					elseif ($field->type == 'Checkbox')
+				}
+				elseif ($field->type == 'Checkbox')
+				{
+					if ($field->value)
 					{
 						?>
 						<div class="form-group">
+							<div class="col-sm-3 control-label">
+								<?php echo $field->label; ?>
+							</div>
+							<div class="col-sm-6 control-label">
 							<?php
-							if ($field->value)
-							{
-								?>
-								<div class="col-sm-3 control-label">
-									<?php echo $field->label; ?>
-								</div>
-								<div class="col-sm-6 control-label">
-								<?php
-									$checked = "";
+								$checked = "";
 
-									if ($field->value = 1)
-									{
-										$checked = ' checked="checked"';
-									}
-									?>
-									<input type="checkbox" disabled="disabled" value="1" <?php echo $checked;?> />
-								</div>
-								<?php
-							}
-							?>
+								if ($field->value = 1)
+								{
+									$checked = ' checked="checked"';
+								}
+								?>
+								<input type="checkbox" disabled="disabled" value="1" <?php echo $checked;?> />
+							</div>
 						</div>
-					<?php
+						<?php
 					}
-					else
+				}
+				else
+				{
+					if ($field->value)
 					{
 						?>
 						<div class="form-group">
@@ -136,13 +131,16 @@ $fieldSets = $this->form_extra->getFieldsets();
 									{
 										echo htmlspecialchars($field->value, ENT_COMPAT, 'UTF-8');
 									}
-									?>
-								</div>
-							<?php
-							}
-							?>
+								}
+								else
+								{
+									echo $field->value;
+								}
+								?>
+							</div>
 						</div>
-				<?php
+					<?php
+					}
 				}
 			}
 		?>

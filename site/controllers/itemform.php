@@ -35,10 +35,31 @@ class TjucmControllerItemForm extends JControllerForm
 		$this->client  = $app->input->get('client');
 		$this->created_by  = $app->input->get('created_by');
 
+		// If client is empty then get client from jform data
 		if (empty($this->client))
 		{
 			$data = $app->input->get('jform', array(), 'array');
 			$this->client  = $data['client'];
+		}
+
+		// If client is empty then get client from menu params
+		if (empty($this->client))
+		{
+			// Get the active item
+			$menuitem   = $app->getMenu()->getActive();
+
+			// Get the params
+			$this->menuparams = $menuitem->params;
+
+			if (!empty($this->menuparams))
+			{
+				$this->ucm_type   = $this->menuparams->get('ucm_type');
+
+				if (!empty($this->ucm_type))
+				{
+					$this->client     = 'com_tjucm.' . $this->ucm_type;
+				}
+			}
 		}
 
 		// Get UCM type id from uniquue identifier
