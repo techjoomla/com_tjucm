@@ -743,94 +743,103 @@ class TjucmControllerItemForm extends JControllerForm
 				JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
 				$tjFieldsHelper = new TjfieldsHelper;
 
-				foreach ($copyIds as $contentId)
+				if ($copyIds)
 				{
-					// UCM table Data
-					$ucmTable = $model->getTable();
-					$ucmTable->load($contentId);
-
 					$ucmData = array();
 					$ucmData['id'] = 0;
 					$ucmData['client'] = $targetClient;
-					$ucmData['ordering'] = $ucmTable->ordering;
-					$ucmData['state'] = $ucmTable->state;
-					$ucmData['created_by'] = $ucmTable->created_by;
-					$ucmData['draft'] = $ucmTable->draft;
 
-					// Tjfield values
-					$data['content_id']  = $contentId;
-					$data['user_id']     = JFactory::getUser()->id;
-					$data['client']      = $sourceClient;
-
-					$extraFieldsData = $tjFieldsHelper->FetchDatavalue($data);
-
-					$ucmExtraData = array();
-
-					foreach ($extraFieldsData as $extraData)
+					foreach ($copyIds as $contentId)
 					{
-						$prefixSourceClient = str_replace(".", "_", $sourceClient);
-						$fieldName = explode($prefixSourceClient . "_", $extraData->name);
+						// UCM table Data
+						$ucmTable = $model->getTable();
+						$ucmTable->load($contentId);
 
-						$prefixTargetClient = str_replace(".", "_", $targetClient);
-						$targetFieldName = $prefixTargetClient . '_' . $fieldName[1];
+						$ucmData['ordering'] = $ucmTable->ordering;
+						$ucmData['state'] = $ucmTable->state;
+						$ucmData['created_by'] = $ucmTable->created_by;
+						$ucmData['draft'] = $ucmTable->draft;
 
-						$ucmExtraData[$targetFieldName] = new stdClass;
+						// Tjfield values
+						$data['content_id']  = $contentId;
+						$data['user_id']     = JFactory::getUser()->id;
+						$data['client']      = $sourceClient;
 
-						if (!is_array($extraData->value))
+						$extraFieldsData = $tjFieldsHelper->FetchDatavalue($data);
+
+						$ucmExtraData = array();
+
+						foreach ($extraFieldsData as $extraData)
 						{
-							$ucmExtraData[$targetFieldName] = trim($extraData->value);
-						}
-						else
-						{
-							$temp = array();
+							$prefixSourceClient = str_replace(".", "_", $sourceClient);
+							$fieldName = explode($prefixSourceClient . "_", $extraData->name);
 
-							switch ($extraData->type)
+							$prefixTargetClient = str_replace(".", "_", $targetClient);
+							$targetFieldName = $prefixTargetClient . '_' . $fieldName[1];
+
+							$ucmExtraData[$targetFieldName] = new stdClass;
+
+							if (!is_array($extraData->value))
 							{
-								case 'multi_select':
-									foreach ($extraData->value as $option)
-									{
-										$temp[] = trim($option->value);
-									}
+								$ucmExtraData[$targetFieldName] = trim($extraData->value);
+							}
+							else
+							{
+								$temp = array();
 
-									if (!empty($temp))
-									{
-										$ucmExtraData[$targetFieldName] = $temp;
-									}
+								switch ($extraData->type)
+								{
+									case 'multi_select':
+										foreach ($extraData->value as $option)
+										{
+											$temp[] = trim($option->value);
+										}
 
-								break;
+										if (!empty($temp))
+										{
+											$ucmExtraData[$targetFieldName] = $temp;
+										}
 
-								case 'single_select':
-									foreach ($extraData->value as $option)
-									{
-										$ucmExtraData[$targetFieldName] = trim($option->value);
-									}
-								break;
+									break;
 
-								case 'radio':
-								default:
-									foreach ($extraData->value as $option)
-									{
-										$ucmExtraData[$targetFieldName] = trim($option->value);
-									}
-								break;
+									case 'single_select':
+										foreach ($extraData->value as $option)
+										{
+											$ucmExtraData[$targetFieldName] = trim($option->value);
+										}
+									break;
+
+									case 'radio':
+									default:
+										foreach ($extraData->value as $option)
+										{
+											$ucmExtraData[$targetFieldName] = trim($option->value);
+										}
+									break;
+								}
 							}
 						}
-					}
 
-					$model->save($ucmData, $ucmExtraData);
+						$model->save($ucmData, $ucmExtraData);
+					}
 
 					$dispatcher = JEventDispatcher::getInstance();
 					JPluginHelper::importPlugin('tjucm');
 					$dispatcher->trigger('onAfterUcmBatch', array($ucmData));
+
+					$menu = $app->getMenu();
+					$item = $menu->getActive();
+					$url = (empty($item->link) ? 'index.php?option=com_tjucm&view=items' : $item->link);
+
+					// Redirect to the list screen
+					$this->setMessage(JText::_('COM_TJUCM_ITEM_COPY_SUCCESSFULLY'));
+					$this->setRedirect(JRoute::_($url . $this->appendUrl, false));
 				}
-
-				$menu = $app->getMenu();
-				$item = $menu->getActive();
-				$url = (empty($item->link) ? 'index.php?option=com_tjucm&view=items' : $item->link);
-
-				// Redirect to the list screen
-				$this->setMessage(JText::_('COM_TJUCM_ITEM_COPY_SUCCESSFULLY'));
-				$this->setRedirect(JRoute::_($url . $this->appendUrl, false));
+				else
+				{
+					$this->setMessage(JText::_('COM_TJUCM_ITEM_NOT_COPY_SUCCESSFULLY'), 'error');
+					$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+				}
 			}
 			else
 			{
@@ -859,7 +868,6 @@ class TjucmControllerItemForm extends JControllerForm
 	{
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
 		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
-		$fieldsModel->setState('filter.state', 1);
 
 		if (!empty($client))
 		{
