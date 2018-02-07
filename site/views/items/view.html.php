@@ -67,7 +67,11 @@ class TjucmViewItems extends JViewLegacy
 			if (!empty($this->menuparams))
 			{
 				$this->ucm_type   = $this->menuparams->get('ucm_type');
-				$this->client     = 'com_tjucm.' . $this->ucm_type;
+
+				if (!empty($this->ucm_type))
+				{
+					$this->client     = 'com_tjucm.' . $this->ucm_type;
+				}
 			}
 		}
 
@@ -90,7 +94,7 @@ class TjucmViewItems extends JViewLegacy
 
 		$TypeData = $tjUcmModelType->getItem($typeId);
 
-		$allowedCount = $TypeData->allowed_count;
+		$allowedCount = (!empty($TypeData->allowed_count))?$TypeData->allowed_count:'0';
 		$user   = JFactory::getUser();
 		$userId = $user->id;
 
