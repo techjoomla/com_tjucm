@@ -15,6 +15,10 @@ JHtml::_('bootstrap.tooltip');
 JHtml::_('behavior.multiselect');
 JHtml::_('formbehavior.chosen', 'select');
 
+
+$TjucmHelpersTjucm = new TjucmHelpersTjucm;
+$TjucmHelpersTjucm::getLanguageConstant();
+
 $user = JFactory::getUser();
 $userId = $user->get('id');
 $listOrder = $this->state->get('list.ordering');
@@ -42,6 +46,9 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 	<table class="table table-striped" id="itemList">
 		<thead>
 			<tr>
+				<th width="1%" class="hidden-phone">
+					<?php echo JHtml::_('grid.checkall'); ?>
+				</th>
 				<?php
 				if (isset($this->items[0]->state))
 				{
@@ -94,112 +101,122 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 		}
 		?>
 		<tbody>
-		<?php
-		if (!empty($this->showList))
-		{
-			if (!empty($this->items))
+			<?php
+			if (!empty($this->showList))
 			{
-				foreach ($this->items as $i => $item)
+				if (!empty($this->items))
 				{
-					 $link = JRoute::_('index.php?option=com_tjucm&view=item&id=' . $item->id . "&client=" . $this->client, false);
-					 $canEdit = $user->authorise('core.type.edititem', 'com_tjucm.type' . $this->ucmTypeId);
-
-					if (!$canEdit && $canEditOwn)
+					foreach ($this->items as $i => $item)
 					{
-						$canEdit = JFactory::getUser()->id == $item->created_by;
-					}
-					?>
-					<tr class="row<?php echo $i % 2; ?>">
-						<?php
-						if (isset($this->items[0]->state))
+						$link = JRoute::_('index.php?option=com_tjucm&view=item&id=' . $item->id . "&client=" . $this->client, false);
+						$canEdit = $user->authorise('core.type.edititem', 'com_tjucm.type' . $this->ucmTypeId);
+
+						if (!$canEdit && $canEditOwn)
 						{
-							$class = ($canChange) ? 'active' : 'disabled'; ?>
-							<td class="center">
-								<a class="<?php echo $class; ?>" href="<?php echo ($canChange) ? 'index.php?option=com_tjucm&task=item.publish&id=' . $item->id . '&state=' . (($item->state + 1) % 2) . $appendUrl : '#'; ?>">
-								<?php
-								if ($item->state == 1)
-								{
-									?><i class="icon-publish"></i><?php
-								}
-								else
-								{
-									?><i class="icon-unpublish"></i><?php
-								}
-								?>
-								</a>
-							</td>
-						<?php
+							// If login user id and created by id is same then mark 'canEdit' is one.
+							$canEdit = JFactory::getUser()->id == $item->created_by;
 						}
 						?>
-						<td>
+						<tr class="row<?php echo $i % 2; ?>">
+							<td class="center">
+									<?php echo JHtml::_('grid.id', $i, $item->id); ?>
+								</td>
 							<?php
-							if (isset($item->checked_out) && $item->checked_out)
+							if (isset($this->items[0]->state))
 							{
-								echo JHtml::_('jgrid.checkedout', $i, $item->uEditor, $item->checked_out_time, 'items.', $canCheckin);
-							}
-							?>
-							<a href="<?php echo JRoute::_('index.php?option=com_tjucm&view=item&id='.(int) $item->id) . "&client=" . $this->client; ?>">
-								<?php echo $this->escape($item->id); ?>
-							</a>
-						</td>
-						<?php
-							if (!empty ($item->field_values))
-							{
-								foreach ($item->field_values as $field_values)
-								{
-									?>
-									<td>
-										<a href="<?php echo $link;?>"><?php echo $field_values; ?></a>
-									</td><?php
-								}
-							}
-
-							if ($canEdit || $canDelete)
-							{
-								?>
+								$class = ($canChange) ? 'active' : 'disabled'; ?>
 								<td class="center">
-								<?php
-								if ($canEdit)
-								{
-									 ?>
-									<a target="_blank" href="<?php echo 'index.php?option=com_tjucm&task=itemform.edit&id=' . $item->id . $appendUrl; ?>" class="btn btn-mini" type="button"><i class="icon-apply" aria-hidden="true"></i></a>
-								<?php
-								}
-
-								if ($canDelete)
-								{
-									?>
-									<a href="<?php echo 'index.php?option=com_tjucm&task=itemform.remove' . '&id=' . $item->id . $appendUrl; ?>" class="btn btn-mini delete-button" type="button"><i class="icon-delete" aria-hidden="true"></i></a>
+									<a class="<?php echo $class; ?>" href="<?php echo ($canChange) ? 'index.php?option=com_tjucm&task=item.publish&id=' . $item->id . '&state=' . (($item->state + 1) % 2) . $appendUrl : '#'; ?>">
 									<?php
-								}
-								?>
+									if ($item->state == 1)
+									{
+										?><i class="icon-publish"></i><?php
+									}
+									else
+									{
+										?><i class="icon-unpublish"></i><?php
+									}
+									?>
+									</a>
 								</td>
 							<?php
 							}
 							?>
+							<td>
+								<?php
+								if (isset($item->checked_out) && $item->checked_out)
+								{
+									echo JHtml::_('jgrid.checkedout', $i, $item->uEditor, $item->checked_out_time, 'items.', $canCheckin);
+								}
+								?>
+								<a href="<?php echo JRoute::_('index.php?option=com_tjucm&view=item&id='.(int) $item->id) . "&client=" . $this->client; ?>">
+									<?php echo $this->escape($item->id); ?>
+								</a>
+							</td>
+							<?php
+								if (!empty ($item->field_values))
+								{
+									foreach ($item->field_values as $field_values)
+									{
+										?>
+										<td>
+											<a href="<?php echo $link;?>"><?php echo $field_values; ?></a>
+										</td><?php
+									}
+								}
+
+								if ($canEdit || $canDelete)
+								{
+									?>
+									<td class="center">
+									<?php
+									if ($canEdit)
+									{
+										 ?>
+										<a target="_blank" href="<?php echo 'index.php?option=com_tjucm&task=itemform.edit&id=' . $item->id . $appendUrl; ?>" class="btn btn-mini" type="button"><i class="icon-apply" aria-hidden="true"></i></a>
+									<?php
+									}
+
+									if ($canDelete)
+									{
+										?>
+										<a href="<?php echo 'index.php?option=com_tjucm&task=itemform.remove' . '&id=' . $item->id . $appendUrl; ?>" class="btn btn-mini delete-button" type="button"><i class="icon-delete" aria-hidden="true"></i></a>
+										<?php
+									}
+									?>
+									</td>
+								<?php
+								}
+								?>
+						</tr>
+					<?php
+					}
+				}
+				else
+				{
+					?>
+					<tr>
+						<td>
+							<strong><?php echo JText::_('COM_TJUCM_ITEM_DOESNT_EXIST');?></strong>
+						</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
 					</tr>
 				<?php
 				}
 			}
 			else
 			{
-				?>
+			?>
 				<tr>
 					<td>
-						<strong><?php echo JText::_('COM_TJUCM_ITEM_DOESNT_EXIST');?></strong>
+						<div class="alert alert-warrning"><strong><?php echo JText::_('COM_TJUCM_NO_FIELD_CONFIG_SET');?></strong></div>
 					</td>
 					<td>&nbsp;</td>
 					<td>&nbsp;</td>
 				</tr>
 			<?php
 			}
-		}
-		else
-		{
-		?>
-			<div class="alert alert-warrning"><?php echo JText::_("COM_TJUCM_NO_DATA_FOUND");?></div>
-		<?php
-		}
 		?>
 		</tbody>
 	</table>
@@ -210,9 +227,26 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 		<a target="_blank" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit&id=0' . $appendUrl, false, 2); ?>" class="btn btn-success btn-small">
 			<i class="icon-plus"></i><?php echo JText::_('COM_TJUCM_ADD_ITEM'); ?>
 		</a>
+		<button data-toggle="modal" onclick="if (document.adminForm.boxchecked.value==0){alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{jQuery( '#collapseModal' ).modal('show'); return true;}" class="btn btn-success btn-small">
+			<span class="icon-checkbox-partial marginr10" aria-hidden="true" title="Batch"></span>
+			<?php echo JText::_('COM_TJUCM_BATCH_ITEM'); ?>
+		</button>
 		<?php
 	}
 	?>
+			<?php // Load the batch processing form. ?>
+				<?php if ($canCreate && $canEdit) : ?>
+				<?php echo JHtml::_(
+					'bootstrap.renderModal',
+					'collapseModal',
+					array(
+						'title'  => JText::_('COM_TJUCM_BATCH_OPTIONS'),
+						'footer' => $this->loadTemplate('batch_footer'),
+					),
+					$this->loadTemplate('batch_body')
+				); ?>
+			<?php endif; ?>
+	<input type="hidden" name="source_client" value="<?php echo $this->client;?>"/>
 	<input type="hidden" name="task" value=""/>
 	<input type="hidden" name="boxchecked" value="0"/>
 	<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>"/>

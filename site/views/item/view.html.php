@@ -82,7 +82,7 @@ class TjucmViewItem extends JViewLegacy
 			"clientComponent" => 'com_tjucm',
 			"client" => $this->client,
 			"view" => $view[1],
-			"layout" => 'edit')
+			"layout" => '')
 			);
 
 		// Check for errors.

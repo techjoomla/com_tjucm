@@ -62,4 +62,16 @@ class TjucmHelpersTjucm
 
 		return explode(',', $db->loadResult());
 	}
+
+	/**
+	 * Get all jtext for javascript
+	 *
+	 * @return   void
+	 *
+	 * @since   1.0
+	 */
+	public static function getLanguageConstant()
+	{
+		JText::script('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST');
+	}
 }

@@ -11,6 +11,7 @@
 defined('_JEXEC') or die;
 
 jimport('joomla.application.component.view');
+JLoader::import('components.com_tjfields.helpers.tjucm', JPATH_SITE);
 
 /**
  * View class for a list of Tjucm.
@@ -26,6 +27,8 @@ class TjucmViewItems extends JViewLegacy
 	protected $state;
 
 	protected $params;
+
+	protected $types;
 
 	/**
 	 * Display the view
@@ -45,6 +48,7 @@ class TjucmViewItems extends JViewLegacy
 		$this->pagination = $this->get('Pagination');
 		$this->params     = $app->getParams('com_tjucm');
 		$this->listcolumn = $this->get('Fields');
+		$this->types = $this->get('Types');
 		$this->allowedToAdd = false;
 
 		$model = $this->getModel("Items");

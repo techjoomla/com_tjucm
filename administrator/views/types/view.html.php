@@ -48,6 +48,13 @@ class TjucmViewTypes extends JViewLegacy
 
 		TjucmHelper::addSubmenu('types');
 
+		// Filter by Form is subform YES/NO
+		$isSubform = array();
+		$isSubform[] = JHTML::_('select.option', '', JText::_('COM_TJUCM_SELECT_IS_SUBFORM_TYPE'));
+		$isSubform[] = JHTML::_('select.option', 0, JText::_('JNO'));
+		$isSubform[] = JHTML::_('select.option', 1, JText::_('JYES'));
+		$this->isSubform = $isSubform;
+
 		$this->addToolbar();
 
 		$this->sidebar = JHtmlSidebar::render();

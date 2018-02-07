@@ -24,6 +24,8 @@ class TjucmControllerItemForm extends JControllerForm
 	// Use imported Trait in model
 	use TjfieldsFilterField;
 
+	public $tjUcmModelType;
+
 	/**
 	 * Constructor
 	 *
@@ -43,8 +45,8 @@ class TjucmControllerItemForm extends JControllerForm
 
 		// Get UCM type id from uniquue identifier
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
-		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
-		$this->ucmTypeId = $tjUcmModelType->getTypeId($this->client);
+		$this->tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		$this->ucmTypeId = $this->tjUcmModelType->getTypeId($this->client);
 
 		$this->appendUrl = "";
 
@@ -705,5 +707,186 @@ class TjucmControllerItemForm extends JControllerForm
 		{
 			return false;
 		}
+	}
+
+	/**
+	 * Method to run batch operations.
+	 *
+	 * @return  void
+	 *
+	 * @since   1.6
+	 */
+	public function batch()
+	{
+		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+
+		$app = JFactory::getApplication();
+		$post = $app->input->post;
+		$model = $this->getModel();
+
+		$sourceClient = $post->get('source_client');
+		$sourceFields = $this->getFieldsData($sourceClient);
+
+		$targetClient = $post->get('target_client');
+		$targetFields = $this->getFieldsData($targetClient);
+
+		$commonElement = array_diff_assoc($sourceFields, $targetFields);
+
+		// Attempt to save the data
+		try
+		{
+			if (empty($commonElement))
+			{
+				$copyIds = $post->get('cid');
+				$model->setClient($targetClient);
+
+				JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
+				$tjFieldsHelper = new TjfieldsHelper;
+
+				if ($copyIds)
+				{
+					$ucmData = array();
+					$ucmData['id'] = 0;
+					$ucmData['client'] = $targetClient;
+
+					foreach ($copyIds as $contentId)
+					{
+						// UCM table Data
+						$ucmTable = $model->getTable();
+						$ucmTable->load($contentId);
+
+						$ucmData['ordering'] = $ucmTable->ordering;
+						$ucmData['state'] = $ucmTable->state;
+						$ucmData['created_by'] = $ucmTable->created_by;
+						$ucmData['draft'] = $ucmTable->draft;
+
+						// Tjfield values
+						$data['content_id']  = $contentId;
+						$data['user_id']     = JFactory::getUser()->id;
+						$data['client']      = $sourceClient;
+
+						$extraFieldsData = $tjFieldsHelper->FetchDatavalue($data);
+
+						$ucmExtraData = array();
+
+						foreach ($extraFieldsData as $extraData)
+						{
+							$prefixSourceClient = str_replace(".", "_", $sourceClient);
+							$fieldName = explode($prefixSourceClient . "_", $extraData->name);
+
+							$prefixTargetClient = str_replace(".", "_", $targetClient);
+							$targetFieldName = $prefixTargetClient . '_' . $fieldName[1];
+
+							$ucmExtraData[$targetFieldName] = new stdClass;
+
+							if (!is_array($extraData->value))
+							{
+								$ucmExtraData[$targetFieldName] = trim($extraData->value);
+							}
+							else
+							{
+								$temp = array();
+
+								switch ($extraData->type)
+								{
+									case 'multi_select':
+										foreach ($extraData->value as $option)
+										{
+											$temp[] = trim($option->value);
+										}
+
+										if (!empty($temp))
+										{
+											$ucmExtraData[$targetFieldName] = $temp;
+										}
+
+									break;
+
+									case 'single_select':
+										foreach ($extraData->value as $option)
+										{
+											$ucmExtraData[$targetFieldName] = trim($option->value);
+										}
+									break;
+
+									case 'radio':
+									default:
+										foreach ($extraData->value as $option)
+										{
+											$ucmExtraData[$targetFieldName] = trim($option->value);
+										}
+									break;
+								}
+							}
+						}
+
+						$model->save($ucmData, $ucmExtraData);
+					}
+
+					$dispatcher = JEventDispatcher::getInstance();
+					JPluginHelper::importPlugin('tjucm');
+					$dispatcher->trigger('onAfterUcmBatch', array($ucmData));
+
+					$menu = $app->getMenu();
+					$item = $menu->getActive();
+					$url = (empty($item->link) ? 'index.php?option=com_tjucm&view=items' : $item->link);
+
+					// Redirect to the list screen
+					$this->setMessage(JText::_('COM_TJUCM_ITEM_COPY_SUCCESSFULLY'));
+					$this->setRedirect(JRoute::_($url . $this->appendUrl, false));
+				}
+				else
+				{
+					$this->setMessage(JText::_('COM_TJUCM_ITEM_NOT_COPY_SUCCESSFULLY'), 'error');
+					$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+				}
+			}
+			else
+			{
+				$this->setMessage(JText::_('COM_TJUCM_ITEM_NOT_COPY_SUCCESSFULLY'), 'error');
+				$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+			}
+		}
+		catch (Exception $e)
+		{
+			$errorType = ($e->getCode() == '404' || '403') ? 'error' : 'warning';
+			$this->setMessage(JText::_('COM_TJUCM_ITEM_NOT_COPY_SUCCESSFULLY'), $errorType);
+			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+		}
+	}
+
+	/**
+	 * Method to get fields.
+	 *
+	 * @param   object  $client  The model.
+	 *
+	 * @return  array  Field name and datatype array
+	 *
+	 * @since   1.6
+	 */
+	public function getFieldsData($client)
+	{
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
+		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+
+		if (!empty($client))
+		{
+			$fieldsModel->setState('filter.client', $client);
+		}
+
+		$fields = $fieldsModel->getItems();
+
+		$data = array();
+
+		foreach ($fields as $field)
+		{
+			$prefix = str_replace(".", "_", $client);
+			$fieldName = explode($prefix . "_", $field->name);
+
+			$data[$fieldName[1]] = new stdClass;
+			$data[$fieldName[1]] = $field->type;
+		}
+
+		return $data;
 	}
 }

@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS `#__tj_ucm_types` (
 `alias` VARCHAR(255) COLLATE utf8_bin NOT NULL ,
 `state` TINYINT(1)  NOT NULL ,
 `type_description` TEXT NOT NULL ,
+`is_subform` tinyint(1) NOT NULL DEFAULT '0',
 `unique_identifier` VARCHAR(255)  NOT NULL ,
 `parent_id` INT(11)  NOT NULL ,
 `params` VARCHAR(255)  NOT NULL ,

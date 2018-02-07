@@ -444,6 +444,10 @@ class TjucmModelItemForm extends JModelForm
 
 		if ($table->save($data) === true)
 		{
+			$dispatcher = JEventDispatcher::getInstance();
+			JPluginHelper::importPlugin('tjucm');
+			$dispatcher->trigger('onAfterUcmSave', array($table));
+
 			$id = (int) $this->getState($this->getName() . '.id');
 
 			if (!empty($extra_jform_data))
