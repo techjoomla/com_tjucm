@@ -65,7 +65,7 @@ $fieldSets = $this->form_extra->getFieldsets();
 										// TODO : SubForm rendering
 										$html = '<div class="form-group">';
 											//$html .= '<div class="col-sm-6 control-label">' . $fieldData->label . '</div>';
-											$html .= '<div class="col-sm-6 control-label"> : ' . $valu . '</div>';
+											$html .= '<div class="col-sm-6 control-label"> : ' . htmlspecialchars($valu, ENT_COMPAT, 'UTF-8') . '</div>';
 										$html .= '</div>';
 
 										echo  $html;
@@ -119,13 +119,13 @@ $fieldSets = $this->form_extra->getFieldsets();
 									foreach($field->value as $eachFieldValue)
 									{
 										?>
-										<p><?php echo "-" . $eachFieldValue; ?></p>
+										<p><?php echo "-" . htmlspecialchars($eachFieldValue, ENT_COMPAT, 'UTF-8'); ?></p>
 										<?php
 									}
 								}
 								else
 								{
-									echo $field->value;
+									htmlspecialchars($field->value, ENT_COMPAT, 'UTF-8');
 								}
 								?>
 							</div>
