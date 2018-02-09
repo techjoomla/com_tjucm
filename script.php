@@ -866,6 +866,41 @@ class Com_TjucmInstallerScript
 		$this->installDb($parent);
 		$this->installPlugins($parent);
 		$this->installModules($parent);
+		$this->fixDatabaseOnUpdate();
+	}
+
+	/**
+	 * Method to fix database on update
+	 *
+	 * @return void
+	 */
+	public function fixDatabaseOnUpdate()
+	{
+		$field_array = array();
+		$db = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query = "SHOW COLUMNS FROM `#__tj_ucm_data`";
+		$db->setQuery($query);
+		$columns = $db->loadobjectlist();
+
+		for ($i = 0; $i < count($columns); $i++)
+		{
+			$field_array[] = $columns[$i]->Field;
+		}
+
+		if (!in_array('client', $field_array))
+		{
+			$query = "ALTER TABLE `#__tj_ucm_data` ADD COLUMN `client` VARCHAR(255) NOT NULL";
+			$db->setQuery($query);
+
+			if (!$db->execute() )
+			{
+				echo $img_ERROR . JText::_('Unable to Alter #__tj_ucm_data table. (While adding filterable client )') . $BR;
+				echo $db->getErrorMsg();
+
+				return false;
+			}
+		}
 	}
 
 	/**
