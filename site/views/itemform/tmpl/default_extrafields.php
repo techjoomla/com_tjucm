@@ -63,10 +63,10 @@ if ($this->form_extra)
 				{
 					?>
 					<div class="form-group">
-						<div class="col-sm-3 control-label">
+						<div class="form-control">
 							<?php echo $field->label; ?>
 						</div>
-						<div class="col-sm-6 control-label">
+						<div class="form-control">
 							<?php echo $field->input; ?>
 						</div>
 						<?php
