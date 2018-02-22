@@ -115,8 +115,9 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 
 					if (!$canEdit && $canEditOwn)
 					{
-						$canEdit = JFactory::getUser()->id == $item->created_by;
+						$canEdit = JFactory::getUser()->id == $item->createdBy_id;
 					}
+
 					?>
 					<tr class="row<?php echo $i % 2; ?>">
 						<?php
