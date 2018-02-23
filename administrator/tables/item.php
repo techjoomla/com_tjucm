@@ -44,7 +44,7 @@ class TjucmTableitem extends JTable
 	{
 		if ($array['id'] == 0)
 		{
-			$array['created_by'] = JFactory::getUser()->id;
+			$array['created_by'] = !empty($array['created_by']) ? $array['created_by'] : JFactory::getUser()->id;
 			$array['created_date'] = date('Y-m-d H:i:s');
 		}
 
