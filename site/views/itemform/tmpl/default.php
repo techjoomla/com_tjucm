@@ -23,6 +23,7 @@ $doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/jqu
 $doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/tjucm_ajaxForm_save.js');
 $doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/tjfield.js');
 $doc->addScript(JUri::root() . 'media/com_tjucm/js/form.js');
+$doc->addScript(JUri::root() . 'media/com_tjucm/js/jquery.dirrty.js');
 
 $jinput                    = JFactory::getApplication();
 $baseUrl                   = $jinput->input->server->get('REQUEST_URI', '', 'STRING');
@@ -40,6 +41,7 @@ $setnavigation             = false;
 	jQuery(window).load(function ()
 	{
 		jQuery('#item-form .nav-tabs li a').first().click();
+		jQuery("#item-form").dirrty();
 	});
 
 	Joomla.submitbutton = function (task)
