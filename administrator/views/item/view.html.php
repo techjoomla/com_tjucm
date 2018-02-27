@@ -44,11 +44,7 @@ class TjucmViewItem extends JViewLegacy
 
 		$this->client  = JFactory::getApplication()->input->get('client');
 		$id  = JFactory::getApplication()->input->get('id');
-
-		$input  = JFactory::getApplication()->input;
-		$input->set("content_id", $id);
 		$model = $this->getModel('item');
-
 		$view = explode('.', $this->client);
 
 		// Call to extra fields
@@ -58,7 +54,8 @@ class TjucmViewItem extends JViewLegacy
 			"clientComponent" => 'com_tjucm',
 			"client" => $this->client,
 			"view" => $view[1],
-			"layout" => 'edit')
+			"layout" => 'default',
+			"content_id" => $id)
 			);
 
 		$this->form_extra = array_filter($this->form_extra);

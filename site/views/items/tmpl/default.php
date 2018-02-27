@@ -40,6 +40,11 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 ?>
 <form action="<?php echo JRoute::_('index.php?option=com_tjucm&view=items' . $appendUrl); ?>" method="post" name="adminForm" id="adminForm">
 	<table class="table table-striped" id="itemList">
+		<?php
+		if (!empty($this->showList))
+		{
+			if (!empty($this->items))
+			{?>
 		<thead>
 			<tr>
 				<?php
@@ -56,6 +61,7 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 					<?php echo JHtml::_('grid.sort',  'COM_TJUCM_ITEMS_ID', 'a.id', $listDirn, $listOrder); ?>
 				</th>
 				<?php
+
 				if (!empty($this->listcolumn))
 				{
 					foreach ($this->listcolumn as $col_name)
@@ -79,6 +85,9 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 				?>
 			</tr>
 		</thead>
+		<?php
+			}
+		}?>
 		<?php
 		if (!empty($this->items))
 		{
@@ -184,20 +193,14 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 			else
 			{
 				?>
-				<tr>
-					<td>
-						<strong><?php echo JText::_('COM_TJUCM_ITEM_DOESNT_EXIST');?></strong>
-					</td>
-					<td>&nbsp;</td>
-					<td>&nbsp;</td>
-				</tr>
+				<div class="alert alert-warning"><?php echo JText::_('COM_TJUCM_NO_DATA_FOUND');?></div>
 			<?php
 			}
 		}
 		else
 		{
 		?>
-			<div class="alert alert-warrning"><?php echo JText::_("COM_TJUCM_NO_DATA_FOUND");?></div>
+			<div class="alert alert-warning"><?php echo JText::_('COM_TJUCM_NO_DATA_FOUND');?></div>
 		<?php
 		}
 		?>

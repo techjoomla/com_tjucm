@@ -41,6 +41,10 @@ class TjucmViewItem extends JViewLegacy
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 
+		// Load tj-fields language file
+		$lang = JFactory::getLanguage();
+		$lang->load('com_tjfields', JPATH_SITE);
+
 		$this->state  = $this->get('State');
 		$this->item   = $this->get('Data');
 		$model   = $this->getModel("Item");
@@ -71,9 +75,7 @@ class TjucmViewItem extends JViewLegacy
 		/* Get model instance here */
 		$model = $this->getModel();
 		$this->client  = JFactory::getApplication()->input->get('client');
-		$this->id = $id  = JFactory::getApplication()->input->get('id');
-		$input  = JFactory::getApplication()->input;
-		$input->set("content_id", $id);
+		$this->id = JFactory::getApplication()->input->get('id');
 		$view = explode('.', $this->client);
 
 		// Call to extra fields
@@ -82,7 +84,8 @@ class TjucmViewItem extends JViewLegacy
 			"clientComponent" => 'com_tjucm',
 			"client" => $this->client,
 			"view" => $view[1],
-			"layout" => 'edit')
+			"layout" => 'default',
+			"content_id" => $this->id)
 			);
 
 		// Check for errors.

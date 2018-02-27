@@ -17,19 +17,36 @@ if ($this->form_extra)
 {
 	// Iterate through the normal form fieldsets and display each one
 	$fieldSets = $this->form_extra->getFieldsets();
+
 	foreach ($fieldSets as $fieldName => $fieldset)
 	{
-		if (count($this->form_extra->getFieldsets()) > 1)
+		$addTab = 0;
+
+		if (count($fieldSets) > 1)
 		{
 			if ($fieldsets_counter == 0)
 			{
-				echo JHtml::_('bootstrap.startTabSet', 'tjucm_myTab', array('active' => 'personal-information'));
+				echo JHtml::_('bootstrap.startTabSet', 'tjucm_myTab');
 			}
 
 			$fieldsets_counter ++;
 
-			$tabName = JFilterOutput::stringURLUnicodeSlug(trim($fieldset->name));
-			echo JHtml::_("bootstrap.addTab", "tjucm_myTab", $tabName, $fieldset->name);
+			if (count($this->form_extra->getFieldset($fieldset->name)))
+			{
+				foreach($this->form_extra->getFieldset($fieldset->name) as $field)
+				{
+					if (!$field->hidden)
+					{
+						$addTab = 1;
+					}
+				}
+
+				if ($addTab)
+				{
+					$tabName = JFilterOutput::stringURLUnicodeSlug(trim($fieldset->name));
+					echo JHtml::_("bootstrap.addTab", "tjucm_myTab", $tabName, $fieldset->name);
+				}
+			}
 		}
 		?>
 		<div class="form-horizontal">
@@ -86,7 +103,13 @@ if ($this->form_extra)
 		<?php
 		if (count($this->form_extra->getFieldsets()) > 1)
 		{
-			echo JHtml::_("bootstrap.endTab");
+			if (count($this->form_extra->getFieldset($fieldset->name)))
+			{
+				if ($addTab)
+				{
+					echo JHtml::_("bootstrap.endTab");
+				}
+			}
 		}
 
 		if ($fieldsets_counter == 0)
