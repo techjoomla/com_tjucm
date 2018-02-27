@@ -99,9 +99,10 @@ class TjucmModelItems extends JModelList
 
 			if (!empty($this->menuparams))
 			{
+				$this->ucm_type   = $this->menuparams->get('ucm_type');
+
 				if (!empty($this->ucm_type))
 				{
-					$this->ucm_type   = $this->menuparams->get('ucm_type');
 					$ucmType     = 'com_tjucm.' . $this->ucm_type;
 				}
 			}
