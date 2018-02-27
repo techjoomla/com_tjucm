@@ -148,7 +148,7 @@ class TjucmModelItems extends JModelList
 		// Select the required fields from the table.
 		$query->select(
 			$this->getState(
-				'list.select', 'DISTINCT a.id, a.state, ' . $group_concat
+				'list.select', 'DISTINCT a.id, a.state,a.created_by,' . $group_concat
 			)
 		);
 
@@ -164,11 +164,11 @@ class TjucmModelItems extends JModelList
 		$query->where('(types.state IN (1))');
 
 		// Join over the user field 'created_by'
-		$query->select('`created_by`.name AS `created_by`');
+		$query->select('`created_by`.name AS `created_by_name`');
 		$query->join('INNER', '#__users AS `created_by` ON `created_by`.id = a.`created_by`');
 
 		// Join over the user field 'modified_by'
-		$query->select('`modified_by`.name AS `modified_by`');
+		$query->select('`modified_by`.name AS `modified_by_name`');
 		$query->join('LEFT', '#__users AS `modified_by` ON `modified_by`.id = a.`modified_by`');
 
 		// Join over the tjfield
