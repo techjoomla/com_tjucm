@@ -112,9 +112,6 @@ jQuery(document).ready(function(){
 				{
 					jQuery("#uploadedreceipt_"+field_id).hide();
 				}
-			},
-			error : function(resp){
-				return false;
 			}
 		});
 	});
