@@ -1,5 +1,4 @@
 jQuery(document).ready(function(){
-
 	// Added By Komal M
 	jQuery(document).on("keyup",".charcounter",function() {
 		var divTextarea = jQuery( this ).attr('id');
@@ -67,8 +66,8 @@ jQuery(document).ready(function(){
 		var accept_array = file_accept.split(",");
 		var file_type = element[0].files[0].type;
 		var afterDot = '.' + file_type.split("/").pop();
-		
-		var count = accept_array.indexOf(afterDot); 
+
+		var count = accept_array.indexOf(afterDot);
 
 		if(element[0].files[0].size > 15728640)
 		{
@@ -80,7 +79,7 @@ jQuery(document).ready(function(){
 		}
 		return true;
 	});
-	document.formvalidator.setHandler('url', function(value, element) 
+	document.formvalidator.setHandler('url', function(value, element)
 	{
 		regex=/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&#\/%?=~_|!:,.;]*[-a-z0-9+&#\/%=~_|]/i;
 		return regex.test(value);
@@ -117,6 +116,50 @@ jQuery(document).ready(function(){
 			error : function(resp){
 			}
 		});
+	});
+
+	// Code added to validate calender field
+
+	//Make date field readonly Tjfield temp fix
+	jQuery(document).on('blur', '.check_date_tjfield', function(event){
+
+		var currVal    = jQuery("#" + event.target.id).val();
+
+		if(currVal === '')
+		{
+			return false;
+		}
+
+		//Declare Regex
+		var rxDatePattern = /^\d{4}-((0\d)|(1[012]))-(([012]\d)|3[01])$/;
+
+		var dtArray = currVal.match(rxDatePattern); // is format OK?
+
+		if (dtArray == null)
+		{
+			alert(Joomla.JText._('COM_TJUCM_DATES_FIELDS_VALIDATION_ERROR'));
+			jQuery("#" + event.target.id).val('');
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	});
+
+	// Make all text fields validation.
+	jQuery(document).on('keypress', '.check_date_tjfield', function(e){
+		var regex = new RegExp("^[a-zA-Z(\) ]+$");
+		var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+		if (!regex.test(str))
+		{
+			return true;
+		}
+		else
+		{
+			alert(Joomla.JText._('COM_TJUCM_DATES_FIELDS_VALIDATION_ERROR'));
+			return false;
+		}
 	});
 	// END
 });

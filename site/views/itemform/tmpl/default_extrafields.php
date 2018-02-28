@@ -54,12 +54,7 @@ if ($this->form_extra)
 			// Iterate through the fields and display them
 			foreach($this->form_extra->getFieldset($fieldset->name) as $field)
 			{
-				// If the field is hidden, only use the input
-				if ($field->hidden)
-				{
-					echo $field->input;
-				}
-				else
+				if (!$field->hidden)
 				{
 					?>
 					<div class="form-group">
@@ -97,6 +92,7 @@ if ($this->form_extra)
 					</div>
 				<?php
 				}
+
 			}
 			?>
 		</div>
