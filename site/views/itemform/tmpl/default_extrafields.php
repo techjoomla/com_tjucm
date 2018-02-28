@@ -33,7 +33,7 @@ if ($this->form_extra)
 
 			if (count($this->form_extra->getFieldset($fieldset->name)))
 			{
-				foreach($this->form_extra->getFieldset($fieldset->name) as $field)
+				foreach ($this->form_extra->getFieldset($fieldset->name) as $field)
 				{
 					if (!$field->hidden)
 					{
@@ -52,7 +52,7 @@ if ($this->form_extra)
 		<div class="form-horizontal">
 			<?php
 			// Iterate through the fields and display them
-			foreach($this->form_extra->getFieldset($fieldset->name) as $field)
+			foreach ($this->form_extra->getFieldset($fieldset->name) as $field)
 			{
 				if (!$field->hidden)
 				{
@@ -92,7 +92,6 @@ if ($this->form_extra)
 					</div>
 				<?php
 				}
-
 			}
 			?>
 		</div>

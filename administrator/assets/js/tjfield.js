@@ -114,6 +114,8 @@ jQuery(document).ready(function(){
 				}
 			},
 			error : function(resp){
+				jQuery("#message").html(resp.message);
+				jQuery("#message").addClass('alert alert-danger');
 			}
 		});
 	});
