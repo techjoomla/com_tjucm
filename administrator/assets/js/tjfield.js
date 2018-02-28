@@ -87,7 +87,7 @@ jQuery(document).ready(function(){
 
 //------------------------------------------------------------------------------------------------------------------------------------------------
 	jQuery(".btn-delete").click(function(){
-		var field_id               = jQuery(this).attr("id");
+		var field_id         = jQuery(this).attr("id");
 		var fileName         = jQuery("#fileName_"+field_id).val();
 
 		var commentContainer = jQuery(this).parent().parent().parent().parent();
@@ -112,8 +112,11 @@ jQuery(document).ready(function(){
 				{
 					jQuery("#uploadedreceipt_"+field_id).hide();
 				}
+			},
+			error : function(resp){
 			}
 		});
+		return true;
 	});
 
 	// Code added to validate calender field
