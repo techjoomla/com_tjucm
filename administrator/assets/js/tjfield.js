@@ -163,7 +163,7 @@ jQuery(document).ready(function(){
 		}
 	});
 
-
+	// Code for number field validation
 	defaultValue = parseFloat(jQuery(".check_number_field").attr('value'));
 
 	jQuery(document).on('change', '.check_number_field', function(e){
