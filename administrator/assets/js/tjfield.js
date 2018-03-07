@@ -172,17 +172,13 @@ jQuery(document).ready(function(){
 		var maxValue = parseFloat(jQuery(this).attr('max'));
 		var minValue = parseFloat(jQuery(this).attr('min'));
 
-		if(maxValue!='' || minValue!='')
+		if(!isNaN(maxValue) || !isNaN(minValue))
 		{
 			if(maxValue < enteredValue || minValue > enteredValue)
 			{
 				jQuery("#" + e.target.id).val(window.defaultValue);
 				alert(Joomla.JText._('COM_TJUCM_NUMBER_FIELDS_VALIDATION_ERROR'));
 				return false;
-			}
-			else
-			{
-				return true;
 			}
 
 			return true;
