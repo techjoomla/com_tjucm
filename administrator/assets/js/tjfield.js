@@ -164,7 +164,7 @@ jQuery(document).ready(function(){
 	});
 
 	// Code for number field validation
-	defaultValue = parseFloat(jQuery(".check_number_field").attr('value'));
+	window.defaultValue = parseFloat(jQuery(".check_number_field").attr('value'));
 
 	jQuery(document).on('change', '.check_number_field', function(e){
 
@@ -176,7 +176,7 @@ jQuery(document).ready(function(){
 		{
 			if(maxValue < enteredValue || minValue > enteredValue)
 			{
-				jQuery("#" + e.target.id).val(defaultValue);
+				jQuery("#" + e.target.id).val(window.defaultValue);
 				alert(Joomla.JText._('COM_TJUCM_NUMBER_FIELDS_VALIDATION_ERROR'));
 				return false;
 			}
@@ -184,6 +184,8 @@ jQuery(document).ready(function(){
 			{
 				return true;
 			}
+
+			return true;
 		}
 
 	});
