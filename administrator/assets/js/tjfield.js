@@ -162,5 +162,32 @@ jQuery(document).ready(function(){
 			return false;
 		}
 	});
+
+
+	defaultValue = parseFloat(jQuery(".check_number_field").attr('value'));
+
+	jQuery(document).on('change', '.check_number_field', function(e){
+
+		var enteredValue    = parseFloat(jQuery("#" + e.target.id).val());
+		var maxValue = parseFloat(jQuery(this).attr('max'));
+		var minValue = parseFloat(jQuery(this).attr('min'));
+
+		if(maxValue!='' || minValue!='')
+		{
+			if(maxValue < enteredValue || minValue > enteredValue)
+			{
+				jQuery("#" + e.target.id).val(defaultValue);
+				alert(Joomla.JText._('COM_TJUCM_NUMBER_FIELDS_VALIDATION_ERROR'));
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+
+	});
+
+
 	// END
 });
