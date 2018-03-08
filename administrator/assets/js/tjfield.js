@@ -138,10 +138,7 @@ jQuery(document).ready(function(){
 				jQuery(element[0].value).val('');
 				return false;
 			}
-			else
-			{
-				return true;
-			}
+			return true;
 		}
 		return false;
 	});
