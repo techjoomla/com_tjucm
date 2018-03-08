@@ -120,72 +120,49 @@ jQuery(document).ready(function(){
 	});
 
 	// Code added to validate calender field
-
-	//Make date field readonly Tjfield temp fix
-	jQuery(document).on('blur', '.check_date_tjfield', function(event){
-
-		var currVal    = jQuery("#" + event.target.id).val();
-
+	document.formvalidator.setHandler('check_date_tjfield', function (value,element) {
+		var currVal    = value;
 		if(currVal === '')
 		{
 			return false;
 		}
+		else{
+			//Declare Regex
+			var rxDatePattern = /^\d{4}-((0\d)|(1[012]))-(([012]\d)|3[01])$/;
 
-		//Declare Regex
-		var rxDatePattern = /^\d{4}-((0\d)|(1[012]))-(([012]\d)|3[01])$/;
+			var dtArray = currVal.match(rxDatePattern); // is format OK?
 
-		var dtArray = currVal.match(rxDatePattern); // is format OK?
-
-		if (dtArray == null)
-		{
-			alert(Joomla.JText._('COM_TJUCM_DATES_FIELDS_VALIDATION_ERROR'));
-			jQuery("#" + event.target.id).val('');
-			return false;
+			if (dtArray == null)
+			{
+				alert(Joomla.JText._('COM_TJUCM_DATES_FIELDS_VALIDATION_ERROR'));
+				jQuery(element[0].value).val('');
+				return false;
+			}
+			else
+			{
+				return true;
+			}
 		}
-		else
-		{
-			return true;
-		}
-	});
-
-	// Make all text fields validation.
-	jQuery(document).on('keypress', '.check_date_tjfield', function(e){
-		var regex = new RegExp("^[a-zA-Z(\) ]+$");
-		var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
-		if (!regex.test(str))
-		{
-			return true;
-		}
-		else
-		{
-			alert(Joomla.JText._('COM_TJUCM_DATES_FIELDS_VALIDATION_ERROR'));
-			return false;
-		}
+		return false;
 	});
 
 	// Code for number field validation
-	window.defaultValue = parseFloat(jQuery(".check_number_field").attr('value'));
-
-	jQuery(document).on('change', '.check_number_field', function(e){
-
-		var enteredValue    = parseFloat(jQuery("#" + e.target.id).val());
-		var maxValue = parseFloat(jQuery(this).attr('max'));
-		var minValue = parseFloat(jQuery(this).attr('min'));
+	document.formvalidator.setHandler('check_number_field', function (value,element) {
+        var enteredValue  = parseFloat(value);
+        var maxValue = parseFloat(element[0].max);
+        var minValue = parseFloat(element[0].min);
 
 		if(!isNaN(maxValue) || !isNaN(minValue))
 		{
 			if(maxValue < enteredValue || minValue > enteredValue)
 			{
-				jQuery("#" + e.target.id).val(window.defaultValue);
 				alert(Joomla.JText._('COM_TJUCM_NUMBER_FIELDS_VALIDATION_ERROR'));
 				return false;
 			}
-
 			return true;
 		}
-
-	});
-
+		return false;
+    });
 
 	// END
 });
