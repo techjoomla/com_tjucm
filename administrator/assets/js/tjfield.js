@@ -140,7 +140,6 @@ jQuery(document).ready(function(){
 			}
 			return true;
 		}
-		return false;
 	});
 
 	// Code for number field validation
