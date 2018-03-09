@@ -152,39 +152,43 @@ class TjucmModelItems extends JModelList
 			)
 		);
 
-		$query->from('`#__tj_ucm_data` AS a');
+		$query->from($db->quoteName('#__tj_ucm_data', 'a'));
 
 		// Join over the users for the checked out user
 		$query->select("uc.name AS uEditor");
-		$query->join("LEFT", "#__users AS uc ON uc.id=a.checked_out");
+		$query->join("LEFT",  $db->quoteName('#__users', 'uc') . ' ON (' . $db->quoteName('uc.id') . ' = ' . $db->quoteName('a.checked_out') . ')');
 
 		// Join over the foreign key 'type_id'
-
-		$query->join('INNER', '#__tj_ucm_types AS types ON types.`id` = a.`type_id`');
+		$query->join("INNER", $db->quoteName('#__tj_ucm_types', 'types') .
+		' ON (' . $db->quoteName('types.id') . ' = ' . $db->quoteName('a.type_id') . ')');
 		$query->where('(types.state IN (1))');
 
 		// Join over the user field 'created_by'
-		$query->select('`created_by`.name AS `created_by_name`');
-		$query->join('INNER', '#__users AS `created_by` ON `created_by`.id = a.`created_by`');
+
+		$query->select("ucby.name AS created_by_name");
+		$query->join("INNER",  $db->quoteName('#__users', 'ucby') . ' ON (' . $db->quoteName('ucby.id') . ' = ' . $db->quoteName('a.created_by') . ')');
 
 		// Join over the user field 'modified_by'
-		$query->select('`modified_by`.name AS `modified_by_name`');
-		$query->join('LEFT', '#__users AS `modified_by` ON `modified_by`.id = a.`modified_by`');
+		$query->select('um.name AS modified_by_name');
+		$query->join("LEFT",  $db->quoteName('#__users', 'um') .
+		' ON (' . $db->quoteName('um.id') . ' = ' . $db->quoteName('a.modified_by') . ')');
 
 		// Join over the tjfield
-		$query->join('INNER', '#__tjfields_fields AS fields ON a.client = fields.client');
+		$query->join("INNER",  $db->quoteName('#__tjfields_fields', 'fields') .
+		' ON (' . $db->quoteName('fields.client') . ' = ' . $db->quoteName('a.client') . ')');
 
 		// Join over the tjfield value
-		$query->join('INNER', '#__tjfields_fields_value AS fieldValue ON a.id = fieldValue.content_id');
+		$query->join("INNER",  $db->quoteName('#__tjfields_fields_value', 'fieldValue') .
+		' ON (' . $db->quoteName('fieldValue.content_id') . ' = ' . $db->quoteName('a.id') . ')');
 
 		$this->client = $this->getState('ucm.client');
 
 		if (!empty($this->client))
 		{
-			$query->where('a.client = ' . $db->quote($db->escape($this->client)));
+			$query->where($db->quoteName('a.client') . "=" . $db->quote($db->escape($this->client)));
 		}
 
-		$query->where('fields.id = fieldValue.field_id');
+		$query->where($db->quoteName('fields.id') . "=" . $db->quoteName('fieldValue.field_id'));
 
 		$ucmType = $this->getState('ucmType.id', '', 'INT');
 
@@ -207,11 +211,11 @@ class TjucmModelItems extends JModelList
 
 		if (is_numeric($published))
 		{
-			$query->where('a.state = ' . (INT) $published);
+			$query->where($db->quoteName('a.state') . "=" . (INT) $published);
 		}
 		elseif ($published === '')
 		{
-			$query->where('(a.state IN (0, 1))');
+			$query->where($db->quoteName('(a.state IN (0, 1))'));
 		}
 
 		// Filter by search in title
@@ -221,7 +225,7 @@ class TjucmModelItems extends JModelList
 		{
 			if (stripos($search, 'id:') === 0)
 			{
-				$query->where('a.id = ' . (int) substr($search, 3));
+				$query->where($db->quoteName('a.id') . "=" . (int) substr($search, 3));
 			}
 			else
 			{

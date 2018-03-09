@@ -119,27 +119,11 @@ jQuery(document).ready(function(){
 		return true;
 	});
 
-	// Code added to validate calender field
-	document.formvalidator.setHandler('check_date_tjfield', function (value,element) {
-		var currVal    = value;
-		if(currVal === '')
-		{
-			return false;
-		}
-		else{
-			//Declare Regex
-			var rxDatePattern = /^\d{4}-((0\d)|(1[012]))-(([012]\d)|3[01])$/;
+	// code to to display datepicker while cursor focus goes to datepicker input box. It restrict the user for manual input in datepicker field
 
-			var dtArray = currVal.match(rxDatePattern); // is format OK?
-
-			if (dtArray == null)
-			{
-				alert(Joomla.JText._('COM_TJUCM_DATES_FIELDS_VALIDATION_ERROR'));
-				jQuery(element[0].value).val('');
-				return false;
-			}
-			return true;
-		}
+	jQuery('.calendar-textfield-class').focusin(function (event){
+		event.preventDefault();
+		jQuery(this).next('button').focus().click();
 	});
 
 	// Code for number field validation
