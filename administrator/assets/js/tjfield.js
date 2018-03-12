@@ -119,7 +119,7 @@ jQuery(document).ready(function(){
 		return true;
 	});
 
-	// code to to display datepicker while cursor focus goes to datepicker input box. It restrict the user for manual input in datepicker field
+	// It restrict the user for manual input in datepicker field
 
 	jQuery('.calendar-textfield-class').focusin(function (event){
 		event.preventDefault();
