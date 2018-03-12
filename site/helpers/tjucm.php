@@ -72,7 +72,7 @@ class TjucmHelpersTjucm
 	public static function getLanguageConstantForJs()
 	{
 		JText::script('COM_TJUCM_ITEMFORM_ALERT', true);
-		JText::script('COM_TJUCM_DATES_FIELDS_VALIDATION_ERROR', true);
-		JText::script('COM_TJUCM_NUMBER_FIELDS_VALIDATION_ERROR', true);
+		JText::script('COM_TJUCM_FIELDS_VALIDATION_ERROR_DATE', true);
+		JText::script('COM_TJUCM_FIELDS_VALIDATION_ERROR_NUMBER', true);
 	}
 }
