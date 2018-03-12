@@ -229,7 +229,7 @@ class TjucmModelItems extends JModelList
 		{
 			if (stripos($search, 'id:') === 0)
 			{
-				$query->where($db->quoteName('a.id') . ' = ' . $db->quote(substr($search, 3)));
+				$query->where($db->quoteName('a.id') . ' = ' . (int) substr($search, 3));
 			}
 			else
 			{
