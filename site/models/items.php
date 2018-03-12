@@ -169,7 +169,8 @@ class TjucmModelItems extends JModelList
 		// Join over the user field 'created_by'
 
 		$query->select($db->quoteName('ucby.name', 'created_by_name'));
-		$query->join("INNER",  $db->quoteName('#__users', 'ucby') . ' ON (' . $db->quoteName('ucby.id') . ' = ' . $db->quoteName('a.created_by') . ')');
+		$query->join("INNER",  $db->quoteName('#__users', 'ucby') . ' ON (' . $db->quoteName('ucby.id') .
+		' = ' . $db->quoteName('a.created_by') . ')');
 
 		// Join over the user field 'modified_by'
 		$query->select($db->quoteName('um.name', 'modified_by_name'));
