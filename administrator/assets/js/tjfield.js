@@ -76,10 +76,10 @@ jQuery(document).ready(function() {
     });
 
     jQuery(".btn-delete").click(function() {
-        var field_id = jQuery(this).attr("id");
-        var fileName = jQuery("#fileName_" + field_id).val();
+        let field_id = jQuery(this).attr("id");
+        let fileName = jQuery("#fileName_" + field_id).val();
 
-        var commentContainer = jQuery(this).parent().parent().parent().parent();
+        let commentContainer = jQuery(this).parent().parent().parent().parent();
 
         if (confirm("Are you sure to remove the uploaded document?") == false) {
             return false;
