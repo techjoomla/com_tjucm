@@ -1,5 +1,13 @@
 jQuery(document).ready(function() {
 
+	/* Code to display available character count in textarea counter field */
+	jQuery(".charcounter").each(function(index) {
+		let usedcharlength = parseInt(jQuery(this).val().length);
+		let maxlength = parseInt(jQuery(this).siblings("span").find(".charscontainer_maxlength").text());
+		let availablecharlength = maxlength - usedcharlength;
+		jQuery(this).siblings("span").find(".charscontainer_remaining").text(availablecharlength);
+	})
+
     jQuery(document).on("keyup", ".charcounter", function() {
         var divTextarea = jQuery(this).attr('id');
         jQuery(".charcounter").each(function(index) {
