@@ -1,7 +1,7 @@
 jQuery(document).ready(function() {
 
 	/* Code to display available character count in textarea counter field */
-	jQuery(".charcounter").each(function(index) {
+	jQuery(".charcounter").each(function() {
 		let usedcharlength = parseInt(jQuery(this).val().length);
 		let maxlength = parseInt(jQuery(this).siblings("span").find(".charscontainer_maxlength").text());
 		let availablecharlength = maxlength - usedcharlength;
