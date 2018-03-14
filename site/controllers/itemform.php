@@ -355,6 +355,15 @@ class TjucmControllerItemForm extends JControllerForm
 				else
 				{
 					$validData['draft'] = 0;
+
+					/* If file field is required then in the validation method return false
+					* * so that we will mearge $data and $ files array using array_merge function
+					* * and pass to the validation funcation.*/
+
+					if ($files)
+					{
+						$extra_jform_data = array_merge($data, $files);
+					}
 				}
 
 				// Validate the posted extra data.

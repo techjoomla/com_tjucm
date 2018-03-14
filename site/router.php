@@ -42,7 +42,7 @@ class TjucmRouter extends JComponentRouterBase
 		{
 			$taskParts  = explode('.', $query['task']);
 			$segments[] = implode('/', $taskParts);
-			$view       = $taskParts[0];
+			$query['view']  = $taskParts[0];
 			unset($query['task']);
 		}
 
@@ -72,6 +72,7 @@ class TjucmRouter extends JComponentRouterBase
 					}
 					else
 					{
+						$model->setClient($query['client']);
 						$item       = $model->getData($query['id']);
 						$alias      = $model->getAliasFieldNameByView($view);
 						$segments[] = (isset($alias)) ? $item->alias : $query['id'];
@@ -119,7 +120,7 @@ class TjucmRouter extends JComponentRouterBase
 			}
 			else
 			{
-				$id = $model->getItemIdByAlias(str_replace(':', '-', $segment));
+				// $id = $model->getItemIdByAlias(str_replace(':', '-', $segment));
 
 				if (!empty($id))
 				{

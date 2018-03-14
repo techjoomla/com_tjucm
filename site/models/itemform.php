@@ -215,7 +215,6 @@ class TjucmModelItemForm extends JModelForm
 		{
 			return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
 		}
-
 		return $this->item;
 	}
 
