@@ -149,6 +149,11 @@ class TjucmModelType extends JModelAdmin
 			{
 				$item->allow_draft_save = $params["allow_draft_save"];
 			}
+
+			if (array_key_exists("is_subform", $params))
+			{
+				$item->is_subform = $params["is_subform"];
+			}
 		}
 
 		return $item;
@@ -332,6 +337,7 @@ class TjucmModelType extends JModelAdmin
 		$params = array();
 		$params['allowed_count'] = $data['allowed_count'];
 		$params['allow_draft_save'] = $data['allow_draft_save'];
+		$params['is_subform'] = $data['is_subform'];
 
 		$data['params'] = json_encode($params);
 
@@ -422,7 +428,7 @@ class TjucmModelType extends JModelAdmin
 	/**
 	 * Method to get UCM type id
 	 *
-	 * @param   string  $client  The client.
+	 * @param   string  $id  The client.
 	 *
 	 * @return	INT  ucm type id
 	 *
