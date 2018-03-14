@@ -140,19 +140,9 @@ class TjucmModelType extends JModelAdmin
 			// Get Params data
 			$params = $item->params;
 
-			if (array_key_exists("allowed_count", $params))
+			foreach ($params as $key => $param)
 			{
-				$item->allowed_count = $params["allowed_count"];
-			}
-
-			if (array_key_exists("allow_draft_save", $params))
-			{
-				$item->allow_draft_save = $params["allow_draft_save"];
-			}
-
-			if (array_key_exists("is_subform", $params))
-			{
-				$item->is_subform = $params["is_subform"];
+				$item->$key = $param;
 			}
 		}
 
