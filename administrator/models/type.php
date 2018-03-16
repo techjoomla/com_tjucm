@@ -140,14 +140,9 @@ class TjucmModelType extends JModelAdmin
 			// Get Params data
 			$params = $item->params;
 
-			if (array_key_exists("allowed_count", $params))
+			foreach ($params as $key => $param)
 			{
-				$item->allowed_count = $params["allowed_count"];
-			}
-
-			if (array_key_exists("allow_draft_save", $params))
-			{
-				$item->allow_draft_save = $params["allow_draft_save"];
+				$item->$key = $param;
 			}
 		}
 
@@ -332,6 +327,7 @@ class TjucmModelType extends JModelAdmin
 		$params = array();
 		$params['allowed_count'] = $data['allowed_count'];
 		$params['allow_draft_save'] = $data['allow_draft_save'];
+		$params['is_subform'] = $data['is_subform'];
 
 		$data['params'] = json_encode($params);
 
@@ -422,7 +418,7 @@ class TjucmModelType extends JModelAdmin
 	/**
 	 * Method to get UCM type id
 	 *
-	 * @param   string  $client  The client.
+	 * @param   string  $id  The client.
 	 *
 	 * @return	INT  ucm type id
 	 *
