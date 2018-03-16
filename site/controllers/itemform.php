@@ -205,10 +205,8 @@ class TjucmControllerItemForm extends JControllerForm
 		$data = $app->input->get('jform', array(), 'array');
 		$all_jform_data = $data;
 
-		// Added By KOMAL TEMP
-		$files           = $app->input->files->get('jform');
-
-		// END
+		// get file information
+		$files = $app->input->files->get('jform');
 
 		// Jform tweak - Get all posted data.
 		$post = $app->input->post;
@@ -336,6 +334,8 @@ class TjucmControllerItemForm extends JControllerForm
 				return false;
 			}
 
+			$formExtra = array_filter($formExtra);
+
 			if (!empty($formExtra))
 			{
 				// Remove required attribute from fields if data is stored in draft mode
@@ -414,25 +414,28 @@ class TjucmControllerItemForm extends JControllerForm
 			$status_title = JFactory::getApplication()->input->get('form_status');
 			$validData['status'] = $status_title;
 
-			// Added By KOMAL TEMP
 			if (!empty($files))
 			{
 				$extra_jform_data['tjFieldFileField'] = $files;
 			}
 
 			$recordId = $model->save($validData, $extra_jform_data, $post);
-			$dispatcher        = JDispatcher::getInstance();
-			JPluginHelper::importPlugin("system", "jlike_tjucm");
-			$dispatcher->trigger('jlike_tjucmOnAfterSave', array($recordId,$validData));
-			$response = $recordId;
-			$redirect_url = '';
-			$redirect_msg = '';
+
+			if ($recordId)
+			{
+				$dispatcher        = JEventDispatcher::getInstance();
+				JPluginHelper::importPlugin("system", "jlike_tjucm");
+				$dispatcher->trigger('jlike_tjucmOnAfterSave', array($recordId, $validData));
+				$response = $recordId;
+				$redirect_url = '';
+				$redirect_msg = '';
+			}
 		}
 		catch (Exception $e)
 		{
 			$response = $e;
 			$redirect_url = '';
-			$redirect_msg = $e->getMsg();
+			$redirect_msg = $e->getMessage();
 		}
 
 		if ($this->isajax)

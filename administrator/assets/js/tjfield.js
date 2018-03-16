@@ -11,7 +11,6 @@ jQuery(document).ready(function() {
     jQuery(document).on("keyup", ".charcounter", function() {
         var divTextarea = jQuery(this).attr('id');
         jQuery(".charcounter").each(function(index) {
-
             counter_span = "#counter_" + divTextarea;
             char_count = jQuery('#' + divTextarea).val().length;
             jQuery(counter_span).text(char_count);
@@ -63,15 +62,16 @@ jQuery(document).ready(function() {
         }
         return true;
     });
+
     document.formvalidator.setHandler('filesize', function(value, element) {
-        var file_accept = element[0].accept;
-        var accept_array = file_accept.split(",");
-        var file_type = element[0].files[0].type;
-        var afterDot = '.' + file_type.split("/").pop();
+        let file_accept = element[0].accept;
+        let accept_array = file_accept.split(",");
+        let file_type = element[0].files[0].type;
+        let afterDot = '.' + file_type.split("/").pop();
 
-        var count = accept_array.indexOf(afterDot);
+        let count = accept_array.indexOf(afterDot);
 
-        if (element[0].files[0].size > 15728640) {
+        if (element[0].files[0].size > 33554432) {
             return false;
         } else if (count < 0) {
             return false;

@@ -472,7 +472,10 @@ class TjucmModelItemForm extends JModelForm
 				$data_extra['fieldsvalue'] = $extra_jform_data;
 
 				// Save extra fields data.
-				$this->saveExtraFields($data_extra);
+				if(!$this->saveExtraFields($data_extra))
+				{
+					return false;
+				}
 			}
 
 			return $table->id;

@@ -72,7 +72,6 @@ class TjucmRouter extends JComponentRouterBase
 					}
 					else
 					{
-						$model->setClient($query['client']);
 						$item       = $model->getData($query['id']);
 						$alias      = $model->getAliasFieldNameByView($view);
 						$segments[] = (isset($alias)) ? $item->alias : $query['id'];
