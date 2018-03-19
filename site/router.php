@@ -3,7 +3,7 @@
  * @version    SVN: <svn_id>
  * @package    Com_Tjucm
  * @author     Techjoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @copyright  Copyright (c) 2009-2018 TechJoomla. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -106,7 +106,7 @@ class TjucmRouter extends JComponentRouterBase
 
 		// View is always the first element of the array
 		$vars['view'] = array_shift($segments);
-		$model        = TjucmHelpersTjucm::getModel($vars['view']);
+		$model = TjucmHelpersTjucm::getModel($vars['view']);
 
 		while (!empty($segments))
 		{
@@ -119,7 +119,7 @@ class TjucmRouter extends JComponentRouterBase
 			}
 			else
 			{
-				// $id = $model->getItemIdByAlias(str_replace(':', '-', $segment));
+				$id = $model->getItemIdByAlias(str_replace(':', '-', $segment));
 
 				if (!empty($id))
 				{
