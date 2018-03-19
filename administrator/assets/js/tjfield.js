@@ -1,88 +1,5 @@
 jQuery(document).ready(function() {
 
-	/* Code to display available character count in textarea counter field */
-	jQuery(".charcounter").each(function() {
-		let usedcharlength = parseInt(jQuery(this).val().length);
-		let maxlength = parseInt(jQuery(this).siblings("span").find(".charscontainer_maxlength").text());
-		let availablecharlength = maxlength - usedcharlength;
-		jQuery(this).siblings("span").find(".charscontainer_remaining").text(availablecharlength);
-	})
-
-    jQuery(document).on("keyup", ".charcounter", function() {
-        var divTextarea = jQuery(this).attr('id');
-        jQuery(".charcounter").each(function(index) {
-            counter_span = "#counter_" + divTextarea;
-            char_count = jQuery('#' + divTextarea).val().length;
-            jQuery(counter_span).text(char_count);
-        });
-    });
-
-    /*Required fields valiadtion*/
-    document.formvalidator.setHandler('min100', function(value, element) {
-        value = value.trim();
-        if (value.trim().length < 100) {
-            return false;
-        }
-        return true;
-    });
-
-    document.formvalidator.setHandler('min200', function(value, element) {
-        value = value.trim();
-        if (value.trim().length < 200) {
-            return false;
-        }
-        return true;
-    });
-
-    document.formvalidator.setHandler('min250', function(value, element) {
-        value = value.trim();
-        if (value.trim().length < 250) {
-            return false;
-        }
-        return true;
-    });
-
-    document.formvalidator.setHandler('min300', function(value, element) {
-        value = value.trim();
-        if (value.trim().length < 300) {
-            return false;
-        }
-        return true;
-    });
-
-    document.formvalidator.setHandler('blank-space', function(value, element) {
-        if (value.trim() == '') {
-            return false;
-        }
-        return true;
-    });
-    document.formvalidator.setHandler('numeric', function(value, element) {
-        if (Number(value) <= 0) {
-            return false;
-        }
-        return true;
-    });
-
-    document.formvalidator.setHandler('filesize', function(value, element) {
-        let file_accept = element[0].accept;
-        let accept_array = file_accept.split(",");
-        let file_type = element[0].files[0].type;
-        let afterDot = '.' + file_type.split("/").pop();
-
-        let count = accept_array.indexOf(afterDot);
-
-        if (element[0].files[0].size > 33554432) {
-            return false;
-        } else if (count < 0) {
-            return false;
-        }
-        return true;
-    });
-    document.formvalidator.setHandler('url', function(value, element) {
-        regex = /\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&#\/%?=~_|!:,.;]*[-a-z0-9+&#\/%=~_|]/i;
-        return regex.test(value);
-    });
-
     jQuery(".btn-delete").click(function() {
         let field_id = jQuery(this).attr("id");
         let fileName = jQuery("#fileName_" + field_id).val();
@@ -112,27 +29,5 @@ jQuery(document).ready(function() {
             error: function(resp) {}
         });
         return true;
-    });
-
-    /* It restrict the user for manual input in datepicker field */
-    jQuery('.calendar-textfield-class').focusin(function(event) {
-        event.preventDefault();
-        jQuery(this).next('button').focus().click();
-    });
-
-    /* Code for number field validation */
-    document.formvalidator.setHandler('check_number_field', function(value, element) {
-        let enteredValue = parseFloat(value);
-        let maxValue = parseFloat(element[0].max);
-        let minValue = parseFloat(element[0].min);
-
-        if (!isNaN(maxValue) || !isNaN(minValue)) {
-            if (maxValue < enteredValue || minValue > enteredValue) {
-                alert(Joomla.JText._('COM_TJUCM_FIELDS_VALIDATION_ERROR_NUMBER'));
-                return false;
-            }
-            return true;
-        }
-        return false;
     });
 });
