@@ -423,7 +423,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 			if ($recordId)
 			{
-				$dispatcher        = JEventDispatcher::getInstance();
+				$dispatcher = JEventDispatcher::getInstance();
 				JPluginHelper::importPlugin("system", "jlike_tjucm");
 				$dispatcher->trigger('jlike_tjucmOnAfterSave', array($recordId, $validData));
 				$response = $recordId;
