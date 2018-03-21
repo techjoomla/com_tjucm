@@ -60,11 +60,9 @@ $fieldSets = $this->form_extra->getFieldsets();
 								{
 									foreach ($val as $name => $value)
 									{
-										$fieldData = $TjfieldsHelper->getFieldData($name, '');
 										// TODO : SubForm rendering
 										$html = '<div class="form-group">';
-											$html .= '<label class="control-label col-sm-2">' . $fieldData->label . '</label>';
-											$html .= '<div class="col-sm-10"> : ' . htmlspecialchars($value, ENT_COMPAT, 'UTF-8') . '</div>';
+											$html .= '<div class="col-sm-10"> ' . htmlspecialchars($value, ENT_COMPAT, 'UTF-8') . '</div>';
 										$html .= '</div>';
 
 										echo  $html;
