@@ -99,9 +99,10 @@ class TjucmModelItems extends JModelList
 
 			if (!empty($this->menuparams))
 			{
+				$this->ucm_type   = $this->menuparams->get('ucm_type');
+
 				if (!empty($this->ucm_type))
 				{
-					$this->ucm_type   = $this->menuparams->get('ucm_type');
 					$ucmType     = 'com_tjucm.' . $this->ucm_type;
 				}
 			}
@@ -141,62 +142,70 @@ class TjucmModelItems extends JModelList
 		$db    = $this->getDbo();
 		$query = $db->getQuery(true);
 
-		$group_concat = 'GROUP_CONCAT(CONCAT_WS("' . $this->fields_separator . '", fields.id, fieldValue.value)';
+		$group_concat = 'GROUP_CONCAT(CONCAT_WS("' . $this->fields_separator . '",
+		' . $db->quoteName('fields.id') . ',' . $db->quoteName('fieldValue.value') . ')';
+
 		$group_concat .= 'SEPARATOR "' . $this->records_separator . '") AS field_values';
 
 		// Select the required fields from the table.
 		$query->select(
 			$this->getState(
-				'list.select', 'DISTINCT a.id, a.state, ' . $group_concat
+				'list.select', 'DISTINCT ' . $db->quoteName('a.id') . ', '
+				. $db->quoteName('a.state') . ', ' . $db->quoteName('a.created_by') . ',' . $group_concat
 			)
 		);
 
-		$query->from('`#__tj_ucm_data` AS a');
+		$query->from($db->quoteName('#__tj_ucm_data', 'a'));
 
 		// Join over the users for the checked out user
-		$query->select("uc.name AS uEditor");
-		$query->join("LEFT", "#__users AS uc ON uc.id=a.checked_out");
+		$query->select($db->quoteName('uc.name', 'uEditor'));
+		$query->join("LEFT",  $db->quoteName('#__users', 'uc') . ' ON (' . $db->quoteName('uc.id') . ' = ' . $db->quoteName('a.checked_out') . ')');
 
 		// Join over the foreign key 'type_id'
-
-		$query->join('INNER', '#__tj_ucm_types AS types ON types.`id` = a.`type_id`');
-		$query->where('(types.state IN (1))');
+		$query->join("INNER", $db->quoteName('#__tj_ucm_types', 'types') .
+		' ON (' . $db->quoteName('types.id') . ' = ' . $db->quoteName('a.type_id') . ')');
+		$query->where('(' . $db->quoteName('types.state') . ' IN (1))');
 
 		// Join over the user field 'created_by'
-		$query->select('`created_by`.name AS `created_by`');
-		$query->join('INNER', '#__users AS `created_by` ON `created_by`.id = a.`created_by`');
+
+		$query->select($db->quoteName('ucby.name', 'created_by_name'));
+		$query->join("INNER",  $db->quoteName('#__users', 'ucby') . ' ON (' . $db->quoteName('ucby.id') .
+		' = ' . $db->quoteName('a.created_by') . ')');
 
 		// Join over the user field 'modified_by'
-		$query->select('`modified_by`.name AS `modified_by`');
-		$query->join('LEFT', '#__users AS `modified_by` ON `modified_by`.id = a.`modified_by`');
+		$query->select($db->quoteName('um.name', 'modified_by_name'));
+		$query->join("LEFT",  $db->quoteName('#__users', 'um') .
+		' ON (' . $db->quoteName('um.id') . ' = ' . $db->quoteName('a.modified_by') . ')');
 
 		// Join over the tjfield
-		$query->join('INNER', '#__tjfields_fields AS fields ON a.client = fields.client');
+		$query->join("INNER",  $db->quoteName('#__tjfields_fields', 'fields') .
+		' ON (' . $db->quoteName('fields.client') . ' = ' . $db->quoteName('a.client') . ')');
 
 		// Join over the tjfield value
-		$query->join('INNER', '#__tjfields_fields_value AS fieldValue ON a.id = fieldValue.content_id');
+		$query->join("INNER",  $db->quoteName('#__tjfields_fields_value', 'fieldValue') .
+		' ON (' . $db->quoteName('fieldValue.content_id') . ' = ' . $db->quoteName('a.id') . ')');
 
-		$this->client = $this->getState('ucm.client');
+		$this->client = $this->getState($db->quoteName('ucm.client'));
 
 		if (!empty($this->client))
 		{
-			$query->where('a.client = ' . $db->quote($db->escape($this->client)));
+			$query->where($db->quoteName('a.client') . ' = ' . $db->quote($db->escape($this->client)));
 		}
 
-		$query->where('fields.id = fieldValue.field_id');
+		$query->where($db->quoteName('fields.id') . ' = ' . $db->quoteName('fieldValue.field_id'));
 
 		$ucmType = $this->getState('ucmType.id', '', 'INT');
 
 		if (!empty($ucmType))
 		{
-			$query->where($db->quoteName('a.type_id') . "=" . (INT) $ucmType);
+			$query->where($db->quoteName('a.type_id') . ' = ' . (INT) $ucmType);
 		}
 
 		$createdBy = $this->getState('created_by', '', 'INT');
 
 		if (!empty($createdBy))
 		{
-			$query->where($db->quoteName('a.created_by') . "=" . (INT) $createdBy);
+			$query->where($db->quoteName('a.created_by') . ' = ' . (INT) $createdBy);
 		}
 
 		$query->where('fields.showonlist =  1');
@@ -206,11 +215,11 @@ class TjucmModelItems extends JModelList
 
 		if (is_numeric($published))
 		{
-			$query->where('a.state = ' . (INT) $published);
+			$query->where($db->quoteName('a.state') . ' = ' . (INT) $published);
 		}
 		elseif ($published === '')
 		{
-			$query->where('(a.state IN (0, 1))');
+			$query->where(($db->quoteName('(a.state) ') . ' IN (0, 1)'));
 		}
 
 		// Filter by search in title
@@ -220,11 +229,11 @@ class TjucmModelItems extends JModelList
 		{
 			if (stripos($search, 'id:') === 0)
 			{
-				$query->where('a.id = ' . (int) substr($search, 3));
+				$query->where($db->quoteName('a.id') . ' = ' . (int) substr($search, 3));
 			}
 			else
 			{
-				$search = $db->Quote('%' . $db->escape($search, true) . '%');
+				$search = $db->quote('%' . $db->escape($search, true) . '%');
 			}
 		}
 

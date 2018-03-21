@@ -37,6 +37,10 @@ if (!class_exists('TjucmFunList'))
 	JLoader::load('TjucmFunList');
 }
 
+JLoader::register('TjucmHelpersTjucm', JPATH_SITE . '/components/com_tjucm/helpers/tjucm.php');
+JLoader::load('TjucmHelpersTjucm');
+TjucmHelpersTjucm::getLanguageConstantForJs();
+
 // Execute the task.
 $controller = JControllerLegacy::getInstance('Tjucm');
 

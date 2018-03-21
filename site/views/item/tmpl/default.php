@@ -10,6 +10,8 @@
 // No direct access
 defined('_JEXEC') or die;
 $user = JFactory::getUser();
+JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
+$TjfieldsHelper = new TjfieldsHelper;
 
 if ($this->form_extra)
 {
@@ -29,45 +31,38 @@ $fieldSets = $this->form_extra->getFieldsets();
 				}
 				elseif ($field->type == 'File')
 				{
-					?>
-					<div class="form-group">
-						<?php
-						if ($field->value)
-						{
-							?>
-							<div class="col-sm-3 control-label">
-								<?php echo $field->label; ?>
-							</div>
-							<div class="col-sm-6 control-label">
-								<a href="<?php echo JUri::root(true) . $field->value ?>" target="_blank" src="<?php echo JUri::root() . $field->value; ?>"><?php echo JText::_("JGLOBAL_PREVIEW");?></a>
-							</div>
-							<?php
-						}
+					if ($field->value)
+					{
 						?>
-					</div>
-				<?php
-				}
-				elseif ($field->type == 'Subform')
-				{
-					?>
-					<div class="form-group">
-						<?php
-						if ($field->value)
-						{
-							?>
-							<div class="col-sm-3 control-label">
-								<?php echo $field->label; ?>
+						<div class="form-group">
+							<?php echo $field->label; ?>
+							<div class="col-sm-10">
+								<?php
+								$tjFieldHelper = new TjfieldsHelper;
+								$mediaLink = $tjFieldHelper->getMediaUrl($field->value);
+								?>
+								<a href="<?php echo $mediaLink;?>"><?php echo JText::_("COM_TJFIELDS_FILE_DOWNLOAD");?></a>
 							</div>
-							<div class="col-sm-6 control-label">
+						</div>
+						<?php
+					}
+				}
+				elseif ($field->type == 'Subform' || $field->type == 'Ucmsubform')
+				{
+					if ($field->value)
+					{
+						?>
+						<div class="form-group">
+							<?php echo $field->label; ?>
+							<div class="col-sm-10">
 							<?php
 								foreach ($field->value as $val)
 								{
-									foreach ($val as $lab => $valu)
+									foreach ($val as $name => $value)
 									{
 										// TODO : SubForm rendering
 										$html = '<div class="form-group">';
-											//$html .= '<div class="col-sm-6 control-label">' . $fieldData->label . '</div>';
-											$html .= '<div class="col-sm-6 control-label"> : ' . htmlspecialchars($valu, ENT_COMPAT, 'UTF-8') . '</div>';
+											$html .= '<div class="col-sm-10"> ' . htmlspecialchars($value, ENT_COMPAT, 'UTF-8') . '</div>';
 										$html .= '</div>';
 
 										echo  $html;
@@ -77,72 +72,59 @@ $fieldSets = $this->form_extra->getFieldsets();
 								}
 							?>
 							</div>
-							<?php
-						} ?>
-					</div>
-					<?php
+						</div>
+						<?php
 					}
-					elseif ($field->type == 'Checkbox')
+				}
+				elseif ($field->type == 'Checkbox')
+				{
+					if ($field->value)
 					{
 						?>
 						<div class="form-group">
+							<?php echo $field->label; ?>
+							<div class="col-sm-10">
 							<?php
-							if ($field->value)
-							{
-								?>
-								<div class="col-sm-3 control-label">
-									<?php echo $field->label; ?>
-								</div>
-								<div class="col-sm-6 control-label">
-								<?php
-									$checked = "";
+								$checked = "";
 
-									if ($field->value = 1)
-									{
-										$checked = ' checked="checked"';
-									}
-									?>
-									<input type="checkbox" disabled="disabled" value="1" <?php echo $checked;?> />
-								</div>
-								<?php
-							}
-							?>
+								if ($field->value = 1)
+								{
+									$checked = ' checked="checked"';
+								}
+								?>
+								<input type="checkbox" disabled="disabled" value="1" <?php echo $checked;?> />
+							</div>
 						</div>
-					<?php
+						<?php
 					}
-					else
+				}
+				else
+				{
+					if ($field->value)
 					{
 						?>
 						<div class="form-group">
-							<?php
-							if ($field->value)
-							{
+							<?php echo $field->label; ?>
+							<div class="col-sm-10 form-control">
+								<?php
+								if (is_array($field->value))
+								{
+									foreach($field->value as $eachFieldValue)
+									{
+										?>
+										<p><?php echo "-" . htmlspecialchars($eachFieldValue, ENT_COMPAT, 'UTF-8'); ?></p>
+										<?php
+									}
+								}
+								else
+								{
+									echo htmlspecialchars($field->value, ENT_COMPAT, 'UTF-8');
+								}
 								?>
-								<div class="col-sm-3 control-label">
-									<?php echo $field->label; ?>
-								</div>
-								<div class="col-sm-6 control-label">
-									<?php
-									if (is_array($field->value))
-									{
-										foreach($field->value as $eachFieldValue)
-										{
-											?>
-											<p><?php echo "-" . htmlspecialchars($eachFieldValue, ENT_COMPAT, 'UTF-8'); ?></p>
-											<?php
-										}
-									}
-									else
-									{
-										echo htmlspecialchars($field->value, ENT_COMPAT, 'UTF-8');
-									}
-									?>
-								</div>
-							<?php
-							}
-							?>
+							</div>
 						</div>
-				<?php
+					<?php
+					}
 				}
 			}
 		?>
@@ -158,7 +140,9 @@ else
 	</div>
 	<?php
 }
-
+?>
+<div class="form-group">
+<?php
 if ($user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId) && $this->item->checked_out == 0)
 {
 	?>
@@ -172,3 +156,5 @@ if ($user->authorise('core.type.deleteitem','com_tjucm.type.' . $this->ucmTypeId
 	<a class="btn" href="<?php echo 'index.php?option=com_tjucm&task=item.remove&id=' . $this->item->id; ?>"><?php echo JText::_("COM_TJUCM_DELETE_ITEM"); ?></a>
 	<?php
 }
+?>
+</div>

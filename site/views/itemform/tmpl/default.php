@@ -21,14 +21,14 @@ $lang->load('com_tjucm', JPATH_SITE);
 $doc = JFactory::getDocument();
 $doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/jquery.form.js');
 $doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/tjucm_ajaxForm_save.js');
-$doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/tjfield.js');
+$doc->addScript(JUri::root() . 'administrator/components/com_tjfields/assets/js/tjfields.js');
 $doc->addScript(JUri::root() . 'media/com_tjucm/js/form.js');
+$doc->addStyleSheet(JUri::root() . 'media/com_tjucm/css/tjucm.css');
 
 $jinput                    = JFactory::getApplication();
 $baseUrl                   = $jinput->input->server->get('REQUEST_URI', '', 'STRING');
 $calledFrom                = (strpos($baseUrl, 'administrator')) ? 'backend' : 'frontend';
 $layout                    = ($calledFrom == 'frontend') ? 'default' : 'edit';
-$client                    = JFactory::getApplication()->input->get('client');
 $is_saved                  = $jinput->input->get("success", '', 'INT');
 $fieldsets_counter_deafult = 0;
 $app                       = JFactory::getApplication();
@@ -85,7 +85,7 @@ $setnavigation             = false;
 					<input type="hidden" name="jform[id]" id="recordId" value="<?php echo JFactory::getApplication()->input->get('id'); ?>" />
 					<input type="hidden" name="jform[ordering]" value="<?php echo $this->item->ordering; ?>" />
 					<input type="hidden" name="jform[state]" value="<?php echo $this->item->state;?>" />
-					<input type="hidden" name="jform[client]" value="<?php echo $client;?>" />
+					<input type="hidden" name="jform[client]" value="<?php echo $this->client;?>" />
 					<input type="hidden" name="jform[checked_out]" value="<?php echo $this->item->checked_out; ?>" />
 					<input type="hidden" name="jform[checked_out_time]" value="<?php echo $this->item->checked_out_time; ?>" />
 					<?php echo $this->form->renderField('created_by'); ?>

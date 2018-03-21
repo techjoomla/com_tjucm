@@ -62,4 +62,17 @@ class TjucmHelpersTjucm
 
 		return explode(',', $db->loadResult());
 	}
+
+	/**
+	 * This define the lanugage contant which you have use in js file.
+	 *
+	 * @since   1.0
+	 * @return   null
+	 */
+	public static function getLanguageConstantForJs()
+	{
+		JText::script('COM_TJUCM_ITEMFORM_ALERT', true);
+		JText::script('COM_TJUCM_FIELDS_VALIDATION_ERROR_DATE', true);
+		JText::script('COM_TJUCM_FIELDS_VALIDATION_ERROR_NUMBER', true);
+	}
 }

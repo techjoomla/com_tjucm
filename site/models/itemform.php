@@ -87,6 +87,25 @@ class TjucmModelItemForm extends JModelForm
 		// Get UCM type id from uniquue identifier
 		$ucmType = $app->input->get('client', '');
 
+		if (empty($ucmType))
+		{
+			// Get the active item
+			$menuitem   = $app->getMenu()->getActive();
+
+			// Get the params
+			$this->menuparams = $menuitem->params;
+
+			if (!empty($this->menuparams))
+			{
+				$this->ucm_type   = $this->menuparams->get('ucm_type');
+
+				if (!empty($this->ucm_type))
+				{
+					$ucmType     = 'com_tjucm.' . $this->ucm_type;
+				}
+			}
+		}
+
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
 		$ucmId = $tjUcmModelType->getTypeId($ucmType);
@@ -196,7 +215,6 @@ class TjucmModelItemForm extends JModelForm
 		{
 			return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
 		}
-
 		return $this->item;
 	}
 
@@ -454,7 +472,10 @@ class TjucmModelItemForm extends JModelForm
 				$data_extra['fieldsvalue'] = $extra_jform_data;
 
 				// Save extra fields data.
-				$this->saveExtraFields($data_extra);
+				if(!$this->saveExtraFields($data_extra))
+				{
+					return false;
+				}
 			}
 
 			return $table->id;
