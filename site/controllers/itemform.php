@@ -288,6 +288,10 @@ class TjucmControllerItemForm extends JControllerForm
 		// Jform tweaking - get data for extra fields jform.
 		$extra_jform_data = array_diff_key($all_jform_data, $validData);
 
+		$dispatcher        = JDispatcher::getInstance();
+		JPluginHelper::importPlugin("system");
+		$onBeforeTjucmSave = $dispatcher->trigger('onBeforeTjucmSave');
+
 		// Check if form file is present.
 		jimport('joomla.filesystem.file');
 		/* Explode client 1. Componet name 2.type */
@@ -391,7 +395,6 @@ class TjucmControllerItemForm extends JControllerForm
 			}
 
 			$recordId = $model->save($validData, $extra_jform_data, $post);
-			$dispatcher        = JDispatcher::getInstance();
 			JPluginHelper::importPlugin("system", "jlike_tjucm");
 			$dispatcher->trigger('jlike_tjucmOnAfterSave', array($recordId,$validData));
 			$response = $recordId;
