@@ -10,7 +10,7 @@
 // No direct access
 defined('_JEXEC') or die;
 $user = JFactory::getUser();
-require_once JPATH_SITE . '/components/com_tjfields/helpers/tjfields.php';
+JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
 $TjfieldsHelper = new TjfieldsHelper;
 
 if ($this->form_extra)
