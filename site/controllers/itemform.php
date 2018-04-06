@@ -203,9 +203,10 @@ class TjucmControllerItemForm extends JControllerForm
 
 		// Get the user data.
 		$data = $app->input->get('jform', array(), 'array');
+
 		$all_jform_data = $data;
 
-		// get file information
+		// Get file information
 		$files = $app->input->files->get('jform');
 
 		// Jform tweak - Get all posted data.

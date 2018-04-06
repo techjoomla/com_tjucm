@@ -7,6 +7,7 @@ function steppedFormSave(form_id, status)
 	jQuery('#form_status').val(status);
 
 	if ('save' == status) {
+
 		if(confirm(Joomla.JText._('COM_TJUCM_ITEMFORM_ALERT')) == true)
 		{
 			if (!document.formvalidator.isValid('#item-form'))
