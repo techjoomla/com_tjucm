@@ -24,10 +24,16 @@ $doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/tju
 $doc->addScript(JUri::root() . 'administrator/components/com_tjfields/assets/js/tjfields.js');
 $doc->addScript(JUri::root() . 'media/com_tjucm/js/form.js');
 
-// Script to show alert box if form changes are made and user is closing the tab or refreshing the tab without saving the content
+/*
+ * Script to show alert box if form changes are made and user is closing the tab or refreshing the tab
+ * without saving the content
+ */
 $doc->addScript(JUri::root() . 'administrator/components/com_tjfields/assets/js/jquery.are-you-sure.js');
 
-// Script to show alert box if form changes are made and user is closing the tab or refreshing the tab without saving the content on iphone|ipad|ipod|opera
+/*
+ * Script to show alert box if form changes are made and user is closing the tab or refreshing the tab
+ * without saving the content on iphone|ipad|ipod|opera
+ */
 $doc->addScript(JUri::root() . 'administrator/components/com_tjfields/assets/js/ays-beforeunload-shim.js');
 $doc->addStyleSheet(JUri::root() . 'media/com_tjucm/css/tjucm.css');
 
@@ -159,13 +165,6 @@ enctype="multipart/form-data" name="adminForm" id="item-form" class="form-valida
 				<input type="button" class="btn btn-success" value="<?php echo JText::_("COM_TJUCM_SAVE_ITEM"); ?>"
 				id="finalSave" onclick="steppedFormSave(this.form.id, 'save');" />
 				<?php
-				if (!empty($this->allow_draft_save))
-				{
-					?>
-					<input type="button" class="btn btn-success" value="<?php echo JText::_("COM_TJUCM_SAVE_AS_DRAFT_ITEM"); ?>"
-					onclick="steppedFormSave(this.form.id, 'draft');" />
-					<?php
-				}
 			}
 			?>
 		</div>
