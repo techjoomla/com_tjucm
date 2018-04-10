@@ -459,8 +459,6 @@ class TjucmModelItemForm extends JModelForm
 
 		if ($table->save($data) === true)
 		{
-			$id = (int) $this->getState($this->getName() . '.id');
-
 			if (!empty($extra_jform_data))
 			{
 				$data_extra = array();
