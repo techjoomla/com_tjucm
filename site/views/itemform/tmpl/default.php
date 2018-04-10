@@ -24,20 +24,8 @@ $doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/tju
 $doc->addScript(JUri::root() . 'administrator/components/com_tjfields/assets/js/tjfields.js');
 $doc->addScript(JUri::root() . 'media/com_tjucm/js/form.js');
 
-/*
- * Script to show alert box if form changes are made and user is closing the tab or refreshing the tab
- * without saving the content
- */
-$doc->addScript(JUri::root() . 'administrator/components/com_tjfields/assets/js/jquery.are-you-sure.js');
-
-/*
- * Script to show alert box if form changes are made and user is closing the tab or refreshing the tab
- * without saving the content on iphone|ipad|ipod|opera
- */
-$doc->addScript(JUri::root() . 'administrator/components/com_tjfields/assets/js/ays-beforeunload-shim.js');
-$doc->addStyleSheet(JUri::root() . 'media/com_tjucm/css/tjucm.css');
-
 $jinput                    = JFactory::getApplication();
+$editRecordId              = $jinput->input->get("id", '', 'INT');
 $baseUrl                   = $jinput->input->server->get('REQUEST_URI', '', 'STRING');
 $calledFrom                = (strpos($baseUrl, 'administrator')) ? 'backend' : 'frontend';
 $layout                    = ($calledFrom == 'frontend') ? 'default' : 'edit';
@@ -46,8 +34,37 @@ $fieldsets_counter_deafult = 0;
 $app                       = JFactory::getApplication();
 $menu                      = $app->getMenu();
 $setnavigation             = false;
+
+if ($editRecordId)
+{
+	/*
+	 * Script to show alert box if form changes are made and user is closing the tab or refreshing the tab
+	 * without saving the content
+	 */
+	$doc->addScript(JUri::root() . 'administrator/components/com_tjfields/assets/js/jquery.are-you-sure.js');
+
+	/*
+	 * Script to show alert box if form changes are made and user is closing the tab or refreshing the tab
+	 * without saving the content on iphone|ipad|ipod|opera
+	 */
+	$doc->addScript(JUri::root() . 'administrator/components/com_tjfields/assets/js/ays-beforeunload-shim.js');
+	$doc->addStyleSheet(JUri::root() . 'media/com_tjucm/css/tjucm.css');
+}
 ?>
 <script type="text/javascript">
+
+	/* Code to show alert box if form changes are made and user is closing the tab or refreshing the tab
+	 * without saving the content
+	 */
+	var editRecordId = '<?php echo $editRecordId; ?>';
+
+	if (editRecordId)
+	{
+		jQuery(function() {
+			jQuery('#item-form').areYouSure();
+		});
+	}
+
 
 	jQuery(window).load(function ()
 	{

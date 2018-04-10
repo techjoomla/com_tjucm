@@ -10,9 +10,12 @@ function steppedFormSave(form_id, status)
 
 		if(confirm(Joomla.JText._('COM_TJUCM_ITEMFORM_ALERT')) == true)
 		{
+			/* code to remove the class added by are-you-sure alert box */
+			jQuery('#item-form').removeClass('dirty');
+
 			if (!document.formvalidator.isValid('#item-form'))
 			{
-					return false;
+				return false;
 			}
 		}
 		else
