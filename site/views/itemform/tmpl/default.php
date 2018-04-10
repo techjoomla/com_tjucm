@@ -142,10 +142,6 @@ enctype="multipart/form-data" name="adminForm" id="item-form" class="form-valida
 				</div>
 			</div>
 		</div>
-		<div id="draft_msg" class="alert alert-success" style="display: none;">
-			<a class="close" data-dismiss="alert">×</a>
-			<?php echo JText::_("COM_TJUCM_MSG_ON_DRAFT_FORM"); ?>
-		</div>
 		<div class="form-actions">
 			<?php
 			// Show next previous buttons only when there are mulitple tabs/groups present under that field type

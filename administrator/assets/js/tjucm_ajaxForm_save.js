@@ -48,8 +48,6 @@ function steppedFormSave(form_id, status)
 					{
 						jQuery("#recordId").val(returnedData.data);
 						promise = true;
-						jQuery("#draft_msg").show();
-						setTimeout(function() { jQuery("#draft_msg").hide(); }, 5000);
 					}
 				}
 				else
