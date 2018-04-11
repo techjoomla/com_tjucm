@@ -57,38 +57,40 @@ if ($this->form_extra)
 				if (!$field->hidden)
 				{
 					?>
-					<div class="form-group">
-						<div class="col-sm-3 control-label">
-							<?php echo $field->label; ?>
-						</div>
-						<div class="col-sm-6 control-label">
-							<?php echo $field->input; ?>
-						</div>
-						<?php
+					<div class="col-xs-12 col-md-6">
+						<div class="form-group">
+							<div class="col-sm-4 control-label">
+								<?php echo $field->label; ?>
+							</div>
+							<div class="col-sm-8">
+								<?php echo $field->input; ?>
+							</div>
+							<?php
 
-						// TODO :- Check and remove
-						if ($field->type == 'File')
-						{
-							?>
-							<script type="text/javascript">
-								jQuery(document).ready(function ()
-								{
-									var fieldValue = "<?php echo $field->value; ?>";
-									var AttrRequired = jQuery('#<?php echo $field->id;?>').attr('required');
-
-									if (typeof AttrRequired !== typeof undefined && AttrRequired !== false)
+							// TODO :- Check and remove
+							if ($field->type == 'File')
+							{
+								?>
+								<script type="text/javascript">
+									jQuery(document).ready(function ()
 									{
-										if (fieldValue)
+										var fieldValue = "<?php echo $field->value; ?>";
+										var AttrRequired = jQuery('#<?php echo $field->id;?>').attr('required');
+
+										if (typeof AttrRequired !== typeof undefined && AttrRequired !== false)
 										{
-											jQuery('#<?php echo $field->id;?>').removeAttr("required");
-											jQuery('#<?php echo $field->id;?>').removeClass("required");
+											if (fieldValue)
+											{
+												jQuery('#<?php echo $field->id;?>').removeAttr("required");
+												jQuery('#<?php echo $field->id;?>').removeClass("required");
+											}
 										}
-									}
-								});
-							</script>
-						<?php
-						}
-						?>
+									});
+								</script>
+							<?php
+							}
+							?>
+						</div>
 					</div>
 				<?php
 				}

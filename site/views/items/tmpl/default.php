@@ -128,11 +128,11 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 								<?php
 								if ($item->state == 1)
 								{
-									?><i class="icon-publish"></i><?php
+									?><i class="fa fa-check"></i><?php
 								}
 								else
 								{
-									?><i class="icon-unpublish"></i><?php
+									?><i class="fa fa-cross"></i><?php
 								}
 								?>
 								</a>

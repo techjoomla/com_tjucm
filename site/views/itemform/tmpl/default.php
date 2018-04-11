@@ -148,7 +148,7 @@ $setnavigation             = false;
 				if (!empty($this->allow_draft_save))
 				{
 					?>
-					<input type="button" class="btn btn-success" value="<?php echo JText::_("COM_TJUCM_SAVE_AS_DRAFT_ITEM"); ?>" onclick="steppedFormSave(this.form.id, 'draft');" />
+					<input type="button" class="btn btn-secondary" value="<?php echo JText::_("COM_TJUCM_SAVE_AS_DRAFT_ITEM"); ?>" onclick="steppedFormSave(this.form.id, 'draft');" />
 					<?php
 				}
 			}
