@@ -3,7 +3,7 @@
  * @version    SVN: <svn_id>
  * @package    Com_Tjucm
  * @author     Techjoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @copyright  Copyright (c) 2009-2018 TechJoomla. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -128,11 +128,11 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 								<?php
 								if ($item->state == 1)
 								{
-									?><i class="icon-publish"></i><?php
+									?><i class="fa fa-check"></i><?php
 								}
 								else
 								{
-									?><i class="icon-unpublish"></i><?php
+									?><i class="fa fa-cross"></i><?php
 								}
 								?>
 								</a>
@@ -210,7 +210,7 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 	if ($this->allowedToAdd)
 	{
 		?>
-		<a target="_blank" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit&id=0' . $appendUrl, false, 2); ?>" class="btn btn-success btn-small">
+		<a target="_blank" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false, 2); ?>" class="btn btn-success btn-small">
 			<i class="icon-plus"></i><?php echo JText::_('COM_TJUCM_ADD_ITEM'); ?>
 		</a>
 		<?php

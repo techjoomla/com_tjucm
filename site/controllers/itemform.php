@@ -3,7 +3,7 @@
  * @version    SVN: <svn_id>
  * @package    Com_Tjucm
  * @author     Techjoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @copyright  Copyright (c) 2009-2018 TechJoomla. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -160,9 +160,12 @@ class TjucmControllerItemForm extends JControllerForm
 		// Get the model.
 		$model = $this->getModel('ItemForm', 'TjucmModel');
 
+		$recordId = '';
+
 		// Check out the item
 		if ($editId)
 		{
+			$recordId = '&id=' . $editId;
 			$model->checkout($editId);
 		}
 
@@ -173,7 +176,7 @@ class TjucmControllerItemForm extends JControllerForm
 		}
 
 		// Redirect to the edit screen.
-		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&client=' . $this->client . '&id=' . $editId, false));
+		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&client=' . $this->client . $recordId, false));
 	}
 
 	/**

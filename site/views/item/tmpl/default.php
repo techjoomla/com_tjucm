@@ -146,14 +146,14 @@ else
 if ($user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId) && $this->item->checked_out == 0)
 {
 	?>
-	<a class="btn" href="<?php echo 'index.php?option=com_tjucm&task=item.edit&id=' . $this->item->id . '&client=' . $this->client; ?>"><?php echo JText::_("COM_TJUCM_EDIT_ITEM"); ?></a>
+	<a class="btn btn-default" href="<?php echo 'index.php?option=com_tjucm&task=item.edit&id=' . $this->item->id . '&client=' . $this->client; ?>"><?php echo JText::_("COM_TJUCM_EDIT_ITEM"); ?></a>
 	<?php
 }
 
 if ($user->authorise('core.type.deleteitem','com_tjucm.type.' . $this->ucmTypeId))
 {
 	?>
-	<a class="btn" href="<?php echo 'index.php?option=com_tjucm&task=item.remove&id=' . $this->item->id; ?>"><?php echo JText::_("COM_TJUCM_DELETE_ITEM"); ?></a>
+	<a class="btn btn-default" href="<?php echo 'index.php?option=com_tjucm&task=item.remove&id=' . $this->item->id; ?>"><?php echo JText::_("COM_TJUCM_DELETE_ITEM"); ?></a>
 	<?php
 }
 ?>
