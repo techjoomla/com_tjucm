@@ -215,6 +215,7 @@ class TjucmModelItemForm extends JModelForm
 		{
 			return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
 		}
+
 		return $this->item;
 	}
 
@@ -411,7 +412,7 @@ class TjucmModelItemForm extends JModelForm
 	public function save($data, $extra_jform_data = '', $post = '')
 	{
 		$app = JFactory::getApplication();
-		$id    = (!empty($data['id'])) ? $data['id'] : (int) $this->getState('item.id');
+		$id    = (!empty($data['id'])) ? (int) $data['id'] : (int) $this->getState('item.id');
 		$state = (!empty($data['state'])) ? 1 : 0;
 		$user  = JFactory::getUser();
 		$status_title = $app->input->get('form_status');
@@ -472,7 +473,7 @@ class TjucmModelItemForm extends JModelForm
 				$data_extra['fieldsvalue'] = $extra_jform_data;
 
 				// Save extra fields data.
-				if(!$this->saveExtraFields($data_extra))
+				if (!$this->saveExtraFields($data_extra))
 				{
 					return false;
 				}
