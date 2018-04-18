@@ -204,7 +204,7 @@ class TjucmControllerItemForm extends JControllerForm
 		// Get the user data.
 		$data = $app->input->get('jform', array(), 'array');
 
-		$data['id'] = (!empty($data['id'])) ? (int) $data['id'] : 0;
+		$data['id'] = empty($data['id']) ? 0 : (int) $data['id'];
 
 		$all_jform_data = $data;
 
