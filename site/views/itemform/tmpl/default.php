@@ -23,48 +23,40 @@ $doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/jqu
 $doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/tjucm_ajaxForm_save.js');
 $doc->addScript(JUri::root() . 'administrator/components/com_tjfields/assets/js/tjfields.js');
 $doc->addScript(JUri::root() . 'media/com_tjucm/js/form.js');
+$doc->addStyleSheet(JUri::root() . 'media/com_tjucm/css/tjucm.css');
+/*
+ * Script to show alert box if form changes are made and user is closing/refreshing/navigating the tab
+ * without saving the content
+ */
+$doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/jquery.are-you-sure.js');
+
+/*
+ * Script to show alert box if form changes are made and user is closing/refreshing/navigating the tab
+ * without saving the content on iphone|ipad|ipod|opera
+ */
+$doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/ays-beforeunload-shim.js');
 
 $jinput                    = JFactory::getApplication();
+//echo "<pre>"; print_r($jinput->input); echo "</pre>"; die();
 $editRecordId              = $jinput->input->get("id", '', 'INT');
 $baseUrl                   = $jinput->input->server->get('REQUEST_URI', '', 'STRING');
 $calledFrom                = (strpos($baseUrl, 'administrator')) ? 'backend' : 'frontend';
 $layout                    = ($calledFrom == 'frontend') ? 'default' : 'edit';
 $is_saved                  = $jinput->input->get("success", '', 'INT');
 $fieldsets_counter_deafult = 0;
-$app                       = JFactory::getApplication();
-$menu                      = $app->getMenu();
+$menu                      = $jinput->getMenu();
 $setnavigation             = false;
+$itemState                 = $this->item->state;
 
-if ($editRecordId)
-{
-	/*
-	 * Script to show alert box if form changes are made and user is closing the tab or refreshing the tab
-	 * without saving the content
-	 */
-	$doc->addScript(JUri::root() . 'administrator/components/com_tjfields/assets/js/jquery.are-you-sure.js');
-
-	/*
-	 * Script to show alert box if form changes are made and user is closing the tab or refreshing the tab
-	 * without saving the content on iphone|ipad|ipod|opera
-	 */
-	$doc->addScript(JUri::root() . 'administrator/components/com_tjfields/assets/js/ays-beforeunload-shim.js');
-	$doc->addStyleSheet(JUri::root() . 'media/com_tjucm/css/tjucm.css');
-}
 ?>
 <script type="text/javascript">
 
-	/* Code to show alert box if form changes are made and user is closing the tab or refreshing the tab
+	/* Code to show alert box if form changes are made and user is closing/refreshing/navigating the tab
 	 * without saving the content
 	 */
-	var editRecordId = '<?php echo $editRecordId; ?>';
-
-	if (editRecordId)
-	{
-		jQuery(function() {
-			jQuery('#item-form').areYouSure();
-		});
-	}
-
+	jQuery(function() {
+		jQuery('#item-form').areYouSure();
+	});
 
 	jQuery(window).load(function ()
 	{
@@ -106,8 +98,8 @@ enctype="multipart/form-data" name="adminForm" id="item-form" class="form-valida
 			</div>
 		</div>
 		<?php
-	}?>
-
+	}
+	?>
 	<div>
 		<div class="row-fluid">
 			<div class="span10 form-horizontal">
@@ -118,6 +110,7 @@ enctype="multipart/form-data" name="adminForm" id="item-form" class="form-valida
 					<input type="hidden" name="jform[client]" value="<?php echo $this->client;?>" />
 					<input type="hidden" name="jform[checked_out]" value="<?php echo $this->item->checked_out; ?>" />
 					<input type="hidden" name="jform[checked_out_time]" value="<?php echo $this->item->checked_out_time; ?>" />
+					<input type="hidden" name="itemState" id="itemState" value="<?php echo $this->item->state; ?>"/>
 					<?php echo $this->form->renderField('created_by'); ?>
 					<?php echo $this->form->renderField('created_date'); ?>
 					<?php echo $this->form->renderField('modified_by'); ?>
@@ -125,15 +118,15 @@ enctype="multipart/form-data" name="adminForm" id="item-form" class="form-valida
 				</fieldset>
 			</div>
 		</div>
-
 		<?php
 		if ($this->form_extra)
 		{
 			// Code to display the form
 			echo $this->loadTemplate('extrafields');
 		}
+		if (!$is_saved)
+		{
 		?>
-
 		<div class="alert alert-success" style="display: block;">
 			<a class="close" data-dismiss="alert">×</a>
 			<div class="msg">
@@ -142,6 +135,9 @@ enctype="multipart/form-data" name="adminForm" id="item-form" class="form-valida
 				</div>
 			</div>
 		</div>
+		<?php
+		}
+		?>
 		<div class="form-actions">
 			<?php
 			// Show next previous buttons only when there are mulitple tabs/groups present under that field type

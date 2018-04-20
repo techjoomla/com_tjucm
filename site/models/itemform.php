@@ -72,12 +72,8 @@ class TjucmModelItemForm extends JModelForm
 		$app = JFactory::getApplication('com_tjucm');
 		$user = JFactory::getUser();
 
-		// Load state from the request userState on edit or from the passed variable on default
-		if (JFactory::getApplication()->input->get('layout') == 'edit')
-		{
-			// Load state from the request.
-			$id = $app->input->getInt('id');
-		}
+		// Load state from the request.
+		$id = $app->input->getInt('id');
 
 		if (!empty($id))
 		{
