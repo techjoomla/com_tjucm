@@ -124,8 +124,9 @@ function deleteTjFile(filePath, fieldId)
 				complete: function(result) {
 					var response = JSON.parse(result.responseText);
 					if (response == '1') {
-						jQuery("input[tj-file-type='" + fieldId + "']").val('');
-						jQuery("#" + filePath).remove();
+						var element = jQuery("input[tj-file-type='" + fieldId + "']");
+						element.val('');
+						element.next().remove('div.control-group');
 					}
 				}
 			});
