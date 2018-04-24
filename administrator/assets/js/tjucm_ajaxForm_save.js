@@ -1,3 +1,6 @@
+/**
+ * global: site_root
+*/
 
 /* This function carries stepped saving via ajax */
 function steppedFormSave(form_id, status)

@@ -763,13 +763,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 		$isAjax = ($isAjaxRequest == 'XMLHttpRequest') ? true : false;
 
-		$tjfieldsHelperPath = JPATH_SITE . '/components/com_tjfields/helpers/tjfields.php';
-
-		if (!class_exists('TjfieldsHelper'))
-		{
-			JLoader::register('TjfieldsHelper', $tjfieldsHelperPath);
-			JLoader::load('TjfieldsHelper');
-		}
+		require_once JPATH_SITE . '/components/com_tjfields/helpers/tjfields.php';
 
 		$tjFieldsHelper = new TjfieldsHelper;
 
