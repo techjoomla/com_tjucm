@@ -103,7 +103,7 @@ function deleteTjFile(filePath, fieldId)
 {
 	if (filePath)
 	{
-		if(confirm(Joomla.JText._('COM_TJFIELDS_FILE_DELETE_CONFIRM')))
+		if(confirm(Joomla.JText._('COM_TJUCM_FILE_DELETE_CONFIRM')))
 		{
 			jQuery.ajax({
 				url: site_root + "index.php?option=com_tjucm&task=itemform.tjFileDelete",
@@ -115,10 +115,10 @@ function deleteTjFile(filePath, fieldId)
 				async:true,
 				success: function (result) {
 					if (result == '1') {
-						alert(Joomla.JText._('COM_TJFIELDS_FILE_DELETE_SUCCESS'));
+						alert(Joomla.JText._('COM_TJUCM_FILE_DELETE_SUCCESS'));
 					}
 					else {
-						alert(Joomla.JText._('COM_TJFIELDS_FILE_DELETE_ERROR'));
+						alert(Joomla.JText._('COM_TJUCM_FILE_DELETE_ERROR'));
 					}
 				},
 				complete: function(result) {
