@@ -742,4 +742,50 @@ class TjucmControllerItemForm extends JControllerForm
 			return false;
 		}
 	}
+
+	/**
+	 * Delete File .
+	 *
+	 * @return boolean|string
+	 *
+	 * @since	1.6
+	 */
+	public function tjFileDelete()
+	{
+		$app = JFactory::getApplication();
+
+		$jinput = $app->input;
+
+		// Here, fpht means file encoded path
+		$filePath = $jinput->get('filePath', '', 'STRING');
+
+		$isAjaxRequest = $app->input->server->getString('HTTP_X_REQUESTED_WITH', '');
+
+		$isAjax = ($isAjaxRequest == 'XMLHttpRequest') ? true : false;
+
+		$tjfieldsHelperPath = JPATH_SITE . '/components/com_tjfields/helpers/tjfields.php';
+
+		if (!class_exists('TjfieldsHelper'))
+		{
+			JLoader::register('TjfieldsHelper', $tjfieldsHelperPath);
+			JLoader::load('TjfieldsHelper');
+		}
+
+		$tjFieldsHelper = new TjfieldsHelper;
+
+		$filePath = base64_decode($filePath);
+
+		$returnValue = $tjFieldsHelper->tjFileDelete($filePath);
+
+		if ($isAjax)
+		{
+			echo (string) $returnValue;
+
+			jexit();
+		}
+		else
+		{
+			return $returnValue;
+		}
+	}
 }

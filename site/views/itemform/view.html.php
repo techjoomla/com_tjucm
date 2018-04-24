@@ -153,6 +153,10 @@ class TjucmViewItemform extends JViewLegacy
 
 		$this->_prepareDocument();
 
+		JText::script('COM_TJFIELDS_FILE_DELETE_SUCCESS');
+		JText::script('COM_TJFIELDS_FILE_DELETE_ERROR');
+		JText::script('COM_TJFIELDS_FILE_DELETE_CONFIRM');
+
 		parent::display($tpl);
 	}
 
