@@ -452,7 +452,10 @@ class TjucmModelItemForm extends JModelForm
 
 		$table = $this->getTable();
 
-		$data['state'] = ($status_title == 'draft' ? 0 : 1);
+		if ($id == 0)
+		{
+			$data['state'] = 0;
+		}
 
 		if ($table->save($data) === true)
 		{
