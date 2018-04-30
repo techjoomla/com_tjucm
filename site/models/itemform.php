@@ -408,8 +408,6 @@ class TjucmModelItemForm extends JModelForm
 	public function save($data, $extra_jform_data = '', $post = '')
 	{
 		$app = JFactory::getApplication();
-		$id    = (!empty($data['id'])) ? (int) $data['id'] : (int) $this->getState('item.id');
-		$state = (!empty($data['state'])) ? 1 : 0;
 		$user  = JFactory::getUser();
 		$status_title = $app->input->get('form_status');
 
@@ -452,9 +450,13 @@ class TjucmModelItemForm extends JModelForm
 
 		$table = $this->getTable();
 
-		if ($id == 0)
+		if ($status_title === 'draft')
 		{
 			$data['state'] = 0;
+		}
+		else
+		{
+			$data['state'] = 1;
 		}
 
 		if ($table->save($data) === true)
