@@ -14,11 +14,13 @@ JHtml::_('behavior.keepalive');
 JHtml::_('behavior.tooltip');
 JHtml::_('behavior.formvalidation');
 JHtml::_('formbehavior.chosen', 'select');
+JHtml::_('jquery.token');
 
 // Load admin language file
 $lang = JFactory::getLanguage();
 $lang->load('com_tjucm', JPATH_SITE);
 $doc = JFactory::getDocument();
+$doc->addScriptDeclaration('const site_root = "' . JUri::root() . '"');
 $doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/jquery.form.js');
 $doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/tjucm_ajaxForm_save.js');
 $doc->addScript(JUri::root() . 'administrator/components/com_tjfields/assets/js/tjfields.js');
@@ -62,7 +64,7 @@ $setnavigation             = false;
 	}
 </script>
 
-<form action="<?php echo JRoute::_('index.php'); ?>" method="post" enctype="multipart/form-data" name="adminForm" id="item-form" class="form-validate">
+<form action="<?php echo JRoute::_('index.php');?>" method="post" enctype="multipart/form-data" name="adminForm" id="item-form" class="form-validate">
 	<?php
 	if ($is_saved)
 	{
@@ -71,7 +73,7 @@ $setnavigation             = false;
 			<a class="close" data-dismiss="alert">×</a>
 			<div class="msg">
 				<?php
-					echo JText::sprintf( 'COM_TJUCM_MSG_ON_SAVED_FORM');
+					echo JText::sprintf('COM_TJUCM_MSG_ON_SAVED_FORM');
 				?>
 			</div>
 		</div>
@@ -134,8 +136,8 @@ $setnavigation             = false;
 				if (!empty($this->allow_draft_save))
 				{
 				?>
-					<button type="button" class="btn btn-primary" id="previous_button" onclick="itemformactions('tjucm_myTab','prev')"><?php echo JText::_('COM_TJUCM_PREVIOUS_BUTTON'); ?><i class="icon-arrow-right-2"></i></button>
-					<button type="button" class="btn btn-primary" id="next_button" onclick="itemformactions('tjucm_myTab','next')"><?php echo JText::_('COM_TJUCM_NEXT_BUTTON'); ?><i class="icon-arrow-right-2"></i></button>
+				<button type="button" class="btn btn-primary" id="previous_button" onclick="itemformactions('tjucm_myTab','prev')"><?php echo JText::_('COM_TJUCM_PREVIOUS_BUTTON'); ?><i class="icon-arrow-right-2"></i></button>
+				<button type="button" class="btn btn-primary" id="next_button" onclick="itemformactions('tjucm_myTab','next')"><?php echo JText::_('COM_TJUCM_NEXT_BUTTON'); ?><i class="icon-arrow-right-2"></i></button>
 				<?php
 				}
 			}
