@@ -10,7 +10,7 @@
                 fieldSelector: ":input:not(input[type=submit]):not(input[type=button])"
             }, i),
             n = function(i) {
-                if (i.hasClass("ays-ignore") || i.hasClass("aysIgnore") || i.attr("data-ays-ignore") || void 0 === i.attr("name")) {
+                if (i.hasClass("ays-ignore") || i.hasClass("aysIgnore") || i.attr("data-ays-ignore") || undefined=== i.attr("name")) {
                    return null;
                 }
                 if (i.is(":disabled")) {
@@ -39,7 +39,7 @@
             r = function(i) {
                 var a = function(e) {
                         var i = e.data("ays-orig");
-                        return void 0 !== i && n(e) != i
+                        return undefined !== i && n(e) != i
                     },
                     r = e(this).is("form") ? e(this) : e(this).parents("form");
                 if (a(e(i.target))) {
@@ -47,10 +47,11 @@
                 }
                 else {
                     var s = r.find(t.fieldSelector);
-                    if (t.addRemoveFieldsMarksDirty)
+                    if (t.addRemoveFieldsMarksDirty){
                         if (r.data("ays-orig-field-count") != s.length) {
                              return void o(r, !0);
                         }
+                    }
                     var d = !1;
                     s.each(function() {
                         var i = e(this);
