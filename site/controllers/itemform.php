@@ -759,9 +759,9 @@ class TjucmControllerItemForm extends JControllerForm
 		$jinput = $app->input;
 
 		// Here, fpht means file encoded path
-		$filePath = $jinput->get('filePath', '', 'STRING');
+		$filePath = $jinput->get('filePath', '', 'BASE64');
 
-		$isAjaxRequest = $app->input->server->getString('HTTP_X_REQUESTED_WITH', '');
+		$isAjaxRequest = $jinput->server->getString('HTTP_X_REQUESTED_WITH', '');
 
 		$isAjax = ($isAjaxRequest == 'XMLHttpRequest') ? true : false;
 
