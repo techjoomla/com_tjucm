@@ -44,7 +44,6 @@ $calledFrom                = (strpos($baseUrl, 'administrator')) ? 'backend' : '
 $layout                    = ($calledFrom == 'frontend') ? 'default' : 'edit';
 $is_saved                  = $jinput->input->get("success", '', 'INT');
 $fieldsets_counter_deafult = 0;
-$menu                      = $jinput->getMenu();
 $setnavigation             = false;
 $itemState                 = $this->item->state;
 
@@ -86,6 +85,19 @@ $itemState                 = $this->item->state;
 <form action="<?php echo JRoute::_('index.php'); ?>" method="post"
 enctype="multipart/form-data" name="adminForm" id="item-form" class="form-validate">
 	<?php
+	if ($itemState === '1')
+	{
+	?>
+	<div class="alert alert-success" style="display: block;">
+		<a class="close" data-dismiss="alert">×</a>
+		<div class="msg">
+			<div>
+			<?php echo JText::_("COM_TJUCM_MSG_FOR_AUTOSAVE_FEATURE_DISABLED"); ?>
+			</div>
+		</div>
+	</div>
+	<?php
+	}
 	if ($is_saved)
 	{
 		?>

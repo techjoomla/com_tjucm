@@ -153,7 +153,9 @@ class TjucmControllerItemForm extends JControllerForm
 		// Get the previous edit id (if any) and the current edit id.
 		$previousId = (int) $app->getUserState('com_tjucm.edit.item.id');
 		$editId     = $app->input->getInt('id', 0);
-		$itemid     = $app->input->getInt('Itemid', 0);
+		$menu = $app->getMenu();
+		$menuItemObj = $menu->getItems('link', 'index.php?option=com_tjucm&view=items', true);
+		$itemId     = $menuItemObj->id;
 
 		// Set the user id for the user to edit in the session.
 		$app->setUserState('com_tjucm.edit.item.id', $editId);
@@ -177,7 +179,7 @@ class TjucmControllerItemForm extends JControllerForm
 		}
 
 		// Redirect to the edit screen.
-		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&client=' . $this->client . $recordId . '&Itemid=' . $itemid, false));
+		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&client=' . $this->client . $recordId . '&Itemid=' . $itemId, false));
 	}
 
 	/**
