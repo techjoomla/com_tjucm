@@ -20,7 +20,6 @@ JHtml::_('jquery.token');
 $lang = JFactory::getLanguage();
 $lang->load('com_tjucm', JPATH_SITE);
 $doc = JFactory::getDocument();
-$doc->addScriptDeclaration('const site_root = "' . JUri::root() . '"');
 $doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/jquery.form.js');
 $doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/tjucm_ajaxForm_save.js');
 $doc->addScript(JUri::root() . 'administrator/components/com_tjfields/assets/js/tjfields.js');

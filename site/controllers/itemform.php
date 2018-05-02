@@ -775,8 +775,14 @@ class TjucmControllerItemForm extends JControllerForm
 
 		if ($isAjax)
 		{
-			echo (string) $returnValue;
+			$msg = JText::_('COM_TJUCM_FILE_DELETE_SUCCESS');
 
+			if (!$returnValue)
+			{
+				$msg = JText::_('COM_TJUCM_FILE_DELETE_ERROR');
+			}
+
+			echo new JResponseJson($returnValue, $msg);
 			jexit();
 		}
 		else

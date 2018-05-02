@@ -1,7 +1,3 @@
-/**
- * global: site_root
-*/
-
 /* This function carries stepped saving via ajax */
 function steppedFormSave(form_id, status)
 {
@@ -106,24 +102,16 @@ function deleteTjFile(filePath, fieldId)
 		if(confirm(Joomla.JText._('COM_TJUCM_FILE_DELETE_CONFIRM')))
 		{
 			jQuery.ajax({
-				url: site_root + "index.php?option=com_tjucm&task=itemform.tjFileDelete",
+				url: "index.php?option=com_tjucm&task=itemform.tjFileDelete",
 				type: 'POST',
 				data:{
 					filePath: filePath
 				},
 				cache: false,
-				async:true,
+				dataType: "json",
 				success: function (result) {
-					if (result == '1') {
-						alert(Joomla.JText._('COM_TJUCM_FILE_DELETE_SUCCESS'));
-					}
-					else {
-						alert(Joomla.JText._('COM_TJUCM_FILE_DELETE_ERROR'));
-					}
-				},
-				complete: function(result) {
-					var response = JSON.parse(result.responseText);
-					if (response == '1') {
+					alert(result.message);
+					if (result.data) {
 						var element = jQuery("input[tj-file-type='" + fieldId + "']");
 						element.val('');
 						element.next().remove('div.control-group');
