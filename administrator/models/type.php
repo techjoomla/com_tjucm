@@ -3,7 +3,7 @@
  * @version    SVN: <svn_id>
  * @package    Com_Tjucm
  * @author     Techjoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @copyright  Copyright (c) 2009-2018 TechJoomla. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -326,7 +326,6 @@ class TjucmModelType extends JModelAdmin
 
 		$params = array();
 		$params['allowed_count'] = $data['allowed_count'];
-		$params['allow_draft_save'] = $data['allow_draft_save'];
 		$params['is_subform'] = $data['is_subform'];
 
 		$data['params'] = json_encode($params);

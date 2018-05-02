@@ -3,7 +3,7 @@
  * @version    SVN: <svn_id>
  * @package    Com_Tjucm
  * @author     Techjoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
+ * @copyright  Copyright (c) 2009-2018 TechJoomla. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -153,6 +153,9 @@ class TjucmControllerItemForm extends JControllerForm
 		// Get the previous edit id (if any) and the current edit id.
 		$previousId = (int) $app->getUserState('com_tjucm.edit.item.id');
 		$editId     = $app->input->getInt('id', 0);
+		$menu = $app->getMenu();
+		$menuItemObj = $menu->getItems('link', 'index.php?option=com_tjucm&view=items', true);
+		$itemId     = $menuItemObj->id;
 
 		// Set the user id for the user to edit in the session.
 		$app->setUserState('com_tjucm.edit.item.id', $editId);
@@ -160,9 +163,12 @@ class TjucmControllerItemForm extends JControllerForm
 		// Get the model.
 		$model = $this->getModel('ItemForm', 'TjucmModel');
 
+		$recordId = '';
+
 		// Check out the item
 		if ($editId)
 		{
+			$recordId = '&id=' . $editId;
 			$model->checkout($editId);
 		}
 
@@ -173,7 +179,7 @@ class TjucmControllerItemForm extends JControllerForm
 		}
 
 		// Redirect to the edit screen.
-		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&client=' . $this->client . '&id=' . $editId, false));
+		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&client=' . $this->client . $recordId . '&Itemid=' . $itemId, false));
 	}
 
 	/**
@@ -203,9 +209,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 		// Get the user data.
 		$data = $app->input->get('jform', array(), 'array');
-
 		$data['id'] = empty($data['id']) ? 0 : (int) $data['id'];
-
 		$all_jform_data = $data;
 
 		// Get file information
