@@ -10,8 +10,12 @@
                 fieldSelector: ":input:not(input[type=submit]):not(input[type=button])"
             }, i),
             n = function(i) {
-                if (i.hasClass("ays-ignore") || i.hasClass("aysIgnore") || i.attr("data-ays-ignore") || void 0 === i.attr("name")) return null;
-                if (i.is(":disabled")) return "ays-disabled";
+                if (i.hasClass("ays-ignore") || i.hasClass("aysIgnore") || i.attr("data-ays-ignore") || void 0 === i.attr("name")) {
+                   return null;
+                }
+                if (i.is(":disabled")) {
+                   return "ays-disabled";
+                }
                 var t, n = i.attr("type");
                 switch (i.is("select") && (n = "select"), n) {
                     case "checkbox":
@@ -38,15 +42,21 @@
                         return void 0 !== i && n(e) != i
                     },
                     r = e(this).is("form") ? e(this) : e(this).parents("form");
-                if (a(e(i.target))) o(r, !0);
+                if (a(e(i.target))) {
+                    o(r, !0);
+                }
                 else {
                     var s = r.find(t.fieldSelector);
                     if (t.addRemoveFieldsMarksDirty)
-                        if (r.data("ays-orig-field-count") != s.length) return void o(r, !0);
+                        if (r.data("ays-orig-field-count") != s.length) {
+                             return void o(r, !0);
+                        }
                     var d = !1;
                     s.each(function() {
                         var i = e(this);
-                        if (a(i)) return d = !0, !1
+                        if (a(i)) {
+                            return d = !0, !1
+                        }
                     }), o(r, d)
                 }
             },
@@ -74,7 +84,9 @@
         return t.silent || window.aysUnloadSet || (window.aysUnloadSet = !0, e(window).bind("beforeunload", function() {
             if (0 != e("form").filter("." + t.dirtyClass).length) {
                 if (window.navigator.userAgent.toLowerCase().match(/msie|chrome/)) {
-                    if (window.aysHasPrompted) return;
+                    if (window.aysHasPrompted) {
+                        return;
+                    }
                     window.aysHasPrompted = !0, window.setTimeout(function() {
                         window.aysHasPrompted = !1
                     }, 900)
