@@ -6,11 +6,15 @@ function steppedFormSave(form_id, status)
 	jQuery('#form_status').val(status);
 
 	if ('save' == status) {
+
 		if(confirm(Joomla.JText._('COM_TJUCM_ITEMFORM_ALERT')) == true)
 		{
+			/* code to remove the class added by are-you-sure alert box */
+			jQuery('#item-form').removeClass('dirty');
+
 			if (!document.formvalidator.isValid('#item-form'))
 			{
-					return false;
+				return false;
 			}
 		}
 		else
@@ -31,7 +35,7 @@ function steppedFormSave(form_id, status)
 						jQuery("#finalSave").attr("disabled", "disabled");
 						var url= window.location.href.split('#')[0],
 						separator = (url.indexOf("?")===-1)?"?":"&",
-						newParam=separator + "id=" + returnedData.data;
+						newParam=separator + "id=" + returnedData.data + "&success=1";
 						newUrl=url.replace(newParam,"");
 						newUrl+=newParam;
 						window.location.href =newUrl;
@@ -43,8 +47,6 @@ function steppedFormSave(form_id, status)
 					{
 						jQuery("#recordId").val(returnedData.data);
 						promise = true;
-						jQuery("#draft_msg").show();
-						setTimeout(function() { jQuery("#draft_msg").hide(); }, 5000);
 					}
 				}
 				else
