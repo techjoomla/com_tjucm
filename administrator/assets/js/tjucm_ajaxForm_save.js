@@ -120,9 +120,9 @@ function deleteFile(filePath, fieldId)
 		success: function (result) {
 			alert(result.message);
 			if (result.data) {
-					var element = jQuery("input[tj-file-type='" + fieldId + "']");
-					element.val('');
-					element.next().remove('div.control-group');
+				var element = jQuery("input[tj-file-type='" + fieldId + "']");
+				element.val('');
+				element.next().remove('div.control-group');
 			}
 		}
 	});
