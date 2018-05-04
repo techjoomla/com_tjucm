@@ -52,7 +52,5 @@ class TjucmControllerItemForm extends JControllerForm
 		}
 
 		echo new JResponseJson($returnValue, $msg);
-
-		jexit();
 	}
 }
