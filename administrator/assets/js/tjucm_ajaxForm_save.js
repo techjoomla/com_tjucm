@@ -97,29 +97,33 @@ function itemformactions(tab_id, navDirection)
 }
 
 /* This function deletes tjucm file via ajax */
-function deleteTjFile(filePath, fieldId)
+function deleteFile(filePath, fieldId)
 {
-	if (filePath)
+	if (!filePath)
 	{
-		if(confirm(Joomla.JText._('COM_TJUCM_FILE_DELETE_CONFIRM')))
-		{
-			jQuery.ajax({
-				url: "index.php?option=com_tjucm&task=itemform.tjFileDelete",
-				type: 'POST',
-				data:{
-					filePath: filePath
-				},
-				cache: false,
-				dataType: "json",
-				success: function (result) {
-					alert(result.message);
-					if (result.data) {
-						var element = jQuery("input[tj-file-type='" + fieldId + "']");
-						element.val('');
-						element.next().remove('div.control-group');
-					}
-				}
-			});
-		}
+		return;
 	}
+
+	if(!confirm(Joomla.JText._('COM_TJUCM_FILE_DELETE_CONFIRM')))
+	{
+		return;
+	}
+
+	jQuery.ajax({
+		url: site_root + "index.php?option=com_tjucm&task=itemform.deleteFile&format=json",
+		type: 'POST',
+		data:{
+				filePath: filePath
+		},
+		cache: false,
+		dataType: "json",
+		success: function (result) {
+			alert(result.message);
+			if (result.data) {
+					var element = jQuery("input[tj-file-type='" + fieldId + "']");
+					element.val('');
+					element.next().remove('div.control-group');
+			}
+		}
+	});
 }
