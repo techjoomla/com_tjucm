@@ -110,7 +110,7 @@ function deleteFile(filePath, fieldId)
 	}
 
 	jQuery.ajax({
-		url: site_root + "index.php?option=com_tjucm&task=itemform.deleteFile&format=json",
+		url: Joomla.getOptions('system.paths').root + "/index.php?option=com_tjucm&task=itemform.deleteFile&format=json",
 		type: 'POST',
 		data:{
 				filePath: filePath
