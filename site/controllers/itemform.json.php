@@ -44,12 +44,7 @@ class TjucmControllerItemForm extends JControllerForm
 		$filePath = base64_decode($filePath);
 
 		$returnValue = $tjFieldsHelper->tjFileDelete($filePath);
-		$msg = JText::_('COM_TJUCM_FILE_DELETE_SUCCESS');
-
-		if (!$returnValue)
-		{
-			$msg = JText::_('COM_TJUCM_FILE_DELETE_ERROR');
-		}
+		$msg = $returnValue ? JText::_('COM_TJUCM_FILE_DELETE_SUCCESS') : JText::_('COM_TJUCM_FILE_DELETE_ERROR');
 
 		echo new JResponseJson($returnValue, $msg);
 	}
