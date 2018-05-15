@@ -1,3 +1,18 @@
+/* This function executes for autosave form */
+jQuery(document).ready(function(){
+
+	/*Code to get item state*/
+	let itemState = jQuery('#itemState').val();
+
+	/*Code for auto save on blur event add new record or editing draft record only*/
+	if (itemState == '' || itemState == 0)
+	{
+		jQuery(document).delegate(":input[type!='button']", "blur", function() {
+			steppedFormSave(this.form.id, 'draft');
+		});
+	}
+})
+
 /* This function carries stepped saving via ajax */
 function steppedFormSave(form_id, status)
 {
