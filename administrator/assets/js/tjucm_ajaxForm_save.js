@@ -31,6 +31,7 @@ function steppedFormSave(form_id, status)
 				var returnedData = JSON.parse(data);
 				if(returnedData.data != null)
 				{
+					jQuery('#item-form').removeClass('dirty');
 					if ('save' == status) {
 						jQuery("#finalSave").attr("disabled", "disabled");
 						var url= window.location.href.split('#')[0],
