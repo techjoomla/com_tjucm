@@ -5,7 +5,7 @@ jQuery(document).ready(function(){
 	let itemState = jQuery('#itemState').val();
 
 	/*Code for auto save on blur event add new record or editing draft record only*/
-	if (itemState == '' || itemState == 0)
+	if (itemState == '' || itemState === 0)
 	{
 		jQuery(document).delegate(":input[type!='button']", "blur", function() {
 			steppedFormSave(this.form.id, 'draft');
@@ -22,7 +22,7 @@ function steppedFormSave(form_id, status)
 
 	if ('save' == status) {
 
-		if(confirm(Joomla.JText._('COM_TJUCM_ITEMFORM_ALERT')) == true)
+		if(confirm(Joomla.JText._('COM_TJUCM_ITEMFORM_ALERT')) === true)
 		{
 			/* code to remove the class added by are-you-sure alert box */
 			jQuery('#item-form').removeClass('dirty');
@@ -46,7 +46,7 @@ function steppedFormSave(form_id, status)
 			datatype:'JSON',
 			success: function(data) {
 				var returnedData = JSON.parse(data);
-				if(returnedData.data != null)
+				if(returnedData.data !== null)
 				{
 					jQuery('#item-form').removeClass('dirty');
 					if ('save' == status) {
