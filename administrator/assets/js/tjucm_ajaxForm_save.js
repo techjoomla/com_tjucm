@@ -29,11 +29,13 @@ function steppedFormSave(form_id, status)
 
 			if (!document.formvalidator.isValid('#item-form'))
 			{
+				jQuery("html, body").animate({ scrollTop: 0 }, "slow");
 				return false;
 			}
 		}
 		else
 		{
+			jQuery("html, body").animate({ scrollTop: 0 }, "slow");
 			return false;
 		}
 	}
