@@ -424,6 +424,26 @@ class TjucmControllerItemForm extends JControllerForm
 				$extra_jform_data['tjFieldFileField'] = $files;
 			}
 
+			// If no data send then dont add any entry in item form table - start
+			$allow = 0;
+
+			foreach ($extra_jform_data as $extra_data)
+			{
+				if ($extra_data != '')
+				{
+					$allow = 1;
+
+					break;
+				}
+			}
+
+			if (empty($allow))
+			{
+				return false;
+			}
+
+			// If no data send then dont add any entry in item form table - end
+
 			$recordId = $model->save($validData, $extra_jform_data, $post);
 
 			if ($recordId)
