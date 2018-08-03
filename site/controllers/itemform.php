@@ -341,8 +341,6 @@ class TjucmControllerItemForm extends JControllerForm
 				return false;
 			}
 
-			$formExtra = array_filter($formExtra);
-
 			if (!empty($formExtra))
 			{
 				// Remove required attribute from fields if data is stored in draft mode
