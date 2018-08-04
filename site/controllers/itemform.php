@@ -445,12 +445,19 @@ class TjucmControllerItemForm extends JControllerForm
 			// If no data send then dont add any entry in item form table - end
 
 			$recordId = $model->save($validData, $extra_jform_data, $post);
+			$isNew = ($validData['id']) ? 0 : 1;
 
 			if ($recordId)
 			{
 				$dispatcher = JEventDispatcher::getInstance();
 				JPluginHelper::importPlugin("system", "jlike_tjucm");
 				$dispatcher->trigger('jlike_tjucmOnAfterSave', array($recordId, $validData));
+
+				// TJ-ucm plugin trigger after save
+				$dispatcher = JEventDispatcher::getInstance();
+				JPluginHelper::importPlugin("content");
+				$dispatcher->trigger('onUcmItemAfterSave', array($validData, $extra_jform_data, $isNew));
+
 				$response = $recordId;
 				$redirect_url = '';
 				$redirect_msg = '';
