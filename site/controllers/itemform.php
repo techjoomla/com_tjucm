@@ -446,6 +446,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 			$recordId = $model->save($validData, $extra_jform_data, $post);
 			$isNew = ($validData['id']) ? 0 : 1;
+			$validData['id'] = $recordId;
 
 			if ($recordId)
 			{
