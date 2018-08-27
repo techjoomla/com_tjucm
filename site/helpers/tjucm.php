@@ -75,4 +75,52 @@ class TjucmHelpersTjucm
 		JText::script('COM_TJUCM_FIELDS_VALIDATION_ERROR_DATE', true);
 		JText::script('COM_TJUCM_FIELDS_VALIDATION_ERROR_NUMBER', true);
 	}
+
+	/**
+	 * Get Itemid for menu links
+	 *
+	 * @param   string   $link          URL to find itemid for
+	 *
+	 * @param   integer  $skipIfNoMenu  return 0 if no menu is found
+	 *
+	 * @return  integer  $itemId
+	 */
+	public function getItemId($link, $skipIfNoMenu = 0)
+	{
+		$app = JFactory::getApplication();
+
+		$itemId = 0;
+
+		parse_str($link, $parsedLinked);
+
+		if (isset($parsedLinked['view']))
+		{
+			// For item form menu link
+			if (($parsedLinked['view'] == 'itemform' || $parsedLinked['view'] == 'items') && !empty($parsedLinked['client']))
+			{
+				$menu = $app->getMenu();
+				$menuItems = $menu->getItems('link', "index.php?option=com_tjucm&view=" . $parsedLinked['view']);
+				$ucmType = explode(".", $parsedLinked['client']);
+				$ucmType = end($ucmType);
+
+				if (!empty($menuItems))
+				{
+					foreach ($menuItems as $menuItem)
+					{
+						if (!empty($menuItem->params))
+						{
+							$menuUcmType = $menuItem->params->get("ucm_type", "", "STRING");
+
+							if ($menuUcmType == $ucmType)
+							{
+								return $menuItem->id;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return $itemId;
+	}
 }
