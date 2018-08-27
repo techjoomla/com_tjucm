@@ -85,7 +85,7 @@ class TjucmHelpersTjucm
 	 *
 	 * @return  integer  $itemId
 	 */
-	public function getItemId($link, $skipIfNoMenu = 0)
+	public function getItemId($link)
 	{
 		$app = JFactory::getApplication();
 
