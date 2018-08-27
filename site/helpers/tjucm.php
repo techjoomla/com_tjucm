@@ -107,9 +107,11 @@ class TjucmHelpersTjucm
 				{
 					foreach ($menuItems as $menuItem)
 					{
-						if (!empty($menuItem->params))
+						$menuParams = $menuItem->params;
+
+						if (!empty($menuParams))
 						{
-							$menuUcmType = $menuItem->params->get("ucm_type", "", "STRING");
+							$menuUcmType = $menuParams->get("ucm_type", "", "STRING");
 
 							if ($menuUcmType == $ucmType)
 							{
