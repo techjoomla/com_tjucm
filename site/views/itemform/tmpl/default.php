@@ -47,6 +47,8 @@ $fieldsets_counter_deafult = 0;
 $setnavigation             = false;
 $itemState                 = $this->item->state;
 
+
+
 ?>
 <script type="text/javascript">
 
@@ -151,6 +153,11 @@ $itemState                 = $this->item->state;
 		<?php
 		}
 		?>
+		<div id="draft_msg" class="alert alert-success" style="display: none;">
+			<a class="close" data-dismiss="alert">×</a>
+			<?php echo JText::_("COM_TJUCM_MSG_ON_DRAFT_FORM"); ?>
+		</div>
+
 		<div class="form-actions">
 			<?php
 			// Show next previous buttons only when there are mulitple tabs/groups present under that field type
@@ -183,6 +190,12 @@ $itemState                 = $this->item->state;
 
 			if ($calledFrom == 'frontend')
 			{
+				if (!empty($this->allow_draft_save))
+				{
+					?>
+					<input type="button" class="btn btn-width150 br-0 btn-default font-normal" value="<?php echo JText::_("COM_TJUCM_SAVE_AS_DRAFT_ITEM"); ?>" onclick="steppedFormSave(this.form.id, 'draft');" />
+					<?php
+				}
 				?>
 				<input type="button" class="btn btn-success" value="<?php echo JText::_("COM_TJUCM_SAVE_ITEM"); ?>"
 				id="finalSave" onclick="steppedFormSave(this.form.id, 'save');" />

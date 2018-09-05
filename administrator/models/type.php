@@ -327,6 +327,7 @@ class TjucmModelType extends JModelAdmin
 		$params = array();
 		$params['allowed_count'] = $data['allowed_count'];
 		$params['is_subform'] = $data['is_subform'];
+		$params['allow_draft_save'] = $data['allow_draft_save'];
 
 		$data['params'] = json_encode($params);
 
