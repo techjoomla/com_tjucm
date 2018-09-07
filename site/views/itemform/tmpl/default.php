@@ -190,7 +190,7 @@ $itemState                 = $this->item->state;
 
 			if ($calledFrom == 'frontend')
 			{
-				if (!empty($this->allow_draft_save))
+				if (!empty($this->allow_draft_save) && empty($itemState))
 				{
 					?>
 					<input type="button" class="btn btn-width150 br-0 btn-default font-normal" value="<?php echo JText::_("COM_TJUCM_SAVE_AS_DRAFT_ITEM"); ?>" onclick="steppedFormSave(this.form.id, 'draft');" />

@@ -278,6 +278,7 @@ class TjucmModelItem extends JModelAdmin
 	{
 		$table = $this->getTable();
 		$table->load($id);
+		$table->draft = $state == 1 ? 0 : 1;
 		$table->state = $state;
 
 		return $table->store();
