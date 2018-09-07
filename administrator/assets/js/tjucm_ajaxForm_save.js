@@ -23,7 +23,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 
 	if ('save' == status) {
 
-		if(confirm(Joomla.JText._("COM_TJUCM_ITEMFORM_ALERT")))
+		if(confirm(Joomla.JText._("COM_TJUCM_ITEMFORM_SUBMIT_ALERT")))
 		{
 			/* code to remove the class added by are-you-sure alert box */
 			jQuery('#item-form').removeClass('dirty');
