@@ -71,7 +71,7 @@ class TjucmHelpersTjucm
 	 */
 	public static function getLanguageConstantForJs()
 	{
-		JText::script('COM_TJUCM_ITEMFORM_ALERT', true);
+		JText::script('COM_TJUCM_ITEMFORM_SUBMIT_ALERT', true);
 		JText::script('COM_TJUCM_FIELDS_VALIDATION_ERROR_DATE', true);
 		JText::script('COM_TJUCM_FIELDS_VALIDATION_ERROR_NUMBER', true);
 	}
@@ -79,9 +79,7 @@ class TjucmHelpersTjucm
 	/**
 	 * Get Itemid for menu links
 	 *
-	 * @param   string   $link          URL to find itemid for
-	 *
-	 * @param   integer  $skipIfNoMenu  return 0 if no menu is found
+	 * @param   string  $link  URL to find itemid for
 	 *
 	 * @return  integer  $itemId
 	 */

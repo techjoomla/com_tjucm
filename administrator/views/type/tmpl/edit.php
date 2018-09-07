@@ -57,6 +57,7 @@ JHtml::script( JUri::root().'administrator/components/com_tjucm/assets/js/tjucm_
 							<?php echo $this->form->renderField('unique_identifier'); ?>
 							<?php echo $this->form->renderField('state'); ?>
 							<?php echo $this->form->renderField('allowed_count'); ?>
+							<?php echo $this->form->renderField('allow_draft_save'); ?>
 							<?php echo $this->form->renderField('is_subform'); ?>
 							<?php echo $this->form->renderField('type_description'); ?>
 

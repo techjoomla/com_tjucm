@@ -8,13 +8,14 @@ jQuery(document).ready(function(){
 	if (itemState == '' || itemState == 0)
 	{
 		jQuery(document).delegate(":input[type!='button']", "blur", function() {
-			steppedFormSave(this.form.id, 'draft');
+			let showDraftSuccessMsg = "0";
+			steppedFormSave(this.form.id, "draft", showDraftSuccessMsg);
 		});
 	}
 })
 
 /* This function carries stepped saving via ajax */
-function steppedFormSave(form_id, status)
+function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 {
 	var item_basic_form = jQuery('#' + form_id);
 	var promise = false;
@@ -22,7 +23,7 @@ function steppedFormSave(form_id, status)
 
 	if ('save' == status) {
 
-		if(confirm(Joomla.JText._('COM_TJUCM_ITEMFORM_ALERT')) == true)
+		if(confirm(Joomla.JText._("COM_TJUCM_ITEMFORM_SUBMIT_ALERT")))
 		{
 			/* code to remove the class added by are-you-sure alert box */
 			jQuery('#item-form').removeClass('dirty');
@@ -63,6 +64,13 @@ function steppedFormSave(form_id, status)
 					{
 						jQuery("#recordId").val(returnedData.data);
 						promise = true;
+
+						if (showDraftSuccessMsg === "1")
+						{
+							jQuery("#draft_msg").show();
+							setTimeout(function() { jQuery("#draft_msg").hide(); }, 5000);
+						}
+
 					}
 				}
 				else
