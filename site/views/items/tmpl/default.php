@@ -105,10 +105,12 @@ if (!empty($this->client))
 				{
 					 $link = JRoute::_('index.php?option=com_tjucm&view=item&id=' . $item->id . "&client=" . $this->client, false);
 
+				    $editown = true;
 					if (!$this->canEdit && $this->canEditOwn)
 					{
-						$canEdit = JFactory::getUser()->id == $item->created_by;
+						$editown = (JFactory::getUser()->id == $item->created_by ? true : false);
 					}
+
 					?>
 					<tr class="row<?php echo $i % 2; ?>">
 						<?php
@@ -155,18 +157,17 @@ if (!empty($this->client))
 								}
 							}
 
-							if ($canEdit || $this->canDelete)
+							if ($this->canEdit || $this->canDelete || $editown)
 							{
 								?>
 								<td class="center">
 								<?php
-								if ($canEdit)
+								if ($this->canEdit || $editown)
 								{
 									 ?>
 									<a target="_blank" href="<?php echo 'index.php?option=com_tjucm&task=itemform.edit&id=' . $item->id . $appendUrl; ?>" class="btn btn-mini" type="button"><i class="icon-apply" aria-hidden="true"></i></a>
 								<?php
 								}
-
 								if ($this->canDelete)
 								{
 									?>

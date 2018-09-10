@@ -27,6 +27,18 @@ class TjucmViewItems extends JViewLegacy
 
 	protected $params;
 
+	protected $canCreate;
+
+	protected $canView;
+
+	protected $canEdit;
+
+	protected $canChange;
+
+	protected $canEditOwn;
+
+	protected $canDelete;
+
 	/**
 	 * Display the view
 	 *
