@@ -51,8 +51,7 @@ class TjucmViewItems extends JViewLegacy
 	public function display($tpl = null)
 	{
 		$app = JFactory::getApplication();
-		$input = $app->input;
-		$this->state  = $this->get('State');
+		$this->state = $this->get('State');
 		$this->items = $this->get('Items');
 		$this->pagination = $this->get('Pagination');
 		$this->params     = $app->getParams('com_tjucm');

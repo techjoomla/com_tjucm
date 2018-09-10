@@ -103,9 +103,9 @@ if (!empty($this->client))
 			{
 				foreach ($this->items as $i => $item)
 				{
-					 $link = JRoute::_('index.php?option=com_tjucm&view=item&id=' . $item->id . "&client=" . $this->client, false);
+					$link = JRoute::_('index.php?option=com_tjucm&view=item&id=' . $item->id . "&client=" . $this->client, false);
 
-				    $editown = true;
+					$editown = true;
 					if (!$this->canEdit && $this->canEditOwn)
 					{
 						$editown = (JFactory::getUser()->id == $item->created_by ? true : false);
