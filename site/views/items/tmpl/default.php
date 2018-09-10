@@ -19,11 +19,6 @@ $user = JFactory::getUser();
 $userId = $user->get('id');
 $listOrder = $this->state->get('list.ordering');
 $listDirn = $this->state->get('list.direction');
-$canCreate = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $this->ucmTypeId);
-$canEdit = $user->authorise('core.type.edititem', 'com_tjucm.type' . $this->ucmTypeId);
-$canChange = $user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $this->ucmTypeId);
-$canEditOwn = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $this->ucmTypeId);
-
 $appendUrl = "";
 
 if (!empty($this->created_by))
@@ -35,8 +30,6 @@ if (!empty($this->client))
 {
 	$appendUrl .= "&client=" . $this->client;
 }
-
-$canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this->ucmTypeId);
 ?>
 <form action="<?php echo JRoute::_('index.php?option=com_tjucm&view=items' . $appendUrl); ?>" method="post" name="adminForm" id="adminForm">
 	<table class="table table-striped" id="itemList">
@@ -74,7 +67,7 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 					}
 				}
 
-				if ($canEdit || $canDelete)
+				if ($this->canEdit || $this->canDelete)
 				{
 					?>
 					<th class="center">
@@ -111,9 +104,8 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 				foreach ($this->items as $i => $item)
 				{
 					 $link = JRoute::_('index.php?option=com_tjucm&view=item&id=' . $item->id . "&client=" . $this->client, false);
-					 $canEdit = $user->authorise('core.type.edititem', 'com_tjucm.type' . $this->ucmTypeId);
 
-					if (!$canEdit && $canEditOwn)
+					if (!$this->canEdit && $this->canEditOwn)
 					{
 						$canEdit = JFactory::getUser()->id == $item->created_by;
 					}
@@ -122,9 +114,9 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 						<?php
 						if (isset($this->items[0]->state))
 						{
-							$class = ($canChange) ? 'active' : 'disabled'; ?>
+							$class = ($this->canChange) ? 'active' : 'disabled'; ?>
 							<td class="center">
-								<a class="<?php echo $class; ?>" href="<?php echo ($canChange) ? 'index.php?option=com_tjucm&task=item.publish&id=' . $item->id . '&state=' . (($item->state + 1) % 2) . $appendUrl : '#'; ?>">
+								<a class="<?php echo $class; ?>" href="<?php echo ($this->canChange) ? 'index.php?option=com_tjucm&task=item.publish&id=' . $item->id . '&state=' . (($item->state + 1) % 2) . $appendUrl : '#'; ?>">
 								<?php
 								if ($item->state == 1)
 								{
@@ -147,7 +139,7 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 								echo JHtml::_('jgrid.checkedout', $i, $item->uEditor, $item->checked_out_time, 'items.', $canCheckin);
 							}
 							?>
-							<a href="<?php echo JRoute::_('index.php?option=com_tjucm&view=item&id='.(int) $item->id) . "&client=" . $this->client; ?>">
+							<a href="<?php echo JRoute::_('index.php?option=com_tjucm&view=item&id='.(int) $item->id . "&client=" . $this->client, false); ?>">
 								<?php echo $this->escape($item->id); ?>
 							</a>
 						</td>
@@ -163,7 +155,7 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 								}
 							}
 
-							if ($canEdit || $canDelete)
+							if ($canEdit || $this->canDelete)
 							{
 								?>
 								<td class="center">
@@ -175,7 +167,7 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 								<?php
 								}
 
-								if ($canDelete)
+								if ($this->canDelete)
 								{
 									?>
 									<a href="<?php echo 'index.php?option=com_tjucm&task=itemform.remove' . '&id=' . $item->id . $appendUrl; ?>" class="btn btn-mini delete-button" type="button"><i class="icon-delete" aria-hidden="true"></i></a>
@@ -223,7 +215,7 @@ $canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this
 	<?php echo JHtml::_('form.token'); ?>
 </form>
 <?php
-if ($canDelete)
+if ($this->canDelete)
 {
 	?>
 	<script type="text/javascript">
