@@ -30,6 +30,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 
 			if (!document.formvalidator.isValid('#item-form'))
 			{
+				jQuery('#finalSave').attr('disabled', false);
 				return false;
 			}
 		}
@@ -56,9 +57,6 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 						newUrl=url.replace(newParam,"");
 						newUrl+=newParam;
 						window.location.href =newUrl;
-
-						/*opener.location.reload();
-						window.close();*/
 					}
 					else
 					{
@@ -68,9 +66,9 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 						if (showDraftSuccessMsg === "1")
 						{
 							jQuery("#draft_msg").show();
+							jQuery('#draftSave').attr('disabled', false);
 							setTimeout(function() { jQuery("#draft_msg").hide(); }, 5000);
 						}
-
 					}
 				}
 				else
@@ -87,7 +85,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 
 					if(returnedData.messages.error)
 					{
-					Joomla.renderMessages({'error': returnedData.messages.error});
+						Joomla.renderMessages({'error': returnedData.messages.error});
 					}
 				}
 
