@@ -62,6 +62,7 @@ class TjucmModelItem extends JModelAdmin
 
 		// Check published state
 		if ((!$user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmId))
+			&& (!$user->authorise('core.type.editownitem', 'com_tjucm.type.' . $ucmId))
 			&& (!$user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $ucmId)))
 		{
 			$this->setState('filter.published', 1);

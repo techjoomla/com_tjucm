@@ -146,7 +146,7 @@ else
 $app = JFactory::getApplication();
 $itemid     = $app->input->getInt('Itemid', 0);
 
-if ($user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId) && $this->item->checked_out == 0)
+if (($user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId) && $this->item->checked_out == 0) || ($user->authorise('core.type.editownitem', 'com_tjucm.type.' . $this->ucmTypeId) && JFactory::getUser()->id == $this->item->created_by))
 {
 	$redirectURL = JRoute::_('index.php?option=com_tjucm&task=item.edit&id=' . $this->item->id . '&client=' . $this->client . '&Itemid=' . $itemid, false);
 	?>
