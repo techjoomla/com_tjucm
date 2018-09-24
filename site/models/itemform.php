@@ -431,6 +431,7 @@ class TjucmModelItemForm extends JModelForm
 				$canEditOwn = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $ucmTypeId);
 
 				// Get the UCM item details
+				$itemDetails = array();
 				Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/tables');
 				$itemDetails = Table::getInstance('Item', 'TjucmTable');
 				$itemDetails->load(array('id' => $typeItemId));
