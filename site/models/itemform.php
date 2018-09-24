@@ -431,12 +431,16 @@ class TjucmModelItemForm extends JModelForm
 				$canEditOwn = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $ucmTypeId);
 
 				// Get the UCM item details
-				$itemDetails = array();
 				Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/tables');
 				$itemDetails = Table::getInstance('Item', 'TjucmTable');
 				$itemDetails->load(array('id' => $typeItemId));
 
-				if (($canEdit == true) || (($canEditOwn == true) && ($itemDetails->created_by == $user->id) && ($itemDetails->created_by == $data['created_by'])))
+				// Check the ownership & privilages to edit the record
+				if ($canEdit)
+				{
+					$authorised = true;
+				}
+				elseif (($canEditOwn == true) && ($itemDetails->created_by == $user->id) && ($itemDetails->created_by == $data['created_by']))
 				{
 					$authorised = true;
 				}
