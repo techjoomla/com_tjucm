@@ -435,7 +435,7 @@ class TjucmModelItemForm extends JModelForm
 				$itemDetails = Table::getInstance('Item', 'TjucmTable');
 				$itemDetails->load(array('id' => $typeItemId));
 
-				if (($canEdit) || (($canEditOwn) && ($itemDetails->created_by == $user->id) && ($itemDetails->created_by == $data['created_by'])))
+				if (($canEdit == true) || (($canEditOwn == true) && ($itemDetails->created_by == $user->id) && ($itemDetails->created_by == $data['created_by'])))
 				{
 					$authorised = true;
 				}
