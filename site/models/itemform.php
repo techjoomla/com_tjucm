@@ -401,7 +401,7 @@ class TjucmModelItemForm extends JModelForm
 	 * @param   array  $extra_jform_data  Exra field data.
 	 * @param   array  $post              all form field data.
 	 *
-	 * @return  boolean  True on success.
+	 * @return  boolean
 	 *
 	 * @since   1.6
 	 */
@@ -436,20 +436,9 @@ class TjucmModelItemForm extends JModelForm
 				$itemDetails->load(array('id' => $typeItemId));
 
 				// Check the ownership & privilages to edit this record
-				if ($canEdit)
+				if (($canEdit) || (($canEditOwn) && ($itemDetails->created_by == $user->id) && ($itemDetails->created_by == $data['created_by'])))
 				{
 					$authorised = true;
-				}
-				elseif ($canEditOwn && $itemDetails)
-				{
-					if (($itemDetails->created_by == $user->id) && ($itemDetails->created_by == $data['created_by']))
-					{
-						$authorised = true;
-					}
-					else
-					{
-						$authorised = false;
-					}
 				}
 				else
 				{
