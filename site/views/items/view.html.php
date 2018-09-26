@@ -185,14 +185,8 @@ class TjucmViewItems extends JViewLegacy
 		// we need to get it from the menu item itself
 		$menu = $menus->getActive();
 
-		if ($menu)
-		{
-			$this->params->def('page_heading', $this->params->get('page_title', $menu->title));
-		}
-		else
-		{
-			$this->params->def('page_heading', JText::_('COM_TJUCM_DEFAULT_PAGE_TITLE'));
-		}
+		$menu ? $this->params->def('page_heading', $this->params->get('page_title', $menu->title))
+		: $this->params->def('page_heading', JText::_('COM_TJUCM_DEFAULT_PAGE_TITLE'));
 
 		$title = $this->params->get('page_title', '');
 
