@@ -27,6 +27,14 @@ class TjucmViewItems extends JViewLegacy
 
 	protected $params;
 
+	protected $listcolumn;
+
+	protected $allowedToAdd;
+
+	protected $ucmTypeId;
+
+	protected $client;
+
 	protected $canCreate;
 
 	protected $canView;
@@ -38,6 +46,14 @@ class TjucmViewItems extends JViewLegacy
 	protected $canEditOwn;
 
 	protected $canDelete;
+
+	protected $menuparams;
+
+	protected $ucm_type;
+
+	protected $showList;
+
+	protected $created_by;
 
 	/**
 	 * Display the view
