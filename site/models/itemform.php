@@ -440,9 +440,9 @@ class TjucmModelItemForm extends JModelForm
 				{
 					$authorised = true;
 				}
-				elseif ($canEditOwn)
+				elseif ($canEditOwn && isset($itemDetails))
 				{
-					if (!empty($itemDetails) && (($itemDetails->created_by == $user->id) && ($itemDetails->created_by == $data['created_by'])))
+					if (($itemDetails->created_by == $user->id) && ($itemDetails->created_by == $data['created_by']))
 					{
 						$authorised = true;
 					}
