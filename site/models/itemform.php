@@ -436,16 +436,9 @@ class TjucmModelItemForm extends JModelForm
 				$itemDetails->load(array('id' => $typeItemId));
 
 				// Check the ownership & privilages to edit this record
-				if ($canEdit)
+				if (($canEdit) || (($canEditOwn) && (($itemDetails->created_by == $user->id) && ($itemDetails->created_by == $data['created_by']))))
 				{
 					$authorised = true;
-				}
-				elseif ($canEditOwn && isset($itemDetails))
-				{
-					if (($itemDetails->created_by == $user->id) && ($itemDetails->created_by == $data['created_by']))
-					{
-						$authorised = true;
-					}
 				}
 				else
 				{
