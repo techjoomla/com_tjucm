@@ -1,13 +1,13 @@
 /* This function executes for autosave form */
-jQuery(document).ready(function(){
-
+jQuery(document).ready(function()
+{
 	/*Code to get item state*/
 	let itemState = jQuery('#itemState').val();
 
 	/*Code for auto save on blur event add new record or editing draft record only*/
 	if (itemState == '' || itemState == 0)
 	{
-		jQuery(document).delegate(":input[type!='button']", "blur", function() {
+		jQuery(document).on("blur", ":input[type!='button']", function() {
 			let showDraftSuccessMsg = "0";
 			steppedFormSave(this.form.id, "draft", showDraftSuccessMsg);
 		});
@@ -17,6 +17,9 @@ jQuery(document).ready(function(){
 /* This function carries stepped saving via ajax */
 function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 {
+	jQuery('#draftSave').attr('disabled', true);
+	jQuery('#finalSave').attr('disabled', true);
+
 	var item_basic_form = jQuery('#' + form_id);
 	var promise = false;
 	jQuery('#form_status').val(status);
@@ -31,11 +34,15 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 			if (!document.formvalidator.isValid('#item-form'))
 			{
 				jQuery('#finalSave').attr('disabled', false);
+				jQuery('#draftSave').attr('disabled', false);
 				return false;
 			}
 		}
 		else
 		{
+			jQuery('#draftSave').attr('disabled', false);
+			jQuery('#finalSave').attr('disabled', false);
+
 			return false;
 		}
 	}
@@ -66,7 +73,6 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 						if (showDraftSuccessMsg === "1")
 						{
 							jQuery("#draft_msg").show();
-							jQuery('#draftSave').attr('disabled', false);
 							setTimeout(function() { jQuery("#draft_msg").hide(); }, 5000);
 						}
 					}
@@ -88,7 +94,8 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 						Joomla.renderMessages({'error': returnedData.messages.error});
 					}
 				}
-
+				jQuery('#draftSave').attr('disabled', false);
+				jQuery('#finalSave').attr('disabled', false);
 			}
 		});
 	}

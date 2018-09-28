@@ -47,8 +47,6 @@ $fieldsets_counter_deafult = 0;
 $setnavigation             = false;
 $itemState                 = $this->item->state;
 
-
-
 ?>
 <script type="text/javascript">
 
@@ -193,12 +191,12 @@ $itemState                 = $this->item->state;
 				if (!empty($this->allow_draft_save) && empty($itemState))
 				{
 					?>
-					<input type="button" class="btn btn-width150 br-0 btn-default font-normal" id="draftSave" value="<?php echo JText::_("COM_TJUCM_SAVE_AS_DRAFT_ITEM"); ?>" onclick="javascript: this.disabled=true; setTimeout(steppedFormSave, 1000, this.form.id, 'draft');" />
+					<input type="button" class="btn btn-width150 br-0 btn-default font-normal" id="draftSave" value="<?php echo JText::_("COM_TJUCM_SAVE_AS_DRAFT_ITEM"); ?>" onclick="steppedFormSave(this.form.id, 'draft');" />
 					<?php
 				}
 				?>
 				<input type="button" class="btn btn-success" value="<?php echo JText::_("COM_TJUCM_SAVE_ITEM"); ?>"
-				id="finalSave" onclick="javascript: this.disabled=true; setTimeout(steppedFormSave, 1000, this.form.id, 'save');" />
+				id="finalSave" onclick="steppedFormSave(this.form.id, 'save');" />
 				<?php
 			}
 			?>
