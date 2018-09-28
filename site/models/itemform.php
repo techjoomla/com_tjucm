@@ -15,7 +15,7 @@ jimport('joomla.event.dispatcher');
 
 require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
 require_once JPATH_ADMINISTRATOR . '/components/com_tjucm/classes/funlist.php';
-
+use Joomla\CMS\Table\Table;
 use Joomla\Utilities\ArrayHelper;
 /**
  * Tjucm model.
@@ -401,7 +401,7 @@ class TjucmModelItemForm extends JModelForm
 	 * @param   array  $extra_jform_data  Exra field data.
 	 * @param   array  $post              all form field data.
 	 *
-	 * @return  boolean  True on success.
+	 * @return  boolean
 	 *
 	 * @since   1.6
 	 */
@@ -410,9 +410,9 @@ class TjucmModelItemForm extends JModelForm
 		$app = JFactory::getApplication();
 		$user  = JFactory::getUser();
 		$status_title = $app->input->get('form_status');
-
 		$ucmTypeId = $this->getState('ucmType.id');
-		$typeItemId = $this->getState('item.id');
+		$typeItemId = (!empty($data['id'])) ? $data['id'] : (int) $this->getState('item.id');
+		$authorised = false;
 
 		if (empty($ucmTypeId))
 		{
@@ -430,7 +430,24 @@ class TjucmModelItemForm extends JModelForm
 				$canEdit = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmTypeId);
 				$canEditOwn = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $ucmTypeId);
 
-				$authorised = ($canEdit || $canEditOwn);
+				// Get the UCM item details
+				Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/tables');
+				$itemDetails = Table::getInstance('Item', 'TjucmTable');
+				$itemDetails->load(array('id' => $typeItemId));
+
+				$data['created_by'] = $itemDetails->created_by;
+
+				if ($canEdit)
+				{
+					$authorised = true;
+				}
+				elseif (($canEditOwn) && ($itemDetails->created_by == $user->id))
+				{
+					if (!empty($data['created_by']) && $itemDetails->created_by == $data['created_by'])
+					{
+						$authorised = true;
+					}
+				}
 			}
 			else
 			{
