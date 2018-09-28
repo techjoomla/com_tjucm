@@ -410,9 +410,9 @@ class TjucmModelItemForm extends JModelForm
 		$app = JFactory::getApplication();
 		$user  = JFactory::getUser();
 		$status_title = $app->input->get('form_status');
-
 		$ucmTypeId = $this->getState('ucmType.id');
 		$typeItemId = (!empty($data['id'])) ? $data['id'] : (int) $this->getState('item.id');
+		$authorised = false;
 
 		if (empty($ucmTypeId))
 		{
@@ -435,14 +435,18 @@ class TjucmModelItemForm extends JModelForm
 				$itemDetails = Table::getInstance('Item', 'TjucmTable');
 				$itemDetails->load(array('id' => $typeItemId));
 
-				// Check the ownership & privilages to edit this record
-				if (($canEdit) || (($canEditOwn) && (($itemDetails->created_by == $user->id) && ($itemDetails->created_by == $data['created_by']))))
+				$data['created_by'] = $itemDetails->created_by;
+
+				if ($canEdit)
 				{
 					$authorised = true;
 				}
-				else
+				elseif (($canEditOwn) && ($itemDetails->created_by == $user->id))
 				{
-					$authorised = false;
+					if (!empty($data['created_by']) && $itemDetails->created_by == $data['created_by'])
+					{
+						$authorised = true;
+					}
 				}
 			}
 			else
