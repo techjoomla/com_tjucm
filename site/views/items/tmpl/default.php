@@ -105,7 +105,7 @@ if (!empty($this->client))
 				{
 					$link = JRoute::_('index.php?option=com_tjucm&view=item&id=' . $item->id . "&client=" . $this->client, false);
 
-					$editown = true;
+					$editown = false;
 					if (!$this->canEdit && $this->canEditOwn)
 					{
 						$editown = (JFactory::getUser()->id == $item->created_by ? true : false);
