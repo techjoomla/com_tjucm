@@ -27,6 +27,34 @@ class TjucmViewItems extends JViewLegacy
 
 	protected $params;
 
+	protected $listcolumn;
+
+	protected $allowedToAdd;
+
+	protected $ucmTypeId;
+
+	protected $client;
+
+	protected $canCreate;
+
+	protected $canView;
+
+	protected $canEdit;
+
+	protected $canChange;
+
+	protected $canEditOwn;
+
+	protected $canDelete;
+
+	protected $menuparams;
+
+	protected $ucm_type;
+
+	protected $showList;
+
+	protected $created_by;
+
 	/**
 	 * Display the view
 	 *
@@ -39,8 +67,7 @@ class TjucmViewItems extends JViewLegacy
 	public function display($tpl = null)
 	{
 		$app = JFactory::getApplication();
-		$input = $app->input;
-		$this->state  = $this->get('State');
+		$this->state = $this->get('State');
 		$this->items = $this->get('Items');
 		$this->pagination = $this->get('Pagination');
 		$this->params     = $app->getParams('com_tjucm');
@@ -54,6 +81,17 @@ class TjucmViewItems extends JViewLegacy
 		$user = JFactory::getUser();
 		$canCreate = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $this->ucmTypeId);
 		$canView = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$canEdit = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$canChange = $user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $this->ucmTypeId);
+		$canEditOwn = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this->ucmTypeId);
+
+		$this->canCreate = $canCreate;
+		$this->canView = $canView;
+		$this->canEdit = $canEdit;
+		$this->canChange = $canChange;
+		$this->canEditOwn = $canEditOwn;
+		$this->canDelete = $canDelete;
 
 		// If did not get the client from url then get if from menu param
 		if (empty($this->client))
@@ -100,7 +138,7 @@ class TjucmViewItems extends JViewLegacy
 
 		if (empty($this->id))
 		{
-			if ($canCreate)
+			if ($this->canCreate)
 			{
 				$this->allowedToAdd = $itemFormModel->allowedToAddTypeData($userId, $this->client, $allowedCount);
 			}
@@ -108,11 +146,11 @@ class TjucmViewItems extends JViewLegacy
 
 		if ($this->created_by == $userId)
 		{
-			$canView = true;
+			$this->canView = true;
 		}
 
 		// Check the view access to the article (the model has already computed the values).
-		if (!$canView)
+		if (!$this->canView)
 		{
 			$app->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
 			$app->setHeader('status', 403, true);
@@ -147,14 +185,8 @@ class TjucmViewItems extends JViewLegacy
 		// we need to get it from the menu item itself
 		$menu = $menus->getActive();
 
-		if ($menu)
-		{
-			$this->params->def('page_heading', $this->params->get('page_title', $menu->title));
-		}
-		else
-		{
-			$this->params->def('page_heading', JText::_('COM_TJUCM_DEFAULT_PAGE_TITLE'));
-		}
+		$menu ? $this->params->def('page_heading', $this->params->get('page_title', $menu->title))
+		: $this->params->def('page_heading', JText::_('COM_TJUCM_DEFAULT_PAGE_TITLE'));
 
 		$title = $this->params->get('page_title', '');
 
