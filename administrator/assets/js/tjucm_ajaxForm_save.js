@@ -17,9 +17,6 @@ jQuery(document).ready(function()
 /* This function carries stepped saving via ajax */
 function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 {
-	jQuery('#draftSave').attr('disabled', true);
-	jQuery('#finalSave').attr('disabled', true);
-
 	var item_basic_form = jQuery('#' + form_id);
 	var promise = false;
 	jQuery('#form_status').val(status);
@@ -51,6 +48,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 	{
 		jQuery(item_basic_form).ajaxSubmit({
 			datatype:'JSON',
+			async: false,
 			success: function(data) {
 				var returnedData = JSON.parse(data);
 				if(returnedData.data != null)
