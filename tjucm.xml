@@ -35,10 +35,6 @@
 		<folder>controllers</folder>
 		<folder>helpers</folder>
 	</files>
-	<media destination="com_tjucm" folder="media">
-		<folder>js</folder>
-		<folder>css</folder>
-	</media>
 	<languages folder="languages/site">
 		<language tag="en-GB">en-GB/en-GB.com_tjucm.ini</language>
 	</languages>
