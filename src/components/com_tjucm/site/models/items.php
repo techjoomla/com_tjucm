@@ -185,7 +185,7 @@ class TjucmModelItems extends JModelList
 		$query->join("INNER",  $db->quoteName('#__tjfields_fields_value', 'fieldValue') .
 		' ON (' . $db->quoteName('fieldValue.content_id') . ' = ' . $db->quoteName('a.id') . ')');
 
-		$this->client = $this->getState($db->quoteName('ucm.client'));
+		$this->client = $this->getState('ucm.client');
 
 		if (!empty($this->client))
 		{
