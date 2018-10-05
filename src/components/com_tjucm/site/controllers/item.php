@@ -136,7 +136,8 @@ class TjucmControllerItem extends JControllerLegacy
 		else
 		{
 			// If there isn't any menu item active, redirect to list view
-			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false), JText::_('COM_TJUCM_ITEM_SAVED_STATE_ERROR'), 'error');
+			$this->setRedirect(
+			JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false), JText::_('COM_TJUCM_ITEM_SAVED_STATE_ERROR'), 'error');
 		}
 	}
 
@@ -194,7 +195,8 @@ class TjucmControllerItem extends JControllerLegacy
 		else
 		{
 			// If there isn't any menu item active, redirect to list view
-			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false), JText::_('COM_TJUCM_ITEM_SAVED_STATE_ERROR'), 'error');
+			$this->setRedirect(
+			JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false), JText::_('COM_TJUCM_ITEM_SAVED_STATE_ERROR'), 'error');
 		}
 	}
 }
