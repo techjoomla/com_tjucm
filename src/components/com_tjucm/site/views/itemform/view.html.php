@@ -99,9 +99,15 @@ class TjucmViewItemform extends JViewLegacy
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
 		$typeId = $tjUcmModelType->getTypeId($this->client);
 
-		$TypeData = $tjUcmModelType->getItem($typeId);
+		$typeData = $tjUcmModelType->getItem($typeId);
 
-		$allowedCount = $TypeData->allowed_count;
+		// Check if the UCM type is unpublished
+		if ($typeData->state == "0")
+		{
+			return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
+		}
+
+		$allowedCount = $typeData->allowed_count;
 		$user   = JFactory::getUser();
 		$userId = $user->id;
 
