@@ -128,7 +128,7 @@ class TjucmModelItems extends JModelList
 
 		if (!$canView)
 		{
-			$createdBy = $createdBy ? $createdBy : $user->id;
+			$createdBy = $user->id;
 		}
 
 		$this->setState("created_by", $createdBy);
