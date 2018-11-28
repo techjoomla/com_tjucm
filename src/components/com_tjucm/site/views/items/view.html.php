@@ -133,7 +133,6 @@ class TjucmViewItems extends JViewLegacy
 		$TypeData = $tjUcmModelType->getItem($typeId);
 
 		$allowedCount = (!empty($TypeData->allowed_count))?$TypeData->allowed_count:'0';
-		$user   = JFactory::getUser();
 		$userId = $user->id;
 
 		if (empty($this->id))
@@ -147,15 +146,6 @@ class TjucmViewItems extends JViewLegacy
 		if ($this->created_by == $userId)
 		{
 			$this->canView = true;
-		}
-
-		// Check the view access to the article (the model has already computed the values).
-		if (!$this->canView)
-		{
-			$app->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
-			$app->setHeader('status', 403, true);
-
-			return false;
 		}
 
 		// Check for errors.
