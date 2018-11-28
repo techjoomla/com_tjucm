@@ -212,33 +212,6 @@ class TjucmControllerItemForm extends JControllerForm
 		$data['id'] = empty($data['id']) ? 0 : (int) $data['id'];
 		$all_jform_data = $data;
 
-		// Check if user is allowed to save the content
-		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
-		$typeId = $tjUcmModelType->getTypeId($this->client);
-		$typeData = $tjUcmModelType->getItem($typeId);
-		$allowedCount = $typeData->allowed_count;
-
-		// 0 : add unlimited records against this UCM type
-		$allowedCount = empty($allowedCount) ? 0 : $allowedCount;
-
-		$user   = JFactory::getUser();
-		$userId = $user->id;
-
-		$allowedToAdd = $model->allowedToAddTypeData($userId, $this->client, $allowedCount);
-
-		if (!$allowedToAdd && $data['id'] == 0)
-		{
-			if ($this->isajax)
-			{
-				$message = JText::sprintf('COM_TJUCM_ALLOWED_COUNT_LIMIT', $allowedCount);
-				$app->enqueueMessage($message, 'warning');
-				echo new JResponseJson;
-				jexit();
-			}
-
-			return false;
-		}
-
 		// Get file information
 		$files = $app->input->files->get('jform');
 
