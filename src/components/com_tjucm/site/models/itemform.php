@@ -415,11 +415,12 @@ class TjucmModelItemForm extends JModelForm
 		$typeItemId = (!empty($data['id'])) ? $data['id'] : (int) $this->getState('item.id');
 		$authorised = false;
 
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+
 		if (empty($ucmTypeId))
 		{
 			// Get UCM type id from uniquue identifier
-			JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
-			$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
 			$ucmTypeId = $tjUcmModelType->getTypeId($this->client);
 		}
 
