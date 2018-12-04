@@ -55,8 +55,6 @@ class TjucmModelItemForm extends JModelForm
 	{
 		$this->common  = new TjucmFunList;
 
-		$this->isajax = ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') ? true : false;
-
 		parent::__construct($config);
 	}
 
@@ -438,7 +436,9 @@ class TjucmModelItemForm extends JModelForm
 
 			if (!$allowedToAdd && $typeItemId == 0)
 			{
-				if ($this->isajax)
+				$isAjax = $app->input->server->get('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest', 'BOOL');
+
+				if ($isAjax)
 				{
 					$message = JText::sprintf('COM_TJUCM_ALLOWED_COUNT_LIMIT', $allowedCount);
 					$app->enqueueMessage($message, 'warning');
