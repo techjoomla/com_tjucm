@@ -441,7 +441,8 @@ class TjucmModelItemForm extends JModelForm
 
 				if ($isAjax)
 				{
-					$app->enqueueMessage(JText::sprintf('COM_TJUCM_ALLOWED_COUNT_LIMIT', $allowedCount), 'warning');
+					$message = JText::sprintf('COM_TJUCM_ALLOWED_COUNT_LIMIT', $allowedCount);
+					$app->enqueueMessage($message, 'warning');
 					echo new JResponseJson;
 					jexit();
 				}
