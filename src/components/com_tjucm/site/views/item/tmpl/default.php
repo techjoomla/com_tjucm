@@ -26,7 +26,7 @@ $fieldValueTableData->fields_value_table = JTable::getInstance('Fieldsvalue', 'T
 
 if ($this->form_extra)
 {
-$fieldSets = $this->form_extra->getFieldsets();
+	$fieldSets = $this->form_extra->getFieldsets();
 
 	// Iterate through the normal form fieldsets and display each one
 	foreach ($fieldSets as $fieldName => $fieldset)
