@@ -80,42 +80,40 @@ $fieldSets = $this->form_extra->getFieldsets();
 										// Get the field data by field name to check the field type
 										$fieldTableData->tjFieldFieldTable->load(array('name' => $name));
 
-										if ($fieldTableData->tjFieldFieldTable->label){?>
+										if ($value){?>
 										<div class="col-sm-2 col-xs-12"><?php echo $fieldTableData->tjFieldFieldTable->label; ?>:</div>
-										<?php } ?>
-										<div class="col-sm-10">
-										<?php
-										// If field type is file
-										if ($fieldTableData->tjFieldFieldTable->type == 'file')
-										{
-											// Get the field value id & subform file field id to get the media URL
-											$fieldValueTableData->fields_value_table->load(array('content_id' => $app->input->get('id', '', 'INT'), 'field_id' => $formData->id));
-											$extraParamArray = array();
-											$extraParamArray['id'] = $fieldValueTableData->fields_value_table->id;
-											$extraParamArray['subFormFileFieldId'] = $fieldTableData->tjFieldFieldTable->id;
-											$mediaLink = $TjfieldsHelper->getMediaUrl($value, $extraParamArray);
-											?>
-											<a href="<?php echo $mediaLink;?>"><?php echo JText::_("COM_TJFIELDS_FILE_DOWNLOAD");?></a>
+										<?php  ?>
+											<div class="col-sm-10">
 											<?php
-										}
-										// If field type is checkbox
-										elseif ($fieldTableData->tjFieldFieldTable->type == 'checkbox')
-										{
-											if ($value)
+											// If field type is file
+											if ($fieldTableData->tjFieldFieldTable->type == 'file')
+											{
+												// Get the field value id & subform file field id to get the media URL
+												$fieldValueTableData->fields_value_table->load(array('content_id' => $app->input->get('id', '', 'INT'), 'field_id' => $formData->id));
+												$extraParamArray = array();
+												$extraParamArray['id'] = $fieldValueTableData->fields_value_table->id;
+												$extraParamArray['subFormFileFieldId'] = $fieldTableData->tjFieldFieldTable->id;
+												$mediaLink = $TjfieldsHelper->getMediaUrl($value, $extraParamArray);
+												?>
+												<a href="<?php echo $mediaLink;?>"><?php echo JText::_("COM_TJFIELDS_FILE_DOWNLOAD");?></a>
+												<?php
+											}
+											// If field type is checkbox
+											elseif ($fieldTableData->tjFieldFieldTable->type == 'checkbox')
 											{
 												$checked = ($value == 1) ? ' checked="checked"' : '';
 												?>
 												<input type="checkbox" disabled="disabled" value="1" <?php echo $checked;?> />
 												<?php
 											}
-										}
-										else
-										{
-											$html = '<div class="form-group">';
-											$html .= '<div class="col-sm-10"> ' . htmlspecialchars($value, ENT_COMPAT, 'UTF-8') . '</div>';
-											$html .= '</div>';
+											else
+											{
+												$html = '<div class="form-group">';
+												$html .= '<div class="col-sm-10"> ' . htmlspecialchars($value, ENT_COMPAT, 'UTF-8') . '</div>';
+												$html .= '</div>';
 
-											echo  $html;
+												echo  $html;
+											}
 										}
 										?>
 										</div>
