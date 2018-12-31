@@ -19,11 +19,6 @@ $fieldTableData = new stdClass;
 JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
 $fieldTableData->tjFieldFieldTable = JTable::getInstance('field', 'TjfieldsTable');
 
-// Get Field value table
-$fieldValueTableData = new stdClass;
-JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/tables');
-$fieldValueTableData->fields_value_table = JTable::getInstance('Fieldsvalue', 'TjfieldsTable');
-
 if ($this->form_extra)
 {
 	$fieldSets = $this->form_extra->getFieldsets();
@@ -44,18 +39,13 @@ if ($this->form_extra)
 				{
 					if ($field->value)
 					{
-						// Get field value id to get the media URL
-						$fieldValueTableData->fields_value_table->load(array('value' => $field->value));
-						$extraParamArray = array();
-						$extraParamArray['id'] = $fieldValueTableData->fields_value_table->id;
+						$layout = new JLayoutFile('file', JPATH_ROOT .'/components/com_tjfields/layouts/fields');
+						$mediaLink = $layout->render(array('fieldValue'=>$field->value));
 						?>
 						<div class="form-group">
 							<div class="col-sm-2 col-xs-12"><?php echo $field->label; ?>:</div>
 							<div class="col-sm-2">
-								<?php
-								$mediaLink = $TjfieldsHelper->getMediaUrl($field->value, $extraParamArray);
-								?>
-								<a href="<?php echo $mediaLink;?>"><?php echo JText::_("COM_TJFIELDS_FILE_DOWNLOAD");?></a>
+								<?php echo $mediaLink;?>
 							</div>
 						</div>
 						<?php
@@ -88,15 +78,9 @@ if ($this->form_extra)
 											// If field type is file
 											if ($fieldTableData->tjFieldFieldTable->type == 'file')
 											{
-												// Get the field value id & subform file field id to get the media URL
-												$fieldValueTableData->fields_value_table->load(array('content_id' => $app->input->get('id', '', 'INT'), 'field_id' => $formData->id));
-												$extraParamArray = array();
-												$extraParamArray['id'] = $fieldValueTableData->fields_value_table->id;
-												$extraParamArray['subFormFileFieldId'] = $fieldTableData->tjFieldFieldTable->id;
-												$mediaLink = $TjfieldsHelper->getMediaUrl($value, $extraParamArray);
-												?>
-												<a href="<?php echo $mediaLink;?>"><?php echo JText::_("COM_TJFIELDS_FILE_DOWNLOAD");?></a>
-												<?php
+												$layout = new JLayoutFile('file', JPATH_ROOT .'/components/com_tjfields/layouts/fields');
+												$mediaLink = $layout->render(array('fieldValue'=>$value, 'isSubformField'=>'1', 'content_id'=>$app->input->get('id', '', 'INT'), 'subformFieldId'=>$formData->id,'subformFileFieldName'=>$name));
+												echo $mediaLink;
 											}
 											// If field type is checkbox
 											elseif ($fieldTableData->tjFieldFieldTable->type == 'checkbox')
