@@ -370,7 +370,7 @@ class TjucmControllerItemForm extends JControllerForm
 				 * * so that we will mearge $data and $ files array using array_merge function
 				 * * and pass to the validation funcation.*/
 
-				if ($files)
+				if (!empty($files))
 				{
 					$extra_jform_data = array_merge_recursive($data, $files);
 				}
