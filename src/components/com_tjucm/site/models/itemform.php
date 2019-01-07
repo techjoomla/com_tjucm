@@ -461,7 +461,10 @@ class TjucmModelItemForm extends JModelForm
 				$itemDetails = Table::getInstance('Item', 'TjucmTable');
 				$itemDetails->load(array('id' => $typeItemId));
 
-				$data['created_by'] = $itemDetails->created_by;
+				if (!empty($itemDetails))
+				{
+					$data['created_by'] = $itemDetails->created_by;
+				}
 
 				if ($canEdit)
 				{
