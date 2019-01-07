@@ -89,15 +89,15 @@ class TjucmModelItemForm extends JModelForm
 			$menuitem   = $app->getMenu()->getActive();
 
 			// Get the params
-			$this->menuparams = $menuitem->params;
+			$menuparams = $menuitem->params;
 
-			if (!empty($this->menuparams))
+			if (!empty($menuparams))
 			{
-				$this->ucm_type   = $this->menuparams->get('ucm_type');
+				$ucm_type   = $menuparams->get('ucm_type');
 
-				if (!empty($this->ucm_type))
+				if (!empty($ucm_type))
 				{
-					$ucmType     = 'com_tjucm.' . $this->ucm_type;
+					$ucmType     = 'com_tjucm.' . $ucm_type;
 				}
 			}
 		}
@@ -351,9 +351,6 @@ class TjucmModelItemForm extends JModelForm
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
-		// Initialise variables.
-		$app = JFactory::getApplication();
-
 		// Get the form.
 		$form = $this->loadForm(
 			'com_tjucm.itemform', 'itemform',
@@ -450,7 +447,7 @@ class TjucmModelItemForm extends JModelForm
 				return false;
 			}
 
-			if (!empty($typeItemId))
+			if ($typeItemId)
 			{
 				// Check the user can edit this item
 				$canEdit = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmTypeId);
