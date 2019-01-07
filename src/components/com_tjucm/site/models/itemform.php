@@ -450,7 +450,7 @@ class TjucmModelItemForm extends JModelForm
 				return false;
 			}
 
-			if ($typeItemId)
+			if (!empty($typeItemId))
 			{
 				// Check the user can edit this item
 				$canEdit = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmTypeId);
@@ -461,10 +461,7 @@ class TjucmModelItemForm extends JModelForm
 				$itemDetails = Table::getInstance('Item', 'TjucmTable');
 				$itemDetails->load(array('id' => $typeItemId));
 
-				if (!empty($itemDetails))
-				{
-					$data['created_by'] = $itemDetails->created_by;
-				}
+				$data['created_by'] = $itemDetails->created_by;
 
 				if ($canEdit)
 				{
