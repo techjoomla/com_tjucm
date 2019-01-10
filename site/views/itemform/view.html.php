@@ -85,6 +85,10 @@ class TjucmViewItemform extends JViewLegacy
 
 		$TypeData = $tjUcmModelType->getItem($typeId);
 
+		// Set Layout to type view
+		$layout = $TypeData->itemform_layout;
+		$this->setLayout($layout);
+
 		$allowedCount = $TypeData->allowed_count;
 		$user   = JFactory::getUser();
 		$userId = $user->id;
