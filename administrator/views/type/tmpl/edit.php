@@ -64,7 +64,6 @@ JHtml::script( JUri::root().'administrator/components/com_tjucm/assets/js/tjucm_
 							<?php echo $this->form->renderField('allow_draft_save'); ?>
 							<?php echo $this->form->renderField('type_description'); ?>
 							<?php echo $this->form->renderField('layout'); ?>
-							<?php echo $this->form->renderField('type_options'); ?>
 
 							<?php echo $this->form->renderField('params'); ?>
 							<input type="hidden" name="jform[checked_out]" value="<?php echo $this->item->checked_out; ?>" />
