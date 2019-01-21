@@ -27,7 +27,6 @@
 		<field name="modified_date" type="timecreated" label="COM_TJUCM_FORM_LBL_TYPE_MODIFIED_DATE" description="COM_TJUCM_FORM_DESC_TYPE_MODIFIED_DATE" hidden="true" hint="COM_TJUCM_FORM_LBL_TYPE_MODIFIED_DATE" />
 		<field name="version_note" type="text" label="JGLOBAL_FIELD_VERSION_NOTE_LABEL" description="JGLOBAL_FIELD_VERSION_NOTE_DESC" class="inputbox" size="45" labelclass="control-label" />
 		<field name="layout" type="componentlayout" label="COM_TJUCM_FORM_LBL_TYPE_LAYOUT" description="COM_TJUCM_FORM_DESC_TYPE_LAYOUT" useglobal="true" extension="com_tjucm" view="itemform"/>
-		<field name="type_options" type="textarea" cols="5" rows="5" label="COM_TJUCM_FORM_LBL_TYPE_OPTIONS" description="COM_TJUCM_FORM_DESC_TYPE_OPTIONS" hint="COM_TJUCM_FORM_LBL_TYPE_TYPE_DESCRIPTION" />
 	</fieldset>
 	<fieldset name="accesscontrol">
 		<field name="asset_id" type="hidden" filter="unset" />
