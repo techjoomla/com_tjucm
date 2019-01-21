@@ -107,7 +107,11 @@ class TjucmViewItemform extends JViewLegacy
 			return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
 		}
 
-		$allowedCount = $typeData->allowed_count;
+		// Set Layout to type view
+		$layout = $TypeData->itemform_layout;
+		$this->setLayout($layout);
+
+		$allowedCount = $TypeData->allowed_count;
 		$user   = JFactory::getUser();
 		$userId = $user->id;
 
