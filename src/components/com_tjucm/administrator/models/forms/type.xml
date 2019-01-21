@@ -30,6 +30,7 @@
 		<field name="modified_by" type="modifiedby" default="0" label="COM_TJUCM_FORM_LBL_TYPE_MODIFIED_BY" description="COM_TJUCM_FORM_DESC_TYPE_MODIFIED_BY" hidden="true" hint="COM_TJUCM_FORM_LBL_TYPE_MODIFIED_BY" />
 		<field name="modified_date" type="timecreated" label="COM_TJUCM_FORM_LBL_TYPE_MODIFIED_DATE" description="COM_TJUCM_FORM_DESC_TYPE_MODIFIED_DATE" hidden="true" hint="COM_TJUCM_FORM_LBL_TYPE_MODIFIED_DATE" />
 		<field name="version_note" type="text" label="JGLOBAL_FIELD_VERSION_NOTE_LABEL" description="JGLOBAL_FIELD_VERSION_NOTE_DESC" class="inputbox" size="45" labelclass="control-label" />
+		<field name="layout" type="componentlayout" label="COM_TJUCM_FORM_LBL_TYPE_LAYOUT" description="COM_TJUCM_FORM_DESC_TYPE_LAYOUT" useglobal="true" extension="com_tjucm" view="itemform"/>
 	</fieldset>
 	<fieldset name="accesscontrol">
 		<field name="asset_id" type="hidden" filter="unset" />
