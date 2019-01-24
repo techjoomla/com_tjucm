@@ -109,7 +109,7 @@ if ($this->form_extra)
 
 		if ($fieldsets_counter == 0)
 		{
-			echo JHtml::_('bootstrap.startTabSet');
+			echo JHtml::_('bootstrap.endTabSet');
 		}
 	}
 }
