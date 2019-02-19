@@ -7,8 +7,15 @@ jQuery(document).ready(function()
 	/*Code for auto save on blur event add new record or editing draft record only*/
 	if (itemState == '' || itemState == 0)
 	{
-		jQuery(document).on("blur", ":input[type!='button']", function() {
-			let showDraftSuccessMsg = "0";
+		let showDraftSuccessMsg = "0";
+		
+		// Save form values 
+		jQuery(document).on("change select", ":input", function() {
+			steppedFormSave(this.form.id, "draft", showDraftSuccessMsg);
+		});
+		
+		// To save calendar field value
+		jQuery(".field-calendar input:text").blur(function(){  
 			steppedFormSave(this.form.id, "draft", showDraftSuccessMsg);
 		});
 	}
