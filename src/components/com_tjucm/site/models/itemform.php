@@ -89,15 +89,15 @@ class TjucmModelItemForm extends JModelForm
 			$menuitem   = $app->getMenu()->getActive();
 
 			// Get the params
-			$this->menuparams = $menuitem->params;
+			$menuparams = $menuitem->params;
 
-			if (!empty($this->menuparams))
+			if (!empty($menuparams))
 			{
-				$this->ucm_type   = $this->menuparams->get('ucm_type');
+				$ucm_type   = $menuparams->get('ucm_type');
 
-				if (!empty($this->ucm_type))
+				if (!empty($ucm_type))
 				{
-					$ucmType     = 'com_tjucm.' . $this->ucm_type;
+					$ucmType     = 'com_tjucm.' . $ucm_type;
 				}
 			}
 		}
@@ -351,9 +351,6 @@ class TjucmModelItemForm extends JModelForm
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
-		// Initialise variables.
-		$app = JFactory::getApplication();
-
 		// Get the form.
 		$form = $this->loadForm(
 			'com_tjucm.itemform', 'itemform',
@@ -415,16 +412,41 @@ class TjucmModelItemForm extends JModelForm
 		$typeItemId = (!empty($data['id'])) ? $data['id'] : (int) $this->getState('item.id');
 		$authorised = false;
 
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+
 		if (empty($ucmTypeId))
 		{
 			// Get UCM type id from uniquue identifier
-			JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
-			$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
 			$ucmTypeId = $tjUcmModelType->getTypeId($this->client);
 		}
 
 		if ($ucmTypeId)
 		{
+			// Check if user is allowed to save the content
+			$typeData = $tjUcmModelType->getItem($ucmTypeId);
+			$allowedCount = $typeData->allowed_count;
+
+			// 0 : add unlimited records against this UCM type
+			$allowedCount = empty($allowedCount) ? 0 : $allowedCount;
+			$userId = $user->id;
+			$allowedToAdd = $this->allowedToAddTypeData($userId, $this->client, $allowedCount);
+
+			if (!$allowedToAdd && $typeItemId == 0)
+			{
+				$isAjax = $app->input->server->get('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest', 'BOOL');
+
+				if ($isAjax)
+				{
+					$message = JText::sprintf('COM_TJUCM_ALLOWED_COUNT_LIMIT', $allowedCount);
+					$app->enqueueMessage($message, 'warning');
+					echo new JResponseJson;
+					jexit();
+				}
+
+				return false;
+			}
+
 			if ($typeItemId)
 			{
 				// Check the user can edit this item
