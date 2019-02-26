@@ -10,8 +10,7 @@
 	<packagename>ucm</packagename>
 	<version>1.0.0</version>
 	<packager>Techjoomla Team</packager>
-	<description />
-	<scriptfile>script.pkg_ucm.php</scriptfile>
+	<scriptfile>script.pkg_tjucm.php</scriptfile>
 	<files folder="components">
 		<file type="component" id="com_tjucm">com_tjucm.zip</file>
 		<file type="component" id="com_tjfields">com_tjfields.zip</file>
