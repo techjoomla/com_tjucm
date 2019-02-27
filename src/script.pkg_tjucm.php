@@ -84,7 +84,7 @@ class Pkg_UcmInstallerScript
 	 *
 	 * @param   JInstaller  $parent  parent
 	 *
-	 * @return  void
+	 * @return  ARRAY
 	 */
 	private function _installStraper($parent)
 	{
@@ -191,7 +191,7 @@ class Pkg_UcmInstallerScript
 	 * Renders the post-installation message
 	 *
 	 * @param   JInstaller  $status         parent
-	 * @param   JInstaller  $straperStatus  parent
+	 * @param   ARRAY       $straperStatus  parent
 	 * @param   JInstaller  $parent         parent
 	 *
 	 * @return  void
