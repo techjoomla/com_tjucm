@@ -363,8 +363,15 @@ class TjucmControllerItemForm extends JControllerForm
 				}
 
 				// Remove the fields having empty value from both the array before merge
-				$data = array_filter($data);
-				$files = array_filter($files);
+				if (is_array($data))
+				{
+					$data = array_filter($data);
+				}
+
+				if (is_array($files))
+				{
+					$files = array_filter($files);
+				}
 
 				/* If file field is required then in the validation method return false
 				 * * so that we will mearge $data and $ files array using array_merge function
