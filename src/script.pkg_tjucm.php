@@ -200,82 +200,68 @@ class Pkg_UcmInstallerScript
 	{
 		$document = JFactory::getDocument();
 		JFactory::getLanguage()->load('com_tjucm', JPATH_ADMINISTRATOR, null, true);
-?>
-	   <?php
-		$rows = 1;
-?>
-	   <link rel="stylesheet" type="text/css" href="<?php
-		echo JURI::root() . 'media/techjoomla_strapper/css/bootstrap.min.css';
-?>"/>
-		<div class="techjoomla-bootstrap" >
-		<table class="table-condensed table" width="100%">
-			<thead>
-				<tr class="row1">
-					<th class="title" colspan="2">Extension</th>
-					<th>Status</th>
-				</tr>
-			</thead>
-			<tfoot>
-				<tr>
-					<td colspan="3"></td>
-				</tr>
-			</tfoot>
-			<tbody>
-				<tr class="row2">
-					<td class="key" colspan="2"><strong>UCM component</strong></td>
-					<td><strong style="color: green">Installed</strong></td>
-				</tr>
-
-				<tr class="row2">
-					<td class="key" colspan="2">
-						<strong>TechJoomla Strapper</strong> [<?php
-		echo $straperStatus['date'];
-?>]
-					</td>
-					<td>
-						<strong>
-							<span style="color: <?php
-		echo $straperStatus['required'] ? ($straperStatus['installed'] ? 'green' : 'red') : '#660';
-?>; font-weight: bold;">
-								<?php
-		echo $straperStatus['required'] ? ($straperStatus['installed'] ? 'Installed' : 'Not Installed') : 'Already up-to-date';
-?>
-							</span>
-						</strong>
-					</td>
-				</tr>
-				<!-- LIB INSTALL-->
-				<?php
-		if (count($status->libraries))
-		{
-?>
-			   <tr class="row1">
-					<th>Library</th>
-					<th></th>
-					<th></th>
-					</tr>
-				<?php
-			foreach ($status->libraries as $libraries)
-			{
-?>
-			   <tr class="row2">
-					<td class="key"><?php
-				echo ucfirst($libraries['name']);
-?></td>
-					<td class="key"></td>
-					<td><strong style="color: <?php
-				echo $libraries['result'] ? "green" : "red";
-?>"><?php
-				echo $libraries['result'] ? 'Installed' : 'Not installed';
-?></strong></td>
-				</tr>
-				<?php
-			}
-		}
 		?>
 
-			</tbody>
-		</table>
+		<link rel="stylesheet" type="text/css" href="<?php echo JURI::root() . 'media/techjoomla_strapper/css/bootstrap.min.css'; ?>"/>
+		<div class="techjoomla-bootstrap" >
+			<table class="table-condensed table" width="100%">
+				<thead>
+					<tr class="row1">
+						<th class="title" colspan="2">Extension</th>
+						<th>Status</th>
+					</tr>
+				</thead>
+				<tfoot>
+					<tr>
+						<td colspan="3"></td>
+					</tr>
+				</tfoot>
+				<tbody>
+					<tr class="row2">
+						<td class="key" colspan="2"><strong>UCM component</strong></td>
+						<td><strong style="color: green">Installed</strong></td>
+					</tr>
+
+					<tr class="row2">
+						<td class="key" colspan="2">
+							<strong>TechJoomla Strapper</strong> [<?php echo $straperStatus['date']; ?>]
+						</td>
+						<td>
+							<strong>
+								<span style="color: <?php echo $straperStatus['required'] ? ($straperStatus['installed'] ? 'green' : 'red') : '#660'; ?>; font-weight: bold;">
+									<?php echo $straperStatus['required'] ? ($straperStatus['installed'] ? 'Installed' : 'Not Installed') : 'Already up-to-date'; ?>
+								</span>
+							</strong>
+						</td>
+					</tr>
+					<!-- LIB INSTALL-->
+					<?php
+					if (count($status->libraries))
+					{
+						?>
+						<tr class="row1">
+							<th>Library</th>
+							<th></th>
+							<th></th>
+						</tr>
+						<?php
+						foreach ($status->libraries as $libraries)
+						{
+							?>
+							<tr class="row2">
+								<td class="key"><?php echo ucfirst($libraries['name']);?></td>
+								<td class="key"></td>
+								<td>
+									<strong style="color: <?php echo $libraries['result'] ? "green" : "red"; ?>">
+									<?php echo $libraries['result'] ? 'Installed' : 'Not installed'; ?></strong>
+								</td>
+							</tr>
+							<?php
+						}
+					}
+				?>
+				</tbody>
+			</table>
 		</div>
 		<?php
 	}
@@ -292,7 +278,6 @@ class Pkg_UcmInstallerScript
 	 */
 	private function _renderPostUninstallation($status, $parent)
 	{
-		$rows = 0;
 		?>
 		<h2><?php echo JText::_('TJUCM Uninstallation Status');?></h2>
 		<table class="adminlist">
