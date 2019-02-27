@@ -283,8 +283,8 @@ class Pkg_UcmInstallerScript
 	/**
 	 * _renderPostUninstallation
 	 *
-	 * @param   STRING  $status  status of installed extensions
-	 * @param   ARRAY   $parent  parent item
+	 * @param   STRING      $status  status of installed extensions
+	 * @param   JInstaller  $parent  parent item
 	 *
 	 * @return  void
 	 *
@@ -292,22 +292,14 @@ class Pkg_UcmInstallerScript
 	 */
 	private function _renderPostUninstallation($status, $parent)
 	{
-?>
-	   <?php
 		$rows = 0;
-?>
-	   <h2><?php
-		echo JText::_('TJUCM Uninstallation Status');
-?></h2>
+		?>
+		<h2><?php echo JText::_('TJUCM Uninstallation Status');?></h2>
 		<table class="adminlist">
 			<thead>
 				<tr>
-					<th class="title" colspan="2"><?php
-		echo JText::_('Extension');
-?></th>
-					<th width="30%"><?php
-		echo JText::_('Status');
-?></th>
+					<th class="title" colspan="2"><?php echo JText::_('Extension');?></th>
+					<th width="30%"><?php echo JText::_('Status'); ?></th>
 				</tr>
 			</thead>
 			<tfoot>
@@ -317,14 +309,10 @@ class Pkg_UcmInstallerScript
 			</tfoot>
 			<tbody>
 				<tr class="row0">
-					<td class="key" colspan="2"><?php
-		echo 'TJUCM ' . JText::_('Component');
-?></td>
-					<td><strong style="color: green"><?php
-		echo JText::_('Removed');
-?></strong></td>
+					<td class="key" colspan="2"><?php echo 'TJUCM ' . JText::_('Component'); ?></td>
+					<td><strong style="color: green"><?php echo JText::_('Removed'); ?></strong></td>
 				</tr>
-		   </tbody>
+			</tbody>
 		</table>
 		<?php
 	}
