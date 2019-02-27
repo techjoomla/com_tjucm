@@ -84,7 +84,7 @@ class Pkg_UcmInstallerScript
 	 *
 	 * @param   JInstaller  $parent  parent
 	 *
-	 * @return  void
+	 * @return  ARRAY
 	 */
 	private function _installStraper($parent)
 	{
@@ -191,7 +191,7 @@ class Pkg_UcmInstallerScript
 	 * Renders the post-installation message
 	 *
 	 * @param   JInstaller  $status         parent
-	 * @param   JInstaller  $straperStatus  parent
+	 * @param   ARRAY       $straperStatus  parent
 	 * @param   JInstaller  $parent         parent
 	 *
 	 * @return  void
@@ -200,82 +200,68 @@ class Pkg_UcmInstallerScript
 	{
 		$document = JFactory::getDocument();
 		JFactory::getLanguage()->load('com_tjucm', JPATH_ADMINISTRATOR, null, true);
-?>
-	   <?php
-		$rows = 1;
-?>
-	   <link rel="stylesheet" type="text/css" href="<?php
-		echo JURI::root() . 'media/techjoomla_strapper/css/bootstrap.min.css';
-?>"/>
-		<div class="techjoomla-bootstrap" >
-		<table class="table-condensed table" width="100%">
-			<thead>
-				<tr class="row1">
-					<th class="title" colspan="2">Extension</th>
-					<th>Status</th>
-				</tr>
-			</thead>
-			<tfoot>
-				<tr>
-					<td colspan="3"></td>
-				</tr>
-			</tfoot>
-			<tbody>
-				<tr class="row2">
-					<td class="key" colspan="2"><strong>UCM component</strong></td>
-					<td><strong style="color: green">Installed</strong></td>
-				</tr>
-
-				<tr class="row2">
-					<td class="key" colspan="2">
-						<strong>TechJoomla Strapper</strong> [<?php
-		echo $straperStatus['date'];
-?>]
-					</td>
-					<td>
-						<strong>
-							<span style="color: <?php
-		echo $straperStatus['required'] ? ($straperStatus['installed'] ? 'green' : 'red') : '#660';
-?>; font-weight: bold;">
-								<?php
-		echo $straperStatus['required'] ? ($straperStatus['installed'] ? 'Installed' : 'Not Installed') : 'Already up-to-date';
-?>
-							</span>
-						</strong>
-					</td>
-				</tr>
-				<!-- LIB INSTALL-->
-				<?php
-		if (count($status->libraries))
-		{
-?>
-			   <tr class="row1">
-					<th>Library</th>
-					<th></th>
-					<th></th>
-					</tr>
-				<?php
-			foreach ($status->libraries as $libraries)
-			{
-?>
-			   <tr class="row2">
-					<td class="key"><?php
-				echo ucfirst($libraries['name']);
-?></td>
-					<td class="key"></td>
-					<td><strong style="color: <?php
-				echo $libraries['result'] ? "green" : "red";
-?>"><?php
-				echo $libraries['result'] ? 'Installed' : 'Not installed';
-?></strong></td>
-				</tr>
-				<?php
-			}
-		}
 		?>
 
-			</tbody>
-		</table>
+		<link rel="stylesheet" type="text/css" href="<?php echo JURI::root() . 'media/techjoomla_strapper/css/bootstrap.min.css'; ?>"/>
+		<div class="techjoomla-bootstrap" >
+			<table class="table-condensed table" width="100%">
+				<thead>
+					<tr class="row1">
+						<th class="title" colspan="2">Extension</th>
+						<th>Status</th>
+					</tr>
+				</thead>
+				<tfoot>
+					<tr>
+						<td colspan="3"></td>
+					</tr>
+				</tfoot>
+				<tbody>
+					<tr class="row2">
+						<td class="key" colspan="2"><strong>UCM component</strong></td>
+						<td><strong style="color: green">Installed</strong></td>
+					</tr>
+
+					<tr class="row2">
+						<td class="key" colspan="2">
+							<strong>TechJoomla Strapper</strong> [<?php echo $straperStatus['date']; ?>]
+						</td>
+						<td>
+							<strong>
+								<span style="color: <?php echo $straperStatus['required'] ? ($straperStatus['installed'] ? 'green' : 'red') : '#660'; ?>; font-weight: bold;">
+									<?php echo $straperStatus['required'] ? ($straperStatus['installed'] ? 'Installed' : 'Not Installed') : 'Already up-to-date'; ?>
+								</span>
+							</strong>
+						</td>
+					</tr>
+					<!-- LIB INSTALL-->
+					<?php
+					if (count($status->libraries))
+					{
+						?>
+						<tr class="row1">
+							<th>Library</th>
+							<th></th>
+							<th></th>
+						</tr>
+						<?php
+						foreach ($status->libraries as $libraries)
+						{
+							?>
+							<tr class="row2">
+								<td class="key"><?php echo ucfirst($libraries['name']);?></td>
+								<td class="key"></td>
+								<td>
+									<strong style="color: <?php echo $libraries['result'] ? "green" : "red"; ?>">
+									<?php echo $libraries['result'] ? 'Installed' : 'Not installed'; ?></strong>
+								</td>
+							</tr>
+							<?php
+						}
+					}
+				?>
+				</tbody>
+			</table>
 		</div>
 		<?php
 	}
@@ -283,8 +269,8 @@ class Pkg_UcmInstallerScript
 	/**
 	 * _renderPostUninstallation
 	 *
-	 * @param   STRING  $status  status of installed extensions
-	 * @param   ARRAY   $parent  parent item
+	 * @param   STRING      $status  status of installed extensions
+	 * @param   JInstaller  $parent  parent item
 	 *
 	 * @return  void
 	 *
@@ -292,22 +278,13 @@ class Pkg_UcmInstallerScript
 	 */
 	private function _renderPostUninstallation($status, $parent)
 	{
-?>
-	   <?php
-		$rows = 0;
-?>
-	   <h2><?php
-		echo JText::_('TJUCM Uninstallation Status');
-?></h2>
+		?>
+		<h2><?php echo JText::_('TJUCM Uninstallation Status');?></h2>
 		<table class="adminlist">
 			<thead>
 				<tr>
-					<th class="title" colspan="2"><?php
-		echo JText::_('Extension');
-?></th>
-					<th width="30%"><?php
-		echo JText::_('Status');
-?></th>
+					<th class="title" colspan="2"><?php echo JText::_('Extension');?></th>
+					<th width="30%"><?php echo JText::_('Status'); ?></th>
 				</tr>
 			</thead>
 			<tfoot>
@@ -317,14 +294,10 @@ class Pkg_UcmInstallerScript
 			</tfoot>
 			<tbody>
 				<tr class="row0">
-					<td class="key" colspan="2"><?php
-		echo 'TJUCM ' . JText::_('Component');
-?></td>
-					<td><strong style="color: green"><?php
-		echo JText::_('Removed');
-?></strong></td>
+					<td class="key" colspan="2"><?php echo 'TJUCM ' . JText::_('Component'); ?></td>
+					<td><strong style="color: green"><?php echo JText::_('Removed'); ?></strong></td>
 				</tr>
-		   </tbody>
+			</tbody>
 		</table>
 		<?php
 	}
