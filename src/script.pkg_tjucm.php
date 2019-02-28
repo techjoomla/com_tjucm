@@ -1,26 +1,97 @@
 <?php
 /**
- * @version    SVN: <svn_id>
- * @package    TJUCM
- * @author     Techjoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2018 TechJoomla. All rights reserved.
- * @license    GNU General Public License version 2 or later.
+ * @package     TJ-UCM
+ * @subpackage  com_tjucm
+ *
+ * @author      Techjoomla <extensions@techjoomla.com>
+ * @copyright   Copyright (C) 2009 - 2019 Techjoomla. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// No direct access
-defined('_JEXEC') or die;
+// No direct access.
+defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.filesystem.folder');
+jimport('joomla.installer.installer');
 jimport('joomla.filesystem.file');
-jimport('joomla.application.component.controller');
+
+$tjInstallerPath = JPATH_ROOT . '/administrator/manifests/packages/tjucm/tjinstaller.php';
+
+if (JFile::exists(__DIR__ . '/tjinstaller.php'))
+{
+	include_once __DIR__ . '/tjinstaller.php';
+}
+elseif (JFile::exists($tjInstallerPath))
+{
+	include_once $tjInstallerPath;
+}
 
 /**
  * TJUCM Installer
  *
  * @since  1.0.0
  */
-class Pkg_UcmInstallerScript
+class Pkg_UcmInstallerScript extends TJInstaller
 {
+	protected $extensionName = 'TJ-UCM';
+
+	/** @var array The list of extra modules and plugins to install */
+	private $oldversion = "";
+
+	/** @var  array  The list of extra modules and plugins to install */
+	protected $installationQueue = array (
+		'postflight' => array(
+			),
+
+			'files' => array(
+				'tj_strapper' => 1
+			),
+
+			/*plugins => { (folder) => { (element) => (published) }}*/
+			'plugins' => array (
+			),
+
+			'libraries' => array (
+				'techjoomla' => 1
+			)
+		);
+
+	/** @var  array  The list of extra modules and plugins to uninstall */
+	protected $uninstallQueue = array (
+		/*plugins => { (folder) => { (element) => (published) }}*/
+		'plugins' => array ()
+	);
+
+	/** @var array The list of obsolete extra modules and plugins to uninstall when upgrading the component */
+	protected $obsoleteExtensionsUninstallationQueue = array (
+		// @modules => { (folder) => { (module) }* }*
+		'modules' => array (
+			'admin' => array (
+			),
+			'site' => array (
+			)
+		),
+		// @plugins => { (folder) => { (element) }* }*
+		'plugins' => array (
+		)
+	);
+
+	/**
+	 * A list of extensions (modules, plugins) to enable after installation. Each item has four values, in this order:
+	 * type (plugin, module, ...), name (of the extension), status (0 - unpublish, 1 - publish),
+	 * client (0=site, 1=admin), group (for plugins), position (for modules).
+	 *
+	 * @var array
+	 */
+	protected $extensionsToEnable = array ();
+
+	/** @var array Obsolete files and folders to remove*/
+	private $removeFilesAndFolders = array(
+		'files'	=> array(
+		),
+		'folders' => array(
+		)
+	);
+
 	/**
 	 * method to run before an install/update/uninstall method
 	 *
@@ -31,20 +102,6 @@ class Pkg_UcmInstallerScript
 	 */
 	public function preflight($type, $parent)
 	{
-		if ($type == 'update')
-		{
-			$db = JFactory::getDbo();
-			$query = $db->getQuery(true);
-			$query->select($db->quoteName(array('manifest_cache')))
-				->from($db->quoteName('#__extensions'))
-				->where($db->quoteName('element') . ' = ' . $db->quote('pkg_ucm'))
-				->where($db->quoteName('type') . ' = ' . $db->quote('package'));
-
-			$db->setQuery($query);
-			$result = $db->loadObject();
-			$decode = json_decode($result->manifest_cache);
-			$this->oldversion = $decode->version;
-		}
 	}
 
 	/**
@@ -56,7 +113,28 @@ class Pkg_UcmInstallerScript
 	 */
 	public function install($parent)
 	{
-		// $parent is the class calling this method
+	}
+
+	/**
+	 * Runs after update
+	 *
+	 * @param   JInstaller  $parent  The class calling this method
+	 *
+	 * @return  void
+	 */
+	public function update($parent)
+	{
+	}
+
+	/**
+	 * Method to uninstall the component
+	 *
+	 * @param   JInstaller  $parent  Class calling this method
+	 *
+	 * @return  void
+	 */
+	public function uninstall($parent)
+	{
 	}
 
 	/**
@@ -69,251 +147,5 @@ class Pkg_UcmInstallerScript
 	 */
 	public function postflight($type, $parent)
 	{
-		// Install Techjoomla Straper
-		$straperStatus = $this->_installStraper($parent);
-
-		$document = JFactory::getDocument();
-		$document->addStyleSheet(JURI::root() . '/media/techjoomla_strapper/css/bootstrap.min.css');
-
-		// Show the post-installation page
-		$this->_renderPostInstallation($status, $straperStatus, $parent);
-	}
-
-	/**
-	 * Install strappers
-	 *
-	 * @param   JInstaller  $parent  parent
-	 *
-	 * @return  ARRAY
-	 */
-	private function _installStraper($parent)
-	{
-		$src = $parent->getParent()->getPath('source');
-
-		$source = $src . '/tj_strapper';
-		$target = JPATH_ROOT . '/media/techjoomla_strapper';
-
-		$haveToInstallStraper = false;
-
-		if (!JFolder::exists($target))
-		{
-			$haveToInstallStraper = true;
-		}
-		else
-		{
-			$straperVersion = array();
-
-			if (JFile::exists($target . '/version.txt'))
-			{
-				$rawData = JFile::read($target . '/version.txt');
-				$info = explode("\n", $rawData);
-				$straperVersion['installed'] = array(
-					'version'	=> trim($info[0]),
-					'date'		=> new JDate(trim($info[1]))
-				);
-			}
-			else
-			{
-				$straperVersion['installed'] = array(
-					'version'	=> '0.0',
-					'date'		=> new JDate('2011-01-01')
-				);
-			}
-
-			$rawData = JFile::read($source . '/version.txt');
-			$info = explode("\n", $rawData);
-			$straperVersion['package'] = array(
-				'version'	=> trim($info[0]),
-				'date'		=> new JDate(trim($info[1]))
-			);
-
-			$haveToInstallStraper = $straperVersion['package']['date']->toUNIX() > $straperVersion['installed']['date']->toUNIX();
-		}
-
-		$installedStraper = false;
-
-		if ($haveToInstallStraper)
-		{
-			$versionSource = 'package';
-			$installer = new JInstaller;
-			$installedStraper = $installer->install($source);
-		}
-		else
-		{
-			$versionSource = 'installed';
-		}
-
-		if (!isset($straperVersion))
-		{
-			$straperVersion = array();
-
-			if (JFile::exists($target . '/version.txt'))
-			{
-				$rawData = JFile::read($target . '/version.txt');
-				$info = explode("\n", $rawData);
-				$straperVersion['installed'] = array(
-					'version'	=> trim($info[0]),
-					'date'		=> new JDate(trim($info[1]))
-				);
-			}
-			else
-			{
-				$straperVersion['installed'] = array(
-					'version'	=> '0.0',
-					'date'		=> new JDate('2011-01-01')
-				);
-			}
-
-			$rawData = JFile::read($source . '/version.txt');
-			$info = explode("\n", $rawData);
-			$straperVersion['package'] = array(
-				'version'	=> trim($info[0]),
-				'date'		=> new JDate(trim($info[1]))
-			);
-
-			$versionSource = 'installed';
-		}
-
-		if (!($straperVersion[$versionSource]['date'] instanceof JDate))
-		{
-			$straperVersion[$versionSource]['date'] = new JDate;
-		}
-
-		return array(
-			'required'	=> $haveToInstallStraper,
-			'installed'	=> $installedStraper,
-			'version'	=> $straperVersion[$versionSource]['version'],
-			'date'		=> $straperVersion[$versionSource]['date']->format('Y-m-d'),
-		);
-	}
-
-	/**
-	 * Renders the post-installation message
-	 *
-	 * @param   JInstaller  $status         parent
-	 * @param   ARRAY       $straperStatus  parent
-	 * @param   JInstaller  $parent         parent
-	 *
-	 * @return  void
-	 */
-	private function _renderPostInstallation($status, $straperStatus, $parent)
-	{
-		$document = JFactory::getDocument();
-		JFactory::getLanguage()->load('com_tjucm', JPATH_ADMINISTRATOR, null, true);
-		?>
-
-		<link rel="stylesheet" type="text/css" href="<?php echo JURI::root() . 'media/techjoomla_strapper/css/bootstrap.min.css'; ?>"/>
-		<div class="techjoomla-bootstrap" >
-			<table class="table-condensed table" width="100%">
-				<thead>
-					<tr class="row1">
-						<th class="title" colspan="2">Extension</th>
-						<th>Status</th>
-					</tr>
-				</thead>
-				<tfoot>
-					<tr>
-						<td colspan="3"></td>
-					</tr>
-				</tfoot>
-				<tbody>
-					<tr class="row2">
-						<td class="key" colspan="2"><strong>UCM component</strong></td>
-						<td><strong style="color: green">Installed</strong></td>
-					</tr>
-
-					<tr class="row2">
-						<td class="key" colspan="2">
-							<strong>TechJoomla Strapper</strong> [<?php echo $straperStatus['date']; ?>]
-						</td>
-						<td>
-							<strong>
-								<span style="color: <?php echo $straperStatus['required'] ? ($straperStatus['installed'] ? 'green' : 'red') : '#660'; ?>; font-weight: bold;">
-									<?php echo $straperStatus['required'] ? ($straperStatus['installed'] ? 'Installed' : 'Not Installed') : 'Already up-to-date'; ?>
-								</span>
-							</strong>
-						</td>
-					</tr>
-					<!-- LIB INSTALL-->
-					<?php
-					if (count($status->libraries))
-					{
-						?>
-						<tr class="row1">
-							<th>Library</th>
-							<th></th>
-							<th></th>
-						</tr>
-						<?php
-						foreach ($status->libraries as $libraries)
-						{
-							?>
-							<tr class="row2">
-								<td class="key"><?php echo ucfirst($libraries['name']);?></td>
-								<td class="key"></td>
-								<td>
-									<strong style="color: <?php echo $libraries['result'] ? "green" : "red"; ?>">
-									<?php echo $libraries['result'] ? 'Installed' : 'Not installed'; ?></strong>
-								</td>
-							</tr>
-							<?php
-						}
-					}
-				?>
-				</tbody>
-			</table>
-		</div>
-		<?php
-	}
-
-	/**
-	 * _renderPostUninstallation
-	 *
-	 * @param   STRING      $status  status of installed extensions
-	 * @param   JInstaller  $parent  parent item
-	 *
-	 * @return  void
-	 *
-	 * @since  1.0.0
-	 */
-	private function _renderPostUninstallation($status, $parent)
-	{
-		?>
-		<h2><?php echo JText::_('TJUCM Uninstallation Status');?></h2>
-		<table class="adminlist">
-			<thead>
-				<tr>
-					<th class="title" colspan="2"><?php echo JText::_('Extension');?></th>
-					<th width="30%"><?php echo JText::_('Status'); ?></th>
-				</tr>
-			</thead>
-			<tfoot>
-				<tr>
-					<td colspan="3"></td>
-				</tr>
-			</tfoot>
-			<tbody>
-				<tr class="row0">
-					<td class="key" colspan="2"><?php echo 'TJUCM ' . JText::_('Component'); ?></td>
-					<td><strong style="color: green"><?php echo JText::_('Removed'); ?></strong></td>
-				</tr>
-			</tbody>
-		</table>
-		<?php
-	}
-
-	/**
-	 * Runs on uninstallation
-	 *
-	 * @param   JInstaller  $parent  Parent
-	 *
-	 * @return void
-	 *
-	 * @since   1.0.0
-	 */
-	public function uninstall($parent)
-	{
-		// Show the post-uninstallation page
-		$this->_renderPostUninstallation($status, $parent);
 	}
 }
