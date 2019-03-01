@@ -46,10 +46,6 @@ class Pkg_UcmInstallerScript extends TJInstaller
 				'tj_strapper' => 1
 			),
 
-			/*plugins => { (folder) => { (element) => (published) }}*/
-			'plugins' => array (
-			),
-
 			'libraries' => array (
 				'techjoomla' => 1
 			)
@@ -113,6 +109,8 @@ class Pkg_UcmInstallerScript extends TJInstaller
 	 */
 	public function install($parent)
 	{
+		// Enable the extensions on fresh install
+		$this->enableExtensions();
 	}
 
 	/**
@@ -135,6 +133,11 @@ class Pkg_UcmInstallerScript extends TJInstaller
 	 */
 	public function uninstall($parent)
 	{
+		// Uninstall subextensions
+		$status = $this->uninstallSubextensions($parent);
+
+		// Show the post-uninstallation page
+		$this->renderPostUninstallation($status);
 	}
 
 	/**
@@ -147,5 +150,16 @@ class Pkg_UcmInstallerScript extends TJInstaller
 	 */
 	public function postflight($type, $parent)
 	{
+		// Install subextensions
+		$status = $this->installSubextensions($parent, 'postflight');
+
+		// Uninstall obsolete subextensions
+		$uninstallStatus = $this->uninstallObsoleteSubextensions($parent);
+
+		// Remove obsolete files and folders
+		$this->removeObsoleteFilesAndFolders($this->removeFilesAndFolders);
+
+		// Show the post-installation page
+		$this->renderPostInstallation($status);
 	}
 }
