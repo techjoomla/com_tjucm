@@ -40,8 +40,6 @@ class Pkg_UcmInstallerScript extends TJInstaller
 	/** @var  array  The list of extra modules and plugins to install */
 	protected $installationQueue = array (
 		'postflight' => array(
-			),
-
 			'files' => array(
 				'tj_strapper' => 1
 			),
@@ -49,7 +47,8 @@ class Pkg_UcmInstallerScript extends TJInstaller
 			'libraries' => array (
 				'techjoomla' => 1
 			)
-		);
+		)
+	);
 
 	/** @var  array  The list of extra modules and plugins to uninstall */
 	protected $uninstallQueue = array (
