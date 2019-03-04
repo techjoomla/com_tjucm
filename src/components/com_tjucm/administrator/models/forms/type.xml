@@ -16,7 +16,11 @@
 			<option value="-2">JTRASHED</option>
 		</field>
 		<field name="allowed_count" type="number" label="COM_TJUCM_FORM_LBL_TYPE_ALLOWED_COUNT" description="COM_TJUCM_FORM_DESC_TYPE_ALLOWED_COUNT" hint="COM_TJUCM_FORM_LBL_TYPE_ALLOWED_COUNT"/>
-		<field name="allow_draft_save" type="radio" class="btn-group" default="1" label="COM_TJUCM_FORM_LBL_TYPE_ALLOW_DRAFT_SAVE" description="COM_TJUCM_FORM_DESC_TYPE_ALLOW_DRAFT_SAVE" hint="COM_TJUCM_FORM_LBL_TYPE_ALLOW_DRAFT_SAVE">
+		<field name="allow_auto_save" type="radio" class="btn-group" default="1" label="COM_TJUCM_FORM_LBL_TYPE_ALLOW_AUTO_SAVE" description="COM_TJUCM_FORM_DESC_TYPE_ALLOW_AUTO_SAVE" hint="COM_TJUCM_FORM_LBL_TYPE_ALLOW_AUTO_SAVE">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="allow_draft_save" type="radio" class="btn-group" default="1" label="COM_TJUCM_FORM_LBL_TYPE_ALLOW_DRAFT_SAVE" description="COM_TJUCM_FORM_DESC_TYPE_ALLOW_DRAFT_SAVE" hint="COM_TJUCM_FORM_LBL_TYPE_ALLOW_DRAFT_SAVE" showon="allow_auto_save:0">
 			<option value="0">JNO</option>
 			<option value="1">JYES</option>
 		</field>

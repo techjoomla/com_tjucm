@@ -216,8 +216,6 @@ class TjucmModelItems extends JModelList
 			$query->where($db->quoteName('a.created_by') . ' = ' . (INT) $createdBy);
 		}
 
-		$query->where('fields.showonlist =  1');
-
 		// Filter by published state
 		$published = $this->getState('filter.state');
 
