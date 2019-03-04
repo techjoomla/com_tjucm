@@ -173,22 +173,22 @@ $itemState                 = $this->item->state;
 			{
 				if (!empty($this->allow_draft_save))
 				{
-				?>
-				<button type="button" class="btn btn-primary" id="previous_button" onclick="itemformactions('tjucm_myTab','prev')">
-					<?php echo JText::_('COM_TJUCM_PREVIOUS_BUTTON'); ?>
-					<i class="icon-arrow-right-2"></i>
-				</button>
-				<button type="button" class="btn btn-primary" id="next_button" onclick="itemformactions('tjucm_myTab','next')">
-					<?php echo JText::_('COM_TJUCM_NEXT_BUTTON'); ?>
-					<i class="icon-arrow-right-2"></i>
-				</button>
-				<?php
+					?>
+					<button type="button" class="btn btn-primary" id="previous_button" onclick="itemformactions('tjucm_myTab','prev')">
+						<?php echo JText::_('COM_TJUCM_PREVIOUS_BUTTON'); ?>
+						<i class="icon-arrow-right-2"></i>
+					</button>
+					<button type="button" class="btn btn-primary" id="next_button" onclick="itemformactions('tjucm_myTab','next')">
+						<?php echo JText::_('COM_TJUCM_NEXT_BUTTON'); ?>
+						<i class="icon-arrow-right-2"></i>
+					</button>
+					<?php
 				}
 			}
 
 			if ($calledFrom == 'frontend')
 			{
-				if (!empty($this->allow_draft_save) && empty($itemState))
+				if (!empty($this->allow_auto_save) && !empty($this->allow_draft_save) && empty($itemState))
 				{
 					?>
 					<input type="button" class="btn btn-width150 br-0 btn-default font-normal" id="draftSave" value="<?php echo JText::_("COM_TJUCM_SAVE_AS_DRAFT_ITEM"); ?>" onclick="javascript: this.disabled=true; steppedFormSave(this.form.id, 'draft');" />

@@ -150,10 +150,8 @@ class TjucmViewItemform extends JViewLegacy
 		$tjUcmTypeTable->load(array('unique_identifier' => $this->client));
 		$typeParams = json_decode($tjUcmTypeTable->params);
 
-		if (!empty($typeParams->allow_draft_save))
-		{
-			$this->allow_draft_save = $typeParams->allow_draft_save;
-		}
+		$this->allow_auto_save = (isset($typeParams->allow_auto_save) && empty($typeParams->allow_auto_save)) ? 0 : 1;
+		$this->allow_draft_save = (isset($typeParams->allow_draft_save) && !empty($typeParams->allow_draft_save)) ? 1 : 0;
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
