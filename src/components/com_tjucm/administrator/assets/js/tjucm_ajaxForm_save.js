@@ -8,16 +8,21 @@ jQuery(document).ready(function()
 	if (itemState == '' || itemState == 0)
 	{
 		let showDraftSuccessMsg = "0";
-		
-		// Save form values 
-		jQuery(document).on("change select", ":input", function() {
-			steppedFormSave(this.form.id, "draft", showDraftSuccessMsg);
-		});
-		
-		// To save calendar field value
-		jQuery(".field-calendar input:text").blur(function(){  
-			steppedFormSave(this.form.id, "draft", showDraftSuccessMsg);
-		});
+
+		let tjUcmAutoSave = jQuery('#item-form #tjucm-autosave').val();
+
+		if (tjUcmAutoSave == 1)
+		{
+			// Save form values
+			jQuery("#item-form").on("change select", ":input", function(){
+				steppedFormSave(this.form.id, "draft", showDraftSuccessMsg);
+			});
+
+			// To save calendar field value
+			jQuery("#item-form .field-calendar input:text").blur(function(){  
+				steppedFormSave(this.form.id, "draft", showDraftSuccessMsg);
+			});
+		}
 	}
 })
 
