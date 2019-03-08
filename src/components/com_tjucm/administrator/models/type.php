@@ -328,9 +328,11 @@ class TjucmModelType extends JModelAdmin
 		$params['allowed_count'] = $data['allowed_count'];
 		$params['is_subform'] = $data['is_subform'];
 		$params['allow_draft_save'] = $data['allow_draft_save'];
+		$params['allow_auto_save'] = $data['allow_auto_save'];
+
 		$params['publish_items'] = $data['publish_items'];
 
-		if ($params['allow_draft_save'] == 1)
+		if ($params['allow_draft_save'] == 1 || $params['allow_auto_save'] == 1)
 		{
 			$params['publish_items'] = 0;
 		}
