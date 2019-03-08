@@ -7,10 +7,22 @@ jQuery(document).ready(function()
 	/*Code for auto save on blur event add new record or editing draft record only*/
 	if (itemState == '' || itemState == 0)
 	{
-		jQuery(document).on("blur", ":input[type!='button']", function() {
-			let showDraftSuccessMsg = "0";
-			steppedFormSave(this.form.id, "draft", showDraftSuccessMsg);
-		});
+		let showDraftSuccessMsg = "0";
+
+		let tjUcmAutoSave = jQuery('#item-form #tjucm-autosave').val();
+
+		if (tjUcmAutoSave == 1)
+		{
+			// Save form values
+			jQuery("#item-form").on("change select", ":input", function(){
+				steppedFormSave(this.form.id, "draft", showDraftSuccessMsg);
+			});
+
+			// To save calendar field value
+			jQuery("#item-form .field-calendar input:text").blur(function(){  
+				steppedFormSave(this.form.id, "draft", showDraftSuccessMsg);
+			});
+		}
 	}
 })
 

@@ -330,6 +330,13 @@ class TjucmModelType extends JModelAdmin
 		$params['allow_draft_save'] = $data['allow_draft_save'];
 		$params['publish_items'] = $data['publish_items'];
 
+		if ($params['allow_draft_save'] == 1)
+		{
+			$params['publish_items'] = 0;
+		}
+
+		$params['layout'] = $data['layout'];
+
 		$data['params'] = json_encode($params);
 
 		if (parent::save($data))

@@ -4,14 +4,13 @@
 	<author>Techjoomla</author>
 	<authorUrl>https://techjoomla.com</authorUrl>
 	<description>TJUCM - Universal Content Manager Package</description>
-	<copyright>Copyright (c) 2009-2018 Techjoomla. All rights reserved.</copyright>
+	<copyright>Copyright (c) 2009-2019 Techjoomla. All rights reserved.</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<creationDate>03 October 2018</creationDate>
 	<packagename>ucm</packagename>
 	<version>1.0.0</version>
 	<packager>Techjoomla Team</packager>
-	<description />
-	<scriptfile>script.pkg_ucm.php</scriptfile>
+	<scriptfile>script.pkg_tjucm.php</scriptfile>
 	<files folder="components">
 		<file type="component" id="com_tjucm">com_tjucm.zip</file>
 		<file type="component" id="com_tjfields">com_tjfields.zip</file>

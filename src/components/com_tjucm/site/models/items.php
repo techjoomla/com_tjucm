@@ -69,6 +69,7 @@ class TjucmModelItems extends JModelList
 	protected function populateState($ordering = null, $direction = null)
 	{
 		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
 
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
@@ -123,6 +124,13 @@ class TjucmModelItems extends JModelList
 		$this->setState("ucmType.id", $type_id);
 
 		$createdBy = $app->input->get('created_by', "", "INT");
+		$canView = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $type_id);
+
+		if (!$canView)
+		{
+			$createdBy = $user->id;
+		}
+
 		$this->setState("created_by", $createdBy);
 
 		// List state information.
@@ -207,8 +215,6 @@ class TjucmModelItems extends JModelList
 		{
 			$query->where($db->quoteName('a.created_by') . ' = ' . (INT) $createdBy);
 		}
-
-		$query->where('fields.showonlist =  1');
 
 		// Filter by published state
 		$published = $this->getState('filter.state');

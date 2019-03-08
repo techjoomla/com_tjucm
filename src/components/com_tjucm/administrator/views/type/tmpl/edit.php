@@ -57,11 +57,12 @@ JHtml::script( JUri::root().'administrator/components/com_tjucm/assets/js/tjucm_
 							<?php echo $this->form->renderField('unique_identifier'); ?>
 							<?php echo $this->form->renderField('state'); ?>
 							<?php echo $this->form->renderField('allowed_count'); ?>
+							<?php echo $this->form->renderField('allow_auto_save'); ?>
 							<?php echo $this->form->renderField('allow_draft_save'); ?>
+							<?php echo $this->form->renderField('publish_items'); ?>
 							<?php echo $this->form->renderField('is_subform'); ?>
 							<?php echo $this->form->renderField('type_description'); ?>
-							<?php echo $this->form->renderField('publish_items'); ?>
-
+							<?php echo $this->form->renderField('layout'); ?>
 							<?php echo $this->form->renderField('params'); ?>
 							<input type="hidden" name="jform[checked_out]" value="<?php echo $this->item->checked_out; ?>" />
 							<input type="hidden" name="jform[checked_out_time]" value="<?php echo $this->item->checked_out_time; ?>" />

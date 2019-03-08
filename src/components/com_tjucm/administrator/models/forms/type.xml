@@ -16,11 +16,15 @@
 			<option value="-2">JTRASHED</option>
 		</field>
 		<field name="allowed_count" type="number" label="COM_TJUCM_FORM_LBL_TYPE_ALLOWED_COUNT" description="COM_TJUCM_FORM_DESC_TYPE_ALLOWED_COUNT" hint="COM_TJUCM_FORM_LBL_TYPE_ALLOWED_COUNT"/>
-		<field name="allow_draft_save" type="radio" class="btn-group" default="1" label="COM_TJUCM_FORM_LBL_TYPE_ALLOW_DRAFT_SAVE" description="COM_TJUCM_FORM_DESC_TYPE_ALLOW_DRAFT_SAVE" hint="COM_TJUCM_FORM_LBL_TYPE_ALLOW_DRAFT_SAVE">
+		<field name="allow_auto_save" type="radio" class="btn-group" default="1" label="COM_TJUCM_FORM_LBL_TYPE_ALLOW_AUTO_SAVE" description="COM_TJUCM_FORM_DESC_TYPE_ALLOW_AUTO_SAVE" hint="COM_TJUCM_FORM_LBL_TYPE_ALLOW_AUTO_SAVE">
 			<option value="0">JNO</option>
 			<option value="1">JYES</option>
 		</field>
-		<field name="publish_items" type="radio" class="btn-group" default="1" label="COM_TJUCM_FORM_LBL_TYPE_PUBLISH_ITEMS_BY_DEFAULT" description="COM_TJUCM_FORM_DESC_TYPE_PUBLISH_ITEMS_BY_DEFAULT" hint="COM_TJUCM_FORM_LBL_TYPE_PUBLISH_ITEMS_BY_DEFAULT">
+		<field name="allow_draft_save" type="radio" class="btn-group" default="1" label="COM_TJUCM_FORM_LBL_TYPE_ALLOW_DRAFT_SAVE" description="COM_TJUCM_FORM_DESC_TYPE_ALLOW_DRAFT_SAVE" hint="COM_TJUCM_FORM_LBL_TYPE_ALLOW_DRAFT_SAVE" showon="allow_auto_save:0">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field showon="allow_draft_save:0[AND]allow_auto_save:0" name="publish_items" type="radio" class="btn-group" default="1" label="COM_TJUCM_FORM_LBL_TYPE_PUBLISH_ITEMS_BY_DEFAULT" description="COM_TJUCM_FORM_DESC_TYPE_PUBLISH_ITEMS_BY_DEFAULT" hint="COM_TJUCM_FORM_LBL_TYPE_PUBLISH_ITEMS_BY_DEFAULT">
 			<option value="0">JNO</option>
 			<option value="1">JYES</option>
 		</field>
@@ -34,6 +38,7 @@
 		<field name="modified_by" type="modifiedby" default="0" label="COM_TJUCM_FORM_LBL_TYPE_MODIFIED_BY" description="COM_TJUCM_FORM_DESC_TYPE_MODIFIED_BY" hidden="true" hint="COM_TJUCM_FORM_LBL_TYPE_MODIFIED_BY" />
 		<field name="modified_date" type="timecreated" label="COM_TJUCM_FORM_LBL_TYPE_MODIFIED_DATE" description="COM_TJUCM_FORM_DESC_TYPE_MODIFIED_DATE" hidden="true" hint="COM_TJUCM_FORM_LBL_TYPE_MODIFIED_DATE" />
 		<field name="version_note" type="text" label="JGLOBAL_FIELD_VERSION_NOTE_LABEL" description="JGLOBAL_FIELD_VERSION_NOTE_DESC" class="inputbox" size="45" labelclass="control-label" />
+		<field name="layout" type="componentlayout" label="COM_TJUCM_FORM_LBL_TYPE_LAYOUT" description="COM_TJUCM_FORM_DESC_TYPE_LAYOUT" useglobal="true" extension="com_tjucm" view="itemform"/>
 	</fieldset>
 	<fieldset name="accesscontrol">
 		<field name="asset_id" type="hidden" filter="unset" />

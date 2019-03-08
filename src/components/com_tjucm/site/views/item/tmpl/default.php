@@ -9,13 +9,19 @@
 
 // No direct access
 defined('_JEXEC') or die;
+$app = JFactory::getApplication();
 $user = JFactory::getUser();
 JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
 $TjfieldsHelper = new TjfieldsHelper;
 
+// Get Field table
+$fieldTableData = new stdClass;
+JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
+$fieldTableData->tjFieldFieldTable = JTable::getInstance('field', 'TjfieldsTable');
+
 if ($this->form_extra)
 {
-$fieldSets = $this->form_extra->getFieldsets();
+	$fieldSets = $this->form_extra->getFieldsets();
 
 	// Iterate through the normal form fieldsets and display each one
 	foreach ($fieldSets as $fieldName => $fieldset)
@@ -33,15 +39,13 @@ $fieldSets = $this->form_extra->getFieldsets();
 				{
 					if ($field->value)
 					{
+						$layout = new JLayoutFile('file', JPATH_ROOT .'/components/com_tjfields/layouts/fields');
+						$mediaLink = $layout->render(array('fieldValue'=>$field->value));
 						?>
 						<div class="form-group">
-							<?php echo $field->label; ?>
-							<div class="col-sm-10">
-								<?php
-								$tjFieldHelper = new TjfieldsHelper;
-								$mediaLink = $tjFieldHelper->getMediaUrl($field->value);
-								?>
-								<a href="<?php echo $mediaLink;?>"><?php echo JText::_("COM_TJFIELDS_FILE_DOWNLOAD");?></a>
+							<div class="col-sm-2 col-xs-12"><?php echo $field->label; ?>:</div>
+							<div class="col-sm-2">
+								<?php echo $mediaLink;?>
 							</div>
 						</div>
 						<?php
@@ -49,23 +53,55 @@ $fieldSets = $this->form_extra->getFieldsets();
 				}
 				elseif ($field->type == 'Subform' || $field->type == 'Ucmsubform')
 				{
+					// Get Subform field data
+					$formData = $TjfieldsHelper->getFieldData($field->getAttribute('name'));
+
 					if ($field->value)
 					{
 						?>
 						<div class="form-group">
-							<?php echo $field->label; ?>
+							<div class="col-sm-2 col-xs-12"><?php echo $field->label; ?>:</div>
 							<div class="col-sm-10">
 							<?php
 								foreach ($field->value as $val)
 								{
 									foreach ($val as $name => $value)
 									{
-										// TODO : SubForm rendering
-										$html = '<div class="form-group">';
-											$html .= '<div class="col-sm-10"> ' . htmlspecialchars($value, ENT_COMPAT, 'UTF-8') . '</div>';
-										$html .= '</div>';
+										// Get the field data by field name to check the field type
+										$fieldTableData->tjFieldFieldTable->load(array('name' => $name));
 
-										echo  $html;
+										if ($value){?>
+										<div class="col-sm-2 col-xs-12"><?php echo $fieldTableData->tjFieldFieldTable->label; ?>:</div>
+										<?php  ?>
+											<div class="col-sm-10">
+											<?php
+											// If field type is file
+											if ($fieldTableData->tjFieldFieldTable->type == 'file')
+											{
+												$layout = new JLayoutFile('file', JPATH_ROOT .'/components/com_tjfields/layouts/fields');
+												$mediaLink = $layout->render(array('fieldValue'=>$value, 'isSubformField'=>'1', 'content_id'=>$app->input->get('id', '', 'INT'), 'subformFieldId'=>$formData->id,'subformFileFieldName'=>$name));
+												echo $mediaLink;
+											}
+											// If field type is checkbox
+											elseif ($fieldTableData->tjFieldFieldTable->type == 'checkbox')
+											{
+												$checked = ($value == 1) ? ' checked="checked"' : '';
+												?>
+												<input type="checkbox" disabled="disabled" value="1" <?php echo $checked;?> />
+												<?php
+											}
+											else
+											{
+												$html = '<div class="form-group">';
+												$html .= '<div class="col-sm-10"> ' . htmlspecialchars($value, ENT_COMPAT, 'UTF-8') . '</div>';
+												$html .= '</div>';
+
+												echo  $html;
+											}
+										}
+										?>
+										</div>
+										<?php
 									}
 
 									echo '<hr>';
@@ -82,15 +118,10 @@ $fieldSets = $this->form_extra->getFieldsets();
 					{
 						?>
 						<div class="form-group">
-							<?php echo $field->label; ?>
-							<div class="col-sm-10">
+							<div class="col-sm-2 col-xs-12"><?php echo $field->label; ?>:</div>
+							<div class="col-sm-2">
 							<?php
-								$checked = "";
-
-								if ($field->value = 1)
-								{
-									$checked = ' checked="checked"';
-								}
+								$checked = ($field->value == 1) ? ' checked="checked"' : '';
 								?>
 								<input type="checkbox" disabled="disabled" value="1" <?php echo $checked;?> />
 							</div>
@@ -104,8 +135,8 @@ $fieldSets = $this->form_extra->getFieldsets();
 					{
 						?>
 						<div class="form-group">
-							<?php echo $field->label; ?>
-							<div class="col-sm-10 form-control">
+							<div class="col-sm-2 col-xs-12"><?php echo $field->label; ?>:</div>
+							<div class="col-sm-2">
 								<?php
 								if (is_array($field->value))
 								{
@@ -143,7 +174,6 @@ else
 ?>
 <div class="form-group">
 <?php
-$app = JFactory::getApplication();
 $itemid     = $app->input->getInt('Itemid', 0);
 
 if (($user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId)) || ($user->authorise('core.type.editownitem', 'com_tjucm.type.' . $this->ucmTypeId) && JFactory::getUser()->id == $this->item->created_by))

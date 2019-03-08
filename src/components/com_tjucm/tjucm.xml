@@ -2,12 +2,12 @@
 <extension type="component" version="3.0" method="upgrade">
 	<name>com_tjucm</name>
 	<creationDate>2016-11-09</creationDate>
-	<copyright>Copyright(C)2012-13 TechJoomla</copyright>
-	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<author>Techjoomla - extensions@techjoomla.com</author>
+	<copyright>Copyright (C) 2010 - 2019 Techjoomla. All rights reserved.</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+	<author>Techjoomla</author>
 	<authorEmail>extensions@techjoomla.com</authorEmail>
-	<authorUrl>http://techjoomla.com</authorUrl>
-	<version>CVS: 1.0.0</version>
+	<authorUrl>https://techjoomla.com</authorUrl>
+	<version>1.0.0</version>
 	<description><![CDATA[<h3>TJ-UCM - Universal Content Manager</h3>]]></description>
 	<scriptfile>script.php</scriptfile>
 	<install>
@@ -67,11 +67,4 @@
 			<language tag="en-GB">en-GB/en-GB.com_tjucm.sys.ini</language>
 		</languages>
 	</administration>
-	<config>
-		<fields name="params">
-			<fieldset name="component">
-				<field name="save_history" default="0" />
-			</fieldset>
-		</fields>
-	</config>
 </extension>

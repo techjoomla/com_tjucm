@@ -99,9 +99,19 @@ class TjucmViewItemform extends JViewLegacy
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
 		$typeId = $tjUcmModelType->getTypeId($this->client);
 
-		$TypeData = $tjUcmModelType->getItem($typeId);
+		$typeData = $tjUcmModelType->getItem($typeId);
 
-		$allowedCount = $TypeData->allowed_count;
+		// Check if the UCM type is unpublished
+		if ($typeData->state == "0")
+		{
+			return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
+		}
+
+		// Set Layout to type view
+		$layout = isset($typeData->params['layout']) ? $typeData->params['layout'] : '';
+		$this->setLayout($layout);
+
+		$allowedCount = $typeData->allowed_count;
 		$user   = JFactory::getUser();
 		$userId = $user->id;
 
@@ -140,10 +150,8 @@ class TjucmViewItemform extends JViewLegacy
 		$tjUcmTypeTable->load(array('unique_identifier' => $this->client));
 		$typeParams = json_decode($tjUcmTypeTable->params);
 
-		if (!empty($typeParams->allow_draft_save))
-		{
-			$this->allow_draft_save = $typeParams->allow_draft_save;
-		}
+		$this->allow_auto_save = (isset($typeParams->allow_auto_save) && empty($typeParams->allow_auto_save)) ? 0 : 1;
+		$this->allow_draft_save = (isset($typeParams->allow_draft_save) && !empty($typeParams->allow_draft_save)) ? 1 : 0;
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
