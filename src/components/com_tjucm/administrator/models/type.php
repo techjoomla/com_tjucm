@@ -325,11 +325,23 @@ class TjucmModelType extends JModelAdmin
 		}
 
 		$params = array();
-		$params['allowed_count'] = $data['allowed_count'];
 		$params['is_subform'] = $data['is_subform'];
 		$params['allow_draft_save'] = $data['allow_draft_save'];
 		$params['allow_auto_save'] = $data['allow_auto_save'];
+		$params['allowed_count'] = $data['allowed_count'];
 		$params['layout'] = $data['layout'];
+
+		// If UCM type is a subform then it cant be saved as draft and auto save is also disabled
+		if ($params['is_subform'] == 1)
+		{
+			$params['allow_draft_save'] = $params['allow_auto_save'] = $params['allowed_count'] = 0;
+		}
+
+		// If auto save is enabled then draft save is enabled by default
+		if ($params['allow_auto_save'] == 1)
+		{
+			$params['allow_draft_save'] = 1;
+		}
 
 		$data['params'] = json_encode($params);
 
