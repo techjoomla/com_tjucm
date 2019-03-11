@@ -5,22 +5,33 @@ jQuery(document).ready(function()
 	let itemState = jQuery('#itemState').val();
 
 	/*Code for auto save on blur event add new record or editing draft record only*/
-	if (itemState == '' || itemState == 0)
+	if (itemState == '' || itemState === 0)
 	{
 		let showDraftSuccessMsg = "0";
 
 		let tjUcmAutoSave = jQuery('#item-form #tjucm-autosave').val();
 
+		/*Check if auto save is enabled for UCM type*/
 		if (tjUcmAutoSave == 1)
 		{
 			// Save form values
 			jQuery("#item-form").on("change select", ":input", function(){
-				steppedFormSave(this.form.id, "draft", showDraftSuccessMsg);
+				let tjUcmFormDirty = jQuery('#item-form').hasClass('dirty');
+
+				if (tjUcmFormDirty === true)
+				{
+					steppedFormSave(this.form.id, "draft", showDraftSuccessMsg);
+				}
 			});
 
 			// To save calendar field value
-			jQuery("#item-form .field-calendar input:text").blur(function(){  
-				steppedFormSave(this.form.id, "draft", showDraftSuccessMsg);
+			jQuery("#item-form .field-calendar input:text").blur(function(){
+				let tjUcmFormDirty = jQuery('#item-form').hasClass('dirty');
+
+				if (tjUcmFormDirty === true)
+				{
+					steppedFormSave(this.form.id, "draft", showDraftSuccessMsg);
+				}
 			});
 		}
 	}
@@ -29,6 +40,14 @@ jQuery(document).ready(function()
 /* This function carries stepped saving via ajax */
 function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 {
+	/* For AJAX save need to add this to prevent popup message for page unload*/
+	window.onbeforeunload = null;
+
+	/* For AJAX save need to assign values to the editor field containers*/
+	jQuery("#item-form .toggle-editor a").each(function(index) {
+		this.click();
+	});
+
 	var item_basic_form = jQuery('#' + form_id);
 	var promise = false;
 	jQuery('#form_status').val(status);
@@ -44,6 +63,8 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 			{
 				jQuery('#finalSave').attr('disabled', false);
 				jQuery('#draftSave').attr('disabled', false);
+				jQuery("html, body").animate({ scrollTop: 0 }, "slow");
+
 				return false;
 			}
 		}
@@ -51,6 +72,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 		{
 			jQuery('#draftSave').attr('disabled', false);
 			jQuery('#finalSave').attr('disabled', false);
+			jQuery("html, body").animate({ scrollTop: 0 }, "slow");
 
 			return false;
 		}
@@ -63,7 +85,39 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 			async: false,
 			success: function(data) {
 				var returnedData = JSON.parse(data);
-				if(returnedData.data != null)
+
+				if (returnedData.messages !== null)
+				{
+					if (returnedData.messages.error !== null)
+					{
+						jQuery.each(returnedData.messages.error, function(index, value) {
+							Joomla.renderMessages({'error':[value]});
+						});
+
+						jQuery("html, body").animate({ scrollTop: 0 }, "slow");
+					}
+				}
+
+				if (returnedData.messages !== null)
+				{
+					if (returnedData.messages.warning !== null)
+					{
+						jQuery.each(returnedData.messages.warning, function(index, value) {
+							Joomla.renderMessages({'warning':[value]});
+						});
+
+						jQuery("html, body").animate({ scrollTop: 0 }, "slow");
+					}
+				}
+
+				if(returnedData.message !== null && returnedData.message != '')
+				{
+					Joomla.renderMessages({'info':[returnedData.message]});
+
+					jQuery("html, body").animate({ scrollTop: 0 }, "slow");
+				}
+
+				if(returnedData.data !== null)
 				{
 					jQuery('#item-form').removeClass('dirty');
 					if ('save' == status) {
@@ -73,7 +127,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 						newParam=separator + "id=" + returnedData.data + "&success=1";
 						newUrl=url.replace(newParam,"");
 						newUrl+=newParam;
-						window.location.href =newUrl;
+						window.location.href=newUrl;
 					}
 					else
 					{
@@ -87,25 +141,14 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 						}
 					}
 				}
-				else
-				{
-					if(returnedData.message)
-					{
-						Joomla.renderMessages({'error':returnedData.message});
-					}
 
-					if(returnedData.messages.warning)
-					{
-						Joomla.renderMessages({'error': returnedData.messages.warning});
-					}
-
-					if(returnedData.messages.error)
-					{
-						Joomla.renderMessages({'error': returnedData.messages.error});
-					}
-				}
 				jQuery('#draftSave').attr('disabled', false);
 				jQuery('#finalSave').attr('disabled', false);
+
+				/* After AJAX save need to toggle back the editors as we had previoussly toggled them to post the values*/
+				jQuery("#item-form .toggle-editor a").each(function(index) {
+					this.click();
+				});
 			}
 		});
 	}

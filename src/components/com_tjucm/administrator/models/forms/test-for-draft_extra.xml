@@ -1,2 +1,0 @@
-<?xml version="1.0"?>
-<form><fieldset name="group for draft test"><field name="com_tjucm_test-for-draft_FirstName" type="text" label="First Name" description="" class=""/><field name="com_tjucm_test-for-draft_EmailAddress" type="email" label="Email Address" description="" class=""/><field name="com_tjucm_test-for-draft_AboutYou" type="textareacounter" label="About You" description="" class="" countertext="{filled}/{maxlength}" maxlength="300" addfieldpath="/administrator/components/com_tjfields/models/fields"/></fieldset></form>

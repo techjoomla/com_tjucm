@@ -425,6 +425,8 @@ class TjucmControllerItemForm extends JControllerForm
 			$validData['tags'] = null;
 		}
 
+		$response = '';
+
 		try
 		{
 			$status_title = JFactory::getApplication()->input->get('form_status');
@@ -454,8 +456,13 @@ class TjucmControllerItemForm extends JControllerForm
 			}
 
 			// If no data send then dont add any entry in item form table - end
-
 			$recordId = $model->save($validData, $extra_jform_data, $post);
+
+			if ($recordId === false)
+			{
+				jexit();
+			}
+
 			$isNew = ($validData['id']) ? 0 : 1;
 			$validData['id'] = $recordId;
 

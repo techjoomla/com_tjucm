@@ -87,7 +87,7 @@ $itemState                 = $this->item->state;
 	if ($itemState === '1')
 	{
 	?>
-	<div class="alert alert-success" style="display: block;">
+	<div class="alert alert-info" style="display: block;">
 		<a class="close" data-dismiss="alert">×</a>
 		<div class="msg">
 			<div>
@@ -188,7 +188,7 @@ $itemState                 = $this->item->state;
 
 			if ($calledFrom == 'frontend')
 			{
-				if (!empty($this->allow_auto_save) && !empty($this->allow_draft_save) && empty($itemState))
+				if (!$this->allow_auto_save && $this->allow_draft_save && empty($itemState))
 				{
 					?>
 					<input type="button" class="btn btn-width150 br-0 btn-default font-normal" id="draftSave" value="<?php echo JText::_("COM_TJUCM_SAVE_AS_DRAFT_ITEM"); ?>" onclick="javascript: this.disabled=true; steppedFormSave(this.form.id, 'draft');" />
@@ -204,6 +204,7 @@ $itemState                 = $this->item->state;
 		<input type="hidden" name="layout" value="<?php echo $layout ?>"/>
 		<input type="hidden" name="task" value="itemform.save"/>
 		<input type="hidden" name="form_status" id="form_status" value=""/>
+		<input type="hidden" name="tjucm-autosave" id="tjucm-autosave" value="<?php echo $this->allow_auto_save;?>"/>
 		<?php echo JHtml::_('form.token'); ?>
 	</div>
 </form>
