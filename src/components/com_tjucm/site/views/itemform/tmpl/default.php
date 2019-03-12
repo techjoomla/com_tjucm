@@ -46,7 +46,6 @@ $is_saved                  = $jinput->input->get("success", '', 'INT');
 $fieldsets_counter_deafult = 0;
 $setnavigation             = false;
 $itemState                 = $this->item->state;
-
 ?>
 <script type="text/javascript">
 
@@ -81,7 +80,6 @@ $itemState                 = $this->item->state;
 		}
 	}
 </script>
-
 <form action="<?php echo JRoute::_('index.php');?>" method="post" enctype="multipart/form-data" name="adminForm" id="item-form" class="form-validate">
 	<?php
 	if ($itemState === '1')
@@ -113,98 +111,100 @@ $itemState                 = $this->item->state;
 	}
 	?>
 	<div>
-		<div class="row-fluid">
-			<div class="span10 form-horizontal">
-				<fieldset class="adminform">
-					<input type="hidden" name="jform[id]" id="recordId" value="<?php echo JFactory::getApplication()->input->get('id'); ?>" />
-					<input type="hidden" name="jform[ordering]" value="<?php echo $this->item->ordering; ?>" />
-					<input type="hidden" name="jform[state]" value="<?php echo $this->item->state;?>" />
-					<input type="hidden" name="jform[client]" value="<?php echo $this->client;?>" />
-					<input type="hidden" name="jform[checked_out]" value="<?php echo $this->item->checked_out; ?>" />
-					<input type="hidden" name="jform[checked_out_time]" value="<?php echo $this->item->checked_out_time; ?>" />
-					<input type="hidden" name="itemState" id="itemState" value="<?php echo $this->item->state; ?>"/>
-					<?php echo $this->form->renderField('created_by'); ?>
-					<?php echo $this->form->renderField('created_date'); ?>
-					<?php echo $this->form->renderField('modified_by'); ?>
-					<?php echo $this->form->renderField('modified_date'); ?>
-				</fieldset>
-			</div>
+		<fieldset>
+			<input type="hidden" name="jform[id]" id="recordId" value="<?php echo JFactory::getApplication()->input->get('id'); ?>" />
+			<input type="hidden" name="jform[ordering]" value="<?php echo $this->item->ordering; ?>" />
+			<input type="hidden" name="jform[state]" value="<?php echo $this->item->state;?>" />
+			<input type="hidden" name="jform[client]" value="<?php echo $this->client;?>" />
+			<input type="hidden" name="jform[checked_out]" value="<?php echo $this->item->checked_out; ?>" />
+			<input type="hidden" name="jform[checked_out_time]" value="<?php echo $this->item->checked_out_time; ?>" />
+			<input type="hidden" name="itemState" id="itemState" value="<?php echo $this->item->state; ?>"/>
+			<?php echo $this->form->renderField('created_by'); ?>
+			<?php echo $this->form->renderField('created_date'); ?>
+			<?php echo $this->form->renderField('modified_by'); ?>
+			<?php echo $this->form->renderField('modified_date'); ?>
+		</fieldset>
+	</div>
+	<?php
+	if ($this->form_extra)
+	{
+		?>
+		<div class="form-horizontal">
+		<?php
+		// Code to display the form
+		echo $this->loadTemplate('extrafields');
+		?>
 		</div>
 		<?php
-		if ($this->form_extra)
-		{
-			// Code to display the form
-			echo $this->loadTemplate('extrafields');
-		}
+	}
 
-		if (!$is_saved)
-		{
-		?>
-		<div class="alert alert-success" style="display: block;">
-			<a class="close" data-dismiss="alert">×</a>
-			<div class="msg">
-				<div>
-				<?php echo JText::_("COM_TJUCM_NOTE_ON_FORM"); ?>
-				</div>
+	if (!$is_saved)
+	{
+	?>
+	<div class="alert alert-success" style="display: block;">
+		<a class="close" data-dismiss="alert">×</a>
+		<div class="msg">
+			<div>
+			<?php echo JText::_("COM_TJUCM_NOTE_ON_FORM"); ?>
 			</div>
 		</div>
+	</div>
+	<?php
+	}
+	?>
+	<div id="draft_msg" class="alert alert-success" style="display: none;">
+		<a class="close" data-dismiss="alert">×</a>
+		<?php echo JText::_("COM_TJUCM_MSG_ON_DRAFT_FORM"); ?>
+	</div>
+
+	<div class="form-actions">
 		<?php
+		// Show next previous buttons only when there are mulitple tabs/groups present under that field type
+		$fieldArray = $this->form_extra;
+
+		foreach ($fieldArray->getFieldsets() as $fieldName => $fieldset)
+		{
+			if (count($fieldArray->getFieldsets()) > 1)
+			{
+				$setnavigation = true;
+			}
 		}
-		?>
-		<div id="draft_msg" class="alert alert-success" style="display: none;">
-			<a class="close" data-dismiss="alert">×</a>
-			<?php echo JText::_("COM_TJUCM_MSG_ON_DRAFT_FORM"); ?>
-		</div>
 
-		<div class="form-actions">
-			<?php
-			// Show next previous buttons only when there are mulitple tabs/groups present under that field type
-			$fieldArray = $this->form_extra;
-
-			foreach ($fieldArray->getFieldsets() as $fieldName => $fieldset)
+		if (isset($setnavigation) && $setnavigation == true)
+		{
+			if (!empty($this->allow_draft_save))
 			{
-				if (count($fieldArray->getFieldsets()) > 1)
-				{
-					$setnavigation = true;
-				}
-			}
-
-			if (isset($setnavigation) && $setnavigation == true)
-			{
-				if (!empty($this->allow_draft_save))
-				{
-					?>
-					<button type="button" class="btn btn-primary" id="previous_button" onclick="itemformactions('tjucm_myTab','prev')">
-						<?php echo JText::_('COM_TJUCM_PREVIOUS_BUTTON'); ?>
-						<i class="icon-arrow-right-2"></i>
-					</button>
-					<button type="button" class="btn btn-primary" id="next_button" onclick="itemformactions('tjucm_myTab','next')">
-						<?php echo JText::_('COM_TJUCM_NEXT_BUTTON'); ?>
-						<i class="icon-arrow-right-2"></i>
-					</button>
-					<?php
-				}
-			}
-
-			if ($calledFrom == 'frontend')
-			{
-				if (!$this->allow_auto_save && $this->allow_draft_save && empty($itemState))
-				{
-					?>
-					<input type="button" class="btn btn-width150 br-0 btn-default font-normal" id="draftSave" value="<?php echo JText::_("COM_TJUCM_SAVE_AS_DRAFT_ITEM"); ?>" onclick="javascript: this.disabled=true; steppedFormSave(this.form.id, 'draft');" />
-					<?php
-				}
 				?>
-				<input type="button" class="btn btn-success" value="<?php echo JText::_("COM_TJUCM_SAVE_ITEM"); ?>"
-				id="finalSave" onclick="javascript: this.disabled=true; steppedFormSave(this.form.id, 'save');" />
+				<button type="button" class="btn btn-primary" id="previous_button" onclick="itemformactions('tjucm_myTab','prev')">
+					<?php echo JText::_('COM_TJUCM_PREVIOUS_BUTTON'); ?>
+					<i class="icon-arrow-right-2"></i>
+				</button>
+				<button type="button" class="btn btn-primary" id="next_button" onclick="itemformactions('tjucm_myTab','next')">
+					<?php echo JText::_('COM_TJUCM_NEXT_BUTTON'); ?>
+					<i class="icon-arrow-right-2"></i>
+				</button>
+				<?php
+			}
+		}
+
+		if ($calledFrom == 'frontend')
+		{
+			if (!$this->allow_auto_save && $this->allow_draft_save && empty($itemState))
+			{
+				?>
+				<input type="button" class="btn btn-width150 br-0 btn-default font-normal" id="draftSave" value="<?php echo JText::_("COM_TJUCM_SAVE_AS_DRAFT_ITEM"); ?>" onclick="javascript: this.disabled=true; steppedFormSave(this.form.id, 'draft');" />
 				<?php
 			}
 			?>
-		</div>
-		<input type="hidden" name="layout" value="<?php echo $layout ?>"/>
-		<input type="hidden" name="task" value="itemform.save"/>
-		<input type="hidden" name="form_status" id="form_status" value=""/>
-		<input type="hidden" name="tjucm-autosave" id="tjucm-autosave" value="<?php echo $this->allow_auto_save;?>"/>
-		<?php echo JHtml::_('form.token'); ?>
+			<input type="button" class="btn btn-success" value="<?php echo JText::_("COM_TJUCM_SAVE_ITEM"); ?>"
+			id="finalSave" onclick="javascript: this.disabled=true; steppedFormSave(this.form.id, 'save');" />
+			<?php
+		}
+		?>
 	</div>
+	<input type="hidden" name="layout" value="<?php echo $layout ?>"/>
+	<input type="hidden" name="task" value="itemform.save"/>
+	<input type="hidden" name="form_status" id="form_status" value=""/>
+	<input type="hidden" name="tjucm-autosave" id="tjucm-autosave" value="<?php echo $this->allow_auto_save;?>"/>
+	<?php echo JHtml::_('form.token'); ?>
 </form>

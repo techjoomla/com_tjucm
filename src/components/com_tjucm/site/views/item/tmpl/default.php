@@ -140,7 +140,7 @@ if ($this->form_extra)
 								<?php
 								if (is_array($field->value))
 								{
-									foreach($field->value as $eachFieldValue)
+									foreach ($field->value as $eachFieldValue)
 									{
 										?>
 										<p><?php echo "-" . htmlspecialchars($eachFieldValue, ENT_COMPAT, 'UTF-8'); ?></p>
