@@ -44,12 +44,12 @@ class TjucmTableitem extends JTable
 	{
 		if ($array['id'] == 0)
 		{
-			$array['created_by'] = JFactory::getUser()->id;
-			$array['created_date'] = date('Y-m-d H:i:s');
+			$array['created_by'] = !empty($array['created_by']) ? $array['created_by'] : JFactory::getUser()->id;
+			$array['created_date'] = JFactory::getDate()->toSql();
 		}
 
 		$array['modified_by'] = JFactory::getUser()->id;
-		$array['modified_date'] = date('Y-m-d H:i:s');
+		$array['modified_date'] = JFactory::getDate()->toSql();
 
 		if (isset($array['params']) && is_array($array['params']))
 		{

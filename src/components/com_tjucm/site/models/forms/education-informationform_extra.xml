@@ -1,2 +1,0 @@
-<?xml version="1.0"?>
-<form><fieldset name="education-group"><field name="com_tjucm_education-information_filefield1" type="file" label="file field 1" description="" class="validate-filetype" size="32" accept=".png,.jpeg,.jpg" addfieldpath="/administrator/components/com_tjfields/models/fields"/><field name="com_tjucm_education-information_filefield2" type="file" label="file field 2" description="" class="validate-filetype" size="32" accept=".png,.jpeg,.jpg" addfieldpath="/administrator/components/com_tjfields/models/fields"/></fieldset></form>

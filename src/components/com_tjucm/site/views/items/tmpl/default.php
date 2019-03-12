@@ -152,8 +152,36 @@ if (!empty($this->client))
 								{
 									?>
 									<td>
-										<a href="<?php echo $link;?>"><?php echo $field_values; ?></a>
-									</td><?php
+									<?php
+									if ($subFormData = json_decode($field_values))
+									{
+										foreach($subFormData as $subFormDataRow)
+										{
+											?>
+											<table class="table table-bordered">
+											<?php
+											foreach ($subFormDataRow as $key => $subFormDataColumn)
+											{
+												?>
+												<tr>
+												<?php
+												echo !empty($subFormDataColumn) ? '<td>' . $key . '</td><td>' . $subFormDataColumn . '</td>' : '';
+												?>
+												</tr>
+												<?php
+											}
+											?>
+											</table>
+											<?php
+										}
+									}
+									else
+									{
+										?><a href="<?php echo $link;?>"><?php echo $field_values; ?></a><?php
+									}
+									?>
+									</td>
+									<?php
 								}
 							}
 
@@ -164,9 +192,9 @@ if (!empty($this->client))
 								<?php
 								if ($this->canEdit || $editown)
 								{
-									 ?>
+									?>
 									<a target="_blank" href="<?php echo 'index.php?option=com_tjucm&task=itemform.edit&id=' . $item->id . $appendUrl; ?>" class="btn btn-mini" type="button"><i class="icon-apply" aria-hidden="true"></i></a>
-								<?php
+									<?php
 								}
 								if ($this->canDelete)
 								{

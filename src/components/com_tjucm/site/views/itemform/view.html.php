@@ -53,7 +53,7 @@ class TjucmViewItemform extends JViewLegacy
 		$this->canSave = $this->get('CanSave');
 		$this->form = $this->get('Form');
 		$this->client = $input->get('client');
-		$this->id = $input->get('id');
+		$this->id = $input->get('id', '', 'INT');
 
 		// If did not get the client from url then get if from menu param
 		if (empty($this->client))
