@@ -486,11 +486,15 @@ class TjucmModelItemForm extends JModelForm
 			return false;
 		}
 
-		$data['type_id'] = $this->common->getDataValues('#__tj_ucm_types', 'id AS type_id', 'unique_identifier = "' . $this->client . '"', 'loadResult');
+		$ucmTypeData = $this->common->getDataValues('#__tj_ucm_types', 'id AS type_id, params', 'unique_identifier = "' . $this->client . '"', 'loadAssoc');
+
+		$data['type_id'] = $ucmTypeData['type_id'];
+
+		$ucmTypeParams = json_decode($ucmTypeData['params']);
 
 		$table = $this->getTable();
 
-		if ($status_title === 'draft')
+		if ($status_title === 'draft' || (isset($ucmTypeParams->publish_items) && $ucmTypeParams->publish_items == 0))
 		{
 			$data['state'] = 0;
 		}
