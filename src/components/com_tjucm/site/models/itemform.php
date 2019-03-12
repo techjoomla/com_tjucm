@@ -121,7 +121,7 @@ class TjucmModelItemForm extends JModelForm
 		$params       = $app->getParams();
 		$params_array = $params->toArray();
 
-		if (!empty($params_array['item_id']))
+		if (isset($params_array['item_id']) && !empty($params_array['item_id']))
 		{
 			$this->setState('item.id', $params_array['item_id']);
 		}
