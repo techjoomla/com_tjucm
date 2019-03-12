@@ -1,2 +1,0 @@
-<?xml version="1.0"?>
-<form><fieldset name="Application For One Time"><field name="com_tjucm_Application For One Time_Testimonial" type="textareacounter" label="Testimonial" description="" class="" countertext="{filled}/{maxlength}" maxlength="1000" addfieldpath="/administrator/components/com_tjfields/models/fields"/></fieldset></form>
