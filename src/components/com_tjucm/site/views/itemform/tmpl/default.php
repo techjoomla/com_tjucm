@@ -42,7 +42,6 @@ $editRecordId              = $jinput->input->get("id", '', 'INT');
 $baseUrl                   = $jinput->input->server->get('REQUEST_URI', '', 'STRING');
 $calledFrom                = (strpos($baseUrl, 'administrator')) ? 'backend' : 'frontend';
 $layout                    = ($calledFrom == 'frontend') ? 'default' : 'edit';
-$is_saved                  = $jinput->input->get("success", '', 'INT');
 $fieldsets_counter_deafult = 0;
 $setnavigation             = false;
 $itemState                 = $this->item->state;
@@ -82,7 +81,7 @@ $itemState                 = $this->item->state;
 </script>
 <form action="<?php echo JRoute::_('index.php');?>" method="post" enctype="multipart/form-data" name="adminForm" id="item-form" class="form-validate">
 	<?php
-	if ($itemState === '1')
+	if ($itemState === '1' && $this->allow_auto_save == '1')
 	{
 	?>
 	<div class="alert alert-info" style="display: block;">
@@ -94,20 +93,6 @@ $itemState                 = $this->item->state;
 		</div>
 	</div>
 	<?php
-	}
-
-	if ($is_saved)
-	{
-		?>
-		<div id="success_msg" class="alert alert-success">
-			<a class="close" data-dismiss="alert">×</a>
-			<div class="msg">
-				<?php
-					echo JText::sprintf('COM_TJUCM_MSG_ON_SAVED_FORM');
-				?>
-			</div>
-		</div>
-		<?php
 	}
 	?>
 	<div>
@@ -138,7 +123,7 @@ $itemState                 = $this->item->state;
 		<?php
 	}
 
-	if (!$is_saved)
+	if ($editRecordId)
 	{
 	?>
 	<div class="alert alert-success" style="display: block;">
