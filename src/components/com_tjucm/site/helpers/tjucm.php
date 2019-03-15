@@ -74,6 +74,7 @@ class TjucmHelpersTjucm
 		JText::script('COM_TJUCM_ITEMFORM_SUBMIT_ALERT', true);
 		JText::script('COM_TJUCM_FIELDS_VALIDATION_ERROR_DATE', true);
 		JText::script('COM_TJUCM_FIELDS_VALIDATION_ERROR_NUMBER', true);
+		JText::script('COM_TJUCM_MSG_ON_SAVED_FORM', true);
 	}
 
 	/**

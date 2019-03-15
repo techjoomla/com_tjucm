@@ -110,24 +110,24 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 					}
 				}
 
-				if(returnedData.message !== null && returnedData.message != '')
+				if (returnedData.message !== null && returnedData.message != '')
 				{
 					Joomla.renderMessages({'info':[returnedData.message]});
 
 					jQuery("html, body").animate({ scrollTop: 0 }, "slow");
 				}
 
-				if(returnedData.data !== null)
+				if (returnedData.data !== null)
 				{
 					jQuery('#item-form').removeClass('dirty');
-					if ('save' == status) {
+					
+					if ('save' == status) 
+					{
 						jQuery("#finalSave").attr("disabled", "disabled");
-						var url= window.location.href.split('#')[0],
-						separator = (url.indexOf("?")===-1)?"?":"&",
-						newParam=separator + "id=" + returnedData.data + "&success=1";
-						newUrl=url.replace(newParam,"");
-						newUrl+=newParam;
-						window.location.href=newUrl;
+						Joomla.renderMessages({'success':[Joomla.JText._('COM_TJUCM_MSG_ON_SAVED_FORM')]});
+						jQuery('html, body').animate({
+							scrollTop: jQuery("#system-message-container").offset().top-40
+						}, "slow");
 					}
 					else
 					{
@@ -140,6 +140,18 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 							setTimeout(function() { jQuery("#draft_msg").hide(); }, 5000);
 						}
 					}
+
+					/* Update item id in the URL if the data is stored successfully */
+					var url = window.location.href.split('#')[0],
+					separator = (url.indexOf("?")===-1)?"?":"&",
+					newParam = separator + "id=" + returnedData.data;
+
+					if (!(url.indexOf(newParam) >= 0))
+					{
+						url+=newParam;
+					}
+
+					history.pushState(null, null, url);
 				}
 
 				jQuery('#draftSave').attr('disabled', false);
