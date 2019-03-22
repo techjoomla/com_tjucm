@@ -452,7 +452,15 @@ class TjucmControllerItemForm extends JControllerForm
 
 			if (empty($allow))
 			{
-				return false;
+				if ($this->isajax)
+				{
+					echo new JResponseJson(false);
+					jexit();
+				}
+				else
+				{
+					return false;
+				}
 			}
 
 			// If no data send then dont add any entry in item form table - end
