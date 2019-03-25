@@ -120,7 +120,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 				if (returnedData.data !== null)
 				{
 					jQuery('#item-form').removeClass('dirty');
-					
+
 					if ('save' == status) 
 					{
 						jQuery("#finalSave").attr("disabled", "disabled");
