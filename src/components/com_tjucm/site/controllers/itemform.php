@@ -232,14 +232,8 @@ class TjucmControllerItemForm extends JControllerForm
 				$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
 				$this->setMessage($this->getError(), 'error');
 
-				$this->setRedirect(
-					JRoute::_(
-						'index.php?option=com_tjucm&view=itemform&client=' . $this->client
-						. $this->getRedirectToItemAppend($recordId, $urlVar), false
-					)
-				);
-
-				return false;
+				echo new JResponseJson(null);
+				jexit();
 			}
 
 			// Reset the ID, the multilingual associations and then treat the request as for Apply.
@@ -254,14 +248,8 @@ class TjucmControllerItemForm extends JControllerForm
 			$this->setError(JText::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'));
 			$this->setMessage($this->getError(), 'error');
 
-			$this->setRedirect(
-				JRoute::_(
-					'index.php?option=com_tjucm&view=items' . $this->appendUrl
-					. $this->getRedirectToListAppend(), false
-				)
-			);
-
-			return false;
+			echo new JResponseJson(null);
+			jexit();
 		}
 
 		// Validate the posted data.
@@ -272,7 +260,8 @@ class TjucmControllerItemForm extends JControllerForm
 		{
 			$app->enqueueMessage($model->getError(), 'error');
 
-			return false;
+			echo new JResponseJson(null);
+			jexit();
 		}
 
 		// Test whether the data is valid.
@@ -289,26 +278,16 @@ class TjucmControllerItemForm extends JControllerForm
 			{
 				if ($errors[$i] instanceof Exception)
 				{
-					$app->enqueueMessage($errors[$i]->getMessage(), 'warning');
+					$app->enqueueMessage($errors[$i]->getMessage(), 'error');
 				}
 				else
 				{
-					$app->enqueueMessage($errors[$i], 'warning');
+					$app->enqueueMessage($errors[$i], 'error');
 				}
 			}
 
-			// Save the data in the session.
-			$app->setUserState($context . '.data', $data);
-
-			// Redirect back to the edit screen.
-			$this->setRedirect(
-				JRoute::_(
-					'index.php?option=com_tjucm&view=itemform&client=' . $this->client
-					. $this->getRedirectToItemAppend($recordId, $urlVar), false
-				)
-			);
-
-			return false;
+			echo new JResponseJson(null);
+			jexit();
 		}
 
 		// Jform tweaking - get data for extra fields jform.
@@ -397,26 +376,16 @@ class TjucmControllerItemForm extends JControllerForm
 				{
 					if ($errors[$i] instanceof Exception)
 					{
-						$app->enqueueMessage($errors[$i]->getMessage(), 'warning');
+						$app->enqueueMessage($errors[$i]->getMessage(), 'error');
 					}
 					else
 					{
-						$app->enqueueMessage($errors[$i], 'warning');
+						$app->enqueueMessage($errors[$i], 'error');
 					}
 				}
 
-				// Save the data in the session.
-				// Tweak.
-				$app->setUserState('com_tjucm.edit.item.data', $all_jform_data);
-
-				// Tweak *important
-				$app->setUserState('com_tjucm.edit.item.data', $all_jform_data['id']);
-
-				// Redirect back to the edit screen.
-				$id = (int) $app->getUserState('com_tjucm.edit.item.id');
-				$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&layout=edit&client=' . $this->client . '&id=' . $id, false));
-
-				return false;
+				echo new JResponseJson(null);
+				jexit();
 			}
 		}
 
