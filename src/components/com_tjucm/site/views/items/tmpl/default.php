@@ -153,34 +153,37 @@ if (!empty($this->client))
 									?>
 									<td>
 									<?php
-									if ($subFormData = json_decode($field_values))
+									if (is_array(json_decode($field_values, true)))
 									{
-										if (is_array(json_decode($field_values, true)))
+										$subFormData = json_decode($field_values);
+
+										foreach ($subFormData as $subFormDataRow)
 										{
-											foreach ($subFormData as $subFormDataRow)
+											?>
+											<table class="table table-bordered">
+											<?php
+											foreach ($subFormDataRow as $key => $subFormDataColumn)
 											{
 												?>
-												<table class="table table-bordered">
+												<tr>
 												<?php
-												foreach ($subFormDataRow as $key => $subFormDataColumn)
-												{
-													?>
-													<tr>
-													<?php
-													echo !empty($subFormDataColumn) ? '<td>' . $key . '</td><td>' . $subFormDataColumn . '</td>' : '';
-													?>
-													</tr>
-													<?php
-												}
+												echo !empty($subFormDataColumn) ? '<td>' . $key . '</td><td>' . $subFormDataColumn . '</td>' : '';
 												?>
-												</table>
+												</tr>
 												<?php
 											}
+											?>
+											</table>
+											<?php
 										}
 									}
 									else
 									{
-										?><a href="<?php echo $link;?>"><?php echo $field_values; ?></a><?php
+										?>
+										<a href="<?php echo $link;?>">
+											<?php echo $field_values; ?>
+										</a>
+										<?php
 									}
 									?>
 									</td>
