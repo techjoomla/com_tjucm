@@ -421,7 +421,10 @@ class TjucmControllerItemForm extends JControllerForm
 
 			if (empty($allow))
 			{
-				return false;
+				$app->enqueueMessage(JText::_("COM_TJUCM_NO_FORM_DATA"), 'error');
+
+				echo new JResponseJson(null);
+				jexit();
 			}
 
 			// If no data send then dont add any entry in item form table - end
@@ -429,6 +432,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 			if ($recordId === false)
 			{
+				echo new JResponseJson(null);
 				jexit();
 			}
 
