@@ -155,24 +155,27 @@ if (!empty($this->client))
 									<?php
 									if ($subFormData = json_decode($field_values))
 									{
-										foreach($subFormData as $subFormDataRow)
+										if (is_array(json_decode($field_values, true)))
 										{
-											?>
-											<table class="table table-bordered">
-											<?php
-											foreach ($subFormDataRow as $key => $subFormDataColumn)
+											foreach ($subFormData as $subFormDataRow)
 											{
 												?>
-												<tr>
+												<table class="table table-bordered">
 												<?php
-												echo !empty($subFormDataColumn) ? '<td>' . $key . '</td><td>' . $subFormDataColumn . '</td>' : '';
+												foreach ($subFormDataRow as $key => $subFormDataColumn)
+												{
+													?>
+													<tr>
+													<?php
+													echo !empty($subFormDataColumn) ? '<td>' . $key . '</td><td>' . $subFormDataColumn . '</td>' : '';
+													?>
+													</tr>
+													<?php
+												}
 												?>
-												</tr>
+												</table>
 												<?php
 											}
-											?>
-											</table>
-											<?php
 										}
 									}
 									else
