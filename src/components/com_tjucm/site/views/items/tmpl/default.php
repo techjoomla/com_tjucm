@@ -153,9 +153,11 @@ if (!empty($this->client))
 									?>
 									<td>
 									<?php
-									if ($subFormData = json_decode($field_values))
+									if (is_array(json_decode($field_values, true)))
 									{
-										foreach($subFormData as $subFormDataRow)
+										$subFormData = json_decode($field_values);
+
+										foreach ($subFormData as $subFormDataRow)
 										{
 											?>
 											<table class="table table-bordered">
@@ -177,7 +179,11 @@ if (!empty($this->client))
 									}
 									else
 									{
-										?><a href="<?php echo $link;?>"><?php echo $field_values; ?></a><?php
+										?>
+										<a href="<?php echo $link;?>">
+											<?php echo $field_values; ?>
+										</a>
+										<?php
 									}
 									?>
 									</td>
