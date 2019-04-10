@@ -89,18 +89,6 @@ class TjucmViewType extends JViewLegacy
 			JToolBarHelper::custom('type.save2new', 'save-new.png', 'save-new_f2.png', 'JTOOLBAR_SAVE_AND_NEW', false);
 		}
 
-		// If an existing item, can save to a copy.
-		if (!$isNew && $canDo->get('core.create'))
-		{
-			JToolBarHelper::custom('type.save2copy', 'save-copy.png', 'save-copy_f2.png', 'JTOOLBAR_SAVE_AS_COPY', false);
-		}
-
-		// Button for version control
-		if ($this->state->params->get('save_history', 1) && $user->authorise('core.edit'))
-		{
-			JToolbarHelper::versions('com_tjucm.type', $this->item->id);
-		}
-
 		if (empty($this->item->id))
 		{
 			JToolBarHelper::cancel('type.cancel', 'JTOOLBAR_CANCEL');

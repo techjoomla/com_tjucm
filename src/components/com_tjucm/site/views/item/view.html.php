@@ -94,6 +94,9 @@ class TjucmViewItem extends JViewLegacy
 			throw new Exception(implode("\n", $errors));
 		}
 
+		$xmlFileName = explode(".", $this->form_extra->getName());
+		$this->formXml = simplexml_load_file(JPATH_SITE . "/administrator/components/com_tjucm/models/forms/" . $xmlFileName[1] . ".xml");
+
 		$this->_prepareDocument();
 
 		parent::display($tpl);

@@ -70,13 +70,6 @@ JHtml::script( JUri::root().'administrator/components/com_tjucm/assets/js/tjucm_
 							<?php echo $this->form->renderField('created_date'); ?>
 							<?php echo $this->form->renderField('modified_by'); ?>
 							<?php echo $this->form->renderField('modified_date'); ?>
-
-							<?php if ($this->state->params->get('save_history', 1)) : ?>
-								<div class="control-group">
-									<div class="control-label"><?php echo $this->form->getLabel('version_note'); ?></div>
-									<div class="controls"><?php echo $this->form->getInput('version_note'); ?></div>
-								</div>
-							<?php endif; ?>
 						</fieldset>
 					</div>
 				</div>
