@@ -159,6 +159,11 @@ class TjucmViewItemform extends JViewLegacy
 			throw new Exception(implode("\n", $errors));
 		}
 
+		// Ucm triggger before item form display
+		JPluginHelper::importPlugin('tjucm');
+		$dispatcher = JDispatcher::getInstance();
+		$dispatcher->trigger('tjucmOnBeforeItemFormDisplay', array(&$this->item, &$this->form_extra));
+
 		$this->_prepareDocument();
 
 		parent::display($tpl);

@@ -503,18 +503,36 @@ class TjucmModelItemForm extends JModelForm
 			$data['state'] = 1;
 		}
 
+		// To store fields value in TJ-Fields
+		$data_extra = array();
+
+		if (!empty($extra_jform_data))
+		{
+			$data_extra['client'] = $this->client;
+			$data_extra['fieldsvalue'] = $extra_jform_data;
+		}
+
+		$isNew = empty($typeItemId) ? 1 : 0;
+
+		// OnBefore UCM record save trigger.
+		JPluginHelper::importPlugin('tjucm');
+		$dispatcher = JDispatcher::getInstance();
+		$dispatcher->trigger('tjucmOnBeforeSaveItem', array(&$data, &$data_extra, $isNew));
+
 		if ($table->save($data) === true)
 		{
 			if (!empty($extra_jform_data))
 			{
-				$data_extra = array();
 				$data_extra['content_id'] = $table->id;
-				$data_extra['client'] = $this->client;
-				$data_extra['fieldsvalue'] = $extra_jform_data;
 
 				// Save extra fields data.
 				$this->saveExtraFields($data_extra);
 			}
+
+			$data['id'] = $table->id;
+
+			// OnAfter UCM record save trigger.
+			$dispatcher->trigger('tjucmOnAfterSaveItem', array($data, $data_extra));
 
 			return $table->id;
 		}
