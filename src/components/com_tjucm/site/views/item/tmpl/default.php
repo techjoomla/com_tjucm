@@ -16,8 +16,8 @@ $TjfieldsHelper = new TjfieldsHelper;
 
 // Layout for field types
 $fieldLayout = array();
-$fieldLayout['file'] = "file";
-$fieldLayout['image'] = "file";
+$fieldLayout['File'] = "file";
+$fieldLayout['Image'] = "file";
 $fieldLayout['Checkbox'] = "checkbox";
 $fieldLayout['Radio'] = "list";
 $fieldLayout['List'] = "list";
