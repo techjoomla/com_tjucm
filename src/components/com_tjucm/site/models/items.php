@@ -70,6 +70,7 @@ class TjucmModelItems extends JModelList
 	{
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
+		$db = JFactory::getDbo();
 
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
@@ -86,9 +87,12 @@ class TjucmModelItems extends JModelList
 
 		$app->setUserState($this->context . '.list', $list);
 		$app->input->set('list', null);
-		$type_id = $app->input->get('id', "", "INT");
+		$typeId = $app->input->get('id', "", "INT");
 
-		$ucmType = $tjUcmModelType->getTypeUniqueIdentifier($type_id);
+		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
+		$typeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', $db));
+		$typeTable->load(array('id' => $typeId));
+		$ucmType = $typeTable->unique_identifier;
 
 		if (empty($ucmType))
 		{
@@ -115,16 +119,16 @@ class TjucmModelItems extends JModelList
 			$ucmType = $app->input->get('client', '', 'STRING');
 		}
 
-		if (empty($type_id))
+		if (empty($typeId))
 		{
-			$type_id = $tjUcmModelType->getTypeId($ucmType);
+			$typeId = $tjUcmModelType->getTypeId($ucmType);
 		}
 
 		$this->setState('ucm.client', $ucmType);
-		$this->setState("ucmType.id", $type_id);
+		$this->setState("ucmType.id", $typeId);
 
 		$createdBy = $app->input->get('created_by', "", "INT");
-		$canView = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $type_id);
+		$canView = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $typeId);
 
 		if (!$canView)
 		{
@@ -293,6 +297,17 @@ class TjucmModelItems extends JModelList
 	 */
 	public function getItems()
 	{
+		$typeId = $this->getState('ucmType.id');
+
+		JLoader::import('components.com_tjucm.models.item', JPATH_SITE);
+		$itemModel = new TjucmModelItem();
+		$canView = $itemModel->canView($typeId);
+
+		if (!$canView)
+		{
+			return false;
+		}
+
 		$items = parent::getItems();
 
 		foreach ($items as $item)

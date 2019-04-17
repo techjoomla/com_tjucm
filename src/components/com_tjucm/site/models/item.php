@@ -333,4 +333,18 @@ class TjucmModelItem extends JModelAdmin
 			break;
 		}
 	}
+
+	/**
+	 * Method to check if a user has permissions to view ucm items of given type
+	 *
+	 * @param   int  $typeId  Type Id
+	 *
+	 * @return  boolean
+	 */
+	public function canView($typeId)
+	{
+		$user = JFactory::getUser();
+
+		return $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $typeId);
+	}
 }
