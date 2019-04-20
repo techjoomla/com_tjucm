@@ -14,17 +14,12 @@ jQuery(document).ready(function()
 		/*Check if auto save is enabled for UCM type*/
 		if (tjUcmAutoSave == 1)
 		{
-			// Save form values
+			/* Save form values */
 			jQuery("#item-form").on("change select", ":input", function(){
-				let tjUcmFormDirty = jQuery('#item-form').hasClass('dirty');
-
-				if (tjUcmFormDirty === true)
-				{
-					steppedFormSave(this.form.id, "draft", showDraftSuccessMsg);
-				}
+				steppedFormSave(this.form.id, "draft", showDraftSuccessMsg);
 			});
 
-			// To save calendar field value
+			/* To save calendar field value */
 			jQuery("#item-form .field-calendar input:text").blur(function(){
 				let tjUcmFormDirty = jQuery('#item-form').hasClass('dirty');
 

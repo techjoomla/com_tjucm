@@ -23,7 +23,6 @@ $doc = JFactory::getDocument();
 $doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/jquery.form.js');
 $doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/tjucm_ajaxForm_save.js');
 $doc->addScript(JUri::root() . 'administrator/components/com_tjfields/assets/js/tjfields.js');
-$doc->addScript(JUri::root() . 'media/com_tjucm/js/form.js');
 
 /*
  * Script to show alert box if form changes are made and user is closing/refreshing/navigating the tab

@@ -121,12 +121,7 @@ class TjucmViewItemform extends JViewLegacy
 
 			if (!$this->allowedToAdd)
 			{
-				if (!class_exists('TjucmControllerItemForm'))
-				{
-					JLoader::register('TjucmControllerItemForm', JPATH_SITE . '/components/com_tjucm/controllers/itemform.php');
-					JLoader::load('TjucmControllerItemForm');
-				}
-
+				JLoader::import('controllers.itemform', JPATH_SITE . '/components/com_tjucm');
 				$itemFormController = new TjucmControllerItemForm;
 				$itemFormController->redirectToListView($typeId, $allowedCount);
 			}
@@ -158,6 +153,11 @@ class TjucmViewItemform extends JViewLegacy
 		{
 			throw new Exception(implode("\n", $errors));
 		}
+
+		// Ucm triggger before item form display
+		JPluginHelper::importPlugin('tjucm');
+		$dispatcher = JDispatcher::getInstance();
+		$dispatcher->trigger('tjucmOnBeforeItemFormDisplay', array(&$this->item, &$this->form_extra));
 
 		$this->_prepareDocument();
 

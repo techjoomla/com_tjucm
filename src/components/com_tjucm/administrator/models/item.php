@@ -54,6 +54,7 @@ class TjucmModelItem extends JModelAdmin
 	 */
 	public function __construct($config = array())
 	{
+		JLoader::import('components.com_tjucm.classes.funlist', JPATH_ADMINISTRATOR);
 		$this->common  = new TjucmFunList;
 
 		parent::__construct($config);

@@ -76,7 +76,6 @@ class TjucmViewTypes extends JViewLegacy
 			if ($canDo->get('core.create'))
 			{
 				JToolBarHelper::addNew('type.add', 'JTOOLBAR_NEW');
-				JToolbarHelper::custom('types.duplicate', 'copy.png', 'copy_f2.png', 'JTOOLBAR_DUPLICATE', true);
 			}
 
 			if ($canDo->get('core.edit') && isset($this->items[0]))
@@ -97,17 +96,6 @@ class TjucmViewTypes extends JViewLegacy
 			{
 				// If this component does not use state then show a direct delete button as we can not trash
 				JToolBarHelper::deleteList('', 'types.delete', 'JTOOLBAR_DELETE');
-			}
-
-			if (isset($this->items[0]->state))
-			{
-				JToolBarHelper::divider();
-				JToolBarHelper::archiveList('types.archive', 'JTOOLBAR_ARCHIVE');
-			}
-
-			if (isset($this->items[0]->checked_out))
-			{
-				JToolBarHelper::custom('types.checkin', 'checkin.png', 'checkin_f2.png', 'JTOOLBAR_CHECKIN', true);
 			}
 		}
 

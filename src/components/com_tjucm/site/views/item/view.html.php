@@ -47,8 +47,8 @@ class TjucmViewItem extends JViewLegacy
 
 		$this->state  = $this->get('State');
 		$this->item   = $this->get('Data');
-		$model   = $this->getModel("Item");
-		$this->model   = $this->getModel("Item");
+		$model        = $this->getModel("Item");
+		$this->model  = $this->getModel("Item");
 		$this->params = $app->getParams('com_tjucm');
 
 		// Load tj-fields helper helper
@@ -93,6 +93,14 @@ class TjucmViewItem extends JViewLegacy
 		{
 			throw new Exception(implode("\n", $errors));
 		}
+
+		// Ucm triggger before item display
+		JPluginHelper::importPlugin('tjucm');
+		$dispatcher = JDispatcher::getInstance();
+		$dispatcher->trigger('tjucmOnBeforeItemDisplay', array(&$this->item, &$this->form_extra));
+
+		$xmlFileName = explode(".", $this->form_extra->getName());
+		$this->formXml = simplexml_load_file(JPATH_SITE . "/administrator/components/com_tjucm/models/forms/" . $xmlFileName[1] . ".xml");
 
 		$this->_prepareDocument();
 

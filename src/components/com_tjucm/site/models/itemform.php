@@ -53,6 +53,7 @@ class TjucmModelItemForm extends JModelForm
 	 */
 	public function __construct($config = array())
 	{
+		JLoader::import('components.com_tjucm.classes.funlist', JPATH_ADMINISTRATOR);
 		$this->common  = new TjucmFunList;
 
 		parent::__construct($config);
@@ -406,7 +407,7 @@ class TjucmModelItemForm extends JModelForm
 	public function save($data, $extra_jform_data = '', $post = '')
 	{
 		$app = JFactory::getApplication();
-		$user  = JFactory::getUser();
+		$user = JFactory::getUser();
 		$status_title = $app->input->get('form_status');
 		$ucmTypeId = $this->getState('ucmType.id');
 		$typeItemId = (!empty($data['id'])) ? $data['id'] : (int) $this->getState('item.id');
@@ -434,15 +435,8 @@ class TjucmModelItemForm extends JModelForm
 
 			if (!$allowedToAdd && $typeItemId == 0)
 			{
-				$isAjax = $app->input->server->get('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest', 'BOOL');
-
-				if ($isAjax)
-				{
-					$message = JText::sprintf('COM_TJUCM_ALLOWED_COUNT_LIMIT', $allowedCount);
-					$app->enqueueMessage($message, 'warning');
-					echo new JResponseJson;
-					jexit();
-				}
+				$message = JText::sprintf('COM_TJUCM_ALLOWED_COUNT_LIMIT', $allowedCount);
+				$app->enqueueMessage($message, 'warning');
 
 				return false;
 			}
@@ -503,18 +497,36 @@ class TjucmModelItemForm extends JModelForm
 			$data['state'] = 1;
 		}
 
+		// To store fields value in TJ-Fields
+		$data_extra = array();
+
+		if (!empty($extra_jform_data))
+		{
+			$data_extra['client'] = $this->client;
+			$data_extra['fieldsvalue'] = $extra_jform_data;
+		}
+
+		$isNew = empty($typeItemId) ? 1 : 0;
+
+		// OnBefore UCM record save trigger.
+		JPluginHelper::importPlugin('tjucm');
+		$dispatcher = JDispatcher::getInstance();
+		$dispatcher->trigger('tjucmOnBeforeSaveItem', array(&$data, &$data_extra, $isNew));
+
 		if ($table->save($data) === true)
 		{
 			if (!empty($extra_jform_data))
 			{
-				$data_extra = array();
 				$data_extra['content_id'] = $table->id;
-				$data_extra['client'] = $this->client;
-				$data_extra['fieldsvalue'] = $extra_jform_data;
 
 				// Save extra fields data.
 				$this->saveExtraFields($data_extra);
 			}
+
+			$data['id'] = $table->id;
+
+			// OnAfter UCM record save trigger.
+			$dispatcher->trigger('tjucmOnAfterSaveItem', array($data, $data_extra));
 
 			return $table->id;
 		}

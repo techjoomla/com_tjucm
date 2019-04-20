@@ -47,7 +47,8 @@ class TjucmModelType extends JModelAdmin
 	 */
 	public function __construct($config = array())
 	{
-		$this->common  = new TjucmFunlist;
+		JLoader::import('components.com_tjucm.classes.funlist', JPATH_ADMINISTRATOR);
+		$this->common  = new TjucmFunList;
 
 		parent::__construct($config);
 	}
@@ -437,22 +438,5 @@ class TjucmModelType extends JModelAdmin
 		$table->load(array('unique_identifier' => $client));
 
 		return $table->id;
-	}
-
-	/**
-	 * Method to get UCM type id
-	 *
-	 * @param   string  $id  The client.
-	 *
-	 * @return	INT  ucm type id
-	 *
-	 * @since	1.0
-	 */
-	public function getTypeUniqueIdentifier($id)
-	{
-		$table = $this->getTable();
-		$table->load(array('id' => $id));
-
-		return $table->unique_identifier;
 	}
 }
