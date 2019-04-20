@@ -407,7 +407,7 @@ class TjucmModelItemForm extends JModelForm
 	public function save($data, $extra_jform_data = '', $post = '')
 	{
 		$app = JFactory::getApplication();
-		$user  = JFactory::getUser();
+		$user = JFactory::getUser();
 		$status_title = $app->input->get('form_status');
 		$ucmTypeId = $this->getState('ucmType.id');
 		$typeItemId = (!empty($data['id'])) ? $data['id'] : (int) $this->getState('item.id');
@@ -435,15 +435,8 @@ class TjucmModelItemForm extends JModelForm
 
 			if (!$allowedToAdd && $typeItemId == 0)
 			{
-				$isAjax = $app->input->server->get('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest', 'BOOL');
-
-				if ($isAjax)
-				{
-					$message = JText::sprintf('COM_TJUCM_ALLOWED_COUNT_LIMIT', $allowedCount);
-					$app->enqueueMessage($message, 'warning');
-					echo new JResponseJson;
-					jexit();
-				}
+				$message = JText::sprintf('COM_TJUCM_ALLOWED_COUNT_LIMIT', $allowedCount);
+				$app->enqueueMessage($message, 'warning');
 
 				return false;
 			}
