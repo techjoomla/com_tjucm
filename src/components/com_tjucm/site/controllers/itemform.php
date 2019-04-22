@@ -333,6 +333,7 @@ class TjucmControllerItemForm extends JControllerForm
 						foreach ($formExtra->getFieldset($fieldset->name) as $field)
 						{
 							$formExtra->setFieldAttribute($field->fieldname, 'required', false);
+							$formExtra->setFieldAttribute($field->fieldname, 'validate', '');
 						}
 					}
 				}

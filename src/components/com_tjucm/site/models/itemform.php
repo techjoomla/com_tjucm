@@ -488,7 +488,7 @@ class TjucmModelItemForm extends JModelForm
 
 		$table = $this->getTable();
 
-		if ($status_title === 'draft' || (isset($ucmTypeParams->publish_items) && $ucmTypeParams->publish_items == 0))
+		if (isset($ucmTypeParams->publish_items) && $ucmTypeParams->publish_items == 0)
 		{
 			$data['state'] = 0;
 		}
