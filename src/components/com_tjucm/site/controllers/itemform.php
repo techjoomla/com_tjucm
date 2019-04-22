@@ -333,6 +333,7 @@ class TjucmControllerItemForm extends JControllerForm
 						foreach ($formExtra->getFieldset($fieldset->name) as $field)
 						{
 							$formExtra->setFieldAttribute($field->fieldname, 'required', false);
+							$formExtra->setFieldAttribute($field->fieldname, 'validate', '');
 						}
 					}
 				}
@@ -550,6 +551,9 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	public function remove()
 	{
+		// Check for request forgeries.
+		(JSession::checkToken('get') or JSession::checkToken()) or jexit(JText::_('JINVALID_TOKEN'));
+
 		$app   = JFactory::getApplication();
 		$model = $this->getModel('ItemForm', 'TjucmModel');
 		$pk    = $app->input->getInt('id');
@@ -588,117 +592,6 @@ class TjucmControllerItemForm extends JControllerForm
 			$this->setMessage($e->getMessage(), $errorType);
 			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
 		}
-	}
-
-	/**
-	 * Method to delete uploaded document.
-	 *
-	 * @return  boolean  True if access level check and checkout passes, false otherwise.
-	 *
-	 * @since   1.6
-	 */
-	public function delete_doc()
-	{
-		if (JFactory::getUser()->id)
-		{
-			$objx     = new stdClass;
-			$jinput   = JFactory::getApplication()->input;
-			$field_name  = $jinput->post->get('field_id', '', 'string');
-			$nameOfField = explode('jform_', $field_name);
-			$fileName = $jinput->post->get('fileName', '', 'string');
-
-			$db = JFactory::getDbo();
-			$query = $db->getQuery(true);
-			$conditions = array($db->quoteName('id') . ' IN (' . $fieldValueEntryId . ') ');
-
-			$query->select("*")
-			->from("#__tjfields_fields")
-			->where("name = '" . $nameOfField[1] . "'");
-			$db->setQuery($query);
-
-			$field_rs = $db->loadobject();
-
-			if ($field_rs->id)
-			{
-				$db    = JFactory::getDbo();
-				$query = $db->getQuery(true);
-
-				// Delete all custom keys for user 1001.
-				$conditions = array(
-					$db->quoteName('field_id') . ' = ' . $db->quote($field_rs->id),
-					$db->quoteName('user_id') . ' = ' . $db->quote(JFactory::getUser()->id)
-				);
-
-				$query->delete($db->quoteName('#__tjfields_fields_value'));
-				$query->where($conditions);
-
-				$db->setQuery($query);
-
-				if ($db->execute())
-				{
-					if ($fileName)
-					{
-						$full_client = explode('.', $field_rs->client);
-						$client = $full_client[0];
-						$client_type = $full_client[1];
-
-						// Get correct file path
-						$return = 0;
-						$filePath = 'media/' . $client . '/' . $client_type . DIRECTORY_SEPARATOR . $fileName;
-
-						// Remove file if it exists
-						if (file_exists($filePath) )
-						{
-							unlink($filePath);
-
-							$return = 1;
-
-							// H header('Location:index.php');
-						}
-						else
-						{
-							$return = 0;
-						}
-					}
-
-					$objx->success = 1;
-					$objx->data    = '';
-
-					// JText::_("COM_PIP_FISN_REPORT_DOCUMENT_DELETE_SUCCESSFULLY");
-					$objx->message = '';
-					$objx->error   = 0;
-				}
-				else
-				{
-					$objx->success = 0;
-					$objx->data    = '';
-
-					// JText::_("COM_PIP_FISN_REPORT_DOCUMENT_NOT_DELETE");
-					$objx->message = '';
-					$objx->error   = 1;
-				}
-			}
-			else
-			{
-				$objx->success = 0;
-				$objx->data    = "";
-
-				// JText::_("COM_PIP_FISN_REPORT_NOT_DELETE");
-				$objx->message = '';
-				$objx->error   = 1;
-			}
-		}
-		else
-		{
-			$objx->success = 0;
-			$objx->data    = '';
-			$objx->message = JText::_("Time Out");
-			$objx->error   = 1;
-		}
-
-		print_r(json_encode($objx));
-
-		jexit();
 	}
 
 	/**

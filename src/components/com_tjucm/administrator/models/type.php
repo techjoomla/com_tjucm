@@ -336,12 +336,6 @@ class TjucmModelType extends JModelAdmin
 		$params['allowed_count'] = $data['allowed_count'];
 		$params['layout'] = $data['layout'];
 
-		// If UCM type allowed to save data as draft or auto saved is enabled then items cant be published automatically
-		if ($params['allow_draft_save'] == 1 || $params['allow_auto_save'] == 1)
-		{
-			$params['publish_items'] = 0;
-		}
-
 		// If UCM type is a subform then it cant be saved as draft and auto save is also disabled
 		if ($params['is_subform'] == 1)
 		{
