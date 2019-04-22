@@ -96,6 +96,9 @@ class TjucmControllerItem extends JControllerLegacy
 	 */
 	public function publish()
 	{
+		// Check for request forgeries.
+		(JSession::checkToken('get') or JSession::checkToken()) or jexit(JText::_('JINVALID_TOKEN'));
+
 		// Initialise variables.
 		$app = JFactory::getApplication();
 
@@ -150,6 +153,9 @@ class TjucmControllerItem extends JControllerLegacy
 	 */
 	public function remove()
 	{
+		// Check for request forgeries.
+		(JSession::checkToken('get') or JSession::checkToken()) or jexit(JText::_('JINVALID_TOKEN'));
+
 		// Initialise variables.
 		$app = JFactory::getApplication();
 

@@ -19,7 +19,8 @@ $user = JFactory::getUser();
 $userId = $user->get('id');
 $listOrder = $this->state->get('list.ordering');
 $listDirn = $this->state->get('list.direction');
-$appendUrl = "";
+$appendUrl = '';
+$csrf = "&" . JSession::getFormToken() . '=1';
 
 if (!empty($this->created_by))
 {
@@ -118,7 +119,7 @@ if (!empty($this->client))
 						{
 							$class = ($this->canChange) ? 'active' : 'disabled'; ?>
 							<td class="center">
-								<a class="<?php echo $class; ?>" href="<?php echo ($this->canChange) ? 'index.php?option=com_tjucm&task=item.publish&id=' . $item->id . '&state=' . (($item->state + 1) % 2) . $appendUrl : '#'; ?>">
+								<a class="<?php echo $class; ?>" href="<?php echo ($this->canChange) ? 'index.php?option=com_tjucm&task=item.publish&id=' . $item->id . '&state=' . (($item->state + 1) % 2) . $appendUrl . $csrf : '#'; ?>">
 								<?php
 								if ($item->state == 1)
 								{
@@ -205,7 +206,7 @@ if (!empty($this->client))
 								if ($this->canDelete)
 								{
 									?>
-									<a href="<?php echo 'index.php?option=com_tjucm&task=itemform.remove' . '&id=' . $item->id . $appendUrl; ?>" class="btn btn-mini delete-button" type="button"><i class="icon-delete" aria-hidden="true"></i></a>
+									<a href="<?php echo 'index.php?option=com_tjucm&task=itemform.remove' . '&id=' . $item->id . $appendUrl . $csrf; ?>" class="btn btn-mini delete-button" type="button"><i class="icon-delete" aria-hidden="true"></i></a>
 									<?php
 								}
 								?>
