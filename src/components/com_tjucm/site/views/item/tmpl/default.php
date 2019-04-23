@@ -21,6 +21,7 @@ $fieldLayout['Image'] = "file";
 $fieldLayout['Checkbox'] = "checkbox";
 $fieldLayout['Radio'] = "list";
 $fieldLayout['List'] = "list";
+$fieldLayout['Itemcategory'] = "itemcategory";
 
 // Get Field table
 $fieldTableData = new stdClass;
