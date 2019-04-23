@@ -513,6 +513,23 @@ class TjucmModelItemForm extends JModelForm
 		$dispatcher = JDispatcher::getInstance();
 		$dispatcher->trigger('tjucmOnBeforeSaveItem', array(&$data, &$data_extra, $isNew));
 
+		// Load TJ-Fields tables
+		Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/tables');
+
+		// If item category field is added in the type then save item category agains the item record
+		foreach ($extra_jform_data as $fieldName => $fieldData)
+		{
+			$fieldTable = Table::getInstance('Field', 'TjfieldsTable');
+			$fieldTable->load(array('name' => $fieldName));
+
+			if ($fieldTable->type == 'itemcategory')
+			{
+				$data['category_id'] = $fieldData;
+
+				break;
+			}
+		}
+
 		if ($table->save($data) === true)
 		{
 			if (!empty($extra_jform_data))
