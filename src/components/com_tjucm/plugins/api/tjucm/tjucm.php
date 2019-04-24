@@ -11,19 +11,19 @@ jimport('joomla.plugin.plugin');
 jimport('joomla.application.component.model');
 
 $lang = JFactory::getLanguage();
-$lang->load('com_activitystream', JPATH_ADMINISTRATOR);
+$lang->load('com_tjucm', JPATH_ADMINISTRATOR);
 
 /**
  * Base Class for api plugin
  *
- * @package     ActivityStream
+ * @package     TJUCM
  * @subpackage  component
  * @since       1.0
  */
 class PlgAPITjucm extends ApiPlugin
 {
 	/**
-	 * ActivityStream api plugin to load com_api classes
+	 * TjUcm api plugin to load com_api classes
 	 *
 	 * @param   string  $subject  originalamount
 	 * @param   array   $config   coupon_code

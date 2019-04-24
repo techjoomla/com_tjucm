@@ -110,7 +110,7 @@ class TjucmApiResourceType extends ApiResource
 	/**
 	 * Post Type Data
 	 *
-	 * @return  json ActivityStream details
+	 * @return  json Type details
 	 *
 	 * @since   0.0.1
 	 */

@@ -109,7 +109,7 @@ class TjucmApiResourceItem extends ApiResource
 	}
 
 	/**
-	 * Delete ActivityStream Data
+	 * Delete Item Data
 	 *
 	 * @return  boolean
 	 *
@@ -118,23 +118,6 @@ class TjucmApiResourceItem extends ApiResource
 	public function delete()
 	{
 		die("Working");
-		$jinput = JFactory::getApplication()->input;
-		$result_arr = array();
-		$id = $jinput->get('id', '', "CMD");
-		$ActivityStreamModelActivity = JModelLegacy::getInstance('Activity', 'ActivityStreamModel');
-		$result = $ActivityStreamModelActivity->delete($id);
-
-		if ($result)
-		{
-			$result_arr['success'] = true;
-			$result_arr['message'] = JText::_("COM_ACTIVITYSTREAM_ACTIVITY_DELETED");
-		}
-		else
-		{
-			$result_arr['success'] = false;
-			$result_arr['message'] = JText::_("COM_ACTIVITYSTREAM_ACTIVITY_NOT_DELETED");
-		}
-
 		$this->plugin->setResponse($result_arr);
 	}
 }
