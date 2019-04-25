@@ -14,8 +14,8 @@ jimport('joomla.plugin.plugin');
  * Class for get TjUCM
  *
  * @package     Com_TjUcm
- * @subpackage  component
- * @since       0.0.1
+ * @subpackage  ApiResource
+ * @since       1.0.0
  */
 class TjucmApiResourceItem extends ApiResource
 {
@@ -24,7 +24,7 @@ class TjucmApiResourceItem extends ApiResource
 	 *
 	 * @return  void
 	 *
-	 * @since   0.0.1
+	 * @since   1.0.0
 	 */
 	public function get()
 	{
@@ -41,55 +41,56 @@ class TjucmApiResourceItem extends ApiResource
 	/**
 	 * Post Item Data
 	 *
-	 * @return  Json Item details
+	 * @return  void
 	 *
-	 * @since   0.0.1
+	 * @since   1.0.0
 	 */
 	public function post()
 	{
 		$jInput = JFactory::getApplication()->input;
 		$client = $jInput->get('client');
+
 		// Getting the request Body Data
-		$input = JFactory::getApplication()->input;
-		$file  = $input->files->get('image'); 
-		var_dump($file);
 		$jinput = JFactory::getApplication()->input->json;
-		var_dump($jInput->get('name'));
-		die;
+
 		// Setting Item details
 		$data = array();
 		$data["id"] = $jinput->get('id');
-		
-		$data["client"] = $jinput->get('client');;
+		$data["client"] = $jinput->get('client');
 		$data["draft"] = $jinput->get('draft');
 		$data["categoryId"] = $jinput->get('category_id');
-		$data["state"] = $jinput->get('state');;
+		$data["state"] = $jinput->get('state');
 		$fields = $jinput->get('fields', array(), 'array');
 		$extra_jform_data = array();
+
 		// Addding Extra item field values
 		$TjfieldsModelFields = JModelLegacy::getInstance('Fields', 'TjfieldsModel');
 		$TjfieldsModelFields->setState("filter.client", $client);
-		
+
 		// Variable to store Fields of FieldGroup
 		$tjFields = $TjfieldsModelFields->getItems();
-		
-		$temp=array();
-		foreach ($tjFields as $k=>$v)
+
+		// Array to store field id=>name
+		$fieldsAssoc = array();
+
+		foreach ($tjFields as $k => $v)
 		{
-		    $temp[$v->id]=$v->name;
+			$fieldsAssoc[$v->id] = $v->name;
 		}
+
 		unset($tjFields);
-		print_r($temp);
+
 		foreach ($fields as $k => $field)
 		{
-			$extra_jform_data[$temp[(int)$field["id"]]] = $field["value"];
+			$extra_jform_data[$fieldsAssoc[(int) $field["id"]]] = $field["value"];
 		}
+
 		$TjucmModelItemForm = JModelLegacy::getInstance('ItemForm', 'TjucmModel');
+
 		// Setting Client ID
 		$TjucmModelItemForm->setClient($client);
 		$itemId = $TjucmModelItemForm->save($data, $extra_jform_data);
 
-		
 		// Response Array
 		$return_arr = array();
 
@@ -106,18 +107,5 @@ class TjucmApiResourceItem extends ApiResource
 		}
 
 		$this->plugin->setResponse($return_arr);
-	}
-
-	/**
-	 * Delete Item Data
-	 *
-	 * @return  boolean
-	 *
-	 * @since   0.0.1
-	 */
-	public function delete()
-	{
-		die("Working");
-		$this->plugin->setResponse($result_arr);
 	}
 }

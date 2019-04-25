@@ -14,8 +14,8 @@ jimport('joomla.plugin.plugin');
  * Class for get TjUCM
  *
  * @package     Com_TjUcm
- * @subpackage  component
- * @since       0.0.1
+ * @subpackage  ApiResource
+ * @since       1.0.0
  */
 class TjucmApiResourceType extends ApiResource
 {
@@ -24,11 +24,10 @@ class TjucmApiResourceType extends ApiResource
 	 *
 	 * @return  void
 	 *
-	 * @since   0.0.1
+	 * @since   1.0.0
 	 */
 	public function get()
 	{
-	    $executionStartTime = microtime(true);
 		$jInput = JFactory::getApplication()->input;
 		$client = $jInput->get('client');
 		$table = JTable::getInstance('Type', 'TjucmTable');
@@ -81,13 +80,12 @@ class TjucmApiResourceType extends ApiResource
 			$fieldgroups[$groupKey]->fields = $fields;
 		}
 
-
 		// Adding fieldGroups to UcmType
 		$ucmType->fieldgroups = $fieldgroups;
 
 		// Variable to store request response
 		$return_arr = array();
-		
+
 		// If no activities found then return the error message
 		if (empty($ucmType))
 		{
@@ -99,37 +97,8 @@ class TjucmApiResourceType extends ApiResource
 			$return_arr['success'] = true;
 			$return_arr['message'] = "";
 			$return_arr['ucmType'] = $ucmType;
-			$executionEndTime = microtime(true);
-			$seconds = $executionEndTime - $executionStartTime;
-			$return_arr["time"]=$seconds;
 		}
 
 		$this->plugin->setResponse($return_arr);
-	}
-
-	/**
-	 * Post Type Data
-	 *
-	 * @return  json Type details
-	 *
-	 * @since   0.0.1
-	 */
-	public function post()
-	{
-		die("Working");
-		$this->plugin->setResponse(["null"]);
-	}
-
-	/**
-	 * Delete Type Data
-	 *
-	 * @return  boolean
-	 *
-	 * @since   0.0.1
-	 */
-	public function delete()
-	{
-		die("Working");
-		$this->plugin->setResponse(["null"]);
 	}
 }
