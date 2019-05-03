@@ -29,12 +29,11 @@ class TjucmApiResourceItem extends ApiResource
 	public function get()
 	{
 		$jInput = JFactory::getApplication()->input;
-		$client = $jInput->get('client');
 		$id = $jInput->get('id');
-		$TjucmModelItem = JModelLegacy::getInstance('Item', 'TjucmModel');
+		$tjUcmModelItem = JModelLegacy::getInstance('Item', 'TjucmModel');
 
 		// Setting Client ID
-		$item = $TjucmModelItem->getItem($id);
+		$item = $tjUcmModelItem->getItem($id);
 		$this->plugin->setResponse($item);
 	}
 
@@ -56,7 +55,7 @@ class TjucmApiResourceItem extends ApiResource
 		// Setting Item details
 		$data = array();
 		$data["id"] = $jinput->get('id');
-		$data["client"] = $jinput->get('client');
+		$data["client"] = $client;
 		$data["draft"] = $jinput->get('draft');
 		$data["categoryId"] = $jinput->get('category_id');
 		$data["state"] = $jinput->get('state');
@@ -64,11 +63,11 @@ class TjucmApiResourceItem extends ApiResource
 		$extra_jform_data = array();
 
 		// Addding Extra item field values
-		$TjfieldsModelFields = JModelLegacy::getInstance('Fields', 'TjfieldsModel');
-		$TjfieldsModelFields->setState("filter.client", $client);
+		$tjFieldsModelFields = JModelLegacy::getInstance('Fields', 'TjfieldsModel');
+		$tjFieldsModelFields->setState("filter.client", $client);
 
 		// Variable to store Fields of FieldGroup
-		$tjFields = $TjfieldsModelFields->getItems();
+		$tjFields = $tjFieldsModelFields->getItems();
 
 		// Array to store field id=>name
 		$fieldsAssoc = array();
@@ -85,11 +84,11 @@ class TjucmApiResourceItem extends ApiResource
 			$extra_jform_data[$fieldsAssoc[(int) $field["id"]]] = $field["value"];
 		}
 
-		$TjucmModelItemForm = JModelLegacy::getInstance('ItemForm', 'TjucmModel');
+		$tjUcmModelItemForm = JModelLegacy::getInstance('ItemForm', 'TjucmModel');
 
 		// Setting Client ID
-		$TjucmModelItemForm->setClient($client);
-		$itemId = $TjucmModelItemForm->save($data, $extra_jform_data);
+		$tjUcmModelItemForm->setClient($client);
+		$itemId = $tjUcmModelItemForm->save($data, $extra_jform_data);
 
 		// Response Array
 		$return_arr = array();

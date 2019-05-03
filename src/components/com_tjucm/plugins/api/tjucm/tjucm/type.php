@@ -33,44 +33,42 @@ class TjucmApiResourceType extends ApiResource
 		$table = JTable::getInstance('Type', 'TjucmTable');
 		$table->load(["unique_identifier" => $client]);
 
-		$TjucmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
-		$TjucmModelType->setState("filter.client", $client);
+		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		$tjUcmModelType->setState("filter.client", $client);
 
 		// Variable to store UCM Type
-		$ucmType = $TjucmModelType->getItem($table->id);
+		$ucmType = $tjUcmModelType->getItem($table->id);
 
 		// Variable to store creator name and id
 		$created_by = JFactory::getUser($ucmType->created_by);
-		$created_by = array("id" => $created_by->id,"name" => $created_by->name);
-		$ucmType->created_by = $created_by;
+		$ucmType->created_by = array("id" => $created_by->id,"name" => $created_by->name);
 
 		// Variable to store modifier name and id
 		$modified_by = JFactory::getUser($ucmType->modified_by);
-		$modified_by = array("id" => $modified_by->id,"name" => $modified_by->name);
-		$ucmType->modified_by = $modified_by;
+		$ucmType->modified_by = array("id" => $modified_by->id,"name" => $modified_by->name);
+
+		$tjFieldsModelGroups = JModelLegacy::getInstance('Groups', 'TjfieldsModel');
 
 		// Variable to store Field Groups
-		$fieldgroups = array();
-		$TjfieldsModelGroups = JModelLegacy::getInstance('Groups', 'TjfieldsModel');
-		$fieldgroups = $TjfieldsModelGroups->getItems();
+		$fieldgroups = $tjFieldsModelGroups->getItems();
 
 		// Getting fields of fieldgroups
 		foreach ($fieldgroups as $groupKey => $groupValue)
 		{
-			$TjfieldsModelFields = JModelLegacy::getInstance('Fields', 'TjfieldsModel');
-			$TjfieldsModelFields->setState("filter.group_id", $fieldgroups[$groupKey]->id);
+			$tjFieldsModelFields = JModelLegacy::getInstance('Fields', 'TjfieldsModel');
+			$tjFieldsModelFields->setState("filter.group_id", $fieldgroups[$groupKey]->id);
 
 			// Variable to store Fields of FieldGroup
-			$fields = $TjfieldsModelFields->getItems();
+			$fields = $tjFieldsModelFields->getItems();
 
 			// Getting options of field
 			foreach ($fields as $fieldKey => $fieldValue)
 			{
-				$TjfieldsModelOptions = JModelLegacy::getInstance('Options', 'TjfieldsModel');
-				$TjfieldsModelOptions->setState("filter.field_id", $fields[$fieldKey]->id);
+				$tjFieldsModelOptions = JModelLegacy::getInstance('Options', 'TjfieldsModel');
+				$tjFieldsModelOptions->setState("filter.field_id", $fields[$fieldKey]->id);
 
 				// Variable to store Options of Field
-				$options = $TjfieldsModelOptions->getItems();
+				$options = $tjFieldsModelOptions->getItems();
 
 				// Adding options to field if any
 				$fields[$fieldKey]->options = empty($options) ? null : $options;
