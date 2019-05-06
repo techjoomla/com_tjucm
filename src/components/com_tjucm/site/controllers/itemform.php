@@ -428,6 +428,18 @@ class TjucmControllerItemForm extends JControllerForm
 				jexit();
 			}
 
+			// Save created_by field by ownership user field (To save form on behalf of someone)
+			if (!empty($data['com_tjucm_ownershipcreatedby']))
+			{
+				$validData['created_by'] = $data['com_tjucm_ownershipcreatedby'];
+			}
+
+			// Cluster client_id store in UCM data
+			if (!empty($data['com_tjucm_clusterclusterid']))
+			{
+				$validData['cluster_id'] = $data['com_tjucm_clusterclusterid'];
+			}
+
 			// If no data send then dont add any entry in item form table - end
 			$recordId = $model->save($validData, $extra_jform_data, $post);
 
