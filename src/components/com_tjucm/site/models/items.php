@@ -298,7 +298,7 @@ class TjucmModelItems extends JModelList
 	public function getItems()
 	{
 		$typeId = $this->getState('ucmType.id');
-		$createdBy = $this->getState('created_by', '', 'INT');
+		$createdBy = $this->getState('created_by', '');
 
 		JLoader::import('components.com_tjucm.models.item', JPATH_SITE);
 		$itemModel = new TjucmModelItem();
@@ -306,7 +306,15 @@ class TjucmModelItems extends JModelList
 		$user = JFactory::getUser();
 
 		// If user is not allowed to view the records and if the created_by is not the logged in user then do not show the records
-		if (!$canView && $createdBy != $user->id)
+		if (!$canView)
+		{
+			if (!empty($createdBy) && $createdBy == $user->id)
+			{
+				$canView = true;
+			}
+		}
+
+		if (!$canView)
 		{
 			return false;
 		}
