@@ -1,20 +1,21 @@
 <?php
 /**
- * @package    TjUcm
- *
- * @author     Techjoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2019 TechJoomla. All rights reserved.
- * @license    GNU General Public License version 2 or later.
+ * @package     TjUcm
+ * @subpackage  Plg_Api_ucm
+ * 
+ * @author      Techjoomla <extensions@techjoomla.com>
+ * @copyright   Copyright (c) 2009-2019 TechJoomla. All rights reserved.
+ * @license     GNU General Public License version 2 or later.
  */
 
 defined('_JEXEC') or die;
 jimport('joomla.plugin.plugin');
 
 /**
- * Class for get TjUCM
+ * Class for get TjUCM item
  *
- * @package     Com_TjUcm
- * @subpackage  ApiResource
+ * @package     TjUcm
+ * @subpackage  Plg_Api_ucm
  * @since       _DEPLOY_VERSION_
  */
 class TjucmApiResourceItem extends ApiResource
@@ -31,7 +32,7 @@ class TjucmApiResourceItem extends ApiResource
 		$jInput = JFactory::getApplication()->input;
 		$id = $jInput->get('id');
 		$tjUcmModelItem = JModelLegacy::getInstance('Item', 'TjucmModel');
-		
+
 		// Setting Client ID
 		$item = $tjUcmModelItem->getItem($id);
 

@@ -1,11 +1,13 @@
 <?php
 /**
- * @version    SVN: <svn_id>
- * @package    TJUCM
- * @author     Techjoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2019 TechJoomla. All rights reserved.
- * @license    GNU General Public License version 2 or later.
+ * @package     TjUcm
+ * @subpackage  Plg_Api_ucm
+ * 
+ * @author      Techjoomla <extensions@techjoomla.com>
+ * @copyright   Copyright (c) 2009-2019 TechJoomla. All rights reserved.
+ * @license     GNU General Public License version 2 or later.
  */
+
 defined('_JEXEC') or die( 'Restricted access');
 jimport('joomla.plugin.plugin');
 jimport('joomla.application.component.model');
@@ -16,10 +18,11 @@ $lang->load('com_tjucm', JPATH_ADMINISTRATOR);
 /**
  * Base Class for api plugin
  *
- * @package     TJUCM
- * @subpackage  ApiPlugin
- * @since       1.0.0
+ * @package     TjUcm
+ * @subpackage  Plg_Api_ucm
+ * @since       _DEPLOY_VERSION_
  */
+
 class PlgAPITjucm extends ApiPlugin
 {
 	/**
@@ -28,7 +31,7 @@ class PlgAPITjucm extends ApiPlugin
 	 * @param   string  $subject  originalamount
 	 * @param   array   $config   coupon_code
 	 *
-	 * @since   1.0.0
+	 * @since   _DEPLOY_VERSION_
 	 */
 	public function __construct($subject, $config = array())
 	{
