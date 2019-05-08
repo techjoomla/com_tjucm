@@ -1,7 +1,7 @@
 <?php
 /**
- * @version    SVN: <svn_id>
- * @package    Com_TjUcm
+ * @package    TjUcm
+ *
  * @author     Techjoomla <extensions@techjoomla.com>
  * @copyright  Copyright (c) 2009-2019 TechJoomla. All rights reserved.
  * @license    GNU General Public License version 2 or later.
@@ -15,7 +15,7 @@ jimport('joomla.plugin.plugin');
  *
  * @package     Com_TjUcm
  * @subpackage  ApiResource
- * @since       1.0.0
+ * @since       _DEPLOY_VERSION_
  */
 class TjucmApiResourceType extends ApiResource
 {
@@ -24,7 +24,7 @@ class TjucmApiResourceType extends ApiResource
 	 *
 	 * @return  void
 	 *
-	 * @since   1.0.0
+	 * @since   _DEPLOY_VERSION_
 	 */
 	public function get()
 	{
@@ -47,7 +47,9 @@ class TjucmApiResourceType extends ApiResource
 		$modified_by = JFactory::getUser($ucmType->modified_by);
 		$ucmType->modified_by = array("id" => $modified_by->id,"name" => $modified_by->name);
 
-		$tjFieldsModelGroups = JModelLegacy::getInstance('Groups', 'TjfieldsModel');
+		$tjFieldsModelGroups = JModelLegacy::getInstance('Groups', 'TjfieldsModel', array('ignore_request' => true));
+		$tjFieldsModelGroups->setState('list.ordering', 'a.id');
+		$tjFieldsModelGroups->setState('list.direction', 'asc');
 
 		// Variable to store Field Groups
 		$fieldgroups = $tjFieldsModelGroups->getItems();
@@ -55,8 +57,10 @@ class TjucmApiResourceType extends ApiResource
 		// Getting fields of fieldgroups
 		foreach ($fieldgroups as $groupKey => $groupValue)
 		{
-			$tjFieldsModelFields = JModelLegacy::getInstance('Fields', 'TjfieldsModel');
+			$tjFieldsModelFields = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
 			$tjFieldsModelFields->setState("filter.group_id", $fieldgroups[$groupKey]->id);
+			$tjFieldsModelFields->setState('list.ordering', 'a.id');
+			$tjFieldsModelFields->setState('list.direction', 'asc');
 
 			// Variable to store Fields of FieldGroup
 			$fields = $tjFieldsModelFields->getItems();
