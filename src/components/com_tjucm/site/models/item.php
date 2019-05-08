@@ -125,7 +125,7 @@ class TjucmModelItem extends JModelAdmin
 		$db = $db->setQuery($query);
 		$fieldGroups = $db->loadObjectList();
 
-		// Getting fields and its of fieldgroups
+		// Getting fields of respective fieldgroups
 		foreach ($fieldGroups as $groupKey => $groupValue)
 		{
 			$query = $db->getQuery(true);
