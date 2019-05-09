@@ -60,7 +60,7 @@ class TjucmApiResourceType extends ApiResource
 		{
 			$tjFieldsModelFields = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
 			$tjFieldsModelFields->setState("filter.group_id", $fieldgroups[$groupKey]->id);
-			$tjFieldsModelFields->setState('list.ordering', 'a.id');
+			$tjFieldsModelFields->setState('list.ordering', 'a.ordering');
 			$tjFieldsModelFields->setState('list.direction', 'asc');
 
 			// Variable to store Fields of FieldGroup
