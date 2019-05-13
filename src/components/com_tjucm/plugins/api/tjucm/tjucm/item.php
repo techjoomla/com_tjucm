@@ -50,13 +50,14 @@ class TjucmApiResourceItem extends ApiResource
 	{
 		$jInput = JFactory::getApplication()->input;
 		$client = $jInput->get('client');
+		$id = $jInput->get('id');
 
 		// Getting the request Body Data
 		$jinput = JFactory::getApplication()->input->json;
 
 		// Setting Item details
 		$data = array();
-		$data["id"] = $jinput->get('id');
+		$data["id"] = $id;
 		$data["client"] = $client;
 		$data["draft"] = $jinput->get('draft');
 		$data["categoryId"] = $jinput->get('category_id');
