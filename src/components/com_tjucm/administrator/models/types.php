@@ -129,11 +129,11 @@ class TjucmModelTypes extends JModelList
 		$query->join("LEFT", "#__users AS uc ON uc.id=a.checked_out");
 
 		// Join over the user field 'created_by'
-		$query->select('`created_by`.name AS `created_by`');
+		$query->select('`created_by`.id AS `created_by`');
 		$query->join('LEFT', '#__users AS `created_by` ON `created_by`.id = a.`created_by`');
 
 		// Join over the user field 'modified_by'
-		$query->select('`modified_by`.name AS `modified_by`');
+		$query->select('`modified_by`.id AS `modified_by`');
 		$query->join('LEFT', '#__users AS `modified_by` ON `modified_by`.id = a.`modified_by`');
 
 		// Filter by published state
@@ -163,6 +163,22 @@ class TjucmModelTypes extends JModelList
 				$query->where('( a.title LIKE ' . $search . ' )');
 			}
 		}
+
+		// Filter by created_by 
+		$created_by = $this->getState('filter.created_by');
+		if ($created_by)
+		{
+			$query->where('a.created_by'. ' IN (' . $created_by . ')');
+		}
+		
+		// Filter by modified_by 
+		$modified_by = $this->getState('filter.modified_by');
+		if ($modified_by)
+		{
+			$query->where('a.modified_by'. ' IN (' . $modified_by . ')');
+		}
+
+
 
 		// Add the list ordering clause.
 		$orderCol  = $this->state->get('list.ordering');
