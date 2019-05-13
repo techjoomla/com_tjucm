@@ -49,7 +49,7 @@ class TjucmApiResourceType extends ApiResource
 		$ucmType->modified_by = array("id" => $modified_by->id,"name" => $modified_by->name);
 
 		$tjFieldsModelGroups = JModelLegacy::getInstance('Groups', 'TjfieldsModel', array('ignore_request' => true));
-		$tjFieldsModelGroups->setState('list.ordering', 'a.id');
+		$tjFieldsModelGroups->setState('list.ordering', 'a.ordering');
 		$tjFieldsModelGroups->setState('list.direction', 'asc');
 
 		// Variable to store Field Groups
@@ -60,7 +60,7 @@ class TjucmApiResourceType extends ApiResource
 		{
 			$tjFieldsModelFields = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
 			$tjFieldsModelFields->setState("filter.group_id", $fieldgroups[$groupKey]->id);
-			$tjFieldsModelFields->setState('list.ordering', 'a.id');
+			$tjFieldsModelFields->setState('list.ordering', 'a.ordering');
 			$tjFieldsModelFields->setState('list.direction', 'asc');
 
 			// Variable to store Fields of FieldGroup
