@@ -85,6 +85,65 @@ class TjucmModelItem extends JModelAdmin
 	}
 
 	/**
+	 * Method to get item data.
+	 *
+	 * @param   integer  $pk  The id of the item.
+	 *
+	 * @return  object|boolean|JException  Menu item data object on success, boolean false or JException instance on error
+	 * 
+	 * @since    _DEPLOY_VERSION_
+	 * 
+	 */
+	public function getItem($pk = null)
+	{
+		$pk = (!empty($pk)) ? $pk : (int) $this->getState('item.id');
+		$db = $this->getDbo();
+		$query = $db->getQuery(true)->select("*");
+		$query->from($db->qn('#__tj_ucm_data', 'a'))->where($db->qn('a.id') . ' = ' . (int) $pk);
+		$db->setQuery($query);
+		$item = $db->loadObject();
+
+		// Variable to store creator name and id
+		$created_by = JFactory::getUser($item->created_by);
+		$created_by = array("id" => $created_by->id,"name" => $created_by->name);
+		$item->created_by = $created_by;
+
+		// Variable to store modifier name and id
+		$modified_by = JFactory::getUser($item->modified_by);
+		$modified_by = array("id" => $modified_by->id,"name" => $modified_by->name);
+		$item->modified_by = $modified_by;
+
+		// Getting UCM Type Details
+		$query = $db->getQuery(true)->select($db->qn(array('id', 'title', 'unique_identifier')));
+		$query->from($db->qn('#__tj_ucm_types', 'a'))->where($db->qn('a.id') . ' = ' . (int) $item->type_id);
+		$db = $db->setQuery($query);
+		$ucmType = $db->loadObject();
+		$item->ucmType = $ucmType;
+
+		$query = $db->getQuery(true)->select($db->qn(array('id', 'title')));
+		$query->from($db->qn('#__tjfields_groups', 'a'))->where($db->qn('a.client') . ' = ' . $db->quote($item->client));
+		$db = $db->setQuery($query);
+		$fieldGroups = $db->loadObjectList();
+
+		// Getting fields of respective fieldgroups
+		foreach ($fieldGroups as $groupKey => $groupValue)
+		{
+			$query = $db->getQuery(true);
+			$query->select($db->qn(array('a.label', 'b.id', 'b.value', 'b.option_id')));
+			$query->from($db->qn('#__tjfields_fields', 'a'));
+			$query->join('INNER', $db->qn('#__tjfields_fields_value', 'b') . ' ON (' . $db->qn('b.field_id') . ' = ' . $db->qn('a.id') . ')');
+			$query->where($db->qn('a.group_id') . ' = ' . (int) $groupValue->id . ' AND ' . $db->qn('b.content_id') . ' = ' . (int) $item->id);
+			$db = $db->setQuery($query);
+			$fields = $db->loadObjectList();
+			$fieldGroups[$groupKey]->fields = $fields;
+		}
+
+		$item->fieldGroups = $fieldGroups;
+
+		return $item;
+	}
+
+	/**
 	 * Method to get an object.
 	 *
 	 * @param   integer  $id  The id of the object to get.
