@@ -445,7 +445,7 @@ class TjucmControllerItemForm extends JControllerForm
 				JLoader::import("/components/com_cluster/includes/cluster", JPATH_ADMINISTRATOR);
 				$ClusterModel = ClusterFactory::model('ClusterUsers', array('ignore_request' => true));
 				$ClusterModel->setState('list.group_by_user_id', 1);
-				$ClusterModel->setState('filter.clusterState', 1);
+				$ClusterModel->setState('filter.published', 1);
 				$ClusterModel->setState('filter.cluster_id', (int) $data['com_tjucm_clusterclusterid']);
 
 				if (!$user->authorise('core.admin'))
