@@ -442,13 +442,14 @@ class TjucmControllerItemForm extends JControllerForm
 			if (!empty($data['com_tjucm_clusterclusterid']) && $clusterExist)
 			{
 				$user = JFactory::getUser();
+				$isSuperUser = $user->authorise('core.admin');
 				JLoader::import("/components/com_cluster/includes/cluster", JPATH_ADMINISTRATOR);
 				$ClusterModel = ClusterFactory::model('ClusterUsers', array('ignore_request' => true));
 				$ClusterModel->setState('list.group_by_user_id', 1);
 				$ClusterModel->setState('filter.published', 1);
 				$ClusterModel->setState('filter.cluster_id', (int) $data['com_tjucm_clusterclusterid']);
 
-				if (!$user->authorise('core.admin'))
+				if (!$isSuperUser && !$user->authorise('core.manageall.cluster', 'com_cluster'))
 				{
 					$ClusterModel->setState('filter.user_id', $user->id);
 				}
@@ -460,7 +461,7 @@ class TjucmControllerItemForm extends JControllerForm
 				{
 					$validData['cluster_id'] = $data['com_tjucm_clusterclusterid'];
 
-					if (!empty($data['com_tjucm_ownershipcreatedby']) && !$user->authorise('core.admin'))
+					if (!empty($data['com_tjucm_ownershipcreatedby']) && !$isSuperUser && !$user->authorise('core.manageall.cluster', 'com_cluster'))
 					{
 						$clusterUsers = array();
 
