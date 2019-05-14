@@ -43,6 +43,8 @@ class TjucmModelTypes extends JModelList
 				'created_date', 'a.`created_date`',
 				'modified_by', 'a.`modified_by`',
 				'modified_date', 'a.`modified_date`',
+				'limit', 'a.`limit`',
+				'offset', 'a.`offset`',
 			);
 		}
 
@@ -116,6 +118,15 @@ class TjucmModelTypes extends JModelList
 		$db    = $this->getDbo();
 		$query = $db->getQuery(true);
 
+		// Variable to store limit
+		$limit = $this->getState('filter.limit');
+
+		// Variable to store offset
+		$offset = $this->getState('filter.offset');
+
+		// Setting limit and offset
+		$query->setLimit($limit, $offset);
+
 		// Select the required fields from the table.
 		$query->select(
 			$this->getState(
@@ -164,21 +175,31 @@ class TjucmModelTypes extends JModelList
 			}
 		}
 
-		// Filter by created_by 
+		// Filter by created_by
 		$created_by = $this->getState('filter.created_by');
-		if ($created_by)
+
+		if (is_numeric($created_by))
 		{
-			$query->where('a.created_by'. ' IN (' . $created_by . ')');
+			$query->where('a.created_by = ' . (int) $created_by);
 		}
-		
-		// Filter by modified_by 
+		elseif (is_array($created_by))
+		{
+			$created_by = implode(',', $created_by);
+			$query->where('a.created_by IN (' . $created_by . ')');
+		}
+
+		// Filter by modified_by
 		$modified_by = $this->getState('filter.modified_by');
-		if ($modified_by)
+
+		if (is_numeric($modified_by))
 		{
-			$query->where('a.modified_by'. ' IN (' . $modified_by . ')');
+			$query->where('a.modified_by = ' . (int) $modified_by);
 		}
-
-
+		elseif (is_array($modified_by))
+		{
+			$modified_by = implode(',', $modified_by);
+			$query->where('a.modified_by IN (' . $modified_by . ')');
+		}
 
 		// Add the list ordering clause.
 		$orderCol  = $this->state->get('list.ordering');
