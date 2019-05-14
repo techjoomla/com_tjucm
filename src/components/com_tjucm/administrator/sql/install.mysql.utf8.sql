@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS `#__tj_ucm_data` (
 `category_id` INT(11)  NOT NULL ,
 `type_id` INT NOT NULL ,
 `client` VARCHAR( 255 ) NOT NULL ,
+`cluster_id` int(11) DEFAULT NULL COMMENT 'Store cluster field Id',
 `checked_out` INT(11)  NOT NULL ,
 `checked_out_time` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
 `created_by` INT(11)  NOT NULL ,

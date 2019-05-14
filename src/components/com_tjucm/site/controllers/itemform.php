@@ -428,17 +428,60 @@ class TjucmControllerItemForm extends JControllerForm
 				jexit();
 			}
 
+			// UCM - Start To store core UCM table values
+
 			// Save created_by field by ownership user field (To save form on behalf of someone)
-			if (!empty($data['com_tjucm_ownershipcreatedby']))
+			if (!empty($data['com_tjucm_ownershipcreatedby']) && empty($data['com_tjucm_clusterclusterid']))
 			{
 				$validData['created_by'] = $data['com_tjucm_ownershipcreatedby'];
 			}
 
-			// Cluster client_id store in UCM data
-			if (!empty($data['com_tjucm_clusterclusterid']))
+			// Cluster Id store in UCM data
+			$clusterExist = ComponentHelper::getComponent('com_cluster', true)->enabled;
+
+			if (!empty($data['com_tjucm_clusterclusterid']) && $clusterExist)
 			{
-				$validData['cluster_id'] = $data['com_tjucm_clusterclusterid'];
+				$user = JFactory::getUser();
+				JLoader::import("/components/com_cluster/includes/cluster", JPATH_ADMINISTRATOR);
+				$ClusterModel = ClusterFactory::model('ClusterUsers', array('ignore_request' => true));
+				$ClusterModel->setState('list.group_by_user_id', 1);
+				$ClusterModel->setState('filter.clusterState', 1);
+				$ClusterModel->setState('filter.cluster_id', (int) $data['com_tjucm_clusterclusterid']);
+
+				if (!$user->authorise('core.admin'))
+				{
+					$ClusterModel->setState('filter.user_id', $user->id);
+				}
+
+				// Get all assigned cluster entries
+				$clusters = $ClusterModel->getItems();
+
+				if (!empty($clusters))
+				{
+					$validData['cluster_id'] = $data['com_tjucm_clusterclusterid'];
+
+					if (!empty($data['com_tjucm_ownershipcreatedby']) && !$user->authorise('core.admin'))
+					{
+						$clusterUsers = array();
+
+						foreach ($clusters as $cluster)
+						{
+							$clusterUsers[] = $cluster->user_id;
+						}
+
+						if (in_array($data['com_tjucm_ownershipcreatedby'], $clusterUsers))
+						{
+							$validData['created_by'] = $data['com_tjucm_ownershipcreatedby'];
+						}
+					}
+					elseif (!empty($data['com_tjucm_ownershipcreatedby']))
+					{
+						$validData['created_by'] = $data['com_tjucm_ownershipcreatedby'];
+					}
+				}
 			}
+
+			// UCM - End
 
 			// If no data send then dont add any entry in item form table - end
 			$recordId = $model->save($validData, $extra_jform_data, $post);
