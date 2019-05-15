@@ -428,59 +428,8 @@ class TjucmControllerItemForm extends JControllerForm
 				jexit();
 			}
 
-			// UCM - Start To store core UCM table values
-
-			// Save created_by field by ownership user field (To save form on behalf of someone)
-			if (!empty($data['com_tjucm_ownershipcreatedby']) && empty($data['com_tjucm_clusterclusterid']))
-			{
-				$validData['created_by'] = $data['com_tjucm_ownershipcreatedby'];
-			}
-
-			// Cluster Id store in UCM data
-			$clusterExist = ComponentHelper::getComponent('com_cluster', true)->enabled;
-
-			if (!empty($data['com_tjucm_clusterclusterid']) && $clusterExist)
-			{
-				$user = JFactory::getUser();
-				$isSuperUser = $user->authorise('core.admin');
-				JLoader::import("/components/com_cluster/includes/cluster", JPATH_ADMINISTRATOR);
-				$ClusterModel = ClusterFactory::model('ClusterUsers', array('ignore_request' => true));
-				$ClusterModel->setState('list.group_by_user_id', 1);
-				$ClusterModel->setState('filter.published', 1);
-				$ClusterModel->setState('filter.cluster_id', (int) $data['com_tjucm_clusterclusterid']);
-
-				if (!$isSuperUser && !$user->authorise('core.manageall.cluster', 'com_cluster'))
-				{
-					$ClusterModel->setState('filter.user_id', $user->id);
-				}
-
-				// Get all assigned cluster entries
-				$clusters = $ClusterModel->getItems();
-
-				if (!empty($clusters))
-				{
-					$validData['cluster_id'] = $data['com_tjucm_clusterclusterid'];
-
-					if (!empty($data['com_tjucm_ownershipcreatedby']) && !$isSuperUser && !$user->authorise('core.manageall.cluster', 'com_cluster'))
-					{
-						$clusterUsers = array();
-
-						foreach ($clusters as $cluster)
-						{
-							$clusterUsers[] = $cluster->user_id;
-						}
-
-						if (in_array($data['com_tjucm_ownershipcreatedby'], $clusterUsers))
-						{
-							$validData['created_by'] = $data['com_tjucm_ownershipcreatedby'];
-						}
-					}
-					elseif (!empty($data['com_tjucm_ownershipcreatedby']))
-					{
-						$validData['created_by'] = $data['com_tjucm_ownershipcreatedby'];
-					}
-				}
-			}
+			// UCM - Start To set cluster values to store in core UCM table values
+			$model->setClusterData($validData, $data);
 
 			// UCM - End
 

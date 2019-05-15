@@ -17,6 +17,9 @@ require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
 require_once JPATH_ADMINISTRATOR . '/components/com_tjucm/classes/funlist.php';
 use Joomla\CMS\Table\Table;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Component\ComponentHelper;
+
 /**
  * Tjucm model.
  *
@@ -746,6 +749,73 @@ class TjucmModelItemForm extends JModelForm
 		else
 		{
 			return false;
+		}
+	}
+
+	/**
+	 * Method to set cluster data in posted data.
+	 *
+	 * @param   array  &$validData  The validated data.
+	 *
+	 * @param   array  $data        UCM form data.
+	 *
+	 * @return null
+	 *
+	 * @since   1.6
+	 */
+	public function setClusterData(&$validData, $data)
+	{
+		// Save created_by field by ownership user field (To save form on behalf of someone)
+		if (!empty($data['com_tjucm_ownershipcreatedby']) && empty($data['com_tjucm_clusterclusterid']))
+		{
+			$validData['created_by'] = $data['com_tjucm_ownershipcreatedby'];
+		}
+
+		// Cluster Id store in UCM data
+		$clusterExist = ComponentHelper::getComponent('com_cluster', true)->enabled;
+
+		if (!empty($data['com_tjucm_clusterclusterid']) && $clusterExist)
+		{
+			$user  = Factory::getUser();
+			$isSuperUser = $user->authorise('core.admin');
+
+			JLoader::import("/components/com_cluster/includes/cluster", JPATH_ADMINISTRATOR);
+			$ClusterModel = ClusterFactory::model('ClusterUsers', array('ignore_request' => true));
+			$ClusterModel->setState('list.group_by_user_id', 1);
+			$ClusterModel->setState('filter.published', 1);
+			$ClusterModel->setState('filter.cluster_id', (int) $data['com_tjucm_clusterclusterid']);
+
+			if (!$isSuperUser && !$user->authorise('core.manageall.cluster', 'com_cluster'))
+			{
+				$ClusterModel->setState('filter.user_id', $user->id);
+			}
+
+			// Get all assigned cluster entries
+			$clusters = $ClusterModel->getItems();
+
+			if (!empty($clusters))
+			{
+				$validData['cluster_id'] = $data['com_tjucm_clusterclusterid'];
+
+				if (!empty($data['com_tjucm_ownershipcreatedby']) && !$isSuperUser && !$user->authorise('core.manageall.cluster', 'com_cluster'))
+				{
+					$clusterUsers = array();
+
+					foreach ($clusters as $cluster)
+					{
+						$clusterUsers[] = $cluster->user_id;
+					}
+
+					if (in_array($data['com_tjucm_ownershipcreatedby'], $clusterUsers))
+					{
+						$validData['created_by'] = $data['com_tjucm_ownershipcreatedby'];
+					}
+				}
+				elseif (!empty($data['com_tjucm_ownershipcreatedby']))
+				{
+					$validData['created_by'] = $data['com_tjucm_ownershipcreatedby'];
+				}
+			}
 		}
 	}
 }
