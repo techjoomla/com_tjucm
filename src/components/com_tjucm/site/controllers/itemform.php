@@ -428,6 +428,11 @@ class TjucmControllerItemForm extends JControllerForm
 				jexit();
 			}
 
+			// UCM - Start To set cluster values to store in core UCM table values
+			$model->setClusterData($validData, $data);
+
+			// UCM - End
+
 			// If no data send then dont add any entry in item form table - end
 			$recordId = $model->save($validData, $extra_jform_data, $post);
 
