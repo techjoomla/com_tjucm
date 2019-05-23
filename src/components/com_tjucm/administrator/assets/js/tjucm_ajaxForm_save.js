@@ -79,7 +79,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 			datatype:'JSON',
 			async: false,
 			success: function(data) {
-				var returnedData = JSON.parse(data);
+				let returnedData = JSON.parse(data);
 
 				if (returnedData.messages !== null)
 				{
@@ -126,7 +126,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 					}
 					else
 					{
-						jQuery("#recordId").val(returnedData.data);
+						jQuery("#recordId").val(returnedData.data.id);
 						promise = true;
 
 						if (showDraftSuccessMsg === "1")
@@ -139,7 +139,12 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 					/* Update item id in the URL if the data is stored successfully */
 					var url = window.location.href.split('#')[0],
 					separator = (url.indexOf("?")===-1)?"?":"&",
-					newParam = separator + "id=" + returnedData.data;
+					newParam = separator + "id=" + returnedData.data.id;
+
+					/* Add content_id in ucmsubform records */
+					jQuery.each(returnedData.data.childContentIds, function(i, val) {
+						jQuery( "input[name='"+val.elementName+"']" ).val(val.content_id);
+					});
 
 					if (!(url.indexOf(newParam) >= 0))
 					{
@@ -173,12 +178,13 @@ function itemformactions(tab_id, navDirection)
 	var prevTabName = jQuery('ul#' + getTabId).find('li.active').prev('li').children('a').attr('href');
 
 	/* Once all fields are validated, enable Final Save*/
-	steppedFormSave('item-form');
+	steppedFormSave('item-form', 'draft');
 
 	if (navDirection == "next")
 	{
 		jQuery('#' + getTabId + ' > .active').next('li').find('a').trigger('click');
 	}
+
 	if (navDirection == "prev")
 	{
 		jQuery('#' + getTabId + ' > .active').prev('li').find('a').trigger('click');
