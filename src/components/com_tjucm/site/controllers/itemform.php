@@ -428,6 +428,9 @@ class TjucmControllerItemForm extends JControllerForm
 				jexit();
 			}
 
+			// Set cluster values to store in core UCM table values
+			$model->setClusterData($validData, $data);
+
 			// Get sorted dataset of submitted ucmsubform records as per their client
 			$ucmSubFormDataSet = $model->getFormattedUcmSubFormRecords($validData, $extra_jform_data);
 
