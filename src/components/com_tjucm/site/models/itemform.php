@@ -853,7 +853,7 @@ class TjucmModelItemForm extends JModelForm
 	 *
 	 * @return ARRAY
 	 */
-	public function getFormattedUcmSubFormRecords(&$validData, &$extra_jform_data)
+	public function getFormattedUcmSubFormRecords($validData, &$extra_jform_data)
 	{
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
@@ -878,18 +878,36 @@ class TjucmModelItemForm extends JModelForm
 			{
 				$ucmSubFormData = array();
 
-				foreach ($subformRecords as $subformRecord)
+				foreach ($subformRecords as $key => $subformRecord)
 				{
-					// Add ucmSubFormFieldName in the data to pass data to JS
-					$subformRecord['ucmSubformFieldName'] = $ucmSubFormField->name;
-					$ucmSubFormData[] = $subformRecord;
+					// Append file data to the ucmSubForm data
+					if (array_key_exists('tjFieldFileField', $extra_jform_data))
+					{
+						if (isset($extra_jform_data['tjFieldFileField'][$ucmSubFormField->name][$key]))
+						{
+							$subformRecord['tjFieldFileField'] = $extra_jform_data['tjFieldFileField'][$ucmSubFormField->name][$key];
+						}
+					}
+
+					$subformRecord = array_filter($subformRecord);
+
+					if (!empty($subformRecord))
+					{
+						// Add ucmSubFormFieldName in the data to pass data to JS
+						$subformRecord['ucmSubformFieldName'] = $ucmSubFormField->name;
+
+						$ucmSubFormData[] = $subformRecord;
+					}
 				}
 
-				$ucmSubFormFieldParams = json_decode($ucmSubFormField->params);
-				$ucmSubFormFormSource = explode('/', $ucmSubFormFieldParams->formsource);
-				$ucmSubFormClient = $ucmSubFormFormSource[1] . '.' . str_replace('form_extra.xml', '', $ucmSubFormFormSource[4]);
-				$ucmSubFormDataSet[$ucmSubFormClient] = $ucmSubFormData;
-				$extra_jform_data[$ucmSubFormField->name] = $ucmSubFormClient;
+				if (!empty($ucmSubFormData))
+				{
+					$ucmSubFormFieldParams = json_decode($ucmSubFormField->params);
+					$ucmSubFormFormSource = explode('/', $ucmSubFormFieldParams->formsource);
+					$ucmSubFormClient = $ucmSubFormFormSource[1] . '.' . str_replace('form_extra.xml', '', $ucmSubFormFormSource[4]);
+					$ucmSubFormDataSet[$ucmSubFormClient] = $ucmSubFormData;
+					$extra_jform_data[$ucmSubFormField->name] = $ucmSubFormClient;
+				}
 			}
 		}
 
@@ -936,16 +954,15 @@ class TjucmModelItemForm extends JModelForm
 				$validData['type_id'] = $tjUcmModelType->getTypeId($client);
 
 				$clientDetail = explode('.', $client);
+
+				// This is an extra field which is used to render the reference of the ucmsubform field on the form (used in case of edit)
 				$ucmSubformContentIdFieldName = $clientDetail[0] . '_' . $clientDetail[1] . '_' . 'contentid';
 
 				$count = 0;
 
 				foreach ($ucmSubFormTypeData as $ucmSubFormData)
 				{
-					if (array_key_exists($ucmSubformContentIdFieldName, $ucmSubFormData))
-					{
-						$validData['id'] = !empty($ucmSubFormData[$ucmSubformContentIdFieldName]) ? (int) $ucmSubFormData[$ucmSubformContentIdFieldName] : 0;
-					}
+					$validData['id'] = isset($ucmSubFormData[$ucmSubformContentIdFieldName]) ? (int) $ucmSubFormData[$ucmSubformContentIdFieldName] : 0;
 
 					// Unset extra data
 					$sfFieldName = $ucmSubFormData['ucmSubformFieldName'];

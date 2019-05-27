@@ -441,7 +441,10 @@ class TjucmControllerItemForm extends JControllerForm
 			$validData['parent_id'] = $recordId;
 
 			// Save ucmSubForm records
-			$subFormContentIds = $model->saveUcmSubFormRecords($validData, $ucmSubFormDataSet);
+			if (!empty($ucmSubFormDataSet))
+			{
+				$subFormContentIds = $model->saveUcmSubFormRecords($validData, $ucmSubFormDataSet);
+			}
 
 			if ($recordId === false)
 			{
@@ -480,7 +483,7 @@ class TjucmControllerItemForm extends JControllerForm
 			{
 				$response = array('id' => $response);
 
-				if (!empty($subFormContentIds))
+				if (isset($subFormContentIds) && !empty($subFormContentIds))
 				{
 					$response['childContentIds'] = $subFormContentIds;
 				}
