@@ -428,13 +428,20 @@ class TjucmControllerItemForm extends JControllerForm
 				jexit();
 			}
 
-			// UCM - Start To set cluster values to store in core UCM table values
+			// Set cluster values to store in core UCM table values
 			$model->setClusterData($validData, $data);
 
-			// UCM - End
+			// Get sorted dataset of submitted ucmsubform records as per their client
+			$ucmSubFormDataSet = $model->getFormattedUcmSubFormRecords($validData, $extra_jform_data);
 
-			// If no data send then dont add any entry in item form table - end
-			$recordId = $model->save($validData, $extra_jform_data, $post);
+			$isNew = empty($validData['id']) ? 1 : 0;
+
+			// Save parent form record
+			$recordId = $model->save($validData, $extra_jform_data);
+			$validData['parent_id'] = $recordId;
+
+			// Save ucmSubForm records
+			$subFormContentIds = $model->saveUcmSubFormRecords($validData, $ucmSubFormDataSet);
 
 			if ($recordId === false)
 			{
@@ -442,11 +449,10 @@ class TjucmControllerItemForm extends JControllerForm
 				jexit();
 			}
 
-			$isNew = ($validData['id']) ? 0 : 1;
-			$validData['id'] = $recordId;
-
 			if ($recordId)
 			{
+				$validData['id'] = $recordId;
+
 				$dispatcher = JEventDispatcher::getInstance();
 				JPluginHelper::importPlugin("system", "jlike_tjucm");
 				$dispatcher->trigger('jlike_tjucmOnAfterSave', array($recordId, $validData));
@@ -470,6 +476,16 @@ class TjucmControllerItemForm extends JControllerForm
 
 		if ($this->isajax)
 		{
+			if (!empty($response))
+			{
+				$response = array('id' => $response);
+
+				if (!empty($subFormContentIds))
+				{
+					$response['childContentIds'] = $subFormContentIds;
+				}
+			}
+
 			echo new JResponseJson($response);
 			jexit();
 		}
@@ -563,16 +579,14 @@ class TjucmControllerItemForm extends JControllerForm
 		$model = $this->getModel('ItemForm', 'TjucmModel');
 		$pk    = $app->input->getInt('id');
 
-		// Get the user data.
-		$data       = array();
-		$data['id'] = $app->input->getInt('id');
-		$data['client'] = $this->client;
+		// Get content_id to be deleted.
+		$contentId = $app->input->getInt('id');
 
 		// Attempt to save the data
 		try
 		{
 			$model->setState('ucmType.id', $this->ucmTypeId);
-			$return = $model->delete($data);
+			$return = $model->delete($contentId);
 
 			// Check in the profile
 			$model->checkin($return);

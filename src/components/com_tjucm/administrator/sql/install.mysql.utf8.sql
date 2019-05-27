@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS `#__tj_ucm_types` (
 `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+`parent_id` int(11) UNSIGNED NOT NULL DEFAULT '0',
 `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0',
 `ordering` INT(11)  NOT NULL ,
 `title` VARCHAR(255)  NOT NULL ,

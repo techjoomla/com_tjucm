@@ -15,6 +15,7 @@ jimport('joomla.event.dispatcher');
 
 require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
 require_once JPATH_ADMINISTRATOR . '/components/com_tjucm/classes/funlist.php';
+
 use Joomla\CMS\Table\Table;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Factory;
@@ -401,13 +402,12 @@ class TjucmModelItemForm extends JModelForm
 	 *
 	 * @param   array  $data              The form data.
 	 * @param   array  $extra_jform_data  Exra field data.
-	 * @param   array  $post              all form field data.
 	 *
 	 * @return  boolean
 	 *
 	 * @since   1.6
 	 */
-	public function save($data, $extra_jform_data = '', $post = '')
+	public function save($data, $extra_jform_data = '')
 	{
 		$app = JFactory::getApplication();
 		$user = JFactory::getUser();
@@ -485,7 +485,7 @@ class TjucmModelItemForm extends JModelForm
 
 		$ucmTypeData = $this->common->getDataValues('#__tj_ucm_types', 'id AS type_id, params', 'unique_identifier = "' . $this->client . '"', 'loadAssoc');
 
-		$data['type_id'] = $ucmTypeData['type_id'];
+		$data['type_id'] = empty($data['type_id']) ? $ucmTypeData['type_id'] : $data['type_id'];
 
 		$ucmTypeParams = json_decode($ucmTypeData['params']);
 
@@ -505,7 +505,7 @@ class TjucmModelItemForm extends JModelForm
 
 		if (!empty($extra_jform_data))
 		{
-			$data_extra['client'] = $this->client;
+			$data_extra['client'] = $data['client'];
 			$data_extra['fieldsvalue'] = $extra_jform_data;
 		}
 
@@ -640,27 +640,53 @@ class TjucmModelItemForm extends JModelForm
 	/**
 	 * Method to delete data
 	 *
-	 * @param   array  $data  Data to be deleted
+	 * @param   array  $contentId  Data to be deleted
 	 *
 	 * @return bool|int If success returns the id of the deleted item, if not false
 	 *
 	 * @throws Exception
 	 */
-	public function delete($data)
+	public function delete($contentId)
 	{
-		$app = JFactory::getApplication('com_tjucm');
-		$id = (!empty($data['id'])) ? $data['id'] : (int) $this->getState('item.id');
-		$table = $this->getTable();
-
 		$ucmTypeId = $this->getState('ucmType.id');
 		$user = JFactory::getUser();
-		$canDelete = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $ucmTypeId);
+		$table = $this->getTable();
+		$table->load($contentId);
+		$canDelete = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $table->type_id);
 
 		if ($canDelete)
 		{
+			$id = (!empty($contentId)) ? $contentId : (int) $this->getState('item.id');
+			$table = $this->getTable();
+
+			// If there are child records then delete child records first
+			$db = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select('id');
+			$query->from($db->quoteName('#__tj_ucm_data'));
+			$query->where($db->quoteName('parent_id') . '=' . $id);
+			$db->setQuery($query);
+			$subFormContentIds = $db->loadColumn();
+
+			if (!empty($subFormContentIds))
+			{
+				foreach ($subFormContentIds as $subFormContentId)
+				{
+					$table->load($subFormContentId);
+
+					if ($table->delete($subFormContentId) === true)
+					{
+						$this->deleteExtraFieldsData($subFormContentId, $table->client);
+					}
+				}
+			}
+
+			// Delete parent record
+			$table->load($id);
+
 			if ($table->delete($id) === true)
 			{
-				$this->deleteExtraFieldsData($id, $data['client']);
+				$this->deleteExtraFieldsData($id, $table->client);
 
 				return $id;
 			}
@@ -817,5 +843,191 @@ class TjucmModelItemForm extends JModelForm
 				}
 			}
 		}
+	}
+
+	/**
+	 * Function to get formatted data to be added of ucmsubform records
+	 *
+	 * @param   ARRAY  &$validData         Parent record data
+	 * @param   ARRAY  &$extra_jform_data  form data
+	 *
+	 * @return ARRAY
+	 */
+	public function getFormattedUcmSubFormRecords(&$validData, &$extra_jform_data)
+	{
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
+		$tjFieldsFieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+		$tjFieldsFieldsModel->setState('filter.client', $validData['client']);
+		$tjFieldsFieldsModel->setState('filter.type', 'ucmsubform');
+
+		// Get list of ucmsubform fields in the parent form
+		$ucmSubFormFields = $tjFieldsFieldsModel->getItems();
+
+		// Variable to store ucmsubform records posted in the form
+		$ucmSubFormDataSet = array();
+
+		// Sort all the ucmsubform records as per client
+		foreach ($ucmSubFormFields as $ucmSubFormField)
+		{
+			$subformRecords = $extra_jform_data[$ucmSubFormField->name];
+
+			if (!empty($subformRecords))
+			{
+				$ucmSubFormData = array();
+
+				foreach ($subformRecords as $subformRecord)
+				{
+					// Add ucmSubFormFieldName in the data to pass data to JS
+					$subformRecord['ucmSubformFieldName'] = $ucmSubFormField->name;
+					$ucmSubFormData[] = $subformRecord;
+				}
+
+				$ucmSubFormFieldParams = json_decode($ucmSubFormField->params);
+				$ucmSubFormFormSource = explode('/', $ucmSubFormFieldParams->formsource);
+				$ucmSubFormClient = $ucmSubFormFormSource[1] . '.' . str_replace('form_extra.xml', '', $ucmSubFormFormSource[4]);
+				$ucmSubFormDataSet[$ucmSubFormClient] = $ucmSubFormData;
+				$extra_jform_data[$ucmSubFormField->name] = $ucmSubFormClient;
+			}
+		}
+
+		// Remove empty records
+		$ucmSubFormDataSet = array_filter($ucmSubFormDataSet);
+
+		return $ucmSubFormDataSet;
+	}
+
+	/**
+	 * Function to save ucmSubForm records
+	 *
+	 * @param   ARRAY  &$validData         Parent record data
+	 * @param   ARRAY  $ucmSubFormDataSet  ucmSubForm records data
+	 *
+	 * @return ARRAY
+	 */
+	public function saveUcmSubFormRecords(&$validData, $ucmSubFormDataSet)
+	{
+		$subFormContentIds = array();
+
+		$isNew = empty($validData['id']) ? 1 : 0;
+
+		// Delete removed subform details
+		if (!$isNew)
+		{
+			$db = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select('id');
+			$query->from($db->quoteName('#__tj_ucm_data'));
+			$query->where($db->quoteName('parent_id') . '=' . $validData['id']);
+			$db->setQuery($query);
+			$oldSubFormContentIds = $db->loadColumn();
+		}
+
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+
+		if (!empty($ucmSubFormDataSet))
+		{
+			foreach ($ucmSubFormDataSet as $client => $ucmSubFormTypeData)
+			{
+				$validData['client'] = $client;
+				$validData['type_id'] = $tjUcmModelType->getTypeId($client);
+
+				$clientDetail = explode('.', $client);
+				$ucmSubformContentIdFieldName = $clientDetail[0] . '_' . $clientDetail[1] . '_' . 'contentid';
+
+				$count = 0;
+
+				foreach ($ucmSubFormTypeData as $ucmSubFormData)
+				{
+					if (array_key_exists($ucmSubformContentIdFieldName, $ucmSubFormData))
+					{
+						$validData['id'] = !empty($ucmSubFormData[$ucmSubformContentIdFieldName]) ? (int) $ucmSubFormData[$ucmSubformContentIdFieldName] : 0;
+					}
+
+					// Unset extra data
+					$sfFieldName = $ucmSubFormData['ucmSubformFieldName'];
+					unset($ucmSubFormData['ucmSubformFieldName']);
+
+					$ucmSubformContentFieldElementId = 'jform[' . $sfFieldName . '][' . $sfFieldName . $count . '][' . $ucmSubformContentIdFieldName . ']';
+					$count++;
+
+					if ($insertedId = $this->save($validData, $ucmSubFormData))
+					{
+						$validData['id'] = $insertedId;
+						$subFormContentIds[] = array('elementName' => $ucmSubformContentFieldElementId, 'content_id' => $insertedId);
+
+						$ucmSubFormData[$ucmSubformContentIdFieldName] = $insertedId;
+						$this->save($validData, $ucmSubFormData);
+					}
+				}
+			}
+		}
+
+		// Delete removed ucmSubForm record from the form
+		if (!empty($oldSubFormContentIds))
+		{
+			foreach ($oldSubFormContentIds as $oldSubFormContentId)
+			{
+				if (array_search($oldSubFormContentId, array_column($subFormContentIds, 'content_id')) === false)
+				{
+					$this->delete($oldSubFormContentId);
+				}
+			}
+		}
+
+		return $subFormContentIds;
+	}
+
+	/**
+	 * Function to save ucmSubForm records
+	 *
+	 * @param   INT     $parentRecordId  parent content id
+	 * @param   OBJECT  $efd             Field object
+	 *
+	 * @return STRING
+	 */
+	public function getUcmSubFormFieldDataJson($parentRecordId, $efd)
+	{
+		$db = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('id');
+		$query->from($db->quoteName('#__tj_ucm_data'));
+		$query->where($db->quoteName('parent_id') . '=' . $parentRecordId);
+		$query->where($db->quoteName('client') . '=' . $db->quote($efd->value));
+		$db->setQuery($query);
+		$contentIds = $db->loadColumn();
+
+		$ucmSubFormFieldData = new stdClass;
+
+		JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
+		$tjFieldsHelper = new TjfieldsHelper;
+
+		foreach ($contentIds as $key => $contentId)
+		{
+			$recordData = array();
+			$recordData['content_id'] = $contentId;
+			$recordData['client'] = $efd->value;
+			$ucmSubFormFieldValues = $tjFieldsHelper->FetchDatavalue($recordData);
+
+			$subFormData = new stdClass;
+
+			foreach ($ucmSubFormFieldValues as $ucmSubFormFieldValue)
+			{
+				$ucmSubFormFieldName = $ucmSubFormFieldValue->name;
+				$subFormData->$ucmSubFormFieldName = $ucmSubFormFieldValue->value;
+			}
+
+			$client = explode('.', $recordData['client']);
+			$ucmSubformContentIdFieldName = $client[0] . '_' . $client[1] . '_' . 'contentid';
+			$subFormData->$ucmSubformContentIdFieldName = $contentId;
+
+			$concat = $efd->name . $key;
+			$ucmSubFormFieldData->$concat = $subFormData;
+		}
+
+		return json_encode($ucmSubFormFieldData);
 	}
 }
