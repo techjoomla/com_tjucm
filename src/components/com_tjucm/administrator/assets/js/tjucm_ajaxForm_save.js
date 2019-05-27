@@ -93,18 +93,6 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 					}
 				}
 
-				if (returnedData.messages !== null)
-				{
-					if (returnedData.messages.warning !== null)
-					{
-						jQuery.each(returnedData.messages.warning, function(index, value) {
-							Joomla.renderMessages({'warning':[value]});
-						});
-
-						jQuery("html, body").animate({ scrollTop: 0 }, "slow");
-					}
-				}
-
 				if (returnedData.message !== null && returnedData.message != '')
 				{
 					Joomla.renderMessages({'info':[returnedData.message]});
