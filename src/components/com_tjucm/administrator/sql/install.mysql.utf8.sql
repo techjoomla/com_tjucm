@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS `#__tj_ucm_types` (
 `state` TINYINT(1)  NOT NULL ,
 `type_description` TEXT NOT NULL ,
 `unique_identifier` VARCHAR(255)  NOT NULL ,
-`parent_id` INT(11)  NOT NULL ,
 `params` VARCHAR(255)  NOT NULL ,
 `checked_out` INT(11)  NOT NULL ,
 `checked_out_time` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
