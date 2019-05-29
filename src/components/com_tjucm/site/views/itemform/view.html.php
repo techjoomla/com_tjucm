@@ -15,6 +15,9 @@ jimport('joomla.application.component.controller');
 jimport('joomla.filesystem.file');
 jimport('joomla.database.table');
 
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+
 /**
  * View to edit
  *
@@ -22,15 +25,58 @@ jimport('joomla.database.table');
  */
 class TjucmViewItemform extends JViewLegacy
 {
-	protected $state;
-
-	protected $item;
-
+	/**
+	 * The JForm object
+	 *
+	 * @var  Form
+	 */
 	protected $form;
 
+	/**
+	 * The active item
+	 *
+	 * @var  object
+	 */
+	protected $item;
+
+	/**
+	 * The model state
+	 *
+	 * @var  object
+	 */
+	protected $state;
+
+	/**
+	 * The model state
+	 *
+	 * @var  object|array
+	 */
 	protected $params;
 
+	/**
+	 * @var  boolean
+	 *
+	 * @since __DEPLOY_VERSION__
+	 */
 	protected $canSave;
+
+	/**
+	 * The Record Id
+	 *
+	 * @var  Int
+	 *
+	 * @since __DEPLOY_VERSION__
+	 */
+	protected $id;
+
+	/**
+	 * The Copy Record Id
+	 *
+	 * @var  Int
+	 *
+	 * @since __DEPLOY_VERSION__
+	 */
+	protected $copyRecId;
 
 	/**
 	 * Display the view
@@ -43,17 +89,41 @@ class TjucmViewItemform extends JViewLegacy
 	 */
 	public function display($tpl = null)
 	{
-		$app  = JFactory::getApplication();
+		$app  = Factory::getApplication();
 		$input = $app->input;
-		$user = JFactory::getUser();
-
+		$user = Factory::getUser();
 		$this->state   = $this->get('State');
+		$this->id = $input->getInt('id', $input->getInt('content_id', 0));
+
+		// Include models
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+
+		/* Get model instance here */
+		$model = $this->getModel();
+		$model->setState('item.id', $this->id);
+
 		$this->item    = $this->get('Data');
 		$this->params  = $app->getParams('com_tjucm');
 		$this->canSave = $this->get('CanSave');
 		$this->form = $this->get('Form');
 		$this->client = $input->get('client');
-		$this->id = $input->get('id', '', 'INT');
+
+		$clusterId = $input->getInt('cluster_id', 0);
+
+		// Set cluster_id in request parameters
+		if ($this->id && !$clusterId)
+		{
+			$input->set('cluster_id', $this->item->cluster_id);
+		}
+
+		// Get a copy record id
+		$this->copyRecId = (int) $app->getUserState('com_tjucm.edit.itemform.data.copy_id', 0);
+
+		// Check copy id set and empty request id record
+		if ($this->copyRecId && !$this->id)
+		{
+			$this->id = $this->copyRecId;
+		}
 
 		// If did not get the client from url then get if from menu param
 		if (empty($this->client))
@@ -77,26 +147,24 @@ class TjucmViewItemform extends JViewLegacy
 
 		if (empty($this->client))
 		{
-			return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
+			$app->enqueueMessage(Text::_('COM_TJUCM_ITEM_DOESNT_EXIST'), 'error');
+			$app->setHeader('status', 404, true);
+
+			return;
 		}
 
 		// Check the view access to the itemform (the model has already computed the values).
 		if ($this->item->params->get('access-view') == false)
 		{
-			$app->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
+			$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
 			$app->setHeader('status', 403, true);
 
 			return;
 		}
 
-		// Include models
-		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
-
-		/* Get model instance here */
-		$model = $this->getModel();
-
 		// Get if user is allowed to save the content
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+
 		$typeId = $tjUcmModelType->getTypeId($this->client);
 
 		$typeData = $tjUcmModelType->getItem($typeId);
@@ -104,7 +172,10 @@ class TjucmViewItemform extends JViewLegacy
 		// Check if the UCM type is unpublished
 		if ($typeData->state == "0")
 		{
-			return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
+			$app->enqueueMessage(Text::_('COM_TJUCM_ITEM_DOESNT_EXIST'), 'error');
+			$app->setHeader('status', 404, true);
+
+			return;
 		}
 
 		// Set Layout to type view
@@ -112,7 +183,6 @@ class TjucmViewItemform extends JViewLegacy
 		$this->setLayout($layout);
 
 		$allowedCount = $typeData->allowed_count;
-		$user   = JFactory::getUser();
 		$userId = $user->id;
 
 		if (empty($this->id))
@@ -173,7 +243,7 @@ class TjucmViewItemform extends JViewLegacy
 	 */
 	protected function _prepareDocument()
 	{
-		$app   = JFactory::getApplication();
+		$app   = Factory::getApplication();
 		$menus = $app->getMenu();
 		$title = null;
 
@@ -187,7 +257,7 @@ class TjucmViewItemform extends JViewLegacy
 		}
 		else
 		{
-			$this->params->def('page_heading', JText::_('COM_TJUCM_DEFAULT_PAGE_TITLE'));
+			$this->params->def('page_heading', Text::_('COM_TJUCM_DEFAULT_PAGE_TITLE'));
 		}
 
 		$title = $this->params->get('page_title', '');
@@ -198,11 +268,11 @@ class TjucmViewItemform extends JViewLegacy
 		}
 		elseif ($app->get('sitename_pagetitles', 0) == 1)
 		{
-			$title = JText::sprintf('JPAGETITLE', $app->get('sitename'), $title);
+			$title = Text::sprintf('JPAGETITLE', $app->get('sitename'), $title);
 		}
 		elseif ($app->get('sitename_pagetitles', 0) == 2)
 		{
-			$title = JText::sprintf('JPAGETITLE', $title, $app->get('sitename'));
+			$title = Text::sprintf('JPAGETITLE', $title, $app->get('sitename'));
 		}
 
 		$this->document->setTitle($title);

@@ -9,6 +9,12 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\Factory;
+use Joomla\CMS\User\User;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Session\Session;
+use Joomla\CMS\Router\Route;
 
 jimport('joomla.filesystem.file');
 
@@ -31,7 +37,7 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	public function __construct()
 	{
-		$app = JFactory::getApplication();
+		$app = Factory::getApplication();
 		$this->client  = $app->input->get('client');
 		$this->created_by  = $app->input->get('created_by');
 
@@ -62,7 +68,7 @@ class TjucmControllerItemForm extends JControllerForm
 			}
 		}
 
-		// Get UCM type id from uniquue identifier
+		// Get UCM type id from unique identifier
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
 		$this->ucmTypeId = $tjUcmModelType->getTypeId($this->client);
@@ -93,17 +99,18 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	public function add()
 	{
-		$context = "com_tjucm.edit.itemform.data";
+		$app = Factory::getApplication();
+		$context = "$this->option.edit.$this->context";
 
 		// Access check.
 		if (!$this->allowAdd())
 		{
 			// Set the internal error and also the redirect error.
-			$this->setError(JText::_('JLIB_APPLICATION_ERROR_CREATE_RECORD_NOT_PERMITTED'));
+			$this->setError(Text::_('JLIB_APPLICATION_ERROR_CREATE_RECORD_NOT_PERMITTED'));
 			$this->setMessage($this->getError(), 'error');
 
 			$this->setRedirect(
-				JRoute::_(
+				Route::_(
 					'index.php?option=com_tjucm&view=items' . $this->appendUrl
 					. $this->getRedirectToListAppend(), false
 				)
@@ -113,12 +120,31 @@ class TjucmControllerItemForm extends JControllerForm
 		}
 
 		// Clear the record edit information from the session.
-		JFactory::getApplication()->setUserState($context . '.data', null);
+		$app->setUserState($context . '.data', null);
+
+		$clusterId     = $app->input->getInt('cluster_id', 0);
+
+		// Check cluster exist
+		if ($clusterId)
+		{
+			$this->appendUrl .= '&cluster_id=' . $clusterId;
+		}
+
+		$itemId = $app->input->getInt('Itemid', 0);
+
+		if (empty($itemId))
+		{
+			$menu = $app->getMenu();
+			$menuItemObj = $menu->getItems('link', 'index.php?option=com_tjucm&view=itemform', true);
+			$itemId     = $menuItemObj->id;
+		}
+
+		$this->appendUrl .= '&Itemid=' . $itemId;
 
 		// Redirect to the edit screen.
 		$this->setRedirect(
-			JRoute::_(
-				'index.php?option=com_tjucm&view=itemform&client=' . $this->client
+			Route::_(
+				'index.php?option=com_tjucm&view=itemform' . $this->appendUrl
 				. $this->getRedirectToItemAppend(), false
 			)
 		);
@@ -148,17 +174,24 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	public function edit($key = null, $urlVar = null)
 	{
-		$app = JFactory::getApplication();
+		Session::checkToken('get') or die('Invalid Token');
+		$app = Factory::getApplication();
 
 		// Get the previous edit id (if any) and the current edit id.
 		$previousId = (int) $app->getUserState('com_tjucm.edit.item.id');
 		$editId     = $app->input->getInt('id', 0);
-		$menu = $app->getMenu();
-		$menuItemObj = $menu->getItems('link', 'index.php?option=com_tjucm&view=items', true);
-		$itemId     = $menuItemObj->id;
+		$itemId     = $app->input->getInt('Itemid', 0);
+
+		if (empty($itemId))
+		{
+			$menu = $app->getMenu();
+			$menuItemObj = $menu->getItems('link', 'index.php?option=com_tjucm&view=itemform', true);
+			$itemId      = $menuItemObj->id;
+		}
 
 		// Set the user id for the user to edit in the session.
 		$app->setUserState('com_tjucm.edit.item.id', $editId);
+		$app->setUserState('com_tjucm.edit.itemform.data.copy_id', 0);
 
 		// Get the model.
 		$model = $this->getModel('ItemForm', 'TjucmModel');
@@ -179,7 +212,7 @@ class TjucmControllerItemForm extends JControllerForm
 		}
 
 		// Redirect to the edit screen.
-		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&client=' . $this->client . $recordId . '&Itemid=' . $itemId, false));
+		$this->setRedirect(Route::_('index.php?option=com_tjucm&view=itemform&client=' . $this->client . $recordId . '&Itemid=' . $itemId, false));
 	}
 
 	/**
@@ -195,11 +228,11 @@ class TjucmControllerItemForm extends JControllerForm
 	public function save($key = null, $urlVar = null)
 	{
 		// Check for request forgeries.
-		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
-		$app = JFactory::getApplication();
-		$lang  = JFactory::getLanguage();
+		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
+		$app   = Factory::getApplication();
+		$lang  = Factory::getLanguage();
 		$model = $this->getModel();
-		$task = $this->getTask();
+		$task  = $this->getTask();
 		$formStatus = $app->input->get('form_status', '', 'STRING');
 
 		// Set client value
@@ -229,7 +262,7 @@ class TjucmControllerItemForm extends JControllerForm
 			if ($checkin && $model->checkin($data[$key]) === false)
 			{
 				// Check-in failed. Go back to the item and display a notice.
-				$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
+				$this->setError(Text::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
 				$this->setMessage($this->getError(), 'error');
 
 				echo new JResponseJson(null);
@@ -245,7 +278,7 @@ class TjucmControllerItemForm extends JControllerForm
 		// Access check.
 		if (!$this->allowSave($data, $key))
 		{
-			$this->setError(JText::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'));
+			$this->setError(Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'));
 			$this->setMessage($this->getError(), 'error');
 
 			echo new JResponseJson(null);
@@ -399,7 +432,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 		try
 		{
-			$status_title = JFactory::getApplication()->input->get('form_status');
+			$status_title = Factory::getApplication()->input->get('form_status');
 			$validData['status'] = $status_title;
 
 			if (!empty($files))
@@ -422,7 +455,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 			if (empty($allow))
 			{
-				$app->enqueueMessage(JText::_("COM_TJUCM_NO_FORM_DATA"), 'error');
+				$app->enqueueMessage(Text::_("COM_TJUCM_NO_FORM_DATA"), 'error');
 
 				echo new JResponseJson(null);
 				jexit();
@@ -514,7 +547,7 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	public function cancel($key = null)
 	{
-		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
 		$model = $this->getModel();
 		$table = $model->getTable();
@@ -535,11 +568,11 @@ class TjucmControllerItemForm extends JControllerForm
 				if ($model->checkin($recordId) === false)
 				{
 					// Check-in failed, go back to the record and display a notice.
-					$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
+					$this->setError(Text::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
 					$this->setMessage($this->getError(), 'error');
 
 					$this->setRedirect(
-						JRoute::_(
+						Route::_(
 							'index.php?option=com_tjucm&view=itemform&client=' . $this->client
 							. $this->getRedirectToItemAppend($recordId, $key), false
 						)
@@ -552,10 +585,10 @@ class TjucmControllerItemForm extends JControllerForm
 
 		// Clean the session data and redirect.
 		$this->releaseEditId($context, $recordId);
-		JFactory::getApplication()->setUserState($context . '.data', null);
+		Factory::getApplication()->setUserState($context . '.data', null);
 
 		$this->setRedirect(
-			JRoute::_(
+			Route::_(
 				'index.php?option=com_tjucm&view=items' . $this->appendUrl
 				. $this->getRedirectToListAppend(), false
 			)
@@ -576,9 +609,9 @@ class TjucmControllerItemForm extends JControllerForm
 	public function remove()
 	{
 		// Check for request forgeries.
-		(JSession::checkToken('get') or JSession::checkToken()) or jexit(JText::_('JINVALID_TOKEN'));
+		(Session::checkToken('get') or Session::checkToken()) or jexit(Text::_('JINVALID_TOKEN'));
 
-		$app   = JFactory::getApplication();
+		$app   = Factory::getApplication();
 		$model = $this->getModel('ItemForm', 'TjucmModel');
 		$pk    = $app->input->getInt('id');
 
@@ -602,8 +635,8 @@ class TjucmControllerItemForm extends JControllerForm
 			$url = (empty($item->link) ? 'index.php?option=com_tjucm&view=items' : $item->link);
 
 			// Redirect to the list screen
-			$this->setMessage(JText::_('COM_TJUCM_ITEM_DELETED_SUCCESSFULLY'));
-			$this->setRedirect(JRoute::_($url . $this->appendUrl, false));
+			$this->setMessage(Text::_('COM_TJUCM_ITEM_DELETED_SUCCESSFULLY'));
+			$this->setRedirect(Route::_($url . $this->appendUrl, false));
 
 			// Flush the data from the session.
 			$app->setUserState('com_tjucm.edit.item.data', null);
@@ -612,7 +645,7 @@ class TjucmControllerItemForm extends JControllerForm
 		{
 			$errorType = ($e->getCode() == '404' || '403') ? 'error' : 'warning';
 			$this->setMessage($e->getMessage(), $errorType);
-			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+			$this->setRedirect(Route::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
 		}
 	}
 
@@ -626,11 +659,11 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	public function redirectToListView($typeId, $allowedCount)
 	{
-		$user = JFactory::getUser();
+		$user = Factory::getUser();
 		$createdBy = $user->id;
-		$link = JRoute::_("index.php?option=com_tjucm&view=items&id=" . $typeId . "&created_by=" . $createdBy . $this->appendUrl, false);
+		$link = Route::_("index.php?option=com_tjucm&view=items&id=" . $typeId . "&created_by=" . $createdBy . $this->appendUrl, false);
 
-		JFactory::getApplication()->redirect($link, sprintf(JText::_('COM_TJUCM_ALLOWED_COUNT_LIMIT'), $allowedCount), "Warning");
+		Factory::getApplication()->redirect($link, sprintf(Text::_('COM_TJUCM_ALLOWED_COUNT_LIMIT'), $allowedCount), "Warning");
 	}
 
 	/**
@@ -646,7 +679,7 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	protected function allowAdd($data = array())
 	{
-		$user = JFactory::getUser();
+		$user = Factory::getUser();
 
 		return $user->authorise('core.type.createitem', 'com_tjucm.type.' . $this->ucmTypeId);
 	}
@@ -665,7 +698,7 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	protected function allowEdit($data = array(), $key = 'id')
 	{
-		$user = JFactory::getUser();
+		$user = Factory::getUser();
 		$edit = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId);
 		$editOwn = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $this->ucmTypeId);
 
@@ -677,5 +710,49 @@ class TjucmControllerItemForm extends JControllerForm
 		{
 			return false;
 		}
+	}
+
+	/**
+	 * Method to check out an item for copying and redirect to the edit form.
+	 *
+	 * @return void
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	public function prepareForCopy()
+	{
+		Session::checkToken('get') or die('Invalid Token');
+		$app = Factory::getApplication();
+
+		// Get the previous edit id (if any) and the current edit id.
+		$editId    = $app->input->getInt('id', 0);
+		$clusterId = $app->input->getInt('cluster_id', 0);
+		$itemId    = $app->input->get('Itemid', '', 'INT');
+
+		if (empty($itemId))
+		{
+			$menu = $app->getMenu();
+			$menuItemObj = $menu->getItems('link', 'index.php?option=com_tjucm&view=itemform', true);
+			$itemId      = $menuItemObj->id;
+		}
+
+		// Set the user id for the user to edit in the session.
+		$app->setUserState('com_tjucm.edit.item.id', $editId);
+
+		$app->setUserState('com_tjucm.edit.itemform.data.copy_id', $editId);
+
+		// Get the model.
+		$model = $this->getModel('ItemForm', 'TjucmModel');
+
+		$cluster = '';
+
+		// Check cluster exist
+		if ($clusterId)
+		{
+			$cluster = '&cluster_id=' . $clusterId;
+		}
+
+		// Redirect to the edit screen.
+		$this->setRedirect(Route::_('index.php?option=com_tjucm&view=itemform&client=' . $this->client . $cluster . '&Itemid=' . $itemId, false));
 	}
 }

@@ -791,16 +791,26 @@ class TjucmModelItemForm extends JModelForm
 	 */
 	public function setClusterData(&$validData, $data)
 	{
-		// Save created_by field by ownership user field (To save form on behalf of someone)
-		if (!empty($data['com_tjucm_ownershipcreatedby']) && empty($data['com_tjucm_clusterclusterid']))
+		$clusterField = $createdByField = '';
+
+		// To get type of UCM
+		if (!empty($this->client))
 		{
-			$validData['created_by'] = $data['com_tjucm_ownershipcreatedby'];
+			$client = explode(".", $this->client);
+			$clusterField = $client[0] . '_' . $client[1] . '_clusterclusterid';
+			$createdByField = $client[0] . '_' . $client[1] . '_ownershipcreatedby';
+		}
+
+		// Save created_by field by ownership user field (To save form on behalf of someone)
+		if (!empty($data[$createdByField]) && empty($data[$clusterField]))
+		{
+			$validData['created_by'] = $data[$createdByField];
 		}
 
 		// Cluster Id store in UCM data
 		$clusterExist = ComponentHelper::getComponent('com_cluster', true)->enabled;
 
-		if (!empty($data['com_tjucm_clusterclusterid']) && $clusterExist)
+		if (!empty($data[$clusterField]) && $clusterExist)
 		{
 			$user  = Factory::getUser();
 			$isSuperUser = $user->authorise('core.admin');
@@ -809,7 +819,7 @@ class TjucmModelItemForm extends JModelForm
 			$ClusterModel = ClusterFactory::model('ClusterUsers', array('ignore_request' => true));
 			$ClusterModel->setState('list.group_by_user_id', 1);
 			$ClusterModel->setState('filter.published', 1);
-			$ClusterModel->setState('filter.cluster_id', (int) $data['com_tjucm_clusterclusterid']);
+			$ClusterModel->setState('filter.cluster_id', (int) $data[$clusterField]);
 
 			if (!$isSuperUser && !$user->authorise('core.manageall.cluster', 'com_cluster'))
 			{
@@ -821,9 +831,9 @@ class TjucmModelItemForm extends JModelForm
 
 			if (!empty($clusters))
 			{
-				$validData['cluster_id'] = $data['com_tjucm_clusterclusterid'];
+				$validData['cluster_id'] = $data[$clusterField];
 
-				if (!empty($data['com_tjucm_ownershipcreatedby']) && !$isSuperUser && !$user->authorise('core.manageall.cluster', 'com_cluster'))
+				if (!empty($data[$createdByField]))
 				{
 					$clusterUsers = array();
 
@@ -832,14 +842,10 @@ class TjucmModelItemForm extends JModelForm
 						$clusterUsers[] = $cluster->user_id;
 					}
 
-					if (in_array($data['com_tjucm_ownershipcreatedby'], $clusterUsers))
+					if (in_array($data[$createdByField], $clusterUsers))
 					{
-						$validData['created_by'] = $data['com_tjucm_ownershipcreatedby'];
+						$validData['created_by'] = $data[$createdByField];
 					}
-				}
-				elseif (!empty($data['com_tjucm_ownershipcreatedby']))
-				{
-					$validData['created_by'] = $data['com_tjucm_ownershipcreatedby'];
 				}
 			}
 		}
@@ -848,7 +854,7 @@ class TjucmModelItemForm extends JModelForm
 	/**
 	 * Function to get formatted data to be added of ucmsubform records
 	 *
-	 * @param   ARRAY  &$validData         Parent record data
+	 * @param   ARRAY  $validData          Parent record data
 	 * @param   ARRAY  &$extra_jform_data  form data
 	 *
 	 * @return ARRAY
