@@ -94,6 +94,7 @@ class TjucmControllerItemForm extends JControllerForm
 	public function add()
 	{
 		$context = "com_tjucm.edit.itemform.data";
+		$tjUcmFrontendHelper = new TjucmHelpersTjucm;
 
 		// Access check.
 		if (!$this->allowAdd())
@@ -102,12 +103,10 @@ class TjucmControllerItemForm extends JControllerForm
 			$this->setError(JText::_('JLIB_APPLICATION_ERROR_CREATE_RECORD_NOT_PERMITTED'));
 			$this->setMessage($this->getError(), 'error');
 
-			$this->setRedirect(
-				JRoute::_(
-					'index.php?option=com_tjucm&view=items' . $this->appendUrl
-					. $this->getRedirectToListAppend(), false
-				)
-			);
+			$link = 'index.php?option=com_tjucm&view=items' . $this->appendUrl;
+			$itemId = $tjUcmFrontendHelper->getItemId($link);
+
+			$this->setRedirect(JRoute::_($link . '&Itemid=' . $itemId . $this->getRedirectToListAppend(), false));
 
 			return false;
 		}
@@ -116,12 +115,10 @@ class TjucmControllerItemForm extends JControllerForm
 		JFactory::getApplication()->setUserState($context . '.data', null);
 
 		// Redirect to the edit screen.
-		$this->setRedirect(
-			JRoute::_(
-				'index.php?option=com_tjucm&view=itemform&client=' . $this->client
-				. $this->getRedirectToItemAppend(), false
-			)
-		);
+		$link = 'index.php?option=com_tjucm&view=itemform&client=' . $this->client;
+		$itemId = $tjUcmFrontendHelper->getItemId($link);
+
+		$this->setRedirect(JRoute::_($link . '&Itemid=' . $itemId . $this->getRedirectToItemAppend(), false));
 
 		return true;
 	}
@@ -153,9 +150,6 @@ class TjucmControllerItemForm extends JControllerForm
 		// Get the previous edit id (if any) and the current edit id.
 		$previousId = (int) $app->getUserState('com_tjucm.edit.item.id');
 		$editId     = $app->input->getInt('id', 0);
-		$menu = $app->getMenu();
-		$menuItemObj = $menu->getItems('link', 'index.php?option=com_tjucm&view=items', true);
-		$itemId     = $menuItemObj->id;
 
 		// Set the user id for the user to edit in the session.
 		$app->setUserState('com_tjucm.edit.item.id', $editId);
@@ -179,7 +173,10 @@ class TjucmControllerItemForm extends JControllerForm
 		}
 
 		// Redirect to the edit screen.
-		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&client=' . $this->client . $recordId . '&Itemid=' . $itemId, false));
+		$tjUcmFrontendHelper = new TjucmHelpersTjucm;
+		$link = 'index.php?option=com_tjucm&view=itemform&client=' . $this->client . $recordId;
+		$itemId = $tjUcmFrontendHelper->getItemId($link);
+		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform' . $recordId . '&Itemid=' . $itemId, false));
 	}
 
 	/**
@@ -519,6 +516,7 @@ class TjucmControllerItemForm extends JControllerForm
 		$model = $this->getModel();
 		$table = $model->getTable();
 		$context = "com_tjucm.edit.itemform.data";
+		$tjUcmFrontendHelper = new TjucmHelpersTjucm;
 
 		if (empty($key))
 		{
@@ -538,12 +536,9 @@ class TjucmControllerItemForm extends JControllerForm
 					$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
 					$this->setMessage($this->getError(), 'error');
 
-					$this->setRedirect(
-						JRoute::_(
-							'index.php?option=com_tjucm&view=itemform&client=' . $this->client
-							. $this->getRedirectToItemAppend($recordId, $key), false
-						)
-					);
+					$link = 'index.php?option=com_tjucm&view=itemform&client=' . $this->client;
+					$itemId = $tjUcmFrontendHelper->getItemId($link);
+					$this->setRedirect(JRoute::_($link . '&Itemid=' . $itemId . $this->getRedirectToItemAppend($recordId, $key), false));
 
 					return false;
 				}
@@ -554,12 +549,9 @@ class TjucmControllerItemForm extends JControllerForm
 		$this->releaseEditId($context, $recordId);
 		JFactory::getApplication()->setUserState($context . '.data', null);
 
-		$this->setRedirect(
-			JRoute::_(
-				'index.php?option=com_tjucm&view=items' . $this->appendUrl
-				. $this->getRedirectToListAppend(), false
-			)
-		);
+		$link = 'index.php?option=com_tjucm&view=items' . $this->appendUrl;
+		$itemId = $tjUcmFrontendHelper->getItemId($link);
+		$this->setRedirect(JRoute::_($link . '&Itemid=' . $itemId . $this->getRedirectToListAppend(), false));
 
 		return true;
 	}
@@ -584,6 +576,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 		// Get content_id to be deleted.
 		$contentId = $app->input->getInt('id');
+		$tjUcmFrontendHelper = new TjucmHelpersTjucm;
 
 		// Attempt to save the data
 		try
@@ -603,7 +596,10 @@ class TjucmControllerItemForm extends JControllerForm
 
 			// Redirect to the list screen
 			$this->setMessage(JText::_('COM_TJUCM_ITEM_DELETED_SUCCESSFULLY'));
-			$this->setRedirect(JRoute::_($url . $this->appendUrl, false));
+
+			$link = $url . $this->appendUrl;
+			$itemId = $tjUcmFrontendHelper->getItemId($link);
+			$this->setRedirect(JRoute::_($link . '&Itemid=' . $itemId, false));
 
 			// Flush the data from the session.
 			$app->setUserState('com_tjucm.edit.item.data', null);
@@ -612,7 +608,10 @@ class TjucmControllerItemForm extends JControllerForm
 		{
 			$errorType = ($e->getCode() == '404' || '403') ? 'error' : 'warning';
 			$this->setMessage($e->getMessage(), $errorType);
-			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+
+			$link = 'index.php?option=com_tjucm&view=items' . $this->appendUrl;
+			$itemId = $tjUcmFrontendHelper->getItemId($link);
+			$this->setRedirect(JRoute::_($link . '&Itemid=' . $itemId, false));
 		}
 	}
 
@@ -628,7 +627,12 @@ class TjucmControllerItemForm extends JControllerForm
 	{
 		$user = JFactory::getUser();
 		$createdBy = $user->id;
-		$link = JRoute::_("index.php?option=com_tjucm&view=items&id=" . $typeId . "&created_by=" . $createdBy . $this->appendUrl, false);
+
+		$tjUcmFrontendHelper = new TjucmHelpersTjucm;
+		$link = "index.php?option=com_tjucm&view=items&created_by=" . $createdBy . $this->appendUrl;
+		$itemId = $tjUcmFrontendHelper->getItemId($link);
+
+		$link = JRoute::_($link . '&Itemid=' . $itemId, false);
 
 		JFactory::getApplication()->redirect($link, sprintf(JText::_('COM_TJUCM_ALLOWED_COUNT_LIMIT'), $allowedCount), "Warning");
 	}

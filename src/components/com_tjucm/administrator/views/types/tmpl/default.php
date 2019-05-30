@@ -261,11 +261,11 @@ if (!empty($this->extra_sidebar))
 							</td>
 
 							<td class='center'>
-								<a href="<?php echo $category_url; ?>"><?php echo JText::_('COM_TJUCM_TYPES_CATEGORY_URL');?></a>&nbsp;|&nbsp;
-								<a href="<?php echo $field_group_url; ?>"><?php echo JText::_('COM_TJUCM_TYPES_FIELD_GROUP_URL');?></a>&nbsp;|&nbsp;
-								<a href="<?php echo $fields_url; ?>"><?php echo JText::_('COM_TJUCM_TYPES_FIELDS_URL');?></a>&nbsp;|&nbsp;
-								<a href="<?php echo $type_addnew_data_url; ?>"><?php echo JText::_('COM_TJUCM_TYPES_ADD_NEW_DATA_URL');?></a>&nbsp;|&nbsp;
-								<a href="<?php echo $type_data_url; ?>"><?php echo JText::_('COM_TJUCM_TYPES_DATA_URL');?></a>
+								<a href="<?php echo $category_url; ?>"><?php echo JText::_('COM_TJUCM_TYPES_CATEGORY_URL');?></a>
+								&nbsp;|&nbsp;<a href="<?php echo $field_group_url; ?>"><?php echo JText::_('COM_TJUCM_TYPES_FIELD_GROUP_URL');?></a>
+								&nbsp;|&nbsp;<a href="<?php echo $fields_url; ?>"><?php echo JText::_('COM_TJUCM_TYPES_FIELDS_URL');?></a>
+								<!-- &nbsp;|&nbsp;<a href="<?php echo $type_addnew_data_url; ?>"><?php echo JText::_('COM_TJUCM_TYPES_ADD_NEW_DATA_URL');?></a>
+								&nbsp;|&nbsp;<a href="<?php echo $type_data_url; ?>"><?php echo JText::_('COM_TJUCM_TYPES_DATA_URL');?></a> -->
 							</td>
 						</tr>
 						<?php

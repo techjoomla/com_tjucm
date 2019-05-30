@@ -179,11 +179,9 @@ else
 <div class="row">
 	<div class="form-group">
 	<?php
-	$itemid = $app->input->getInt('Itemid', 0);
-
 	if (($user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId)) || ($user->authorise('core.type.editownitem', 'com_tjucm.type.' . $this->ucmTypeId) && JFactory::getUser()->id == $this->item->created_by))
 	{
-		$redirectURL = JRoute::_('index.php?option=com_tjucm&task=item.edit&id=' . $this->item->id . '&client=' . $this->client . '&Itemid=' . $itemid, false);
+		$redirectURL = JRoute::_('index.php?option=com_tjucm&task=item.edit&id=' . $this->item->id . '&client=' . $this->client, false);
 		?>
 		<a class="btn btn-default" href="<?php echo $redirectURL; ?>"><?php echo JText::_("COM_TJUCM_EDIT_ITEM"); ?></a>
 		<?php
@@ -191,7 +189,7 @@ else
 
 	if ($user->authorise('core.type.deleteitem','com_tjucm.type.' . $this->ucmTypeId))
 	{
-		$redirectURL = JRoute::_('index.php?option=com_tjucm&task=item.remove&id=' . $this->item->id . '&client=' . $this->client . '&Itemid=' . $itemid, false);
+		$redirectURL = JRoute::_('index.php?option=com_tjucm&task=item.remove&id=' . $this->item->id . '&client=' . $this->client, false);
 		?>
 		<a class="btn btn-default" href="<?php echo $redirectURL; ?>"><?php echo JText::_("COM_TJUCM_DELETE_ITEM"); ?></a>
 		<?php
