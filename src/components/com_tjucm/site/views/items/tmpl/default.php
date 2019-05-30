@@ -17,6 +17,7 @@ JHtml::_('formbehavior.chosen', 'select');
 
 $user = JFactory::getUser();
 $userId = $user->get('id');
+$tjUcmFrontendHelper = new TjucmHelpersTjucm;
 $listOrder = $this->state->get('list.ordering');
 $listDirn = $this->state->get('list.direction');
 $appendUrl = '';
@@ -31,8 +32,11 @@ if (!empty($this->client))
 {
 	$appendUrl .= "&client=" . $this->client;
 }
+
+$link = 'index.php?option=com_tjucm&view=items' . $appendUrl;
+$itemId = $tjUcmFrontendHelper->getItemId($link);
 ?>
-<form action="<?php echo JRoute::_('index.php?option=com_tjucm&view=items' . $appendUrl); ?>" method="post" name="adminForm" id="adminForm">
+<form action="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>" method="post" name="adminForm" id="adminForm">
 	<table class="table table-striped" id="itemList">
 		<?php
 		if (!empty($this->showList))
@@ -104,7 +108,9 @@ if (!empty($this->client))
 			{
 				foreach ($this->items as $i => $item)
 				{
-					$link = JRoute::_('index.php?option=com_tjucm&view=item&id=' . $item->id . "&client=" . $this->client, false);
+					$link = 'index.php?option=com_tjucm&view=items&client=' . $this->client;
+					$itemId = $tjUcmFrontendHelper->getItemId($link);
+					$link = JRoute::_('index.php?option=com_tjucm&view=item&id=' . $item->id . "&client=" . $this->client . '&Itemid=' . $itemId, false);
 
 					$editown = false;
 					if ($this->canEditOwn)
@@ -141,8 +147,11 @@ if (!empty($this->client))
 							{
 								echo JHtml::_('jgrid.checkedout', $i, $item->uEditor, $item->checked_out_time, 'items.', $canCheckin);
 							}
+
+							$link = 'index.php?option=com_tjucm&view=items&client=' . $this->client;
+							$itemId = $tjUcmFrontendHelper->getItemId($link);
 							?>
-							<a href="<?php echo JRoute::_('index.php?option=com_tjucm&view=item&id='.(int) $item->id . "&client=" . $this->client, false); ?>">
+							<a href="<?php echo JRoute::_('index.php?option=com_tjucm&view=item&id='.(int) $item->id . "&client=" . $this->client . '&Itemid=' . $itemId, false); ?>">
 								<?php echo $this->escape($item->id); ?>
 							</a>
 						</td>

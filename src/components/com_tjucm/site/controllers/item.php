@@ -83,7 +83,11 @@ class TjucmControllerItem extends JControllerLegacy
 		}
 
 		// Redirect to the edit screen.
-		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&layout=edit&id=' . $editId . '&client=' . $this->client, false));
+		$tjUcmFrontendHelper = new TjucmHelpersTjucm;
+		$link = 'index.php?option=com_tjucm&view=itemform&layout=default&client=' . $this->client . '&id=' . $editId;
+		$itemId = $tjUcmFrontendHelper->getItemId($link);
+
+		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&id=' . $editId . '&Itemid=' . $itemId, false));
 	}
 
 	/**
@@ -101,6 +105,7 @@ class TjucmControllerItem extends JControllerLegacy
 
 		// Initialise variables.
 		$app = JFactory::getApplication();
+		$tjUcmFrontendHelper = new TjucmHelpersTjucm;
 
 		// Checking if the user can remove object
 		$user = JFactory::getUser();
@@ -134,13 +139,15 @@ class TjucmControllerItem extends JControllerLegacy
 			$this->setMessage(JText::_('COM_TJUCM_ITEM_SAVED_SUCCESSFULLY'));
 
 			// If there isn't any menu item active, redirect to list view
-			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+			$itemId = $tjUcmFrontendHelper->getItemId('index.php?option=com_tjucm&view=items' . $this->appendUrl);
+			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl . '&Itemid=' . $itemId, false));
 		}
 		else
 		{
 			// If there isn't any menu item active, redirect to list view
-			$this->setRedirect(
-			JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false), JText::_('COM_TJUCM_ITEM_SAVED_STATE_ERROR'), 'error');
+			$link = 'index.php?option=com_tjucm&view=items' . $this->appendUrl;
+			$itemId = $tjUcmFrontendHelper->getItemId($link);
+			$this->setRedirect(JRoute::_($link . '&Itemid=' . $itemId, false), JText::_('COM_TJUCM_ITEM_SAVED_STATE_ERROR'), 'error');
 		}
 	}
 
@@ -196,13 +203,16 @@ class TjucmControllerItem extends JControllerLegacy
 			}
 
 			// If there isn't any menu item active, redirect to list view
-			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+			$link = 'index.php?option=com_tjucm&view=items' . $this->appendUrl;
+			$itemId = $tjUcmFrontendHelper->getItemId($link);
+			$this->setRedirect(JRoute::_($link . '&Itemid=' . $itemId, false));
 		}
 		else
 		{
 			// If there isn't any menu item active, redirect to list view
-			$this->setRedirect(
-			JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false), JText::_('COM_TJUCM_ITEM_SAVED_STATE_ERROR'), 'error');
+			$link = 'index.php?option=com_tjucm&view=items' . $this->appendUrl;
+			$itemId = $tjUcmFrontendHelper->getItemId($link);
+			$this->setRedirect(JRoute::_($link . '&Itemid=' . $itemId, false), JText::_('COM_TJUCM_ITEM_SAVED_STATE_ERROR'), 'error');
 		}
 	}
 }

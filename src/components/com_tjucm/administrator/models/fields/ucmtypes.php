@@ -47,7 +47,7 @@ class JFormFieldUcmTypes extends JFormFieldList
 
 		$options = array();
 
-		$options[] = JHtml::_('select.option', 0, JText::_('COM_TJUCM_SELECT_UCM_TYPE_DESC'));
+		$options[] = JHtml::_('select.option', '', JText::_('COM_TJUCM_SELECT_UCM_TYPE_DESC'));
 
 		foreach ($ucmTypes as $ucmType)
 		{

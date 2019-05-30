@@ -1,96 +1,126 @@
 <?php
 /**
- * @version    SVN: <svn_id>
- * @package    Com_Tjucm
- * @author     Techjoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2018 TechJoomla. All rights reserved.
- * @license    GNU General Public License version 2 or later.
+ * @package	TJ-UCM
+ *
+ * @author	 TechJoomla <extensions@techjoomla.com>
+ * @copyright  Copyright (c) 2009-2019 TechJoomla. All rights reserved.
+ * @license	GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// No direct access
+// No direct access.
 defined('_JEXEC') or die;
 
-JLoader::registerPrefix('Tjucm', JPATH_SITE . '/components/com_tjucm/');
+use Joomla\CMS\Table\Table;
 
 // Add Table Path
-JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
+Table::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
 
 /**
- * Class TjucmRouter
+ * Routing class from com_tjucm
  *
- * @since  3.3
+ * @subpackage  com_tjucm
+ *
+ * @since	   _DEPLOY_VERSION_
  */
-class TjucmRouter extends JComponentRouterBase
+class tjUcmRouter extends JComponentRouterBase
 {
+	private  $views = array('itemform', 'items', 'item');
+
+	private  $menu_views = array('itemform', 'items');
+
 	/**
-	 * Build method for URLs
-	 * This method is meant to transform the query parameters into a more human
-	 * readable form. It is only executed when SEF mode is switched on.
+	 * Build the route for the com_tjucm component
 	 *
 	 * @param   array  &$query  An array of URL arguments
 	 *
 	 * @return  array  The URL arguments to use to assemble the subsequent URL.
 	 *
-	 * @since   3.3
+	 * @since   _DEPLOY_VERSION_
 	 */
 	public function build(&$query)
 	{
 		$segments = array();
-		$view     = null;
 
-		if (isset($query['task']))
+		// Get a menu item based on Itemid or currently active
+		$app = JFactory::getApplication();
+		$menu = $app->getMenu();
+		$db = JFactory::getDbo();
+
+		// We need a menu item.  Either the one specified in the query, or the current active one if none specified
+		if (empty($query['Itemid']))
 		{
-			$taskParts  = explode('.', $query['task']);
-			$segments[] = implode('/', $taskParts);
-			$query['view']  = $taskParts[0];
-			unset($query['task']);
+			$menuItem = $menu->getActive();
+			$menuItemGiven = false;
+		}
+		else
+		{
+			$menuItem = $menu->getItem($query['Itemid']);
+			$menuItemGiven = true;
+
+			// If Itemid is there in the URL then we do not need client in the URL
+			unset($query['client']);
 		}
 
-		if (isset($query['view']))
+		// Check again
+		if ($menuItemGiven && isset($menuItem) && $menuItem->component != 'com_tjucm')
 		{
-			$segments[] = $query['view'];
-			$view = $query['view'];
-
-			unset($query['view']);
+			$menuItemGiven = false;
+			unset($query['Itemid']);
 		}
 
-		if (isset($query['id']))
+		// Are we dealing with an view for which menu is already created
+		if (($menuItem instanceof stdClass)
+			&& isset($menuItem->query['view']) && isset($query['view']))
 		{
-			if ($view !== null)
+			if ($menuItem->query['view'] == $query['view'] && in_array($query['view'], $this->menu_views))
 			{
-				$model      = TjucmHelpersTjucm::getModel($view);
+				unset($query['view']);
 
-				if ($model !== null)
+				if (isset($query['layout']))
 				{
-					if ($view == "items")
-					{
-						$db = JFactory::getDbo();
-						$table = JTable::getInstance('type', 'TjucmTable', array('dbo', $db));
-						$table->load(array('id' => $query['id']));
-
-						$segments[] = $table->alias;
-					}
-					else
-					{
-						$segments[] = $query['id'];
-					}
+					unset($query['layout']);
 				}
-			}
-			else
-			{
-				$segments[] = $query['id'];
-			}
 
-			unset($query['id']);
+				return $segments;
+			}
+		}
+
+		// Check if view is set.
+		if (!isset($query['view']))
+		{
+			return $segments;
+		}
+
+		// Add the view only for normal views for which menu is not created
+		$view = $query['view'];
+		$segments[] = $view;
+
+		unset($query['view']);
+
+		/* Handle client in URL */
+		if (isset($query['client']))
+		{
+			$ucmTypeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', $db));
+			$ucmTypeTable->load(array('unique_identifier' => $query['client']));
+
+			$segments[] = $ucmTypeTable->alias;
+			unset($query['client']);
+		}
+
+		if ($view == 'item')
+		{
+			if (isset($query['id']))
+			{
+				$segments[] = (INT) $query['id'];
+				unset($query['id']);
+			}
 		}
 
 		return $segments;
 	}
 
 	/**
-	 * Parse method for URLs
-	 * This method is meant to transform the human readable URL back into
-	 * query parameters. It is only executed when SEF mode is switched on.
+	 * Parse the segments of a URL.
 	 *
 	 * @param   array  &$segments  The segments of the URL to parse.
 	 *
@@ -100,24 +130,29 @@ class TjucmRouter extends JComponentRouterBase
 	 */
 	public function parse(&$segments)
 	{
+		$item = $this->menu->getActive();
 		$vars = array();
+		$db = JFactory::getDbo();
 
-		// View is always the first element of the array
-		$vars['view'] = array_shift($segments);
-		$model = TjucmHelpersTjucm::getModel($vars['view']);
+		// Count route segments
+		$count = count($segments);
 
-		while (!empty($segments))
+		// First segment will always be view name
+		$vars['view'] = $segments[0];
+
+		if ($count >= 1)
 		{
-			$segment = array_pop($segments);
+			$ucmTypeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', $db));
+			$ucmTypeTable->load(array('alias' => $segments[1]));
 
-			// If it's the ID, let's put on the request
-			if (is_numeric($segment))
+			if ($ucmTypeTable->id)
 			{
-				$vars['id'] = $segment;
-			}
-			else
-			{
-				$vars['task'] = $vars['view'] . '.' . $segment;
+				$vars['client'] = $ucmTypeTable->unique_identifier;
+
+				if (!empty($segments[2]))
+				{
+					$vars['id'] = $segments[2];
+				}
 			}
 		}
 
