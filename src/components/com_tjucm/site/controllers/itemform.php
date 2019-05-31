@@ -122,19 +122,20 @@ class TjucmControllerItemForm extends JControllerForm
 		// Clear the record edit information from the session.
 		$app->setUserState($context . '.data', null);
 
-		$clusterId     = $app->input->getInt('cluster_id', 0);
+		$clusterId = $app->input->getInt('cluster_id', 0);
+		$cluster   = '';
 
 		// Check cluster exist
 		if ($clusterId)
 		{
-			$this->appendUrl .= '&cluster_id=' . $clusterId;
+			$cluster = '&cluster_id=' . $clusterId;
 		}
 
 		// Redirect to the edit screen.
-		$link = 'index.php?option=com_tjucm&view=itemform&client=' . $this->appendUrl;
+		$link = 'index.php?option=com_tjucm&view=itemform&client=' . $this->client;
 		$itemId = $tjUcmFrontendHelper->getItemId($link);
 
-		$this->setRedirect(Route::_($link . '&Itemid=' . $itemId . $this->getRedirectToItemAppend(), false));
+		$this->setRedirect(Route::_($link . '&Itemid=' . $itemId . $cluster . $this->getRedirectToItemAppend(), false));
 
 		return true;
 	}
@@ -713,18 +714,9 @@ class TjucmControllerItemForm extends JControllerForm
 		// Get the previous edit id (if any) and the current edit id.
 		$editId    = $app->input->getInt('id', 0);
 		$clusterId = $app->input->getInt('cluster_id', 0);
-		$itemId    = $app->input->get('Itemid', '', 'INT');
-
-		if (empty($itemId))
-		{
-			$menu = $app->getMenu();
-			$menuItemObj = $menu->getItems('link', 'index.php?option=com_tjucm&view=itemform', true);
-			$itemId      = $menuItemObj->id;
-		}
 
 		// Set the user id for the user to edit in the session.
 		$app->setUserState('com_tjucm.edit.item.id', $editId);
-
 		$app->setUserState('com_tjucm.edit.itemform.data.copy_id', $editId);
 
 		// Get the model.
@@ -738,7 +730,11 @@ class TjucmControllerItemForm extends JControllerForm
 			$cluster = '&cluster_id=' . $clusterId;
 		}
 
+		$tjUcmFrontendHelper = new TjucmHelpersTjucm;
+		$link = 'index.php?option=com_tjucm&view=itemform&client=' . $this->client;
+		$itemId = $tjUcmFrontendHelper->getItemId($link);
+
 		// Redirect to the edit screen.
-		$this->setRedirect(Route::_('index.php?option=com_tjucm&view=itemform&client=' . $this->client . $cluster . '&Itemid=' . $itemId, false));
+		$this->setRedirect(Route::_($link . '&Itemid=' . $itemId . $cluster . $this->getRedirectToItemAppend(), false));
 	}
 }
