@@ -85,6 +85,13 @@ class tjUcmRouter extends JComponentRouterBase
 			}
 		}
 
+		// If the URL is task URL
+		if (isset($query['task']))
+		{
+			$segments[] = str_replace(".", "-", $query['task']);
+			unset($query['task']);
+		}
+
 		// Check if view is set.
 		if (!isset($query['view']))
 		{
@@ -137,8 +144,15 @@ class tjUcmRouter extends JComponentRouterBase
 		// Count route segments
 		$count = count($segments);
 
-		// First segment will always be view name
-		$vars['view'] = $segments[0];
+		// If first segment is not the view then its task
+		if (!in_array($segments[0], $this->views))
+		{
+			$vars['task'] = str_replace("-", ".", $segments[0]);
+		}
+		else
+		{
+			$vars['view'] = $segments[0];
+		}
 
 		if ($count >= 1)
 		{
