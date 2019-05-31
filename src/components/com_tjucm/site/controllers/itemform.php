@@ -719,9 +719,6 @@ class TjucmControllerItemForm extends JControllerForm
 		$app->setUserState('com_tjucm.edit.item.id', $editId);
 		$app->setUserState('com_tjucm.edit.itemform.data.copy_id', $editId);
 
-		// Get the model.
-		$model = $this->getModel('ItemForm', 'TjucmModel');
-
 		$cluster = '';
 
 		// Check cluster exist
