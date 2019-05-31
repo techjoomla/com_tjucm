@@ -720,7 +720,6 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	public function prepareForCopy()
 	{
-		Session::checkToken('get') or die('Invalid Token');
 		$app = Factory::getApplication();
 
 		// Get the previous edit id (if any) and the current edit id.
