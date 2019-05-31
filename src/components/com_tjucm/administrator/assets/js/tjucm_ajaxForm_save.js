@@ -104,7 +104,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 				{
 					jQuery('#item-form').removeClass('dirty');
 
-					if ('save' == status) 
+					if ('save' == status)
 					{
 						jQuery("#finalSave").attr("disabled", "disabled");
 						Joomla.renderMessages({'success':[Joomla.JText._('COM_TJUCM_MSG_ON_SAVED_FORM')]});
@@ -125,9 +125,9 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 					}
 
 					/* Update item id in the URL if the data is stored successfully */
-					var url = window.location.href.split('#')[0],
-					separator = (url.indexOf("?")===-1)?"?":"&",
-					newParam = separator + "id=" + returnedData.data.id;
+					let url = window.location.href.split('#')[0];
+					let separator = (url.indexOf("?")===-1)?"?":"&";
+					let newParam = "id=" + returnedData.data.id;
 
 					/* Add content_id in ucmsubform records */
 					jQuery.each(returnedData.data.childContentIds, function(i, val) {
@@ -136,7 +136,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 
 					if (!(url.indexOf(newParam) >= 0))
 					{
-						url+=newParam;
+						url+=separator+newParam;
 					}
 
 					history.pushState(null, null, url);

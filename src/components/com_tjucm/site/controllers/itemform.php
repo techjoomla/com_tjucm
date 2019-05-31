@@ -102,6 +102,8 @@ class TjucmControllerItemForm extends JControllerForm
 		$app = Factory::getApplication();
 		$context = "$this->option.edit.$this->context";
 
+		$tjUcmFrontendHelper = new TjucmHelpersTjucm;
+
 		// Access check.
 		if (!$this->allowAdd())
 		{
@@ -109,12 +111,10 @@ class TjucmControllerItemForm extends JControllerForm
 			$this->setError(Text::_('JLIB_APPLICATION_ERROR_CREATE_RECORD_NOT_PERMITTED'));
 			$this->setMessage($this->getError(), 'error');
 
-			$this->setRedirect(
-				Route::_(
-					'index.php?option=com_tjucm&view=items' . $this->appendUrl
-					. $this->getRedirectToListAppend(), false
-				)
-			);
+			$link = 'index.php?option=com_tjucm&view=items' . $this->appendUrl;
+			$itemId = $tjUcmFrontendHelper->getItemId($link);
+
+			$this->setRedirect(Route::_($link . '&Itemid=' . $itemId . $this->getRedirectToListAppend(), false));
 
 			return false;
 		}
@@ -130,24 +130,11 @@ class TjucmControllerItemForm extends JControllerForm
 			$this->appendUrl .= '&cluster_id=' . $clusterId;
 		}
 
-		$itemId = $app->input->getInt('Itemid', 0);
-
-		if (empty($itemId))
-		{
-			$menu = $app->getMenu();
-			$menuItemObj = $menu->getItems('link', 'index.php?option=com_tjucm&view=itemform', true);
-			$itemId     = $menuItemObj->id;
-		}
-
-		$this->appendUrl .= '&Itemid=' . $itemId;
-
 		// Redirect to the edit screen.
-		$this->setRedirect(
-			Route::_(
-				'index.php?option=com_tjucm&view=itemform' . $this->appendUrl
-				. $this->getRedirectToItemAppend(), false
-			)
-		);
+		$link = 'index.php?option=com_tjucm&view=itemform&client=' . $this->appendUrl;
+		$itemId = $tjUcmFrontendHelper->getItemId($link);
+
+		$this->setRedirect(Route::_($link . '&Itemid=' . $itemId . $this->getRedirectToItemAppend(), false));
 
 		return true;
 	}
@@ -179,14 +166,6 @@ class TjucmControllerItemForm extends JControllerForm
 		// Get the previous edit id (if any) and the current edit id.
 		$previousId = (int) $app->getUserState('com_tjucm.edit.item.id');
 		$editId     = $app->input->getInt('id', 0);
-		$itemId     = $app->input->getInt('Itemid', 0);
-
-		if (empty($itemId))
-		{
-			$menu = $app->getMenu();
-			$menuItemObj = $menu->getItems('link', 'index.php?option=com_tjucm&view=itemform', true);
-			$itemId      = $menuItemObj->id;
-		}
 
 		// Set the user id for the user to edit in the session.
 		$app->setUserState('com_tjucm.edit.item.id', $editId);
@@ -211,7 +190,10 @@ class TjucmControllerItemForm extends JControllerForm
 		}
 
 		// Redirect to the edit screen.
-		$this->setRedirect(Route::_('index.php?option=com_tjucm&view=itemform&client=' . $this->client . $recordId . '&Itemid=' . $itemId, false));
+		$tjUcmFrontendHelper = new TjucmHelpersTjucm;
+		$link = 'index.php?option=com_tjucm&view=itemform&client=' . $this->client . $recordId;
+		$itemId = $tjUcmFrontendHelper->getItemId($link);
+		$this->setRedirect(Route::_('index.php?option=com_tjucm&view=itemform' . $recordId . '&Itemid=' . $itemId, false));
 	}
 
 	/**
@@ -551,6 +533,7 @@ class TjucmControllerItemForm extends JControllerForm
 		$model = $this->getModel();
 		$table = $model->getTable();
 		$context = "com_tjucm.edit.itemform.data";
+		$tjUcmFrontendHelper = new TjucmHelpersTjucm;
 
 		if (empty($key))
 		{
@@ -570,12 +553,9 @@ class TjucmControllerItemForm extends JControllerForm
 					$this->setError(Text::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
 					$this->setMessage($this->getError(), 'error');
 
-					$this->setRedirect(
-						Route::_(
-							'index.php?option=com_tjucm&view=itemform&client=' . $this->client
-							. $this->getRedirectToItemAppend($recordId, $key), false
-						)
-					);
+					$link = 'index.php?option=com_tjucm&view=itemform&client=' . $this->client;
+					$itemId = $tjUcmFrontendHelper->getItemId($link);
+					$this->setRedirect(Route::_($link . '&Itemid=' . $itemId . $this->getRedirectToItemAppend($recordId, $key), false));
 
 					return false;
 				}
@@ -586,12 +566,9 @@ class TjucmControllerItemForm extends JControllerForm
 		$this->releaseEditId($context, $recordId);
 		Factory::getApplication()->setUserState($context . '.data', null);
 
-		$this->setRedirect(
-			Route::_(
-				'index.php?option=com_tjucm&view=items' . $this->appendUrl
-				. $this->getRedirectToListAppend(), false
-			)
-		);
+		$link = 'index.php?option=com_tjucm&view=items' . $this->appendUrl;
+		$itemId = $tjUcmFrontendHelper->getItemId($link);
+		$this->setRedirect(Route::_($link . '&Itemid=' . $itemId . $this->getRedirectToListAppend(), false));
 
 		return true;
 	}
@@ -616,6 +593,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 		// Get content_id to be deleted.
 		$contentId = $app->input->getInt('id');
+		$tjUcmFrontendHelper = new TjucmHelpersTjucm;
 
 		// Attempt to save the data
 		try
@@ -635,7 +613,10 @@ class TjucmControllerItemForm extends JControllerForm
 
 			// Redirect to the list screen
 			$this->setMessage(Text::_('COM_TJUCM_ITEM_DELETED_SUCCESSFULLY'));
-			$this->setRedirect(Route::_($url . $this->appendUrl, false));
+
+			$link = $url . $this->appendUrl;
+			$itemId = $tjUcmFrontendHelper->getItemId($link);
+			$this->setRedirect(Route::_($link . '&Itemid=' . $itemId, false));
 
 			// Flush the data from the session.
 			$app->setUserState('com_tjucm.edit.item.data', null);
@@ -644,7 +625,10 @@ class TjucmControllerItemForm extends JControllerForm
 		{
 			$errorType = ($e->getCode() == '404' || '403') ? 'error' : 'warning';
 			$this->setMessage($e->getMessage(), $errorType);
-			$this->setRedirect(Route::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+
+			$link = 'index.php?option=com_tjucm&view=items' . $this->appendUrl;
+			$itemId = $tjUcmFrontendHelper->getItemId($link);
+			$this->setRedirect(Route::_($link . '&Itemid=' . $itemId, false));
 		}
 	}
 
@@ -659,8 +643,12 @@ class TjucmControllerItemForm extends JControllerForm
 	public function redirectToListView($typeId, $allowedCount)
 	{
 		$user = Factory::getUser();
-		$createdBy = $user->id;
-		$link = Route::_("index.php?option=com_tjucm&view=items&id=" . $typeId . "&created_by=" . $createdBy . $this->appendUrl, false);
+
+		$tjUcmFrontendHelper = new TjucmHelpersTjucm;
+		$link = "index.php?option=com_tjucm&view=items&created_by=" . $user->id . $this->appendUrl;
+		$itemId = $tjUcmFrontendHelper->getItemId($link);
+
+		$link = Route::_($link . '&Itemid=' . $itemId, false);
 
 		Factory::getApplication()->redirect($link, sprintf(Text::_('COM_TJUCM_ALLOWED_COUNT_LIMIT'), $allowedCount), "Warning");
 	}
