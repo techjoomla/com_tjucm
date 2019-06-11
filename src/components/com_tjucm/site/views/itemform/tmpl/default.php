@@ -46,19 +46,6 @@ $fieldsets_counter_deafult = 0;
 $setnavigation             = false;
 $itemState                 = $this->item->state;
 
-// Code check cluster Id of URL with saved cluster_id both are equal in edit mode
-if (!$this->copyRecId && $editRecordId)
-{
-	$clusterId = $jinput->input->getInt("cluster_id", 0);
-
-	if ($clusterId != $this->item->cluster_id)
-	{
-		$jinput->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
-		$jinput->setHeader('status', 403, true);
-
-		return;
-	}
-}
 ?>
 <script type="text/javascript">
 

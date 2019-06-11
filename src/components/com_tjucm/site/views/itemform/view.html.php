@@ -125,6 +125,20 @@ class TjucmViewItemform extends JViewLegacy
 			$this->id = $this->copyRecId;
 		}
 
+		// Code check cluster Id of URL with saved cluster_id both are equal in edit mode
+		if (!$this->copyRecId && $this->id)
+		{
+			$clusterId = $input->getInt("cluster_id", 0);
+
+			if ($clusterId != $this->item->cluster_id)
+			{
+				$jinput->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
+				$jinput->setHeader('status', 403, true);
+
+				return;
+			}
+		}
+
 		// If did not get the client from url then get if from menu param
 		if (empty($this->client))
 		{
