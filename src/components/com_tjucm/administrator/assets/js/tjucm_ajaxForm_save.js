@@ -1,3 +1,6 @@
+/*Variable to store the updated options of related field*/
+var tjucmRelatedFieldUpdatedOptions = '';
+
 /* This function executes for autosave form */
 jQuery(document).ready(function()
 {
@@ -30,7 +33,25 @@ jQuery(document).ready(function()
 			});
 		}
 	}
-})
+
+	/*Update the options of related field for new record of subform*/
+	jQuery(document).on('subform-row-add', function(event, row){
+		let count = jQuery(row).attr('data-group').replace(jQuery(row).attr('data-base-name'), "");
+
+		jQuery.each(tjucmRelatedFieldUpdatedOptions, function(index, value) {
+			if (value.templateId)
+			{
+				let newTemplateId = value.templateId.replace("XXX-XXX", count);
+				jQuery(row).find("#"+newTemplateId).html('');
+				jQuery.each(value.options, function(i, val) {
+					jQuery(row).find("#"+newTemplateId).append('<option value="'+val.value+'">'+val.text+'</option>');
+				});
+
+				jQuery(row).find("#"+newTemplateId).trigger("liszt:updated");
+			}
+		});
+	});
+});
 
 /* This function carries stepped saving via ajax */
 function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
@@ -131,7 +152,25 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 
 					/* Add content_id in ucmsubform records */
 					jQuery.each(returnedData.data.childContentIds, function(i, val) {
-						jQuery( "input[name='"+val.elementName+"']" ).val(val.content_id);
+						jQuery("input[name='"+val.elementName+"']").val(val.content_id);
+					});
+
+					/* Add content_id in ucmsubform records */
+					tjucmRelatedFieldUpdatedOptions = returnedData.data.relatedFieldOptions;
+					jQuery.each(returnedData.data.relatedFieldOptions, function(index, value) {
+						jQuery("#"+value.elementId).html('');
+
+						jQuery.each(value.options, function(i, val) {
+							let selected = '';
+
+							if (val.selected == '1'){
+								selected = ' selected="selected" ';
+							}
+
+							jQuery("#"+value.elementId).append('<option value="'+val.value+'" '+selected+'>'+val.text+'</option>');
+						});
+
+						jQuery("#"+value.elementId).trigger("liszt:updated");
 					});
 
 					if (!(url.indexOf(newParam) >= 0))
