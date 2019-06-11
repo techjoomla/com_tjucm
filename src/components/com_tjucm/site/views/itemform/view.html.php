@@ -132,8 +132,8 @@ class TjucmViewItemform extends JViewLegacy
 
 			if ($clusterId != $this->item->cluster_id)
 			{
-				$jinput->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
-				$jinput->setHeader('status', 403, true);
+				$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
+				$app->setHeader('status', 403, true);
 
 				return;
 			}
