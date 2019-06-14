@@ -60,38 +60,45 @@ class TjucmViewItems extends JViewLegacy
 	 *
 	 * @param   string  $tpl  Template name
 	 *
-	 * @return void
+	 * @return boolean|void
 	 *
 	 * @throws Exception
 	 */
 	public function display($tpl = null)
 	{
-		$app = JFactory::getApplication();
-		$this->state = $this->get('State');
-		$this->items = $this->get('Items');
-		$this->pagination = $this->get('Pagination');
-		$this->params     = $app->getParams('com_tjucm');
-		$this->listcolumn = $this->get('Fields');
-		$this->allowedToAdd = false;
-
-		$model = $this->getModel("Items");
-		$this->ucmTypeId = $id = $model->getState('ucmType.id');
-		$this->client = $model->getState('ucm.client');
-
+		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
-		$canCreate = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$canView = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$canEdit = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$canChange = $user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $this->ucmTypeId);
-		$canEditOwn = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this->ucmTypeId);
 
-		$this->canCreate = $canCreate;
-		$this->canView = $canView;
-		$this->canEdit = $canEdit;
-		$this->canChange = $canChange;
-		$this->canEditOwn = $canEditOwn;
-		$this->canDelete = $canDelete;
+		// Check the view access to the article (the model has already computed the values).
+		if (!$user->id)
+		{
+			$app->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
+			$app->setHeader('status', 403, true);
+
+			return false;
+		}
+
+		$this->state        = $this->get('State');
+		$this->items        = $this->get('Items');
+		$this->pagination   = $this->get('Pagination');
+		$this->params       = $app->getParams('com_tjucm');
+		$this->listcolumn   = $this->get('Fields');
+		$this->allowedToAdd = false;
+		$model              = $this->getModel("Items");
+		$this->ucmTypeId    = $id = $model->getState('ucmType.id');
+		$this->client       = $model->getState('ucm.client');
+		$canCreate          = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$canView            = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$canEdit            = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$canChange          = $user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $this->ucmTypeId);
+		$canEditOwn         = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$canDelete          = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$this->canCreate    = $canCreate;
+		$this->canView      = $canView;
+		$this->canEdit      = $canEdit;
+		$this->canChange    = $canChange;
+		$this->canEditOwn   = $canEditOwn;
+		$this->canDelete    = $canDelete;
 
 		// If did not get the client from url then get if from menu param
 		if (empty($this->client))
