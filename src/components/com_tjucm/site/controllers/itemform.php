@@ -443,6 +443,9 @@ class TjucmControllerItemForm extends JControllerForm
 				$subFormContentIds = $model->saveUcmSubFormRecords($validData, $ucmSubFormDataSet);
 			}
 
+			// Get updated options for related fields
+			$updatedRelatedFieldsOptions = $model->getUdatedRelatedFieldOptions($recordId);
+
 			if ($recordId === false)
 			{
 				echo new JResponseJson(null);
@@ -480,9 +483,16 @@ class TjucmControllerItemForm extends JControllerForm
 			{
 				$response = array('id' => $response);
 
+				// Add subform record ids in the response
 				if (isset($subFormContentIds) && !empty($subFormContentIds))
 				{
 					$response['childContentIds'] = $subFormContentIds;
+				}
+
+				// Add updated options of related fields in the response
+				if (!empty($updatedRelatedFieldsOptions))
+				{
+					$response['relatedFieldOptions'] = $updatedRelatedFieldsOptions;
 				}
 			}
 
