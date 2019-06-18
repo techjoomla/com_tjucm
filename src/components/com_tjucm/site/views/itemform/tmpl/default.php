@@ -45,6 +45,7 @@ $layout                    = ($calledFrom == 'frontend') ? 'default' : 'edit';
 $fieldsets_counter_deafult = 0;
 $setnavigation             = false;
 $itemState                 = $this->item->state;
+
 ?>
 <script type="text/javascript">
 
@@ -97,7 +98,7 @@ $itemState                 = $this->item->state;
 	?>
 	<div>
 		<fieldset>
-			<input type="hidden" name="jform[id]" id="recordId" value="<?php echo JFactory::getApplication()->input->get('id'); ?>" />
+			<input type="hidden" name="jform[id]" id="recordId" value="<?php echo $editRecordId; ?>" />
 			<input type="hidden" name="jform[ordering]" value="<?php echo $this->item->ordering; ?>" />
 			<input type="hidden" name="jform[state]" value="<?php echo $this->item->state;?>" />
 			<input type="hidden" name="jform[client]" value="<?php echo $this->client;?>" />
@@ -177,7 +178,9 @@ $itemState                 = $this->item->state;
 			if (!$this->allow_auto_save && $this->allow_draft_save && empty($itemState))
 			{
 				?>
-				<input type="button" class="btn btn-width150 br-0 btn-default font-normal" id="draftSave" value="<?php echo JText::_("COM_TJUCM_SAVE_AS_DRAFT_ITEM"); ?>" onclick="javascript: this.disabled=true; steppedFormSave(this.form.id, 'draft');" />
+				<input type="button" class="btn btn-width150 br-0 btn-default font-normal" id="draftSave"
+				value="<?php echo JText::_("COM_TJUCM_SAVE_AS_DRAFT_ITEM"); ?>"
+				onclick="javascript: this.disabled=true; steppedFormSave(this.form.id, 'draft');" />
 				<?php
 			}
 			?>
