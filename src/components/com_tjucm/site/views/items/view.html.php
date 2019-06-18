@@ -69,7 +69,7 @@ class TjucmViewItems extends JViewLegacy
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 
-		// Check the view access to the article (the model has already computed the values).
+		// Check the view access to the items.
 		if (!$user->id)
 		{
 			$app->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
