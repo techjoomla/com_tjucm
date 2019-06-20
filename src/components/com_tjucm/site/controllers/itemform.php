@@ -414,7 +414,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 		try
 		{
-			$status_title = Factory::getApplication()->input->get('form_status');
+			$status_title = $app->input->get('form_status');
 			$validData['status'] = $status_title;
 
 			if (!empty($files))
@@ -462,6 +462,7 @@ class TjucmControllerItemForm extends JControllerForm
 			}
 
 			// Get updated options for related fields
+			$app->input->set('id', $recordId);
 			$updatedRelatedFieldsOptions = $model->getUdatedRelatedFieldOptions($recordId);
 
 			if ($recordId === false)

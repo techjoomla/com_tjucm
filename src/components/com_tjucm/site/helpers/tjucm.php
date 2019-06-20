@@ -87,7 +87,7 @@ class TjucmHelpersTjucm
 	public function getItemId($link)
 	{
 		$app = Factory::getApplication();
-		$db  = Factory::getDbo();
+		$db = Factory::getDbo();
 
 		static $ucmItemIds = array();
 

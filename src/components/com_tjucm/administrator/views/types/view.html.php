@@ -11,6 +11,7 @@
 defined('_JEXEC') or die;
 
 jimport('joomla.application.component.view');
+JHTML::_('behavior.modal');
 
 /**
  * View class for a list of Tjucm.
@@ -112,6 +113,22 @@ class TjucmViewTypes extends JViewLegacy
 				JToolBarHelper::trash('types.trash', 'JTOOLBAR_TRASH');
 				JToolBarHelper::divider();
 			}
+		}
+
+		if ($canDo->get('core.edit') || $canDo->get('core.create'))
+		{
+			JToolBarHelper::custom('types.export', 'download', '', 'COM_TJUCM_TYPE_EXPORT', false);
+
+			// Get an instance of the Toolbar
+			$toolbar = JToolbar::getInstance('toolbar');
+			$link = "'" . JUri::root() . "administrator/index.php?option=com_tjucm&view=types&layout=import&tmpl=component" . "'";
+
+			// Add New button manage enrollment view
+			$toolbar->appendButton(
+			'Custom', '<a class="modal btn"
+			onclick="tjUcm.admin.openTjUcmSqueezeBox(' . $link . ',40, 38)">
+			<span class="icon-upload"></span>' . JText::_('COM_TJUCM_TYPE_IMPORT') . '</a>'
+			);
 		}
 
 		if ($canDo->get('core.admin'))

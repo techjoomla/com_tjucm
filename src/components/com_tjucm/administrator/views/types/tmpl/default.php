@@ -21,6 +21,9 @@ $listDirn  = $this->state->get('list.direction');
 $canOrder  = $user->authorise('core.edit.state', 'com_tjucm');
 $saveOrder = $listOrder == 'a.`ordering`';
 
+$document = JFactory::getDocument();
+$document->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/tjucm.js');
+
 if ($saveOrder)
 {
 	$saveOrderingUrl = 'index.php?option=com_tjucm&task=types.saveOrderAjax&tmpl=component';
@@ -30,6 +33,17 @@ if ($saveOrder)
 $sortFields = $this->getSortFields();
 ?>
 <script type="text/javascript">
+	Joomla.submitbutton = function (task) {
+		if (task == 'types.export')
+		{
+			tjUcm.types.export();
+		}
+		else
+		{
+			Joomla.submitform(task);
+		}
+	}
+
 	Joomla.orderTable = function () {
 		table = document.getElementById("sortTable");
 		direction = document.getElementById("directionTable");
