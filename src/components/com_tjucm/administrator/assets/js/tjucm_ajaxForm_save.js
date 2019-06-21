@@ -41,7 +41,7 @@ jQuery(document).ready(function()
 		jQuery.each(tjucmRelatedFieldUpdatedOptions, function(index, value) {
 			if (value.templateId)
 			{
-				let newTemplateId = value.templateId.replace("XXX-XXX", count);
+				let newTemplateId = value.templateId.replace("XXX_XXX", count);
 				jQuery(row).find("#"+newTemplateId).html('');
 				jQuery.each(value.options, function(i, val) {
 					jQuery(row).find("#"+newTemplateId).append('<option value="'+val.value+'">'+val.text+'</option>');

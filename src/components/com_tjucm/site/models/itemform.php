@@ -1189,7 +1189,7 @@ class TjucmModelItemForm extends JModelForm
 								// This is required to replace the options of related field of subform in the DOM
 								$ucmSubFormFieldElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . $count . '__' . $ucmSubFormfield->name;
 								$ucmSubFormFieldElementId = str_replace('-', '_', $ucmSubFormFieldElementId);
-								$ucmSubFormFieldTemplateElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . 'XXX-XXX__' . $ucmSubFormfield->name;
+								$ucmSubFormFieldTemplateElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . 'XXX_XXX__' . $ucmSubFormfield->name;
 								$ucmSubFormFieldTemplateElementId = str_replace('-', '_', $ucmSubFormFieldTemplateElementId);
 								$returnData[] = array('templateId' => $ucmSubFormFieldTemplateElementId, 'elementId' => $ucmSubFormFieldElementId, 'options' => $options);
 							}
@@ -1219,7 +1219,7 @@ class TjucmModelItemForm extends JModelForm
 									// This is required to replace the options of related field of subform in the DOM
 									$ucmSubFormFieldElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . $i .'__' . $ucmSubFormfield->name;
 									$ucmSubFormFieldElementId = str_replace('-', '_', $ucmSubFormFieldElementId);
-									$ucmSubFormFieldTemplateElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . 'XXX-XXX__' . $ucmSubFormfield->name;
+									$ucmSubFormFieldTemplateElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . 'XXX_XXX__' . $ucmSubFormfield->name;
 									$ucmSubFormFieldTemplateElementId = str_replace('-', '_', $ucmSubFormFieldTemplateElementId);
 									$returnData[] = array('templateId' => $ucmSubFormFieldTemplateElementId, 'elementId' => $ucmSubFormFieldElementId, 'options' => $options);
 								}
