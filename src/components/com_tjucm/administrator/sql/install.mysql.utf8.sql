@@ -20,6 +20,7 @@ PRIMARY KEY (`id`)
 
 CREATE TABLE IF NOT EXISTS `#__tj_ucm_data` (
 `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+`parent_id` int(11) UNSIGNED NOT NULL DEFAULT '0',
 `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0',
 `ordering` INT(11)  NOT NULL ,
 `state` TINYINT(1)  NOT NULL ,
