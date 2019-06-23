@@ -10,7 +10,14 @@
 // No direct access
 defined('_JEXEC') or die;
 ?>
-<form action="<?php echo JRoute::_('index.php?option=com_tjucm&view=types&layout=default'); ?>" method="post" enctype="multipart/form-data" name="adminForm" id="type-form" class="form-validate">
+<script>
+function tjUcmImportTypes(obj)
+{
+	jQuery(obj).attr("disabled", true);
+	jQuery("#type-import-form").submit();
+}
+</script>
+<form action="<?php echo JRoute::_('index.php?option=com_tjucm&view=types&layout=default'); ?>" method="post" enctype="multipart/form-data" name="adminForm" id="type-import-form" class="form-validate">
 	<div class="form-horizontal">
 		<div>
 			<h1><?php echo JText::_("COM_TJUCM_TYPES_IMPORT");?></h1>
@@ -18,7 +25,7 @@ defined('_JEXEC') or die;
 		<hr />
 		<div class="input-append">
 			<input type="file" id="ucm-types-upload" required="true" name="ucm-types-upload" accept="application/json" >
-			<button type="submit" form="type-form" class="btn btn-success" value="Submit"><?php echo JText::_("COM_TJUCM_IMPORT");?></button>
+			<button type="submit" form="type-form" id="tjucmImportUcm" onclick="tjUcmImportTypes(this);" class="btn btn-success" value="Submit"><?php echo JText::_("COM_TJUCM_IMPORT");?></button>
 		</div>
 		<input type="hidden" name="option" value="com_tjucm"/>
 		<input type="hidden" name="task" value="types.import"/>

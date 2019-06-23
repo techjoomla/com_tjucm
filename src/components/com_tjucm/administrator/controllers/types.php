@@ -215,9 +215,10 @@ class TjucmControllerTypes extends JControllerAdmin
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 
 		$app = Factory::getApplication();
+		$input = $app->input;
 		$user = Factory::getUser();
-		$app->input->set('task', 'apply');
-		$importFile = $app->input->files->get('ucm-types-upload');
+		$input->set('task', 'apply');
+		$importFile = $input->files->get('ucm-types-upload');
 
 		// Check if the file is a JSON file
 		if ($importFile['type'] != "application/json")
@@ -305,7 +306,22 @@ class TjucmControllerTypes extends JControllerAdmin
 					{
 						foreach ($fields as $field)
 						{
+							$input->post->set('tjfields', '');
 							$options = $field->options;
+
+							// Format options data
+							if (!empty($options))
+							{
+								foreach ($options as &$option)
+								{
+									$option = (array) $option;
+									$option['optionname'] = $option['options'];
+									$option['optionvalue'] = $option['value'];
+								}
+
+								$input->post->set('tjfields', $options);
+							}
+
 							unset($field->options);
 							$field = (array) $field;
 
@@ -316,6 +332,8 @@ class TjucmControllerTypes extends JControllerAdmin
 							$field['asset_id'] = '';
 							$field['created_by'] = $user->id;
 							$field['group_id'] = $fieldGroupId;
+							$field['saveOption'] = empty($options) ? 0 : 1 ;
+							$field['params'] = (array) json_decode($field['params']);
 
 							$tjFieldsFieldModel = JModelLegacy::getInstance('Field', 'TjfieldsModel', array('ignore_request' => true));
 							$tjFieldsFieldModel->save($field);
@@ -340,6 +358,7 @@ class TjucmControllerTypes extends JControllerAdmin
 			}
 		}
 
+		$app->enqueueMessage(Text::_('COM_TJUCM_TYPE_IMPORT_SUCCESS_MSG'), 'success');
 		$app->redirect(JUri::root() . 'administrator/index.php?option=com_tjucm&view=types&layout=import&tmpl=component');
 	}
 }
