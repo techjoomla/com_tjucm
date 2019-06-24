@@ -336,6 +336,21 @@ class TjucmModelType extends JModelAdmin
 		$params['allowed_count'] = $data['allowed_count'];
 		$params['layout'] = $data['layout'];
 
+		// If UCM type is a subform then need to add content_id as hidden field in the form - For flat subform storage
+		if ($params['is_subform'] == 1 && empty($data['id']))
+		{
+			JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
+			$fieldGroup = array("name" => "hidden", "title" => "hidden", "client" => $data['unique_identifier'], "state" => 1);
+			$tjFieldsGroupModel = JModelLegacy::getInstance('Group', 'TjfieldsModel', array('ignore_request' => true));
+			$tjFieldsGroupModel->save($fieldGroup);
+			$fieldGroupId = (int) $tjFieldsGroupModel->getState($tjFieldsGroupModel->getName() . '.id');
+			$field = array("label" => "contentid", "name" => "contentid", "type" => "hidden", "client" => $data['unique_identifier'], "state" => 1, "group_id" => $fieldGroupId);
+			$tjFieldsFieldModel = JModelLegacy::getInstance('Field', 'TjfieldsModel', array('ignore_request' => true));
+			$input->post->set('client_type', end(explode(".", $data['unique_identifier'])));
+			$tjFieldsFieldModel->save($field);
+			$input->post->set('client_type', '');
+		}
+
 		// If UCM type is a subform then it cant be saved as draft and auto save is also disabled
 		if ($params['is_subform'] == 1)
 		{

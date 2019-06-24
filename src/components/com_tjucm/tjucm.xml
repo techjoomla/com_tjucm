@@ -43,10 +43,6 @@
 	</languages>
 	<administration>
 		<menu img="media/com_tjucm/images/s_com_tjucm.png">COM_TJUCM</menu>
-		<submenu>
-			<menu link="option=com_tjucm&amp;view=types" view="types" img="media/com_tjucm/images/s_types.png" alt="Tjucm/Types">COM_TJUCM_TITLE_TYPES</menu>
-			<menu link="option=com_tjucm&amp;view=items" view="items" img="media/com_tjucm/images/s_items.png" alt="Tjucm/Items">COM_TJUCM_TITLE_ITEMS</menu>
-		</submenu>
 		<files folder="administrator">
 			<filename>access.xml</filename>
 			<filename>config.xml</filename>

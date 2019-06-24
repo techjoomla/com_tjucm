@@ -268,7 +268,6 @@ class TjucmControllerTypes extends JControllerAdmin
 
 			// Cleaning UCM Type data
 			$ucmTypeData['id'] = '';
-			$ucmTypeData['alias'] = '';
 			$ucmTypeData['asset_id'] = '';
 			$ucmTypeData['checked_out'] = '';
 			$ucmTypeData['checked_out_time'] = '';
@@ -334,10 +333,21 @@ class TjucmControllerTypes extends JControllerAdmin
 							$field['group_id'] = $fieldGroupId;
 							$field['saveOption'] = empty($options) ? 0 : 1 ;
 							$field['params'] = (array) json_decode($field['params']);
+							$tmpName = str_replace('.', '_', $ucmTypeData['unique_identifier']) . '_';
+							$field['name'] = str_replace($tmpName, '', $field['name']);
+
+							// Special case - Do not insert field with name 'contentid' as this will be added when ucm type for ucmsubform is created
+							if ($field['name'] == 'contentid')
+							{
+								continue;
+							}
+
+							$input->post->set('client_type', end(explode(".", $ucmTypeData['unique_identifier'])));
 
 							$tjFieldsFieldModel = JModelLegacy::getInstance('Field', 'TjfieldsModel', array('ignore_request' => true));
 							$tjFieldsFieldModel->save($field);
 							$fieldId = (int) $tjFieldsFieldModel->getState($tjFieldsFieldModel->getName() . '.id');
+							$input->post->set('client_type', '');
 
 							if (!empty($fieldId) && !empty($options))
 							{
