@@ -108,8 +108,6 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 			{
 				foreach ($this->items as $i => $item)
 				{
-					$link = 'index.php?option=com_tjucm&view=items&client=' . $this->client;
-					$itemId = $tjUcmFrontendHelper->getItemId($link);
 					$link = JRoute::_('index.php?option=com_tjucm&view=item&id=' . $item->id . "&client=" . $this->client . '&Itemid=' . $itemId, false);
 
 					$editown = false;
@@ -147,9 +145,6 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 							{
 								echo JHtml::_('jgrid.checkedout', $i, $item->uEditor, $item->checked_out_time, 'items.', $canCheckin);
 							}
-
-							$link = 'index.php?option=com_tjucm&view=items&client=' . $this->client;
-							$itemId = $tjUcmFrontendHelper->getItemId($link);
 							?>
 							<a href="<?php echo JRoute::_('index.php?option=com_tjucm&view=item&id='.(int) $item->id . "&client=" . $this->client . '&Itemid=' . $itemId, false); ?>">
 								<?php echo $this->escape($item->id); ?>
