@@ -15,6 +15,8 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Router\Route;
+use Joomla\Registry\Registry;
+use Joomla\CMS\Plugin\PluginHelper;
 
 jimport('joomla.filesystem.file');
 
@@ -744,5 +746,159 @@ class TjucmControllerItemForm extends JControllerForm
 
 		// Redirect to the edit screen.
 		$this->setRedirect(Route::_($link . '&Itemid=' . $itemId . $cluster . $this->getRedirectToItemAppend(), false));
+	}
+
+	/**
+	 * Method to copy items
+	 *
+	 * @return  void
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	public function copyItems()
+	{
+		Session::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+
+		$app = Factory::getApplication();
+		$post = $app->input->post;
+		$model = $this->getModel();
+
+		$sourceClient = $this->client;
+		$targetClient = $post->get('target_client');
+		$result = $model->copyItemsValidation($this->client, $targetClient);
+
+		// Attempt to save the data
+		try
+		{
+			if ($result)
+			{
+				$copyIds = $post->get('cid');
+				$model->setClient($targetClient);
+
+				JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
+				$tjFieldsHelper = new TjfieldsHelper;
+
+				if ($copyIds)
+				{
+					$dispatcher = JEventDispatcher::getInstance();
+					PluginHelper::importPlugin('tjucm');
+
+					$ucmData = array();
+					$ucmData['id'] = 0;
+					$ucmData['client'] = $targetClient;
+
+					foreach ($copyIds as $contentId)
+					{
+						// UCM table Data
+						$ucmTable = $model->getTable();
+						$ucmTable->load($contentId);
+
+						$ucmData['ordering'] = $ucmTable->ordering;
+						$ucmData['state'] = $ucmTable->state;
+						$ucmData['created_by'] = $ucmTable->created_by;
+						$ucmData['draft'] = $ucmTable->draft;
+
+						// Tjfield values
+						$data['content_id']  = $contentId;
+						$data['user_id']     = JFactory::getUser()->id;
+						$data['client']      = $sourceClient;
+
+						$extraFieldsData = $tjFieldsHelper->FetchDatavalue($data);
+
+						$ucmExtraData = array();
+
+						foreach ($extraFieldsData as $extraData)
+						{
+							$prefixSourceClient = str_replace(".", "_", $sourceClient);
+							$fieldName = explode($prefixSourceClient . "_", $extraData->name);
+
+							$prefixTargetClient = str_replace(".", "_", $targetClient);
+							$targetFieldName = $prefixTargetClient . '_' . $fieldName[1];
+
+							$ucmExtraData[$targetFieldName] = new stdClass;
+
+							if (!is_array($extraData->value))
+							{
+								$ucmExtraData[$targetFieldName] = trim($extraData->value);
+							}
+							else
+							{
+								if ($extraData->type === 'tjlist')
+								{
+									$fieldTypeParam = new Registry($extraData->params);
+									$extraData->type = $fieldTypeParam->get('multiple') ? 'multi_select' : 'single_select';
+								}
+
+								$temp = array();
+
+								switch ($extraData->type)
+								{
+									case 'multi_select':
+										foreach ($extraData->value as $option)
+										{
+											$temp[] = trim($option->value);
+										}
+
+										if (!empty($temp))
+										{
+											$ucmExtraData[$targetFieldName] = $temp;
+										}
+
+									break;
+
+									case 'single_select':
+										foreach ($extraData->value as $option)
+										{
+											$ucmExtraData[$targetFieldName] = trim($option->value);
+										}
+									break;
+
+									case 'radio':
+									default:
+										foreach ($extraData->value as $option)
+										{
+											$ucmExtraData[$targetFieldName] = trim($option->value);
+										}
+									break;
+								}
+							}
+						}
+
+						$recordId = $model->save($ucmData, $ucmExtraData);
+
+						if ($recordId)
+						{
+							$dispatcher->trigger('onAfterUcmBatchProcess', array($recordId, $ucmData, $ucmExtraData));
+						}
+					}
+
+					$dispatcher->trigger('onAfterUcmBatch', array($ucmData));
+
+					$menu = $app->getMenu();
+					$item = $menu->getActive();
+					$url = (empty($item->link) ? 'index.php?option=com_tjucm&view=items' : $item->link);
+
+					// Redirect to the list screen
+					$this->setMessage(Text::_('COM_TJUCM_ITEM_COPY_SUCCESSFULLY'));
+					$this->setRedirect(Route::_($url . $this->appendUrl, false));
+				}
+				else
+				{
+					$this->setMessage(Text::_('COM_TJUCM_ITEM_NOT_COPY_SUCCESSFULLY'), 'error');
+					$this->setRedirect(Route::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+				}
+			}
+			else
+			{
+				$this->setMessage(Text::_('COM_TJUCM_ITEM_NOT_COPY_SUCCESSFULLY'), 'error');
+				$this->setRedirect(Route::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+			}
+		}
+		catch (Exception $e)
+		{
+			$errorType = ($e->getCode() == '404' || '403') ? 'error' : 'warning';
+			$this->setMessage(Text::_('COM_TJUCM_ITEM_NOT_COPY_SUCCESSFULLY'), $errorType);
+			$this->setRedirect(Route::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+		}
 	}
 }
