@@ -144,6 +144,11 @@ class TjucmModelType extends JModelAdmin
 			{
 				$item->allowed_count = $params["allowed_count"];
 			}
+
+			if (array_key_exists("allow_draft_save", $params))
+			{
+				$item->allow_draft_save = $params["allow_draft_save"];
+			}
 		}
 
 		return $item;
@@ -326,6 +331,7 @@ class TjucmModelType extends JModelAdmin
 
 		$params = array();
 		$params['allowed_count'] = $data['allowed_count'];
+		$params['allow_draft_save'] = $data['allow_draft_save'];
 
 		$data['params'] = json_encode($params);
 
@@ -411,5 +417,22 @@ class TjucmModelType extends JModelAdmin
 		$table->load(array('unique_identifier' => $client));
 
 		return $table->id;
+	}
+
+	/**
+	 * Method to get UCM type id
+	 *
+	 * @param   string  $client  The client.
+	 *
+	 * @return	INT  ucm type id
+	 *
+	 * @since	1.0
+	 */
+	public function getTypeUniqueIdentifier($id)
+	{
+		$table = $this->getTable();
+		$table->load(array('id' => $id));
+
+		return $table->unique_identifier;
 	}
 }

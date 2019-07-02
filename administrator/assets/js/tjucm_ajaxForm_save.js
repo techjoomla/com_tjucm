@@ -1,4 +1,3 @@
-js = jQuery.noConflict();
 
 /* This function carries stepped saving via ajax */
 function steppedFormSave(form_id, status)
@@ -53,4 +52,26 @@ function steppedFormSave(form_id, status)
 	}
 
 	return promise;
+}
+
+/*Function triggered by clicking on the "Save and next"*/
+function itemformactions(tab_id, navDirection)
+{
+	var getTabId = tab_id + "Tabs";
+
+	var currentTabName = jQuery('ul#' + getTabId).find('li.active a').attr('href');
+	var nextTabName = jQuery('ul#' + getTabId).find('li.active').next('li').children('a').attr('href');
+	var prevTabName = jQuery('ul#' + getTabId).find('li.active').prev('li').children('a').attr('href');
+
+	/* Once all fields are validated, enable Final Save*/
+	steppedFormSave('item-form');
+
+	if (navDirection == "next")
+	{
+		jQuery('#' + getTabId + ' > .active').next('li').find('a').trigger('click');
+	}
+	if (navDirection == "prev")
+	{
+		jQuery('#' + getTabId + ' > .active').prev('li').find('a').trigger('click');
+	}
 }

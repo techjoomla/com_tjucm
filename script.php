@@ -901,6 +901,20 @@ class Com_TjucmInstallerScript
 				return false;
 			}
 		}
+
+		if (!in_array('draft', $field_array))
+		{
+			$query = "ALTER TABLE `#__tj_ucm_data` ADD COLUMN `draft` TINYINT(1) NOT NULL";
+			$db->setQuery($query);
+
+			if (!$db->execute() )
+			{
+				echo $img_ERROR . JText::_('Unable to Alter #__tj_ucm_data table. (While adding draft )') . $BR;
+				echo $db->getErrorMsg();
+
+				return false;
+			}
+		}
 	}
 
 	/**

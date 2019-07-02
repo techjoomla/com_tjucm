@@ -17,7 +17,6 @@
 		<action name="core.edit.own" title="JACTION_EDITOWN" description="JACTION_EDITOWN_COMPONENT_DESC" />
 		<action name="core.type.createitem" title="COM_TJUCM_PERMISSION_TYPE_ITEM_CREATE" description="JACTION_CREATE_COMPONENT_DESC" />
 		<action name="core.type.viewitem" title="COM_TJUCM_PERMISSION_TYPE_ITEM_VIEW" description="COM_TJUCM_PERMISSION_VIEW_DESC" />
-		<action name="core.type.viewallitem" title="COM_TJUCM_PERMISSION_TYPE_ITEM_VIEW_ALL" description="COM_TJUCM_PERMISSION_TYPE_ITEM_VIEW_ALL_DESC" />
 		<action name="core.type.edititem" title="COM_TJUCM_PERMISSION_TYPE_ITEM_EDIT" description="JACTION_EDIT_COMPONENT_DESC" />
 		<action name="core.type.edititemstate" title="COM_TJUCM_PERMISSION_TYPE_ITEM_EDITSTATE" description="JACTION_EDITSTATE_COMPONENT_DESC" />
 		<action name="core.type.editownitem" title="COM_TJUCM_PERMISSION_TYPE_ITEM_EDITOWN" description="JACTION_EDITOWN_COMPONENT_DESC" />

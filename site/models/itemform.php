@@ -75,15 +75,14 @@ class TjucmModelItemForm extends JModelForm
 		// Load state from the request userState on edit or from the passed variable on default
 		if (JFactory::getApplication()->input->get('layout') == 'edit')
 		{
-			$id = JFactory::getApplication()->getUserState('com_tjucm.edit.item.id');
-		}
-		else
-		{
 			// Load state from the request.
 			$id = $app->input->getInt('id');
 		}
 
-		$this->setState('item.id', $id);
+		if (!empty($id))
+		{
+			$this->setState('item.id', $id);
+		}
 
 		// Get UCM type id from uniquue identifier
 		$ucmType = $app->input->get('client', '');
@@ -429,10 +428,9 @@ class TjucmModelItemForm extends JModelForm
 
 		if ($authorised !== true)
 		{
-			$app->enqueueMessage(JText::_('COM_TJUCM_ERROR_MESSAGE_NOT_AUTHORISED'), 'error');
-			$app->setHeader('status', 403, true);
+			throw new Exception(JText::_('COM_TJUCM_ERROR_MESSAGE_NOT_AUTHORISED'), 403);
 
-			throw new Exception(JText::_('JERROR_ALERTNOAUTHOR'), 403);
+			return false;
 		}
 
 		$data['type_id'] = $this->common->getDataValues('#__tj_ucm_types', 'id AS type_id', 'unique_identifier = "' . $this->client . '"', 'loadResult');
@@ -485,6 +483,8 @@ class TjucmModelItemForm extends JModelForm
 		if (!$user->authorise('core.type.createitem', 'com_tjucm.type.' . $ucmTypeId))
 		{
 			throw new Exception(JText::_('JERROR_CORE_CREATE_NOT_PERMITTED'));
+
+			return false;
 		}
 
 		$dispatcher = JEventDispatcher::getInstance();
@@ -505,6 +505,8 @@ class TjucmModelItemForm extends JModelForm
 				if (!$table->check())
 				{
 					throw new Exception($table->getError());
+
+					return false;
 				}
 
 				if (!empty($table->type_id))
@@ -533,6 +535,8 @@ class TjucmModelItemForm extends JModelForm
 			else
 			{
 				throw new Exception($table->getError());
+
+				return false;
 			}
 		}
 
@@ -553,18 +557,31 @@ class TjucmModelItemForm extends JModelForm
 	 */
 	public function delete($data)
 	{
+		$app = JFactory::getApplication('com_tjucm');
 		$id = (!empty($data['id'])) ? $data['id'] : (int) $this->getState('item.id');
-
 		$table = $this->getTable();
 
-		if ($table->delete($data['id']) === true)
-		{
-			$this->deleteExtraFieldsData($data['id'], $data['client']);
+		$ucmTypeId = $this->getState('ucmType.id');
+		$user = JFactory::getUser();
+		$canDelete = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $ucmTypeId);
 
-			return $id;
+		if ($canDelete)
+		{
+			if ($table->delete($id) === true)
+			{
+				$this->deleteExtraFieldsData($id, $data['client']);
+
+				return $id;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		else
 		{
+			throw new Exception(JText::_('COM_TJUCM_ITEM_SAVED_STATE_ERROR'), 403);
+
 			return false;
 		}
 	}
@@ -622,6 +639,12 @@ class TjucmModelItemForm extends JModelForm
 			$query->where($db->quoteName('client') . '=' . $db->quote($client));
 			$db->setQuery($query);
 			$result = $db->loadResult();
+
+			// If Zero Allowed count means unlimited
+			if ($allowedCount == '0')
+			{
+				return true;
+			}
 
 			if ($result < $allowedCount)
 			{

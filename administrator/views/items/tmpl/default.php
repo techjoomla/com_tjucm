@@ -187,7 +187,7 @@ if (!empty($this->extra_sidebar))
 								foreach ($this->listcolumn as $col_name)
 								{ ?>
 									<th class='left'>
-										<?php echo $col_name; ?>
+										<?php echo htmlspecialchars($col_name, ENT_COMPAT, 'UTF-8'); ?>
 									</th> <?php
 								}
 							}?>

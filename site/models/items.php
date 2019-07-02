@@ -69,17 +69,9 @@ class TjucmModelItems extends JModelList
 	protected function populateState($ordering = null, $direction = null)
 	{
 		$app  = JFactory::getApplication();
-		$input = $app->input;
-
-		// Get UCM type id from uniquue identifier
-		$ucmType = $input->get('client', '', 'STRING');
 
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
-		$ucmId = $tjUcmModelType->getTypeId($ucmType);
-
-		$this->setState('ucm.client', $ucmType);
-		$this->setState('ucmType.id', $ucmId);
 
 		$list = $app->getUserState($this->context . '.list');
 
@@ -94,7 +86,40 @@ class TjucmModelItems extends JModelList
 		$app->setUserState($this->context . '.list', $list);
 		$app->input->set('list', null);
 		$type_id = $app->input->get('id', "", "INT");
-		$this->setState("type_id", $type_id);
+
+		$ucmType = $tjUcmModelType->getTypeUniqueIdentifier($type_id);
+
+		if (empty($ucmType))
+		{
+			// Get the active item
+			$menuitem   = $app->getMenu()->getActive();
+
+			// Get the params
+			$this->menuparams = $menuitem->params;
+
+			if (!empty($this->menuparams))
+			{
+				if (!empty($this->ucm_type))
+				{
+					$this->ucm_type   = $this->menuparams->get('ucm_type');
+					$ucmType     = 'com_tjucm.' . $this->ucm_type;
+				}
+			}
+		}
+
+		if (empty($ucmType))
+		{
+			// Get UCM type id from uniquue identifier
+			$ucmType = $app->input->get('client', '', 'STRING');
+		}
+
+		if (empty($type_id))
+		{
+			$type_id = $tjUcmModelType->getTypeId($ucmType);
+		}
+
+		$this->setState('ucm.client', $ucmType);
+		$this->setState("ucmType.id", $type_id);
 
 		$createdBy = $app->input->get('created_by', "", "INT");
 		$this->setState("created_by", $createdBy);
@@ -160,7 +185,7 @@ class TjucmModelItems extends JModelList
 
 		$query->where('fields.id = fieldValue.field_id');
 
-		$ucmType = $this->getState('type_id', '', 'INT');
+		$ucmType = $this->getState('ucmType.id', '', 'INT');
 
 		if (!empty($ucmType))
 		{
@@ -169,7 +194,7 @@ class TjucmModelItems extends JModelList
 
 		$createdBy = $this->getState('created_by', '', 'INT');
 
-		if (!empty($ucmType))
+		if (!empty($createdBy))
 		{
 			$query->where($db->quoteName('a.created_by') . "=" . (INT) $createdBy);
 		}
@@ -181,7 +206,7 @@ class TjucmModelItems extends JModelList
 
 		if (is_numeric($published))
 		{
-			$query->where('a.state = ' . (int) $published);
+			$query->where('a.state = ' . (INT) $published);
 		}
 		elseif ($published === '')
 		{

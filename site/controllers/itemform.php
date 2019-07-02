@@ -10,6 +10,8 @@
 // No direct access
 defined('_JEXEC') or die;
 
+jimport('joomla.filesystem.file');
+
 require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
 
 /**
@@ -29,19 +31,32 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	public function __construct()
 	{
-		$this->view_list = 'items';
-
-		$this->client  = JFactory::getApplication()->input->get('client');
+		$app = JFactory::getApplication();
+		$this->client  = $app->input->get('client');
+		$this->created_by  = $app->input->get('created_by');
 
 		if (empty($this->client))
 		{
-			$this->client  = JFactory::getApplication()->input->get('jform', array(), 'array')['client'];
+			$data = $app->input->get('jform', array(), 'array');
+			$this->client  = $data['client'];
 		}
 
 		// Get UCM type id from uniquue identifier
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
 		$this->ucmTypeId = $tjUcmModelType->getTypeId($this->client);
+
+		$this->appendUrl = "";
+
+		if (!empty($this->created_by))
+		{
+			$this->appendUrl .= "&created_by=" . $this->created_by;
+		}
+
+		if (!empty($this->client))
+		{
+			$this->appendUrl .= "&client=" . $this->client;
+		}
 
 		$this->isajax = ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') ? true : false;
 
@@ -57,7 +72,7 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	public function add()
 	{
-		$context = "$this->option.edit.$this->context";
+		$context = "com_tjucm.edit.itemform.data";
 
 		// Access check.
 		if (!$this->allowAdd())
@@ -68,7 +83,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 			$this->setRedirect(
 				JRoute::_(
-					'index.php?option=' . $this->option . '&view=' . $this->view_list . '&client=' . $this->client
+					'index.php?option=com_tjucm&view=items' . $this->appendUrl
 					. $this->getRedirectToListAppend(), false
 				)
 			);
@@ -82,7 +97,7 @@ class TjucmControllerItemForm extends JControllerForm
 		// Redirect to the edit screen.
 		$this->setRedirect(
 			JRoute::_(
-				'index.php?option=' . $this->option . '&view=' . $this->view_item . '&client=' . $this->client
+				'index.php?option=com_tjucm&view=itemform&client=' . $this->client
 				. $this->getRedirectToItemAppend(), false
 			)
 		);
@@ -154,10 +169,11 @@ class TjucmControllerItemForm extends JControllerForm
 	{
 		// Check for request forgeries.
 		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
-		$app   = JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$lang  = JFactory::getLanguage();
 		$model = $this->getModel();
 		$task = $this->getTask();
+		$formStatus = $app->input->get('form_status', '', 'STRING');
 
 		// Set client value
 		$model->setClient($this->client);
@@ -165,7 +181,7 @@ class TjucmControllerItemForm extends JControllerForm
 		$table = $model->getTable();
 
 		// Get the user data.
-		$data = JFactory::getApplication()->input->get('jform', array(), 'array');
+		$data = $app->input->get('jform', array(), 'array');
 		$all_jform_data = $data;
 
 		// Added By KOMAL TEMP
@@ -174,7 +190,7 @@ class TjucmControllerItemForm extends JControllerForm
 		// END
 
 		// Jform tweak - Get all posted data.
-		$post = JFactory::getApplication()->input->post;
+		$post = $app->input->post;
 
 		// Populate the row id from the session.
 
@@ -192,7 +208,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 				$this->setRedirect(
 					JRoute::_(
-						'index.php?option=' . $this->option . '&view=' . $this->view_item . '&client=' . $this->client
+						'index.php?option=com_tjucm&view=itemform&client=' . $this->client
 						. $this->getRedirectToItemAppend($recordId, $urlVar), false
 					)
 				);
@@ -214,7 +230,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 			$this->setRedirect(
 				JRoute::_(
-					'index.php?option=' . $this->option . '&view=' . $this->view_list
+					'index.php?option=com_tjucm&view=items' . $this->appendUrl
 					. $this->getRedirectToListAppend(), false
 				)
 			);
@@ -261,7 +277,7 @@ class TjucmControllerItemForm extends JControllerForm
 			// Redirect back to the edit screen.
 			$this->setRedirect(
 				JRoute::_(
-					'index.php?option=' . $this->option . '&view=' . $this->view_item . '&client=' . $this->client
+					'index.php?option=com_tjucm&view=itemform&client=' . $this->client
 					. $this->getRedirectToItemAppend($recordId, $urlVar), false
 				)
 			);
@@ -299,20 +315,29 @@ class TjucmControllerItemForm extends JControllerForm
 				return false;
 			}
 
-			$formExtra = array_filter($formExtra);
-
 			if (!empty($formExtra))
 			{
-				if (!empty($formExtra[0]))
+				// Remove required attribute from fields if data is stored in draft mode
+				if ($formStatus == 'draft')
 				{
-					// Validate the posted extra data.
-					// $extra_jform_data = $model->validateExtra($formExtra[0], $extra_jform_data);
+					$validData['draft'] = 1;
+					$fieldSets = $formExtra->getFieldsets();
+
+					foreach ($fieldSets as $fieldset)
+					{
+						foreach ($formExtra->getFieldset($fieldset->name) as $field)
+						{
+							$formExtra->setFieldAttribute($field->fieldname, 'required', false);
+						}
+					}
 				}
 				else
 				{
-					// Validate the posted extra data.
-					// $extra_jform_data = $model->validateExtra($formExtra[1], $extra_jform_data);
+					$validData['draft'] = 0;
 				}
+
+				// Validate the posted extra data.
+				$extra_jform_data = $model->validateExtra($formExtra, $extra_jform_data);
 			}
 
 			// Check for errors.
@@ -411,7 +436,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 		$model = $this->getModel();
 		$table = $model->getTable();
-		$context = "$this->option.edit.$this->context";
+		$context = "com_tjucm.edit.itemform.data";
 
 		if (empty($key))
 		{
@@ -433,7 +458,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 					$this->setRedirect(
 						JRoute::_(
-							'index.php?option=' . $this->option . '&view=' . $this->view_item . '&client=' . $this->client
+							'index.php?option=com_tjucm&view=itemform&client=' . $this->client
 							. $this->getRedirectToItemAppend($recordId, $key), false
 						)
 					);
@@ -449,7 +474,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 		$this->setRedirect(
 			JRoute::_(
-				'index.php?option=' . $this->option . '&view=' . $this->view_list . '&client=' . $this->client
+				'index.php?option=com_tjucm&view=items' . $this->appendUrl
 				. $this->getRedirectToListAppend(), false
 			)
 		);
@@ -480,6 +505,7 @@ class TjucmControllerItemForm extends JControllerForm
 		// Attempt to save the data
 		try
 		{
+			$model->setState('ucmType.id', $this->ucmTypeId);
 			$return = $model->delete($data);
 
 			// Check in the profile
@@ -494,16 +520,16 @@ class TjucmControllerItemForm extends JControllerForm
 
 			// Redirect to the list screen
 			$this->setMessage(JText::_('COM_TJUCM_ITEM_DELETED_SUCCESSFULLY'));
-			$this->setRedirect(JRoute::_($url, false));
+			$this->setRedirect(JRoute::_($url . $this->appendUrl, false));
 
 			// Flush the data from the session.
 			$app->setUserState('com_tjucm.edit.item.data', null);
 		}
 		catch (Exception $e)
 		{
-			$errorType = ($e->getCode() == '404') ? 'error' : 'warning';
+			$errorType = ($e->getCode() == '404' || '403') ? 'error' : 'warning';
 			$this->setMessage($e->getMessage(), $errorType);
-			$this->setRedirect('index.php?option=com_tjucm&view=items');
+			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
 		}
 	}
 
@@ -630,7 +656,7 @@ class TjucmControllerItemForm extends JControllerForm
 	{
 		$user = JFactory::getUser();
 		$createdBy = $user->id;
-		$link = JRoute::_("index.php?option=com_tjucm&view=items&id=" . $typeId . "&created_by=" . $createdBy, false);
+		$link = JRoute::_("index.php?option=com_tjucm&view=items&id=" . $typeId . $this->appendUrl, false);
 
 		JFactory::getApplication()->redirect($link, sprintf(JText::_('COM_TJUCM_ALLOWED_COUNT_LIMIT'), $allowedCount), "Warning");
 	}
@@ -667,6 +693,17 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	protected function allowEdit($data = array(), $key = 'id')
 	{
-		return JFactory::getUser()->authorise('core.edit', $this->option);
+		$user = JFactory::getUser();
+		$edit = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$editOwn = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $this->ucmTypeId);
+
+		if ($edit || $editOwn)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }
