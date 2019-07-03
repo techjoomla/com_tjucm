@@ -1209,27 +1209,24 @@ class TjucmModelItemForm extends JModelForm
 				{
 					$parentUcmFieldParams = new Registry($field->params);
 
-					if (!empty($parentUcmFieldParams->get('min', '0', 'INT')))
+					$minimumUcmRecords = $parentUcmFieldParams->get('min', 0, 'INT');
+
+					for ($i = 0; $i <= $minimumUcmRecords; $i++)
 					{
-						$minimumUcmRecords = $parentUcmFieldParams->get('min', '0', 'INT');
-
-						for ($i = 0; $i < $minimumUcmRecords; $i++)
+						foreach ($ucmSubFormfields as $ucmSubFormfield)
 						{
-							foreach ($ucmSubFormfields as $ucmSubFormfield)
+							$fieldParams = new Registry($ucmSubFormfield->params);
+
+							if ($ucmSubFormfield->type == 'related' && !empty($fieldParams->get('showParentRecordsOnly', '')))
 							{
-								$fieldParams = new Registry($ucmSubFormfield->params);
+								$options = $tjFieldsModelField->getRelatedFieldOptions($ucmSubFormfield->id);
 
-								if ($ucmSubFormfield->type == 'related' && !empty($fieldParams->get('showParentRecordsOnly', '')))
-								{
-									$options = $tjFieldsModelField->getRelatedFieldOptions($ucmSubFormfield->id);
-
-									// This is required to replace the options of related field of subform in the DOM
-									$ucmSubFormFieldElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . $i .'__' . $ucmSubFormfield->name;
-									$ucmSubFormFieldElementId = str_replace('-', '_', $ucmSubFormFieldElementId);
-									$ucmSubFormFieldTemplateElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . 'XXX_XXX__' . $ucmSubFormfield->name;
-									$ucmSubFormFieldTemplateElementId = str_replace('-', '_', $ucmSubFormFieldTemplateElementId);
-									$returnData[] = array('templateId' => $ucmSubFormFieldTemplateElementId, 'elementId' => $ucmSubFormFieldElementId, 'options' => $options);
-								}
+								// This is required to replace the options of related field of subform in the DOM
+								$ucmSubFormFieldElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . $i .'__' . $ucmSubFormfield->name;
+								$ucmSubFormFieldElementId = str_replace('-', '_', $ucmSubFormFieldElementId);
+								$ucmSubFormFieldTemplateElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . 'XXX_XXX__' . $ucmSubFormfield->name;
+								$ucmSubFormFieldTemplateElementId = str_replace('-', '_', $ucmSubFormFieldTemplateElementId);
+								$returnData[] = array('templateId' => $ucmSubFormFieldTemplateElementId, 'elementId' => $ucmSubFormFieldElementId, 'options' => $options);
 							}
 						}
 					}
