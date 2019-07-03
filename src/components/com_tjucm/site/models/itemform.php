@@ -1246,7 +1246,7 @@ class TjucmModelItemForm extends JModelForm
 	 * @param   object  $sourceClient  Source client.
 	 * @param   object  $targetClient  Tareget client.
 	 * 
-	 * @return  void
+	 * @return  Boolean
 	 *
 	 * @since   __DEPLOY_VERSION__
 	 */

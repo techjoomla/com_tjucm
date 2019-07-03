@@ -819,7 +819,85 @@ class TjucmControllerItemForm extends JControllerForm
 
 							if (!is_array($extraData->value))
 							{
-								$ucmExtraData[$targetFieldName] = trim($extraData->value);
+									if ($extraData->type === 'ucmsubform')
+									{
+										$sourceClientName = explode('.', $this->client);
+										$ucmSubFormData = array();
+										$ucmSubFormData['clientComponent'] = 'com_tjucm';
+										$ucmSubFormData['client'] = $this->client;
+										$ucmSubFormData['view'] = $sourceClientName[1];
+										$ucmSubFormData['layout'] = 'default';
+										$ucmSubFormData['content_id'] = $ucmTable->id;
+
+										$resultSubFormData = $this->loadFormDataExtra($ucmSubFormData);
+
+										foreach ($resultSubFormData as $key => $subFormData)
+										{
+											if ($key == $extraData->name)
+											{
+												$prefixSourceClient = str_replace(".", "_", $this->client);
+												$fieldName = explode($prefixSourceClient . "_", $key);
+
+												$prefixTargetClient = str_replace(".", "_", $targetClient);
+												$targetFieldName = $prefixTargetClient . '_' . $fieldName[1];
+
+												JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
+												$tjFieldsTable = JTable::getInstance('field', 'TjfieldsTable', array('dbo', $db));
+												$tjFieldsTable->load(array('name' => $targetFieldName));
+												$params = json_decode($tjFieldsTable->params)->formsource;
+												$subFormClient = explode('components/com_tjucm/models/forms/', $params);
+												$subFormClient = explode('form_extra.xml', $subFormClient[1]);
+												$ucmExtraData[$targetFieldName] = 'com_tjucm.' . $subFormClient[0];
+												$subFormData = (array) json_decode($subFormData);
+												$formDataArray = array();
+
+												foreach ($subFormData as $subKey => $formData)
+												{
+													$prefixSourceClient = str_replace(".", "_", $this->client);
+													$fieldName = explode($prefixSourceClient . "_", $subKey);
+
+													$prefixTargetClient = str_replace(".", "_", $targetClient);
+													$targetSubFieldName = $prefixTargetClient . '_' . $fieldName[1];
+
+													$subFormClientData = (array) $formData;
+
+													$subFormFieldsArray = array();
+
+													foreach ($subFormClientData as $subFormKey => $subFormValue)
+													{
+														$prefixSourceClient = str_replace(".", "_", $extraData->value);
+														$fieldName = explode($prefixSourceClient . "_", $subFormKey);
+														$prefixTargetClient = 'com_tjucm_' . $subFormClient[0];
+														$fieldName = $prefixTargetClient . '_' . $fieldName[1];
+
+														if ($subFormKey == $prefixSourceClient . '_contentid')
+														{
+															unset($fieldName);
+															unset($subFormValue);
+														}
+
+														if ($subFormValue)
+														{
+															if (is_array($subFormValue))
+															{
+																$subFormValue = $subFormValue[0]->value;
+															}
+
+															$subFormFieldsArray[$fieldName] = $subFormValue;
+														}
+													}
+
+													$formDataArray[$targetSubFieldName] = (array) $subFormFieldsArray;
+												}
+											}
+										}
+
+										$extrasSubFormFieldsData[$targetFieldName] = $formDataArray;
+									}
+									else
+									{
+										$ucmExtraData[$targetFieldName] = trim($extraData->value);
+									}
 							}
 							else
 							{
@@ -845,14 +923,12 @@ class TjucmControllerItemForm extends JControllerForm
 										}
 
 									break;
-
 									case 'single_select':
 										foreach ($extraData->value as $option)
 										{
 											$ucmExtraData[$targetFieldName] = trim($option->value);
 										}
 									break;
-
 									case 'radio':
 									default:
 										foreach ($extraData->value as $option)
@@ -864,15 +940,20 @@ class TjucmControllerItemForm extends JControllerForm
 							}
 						}
 
-						$recordId = $model->save($ucmData, $ucmExtraData);
+						$ucmData['status'] = 'save';
 
-						if ($recordId)
+						// Get sorted dataset of submitted ucmsubform records as per their client
+						$ucmSubFormDataSet = $model->getFormattedUcmSubFormRecords($ucmData, $extrasSubFormFieldsData);
+
+						$recordId = $model->save($ucmData, $ucmExtraData);
+						$ucmData['parent_id'] = $recordId;
+
+						// Save ucmSubForm records
+						if (!empty($ucmSubFormDataSet))
 						{
-							$dispatcher->trigger('onAfterUcmBatchProcess', array($recordId, $ucmData, $ucmExtraData));
+							$subFormContentIds = $model->saveUcmSubFormRecords($ucmData, $ucmSubFormDataSet);
 						}
 					}
-
-					$dispatcher->trigger('onAfterUcmBatch', array($ucmData));
 
 					$menu = $app->getMenu();
 					$item = $menu->getActive();
