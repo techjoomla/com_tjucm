@@ -841,9 +841,7 @@ class TjucmControllerItemForm extends JControllerForm
 												$prefixTargetClient = str_replace(".", "_", $targetClient);
 												$targetFieldName = $prefixTargetClient . '_' . $fieldName[1];
 
-												JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
-												$tjFieldsTable = JTable::getInstance('field', 'TjfieldsTable', array('dbo', $db));
-												$tjFieldsTable->load(array('name' => $targetFieldName));
+												$tjFieldsTable = $tjFieldsHelper->getFieldData($targetFieldName);
 												$params = json_decode($tjFieldsTable->params)->formsource;
 												$subFormClient = explode('components/com_tjucm/models/forms/', $params);
 												$subFormClient = explode('form_extra.xml', $subFormClient[1]);
@@ -952,6 +950,12 @@ class TjucmControllerItemForm extends JControllerForm
 						if (!empty($ucmSubFormDataSet))
 						{
 							$subFormContentIds = $model->saveUcmSubFormRecords($ucmData, $ucmSubFormDataSet);
+
+							if (empty($subFormContentIds))
+							{
+								$this->setMessage(Text::_('COM_TJUCM_ITEM_NOT_COPY_SUCCESSFULLY'), 'error');
+								$this->setRedirect(Route::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+							}
 						}
 					}
 
