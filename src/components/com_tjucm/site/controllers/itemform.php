@@ -17,6 +17,7 @@ use Joomla\CMS\Session\Session;
 use Joomla\CMS\Router\Route;
 use Joomla\Registry\Registry;
 use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 
 jimport('joomla.filesystem.file');
 
@@ -765,7 +766,10 @@ class TjucmControllerItemForm extends JControllerForm
 
 		$sourceClient = $this->client;
 		$targetClient = $post->get('target_client');
-		$result = $model->copyItemsValidation($this->client, $targetClient);
+
+		BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$typeModel = BaseDatabaseModel::getInstance('Type', 'TjucmModel', array('ignore_request' => true));
+		$result = $typeModel->checkCompatibility($this->client, $targetClient);
 
 		// Attempt to save the data
 		try
@@ -919,11 +923,6 @@ class TjucmControllerItemForm extends JControllerForm
 
 									break;
 									case 'single_select':
-										foreach ($extraData->value as $option)
-										{
-											$ucmExtraData[$targetFieldName] = trim($option->value);
-										}
-									break;
 									case 'radio':
 									default:
 										foreach ($extraData->value as $option)
@@ -950,8 +949,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 							if (empty($subFormContentIds))
 							{
-								$this->setMessage(Text::_('COM_TJUCM_ITEM_NOT_COPY_SUCCESSFULLY'), 'error');
-								$this->setRedirect(Route::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+								$flag = 0;
 							}
 						}
 					}
@@ -963,23 +961,29 @@ class TjucmControllerItemForm extends JControllerForm
 					// Redirect to the list screen
 					$this->setMessage(Text::_('COM_TJUCM_ITEM_COPY_SUCCESSFULLY'));
 					$this->setRedirect(Route::_($url . $this->appendUrl, false));
+
+					return false;
 				}
 				else
 				{
-					$this->setMessage(Text::_('COM_TJUCM_ITEM_NOT_COPY_SUCCESSFULLY'), 'error');
-					$this->setRedirect(Route::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+					$flag = 0;
 				}
 			}
 			else
 			{
-				$this->setMessage(Text::_('COM_TJUCM_ITEM_NOT_COPY_SUCCESSFULLY'), 'error');
-				$this->setRedirect(Route::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+				$flag = 0;
 			}
 		}
 		catch (Exception $e)
 		{
 			$errorType = ($e->getCode() == '404' || '403') ? 'error' : 'warning';
 			$this->setMessage(Text::_('COM_TJUCM_ITEM_NOT_COPY_SUCCESSFULLY'), $errorType);
+			$this->setRedirect(Route::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+		}
+
+		if ($flag == 0)
+		{
+			$this->setMessage(Text::_('COM_TJUCM_ITEM_NOT_COPY_SUCCESSFULLY'), 'error');
 			$this->setRedirect(Route::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
 		}
 	}

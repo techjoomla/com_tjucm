@@ -21,7 +21,6 @@ use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\Registry\Registry;
-use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 
 /**
  * Tjucm model.
@@ -1235,72 +1234,5 @@ class TjucmModelItemForm extends JModelForm
 		}
 
 		return $returnData;
-	}
-
-	/**
-	 * Method to validation before copy items
-	 *
-	 * @param   object  $sourceClient  Source client.
-	 * @param   object  $targetClient  Tareget client.
-	 * 
-	 * @return  Boolean
-	 *
-	 * @since   __DEPLOY_VERSION__
-	 */
-	public function copyItemsValidation($sourceClient, $targetClient)
-	{
-		if ($sourceClient && $targetClient)
-		{
-			$sourceFields = $this->getFieldNamesByClient($sourceClient);
-			$targetFields = $this->getFieldNamesByClient($targetClient);
-
-			if (empty(array_diff_assoc($sourceFields, $targetFields)))
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	/**
-	 * Method to get field unique names by client.
-	 *
-	 * @param   object  $client  The model.
-	 *
-	 * @return  array  Field name and datatype array
-	 *
-	 * @since   __DEPLOY_VERSION__
-	 */
-	public function getFieldNamesByClient($client)
-	{
-		BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
-		$fieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
-
-		if (!empty($client))
-		{
-			$fieldsModel->setState('filter.client', $client);
-		}
-
-		$fields = $fieldsModel->getItems();
-
-		$data = array();
-
-		foreach ($fields as $field)
-		{
-			$prefix = str_replace(".", "_", $client);
-			$fieldName = explode($prefix . "_", $field->name);
-
-			$data[$fieldName[1]] = new stdClass;
-			$data[$fieldName[1]] = $field->type;
-		}
-
-		return $data;
 	}
 }

@@ -10,6 +10,8 @@
 // No direct access.
 defined('_JEXEC') or die;
 
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+
 jimport('joomla.application.component.modeladmin');
 
 /**
@@ -447,5 +449,58 @@ class TjucmModelType extends JModelAdmin
 		$table->load(array('unique_identifier' => $client));
 
 		return $table->id;
+	}
+
+	/**
+	 * Method to validation before copy items
+	 *
+	 * @param   object  $sourceClient  Source client.
+	 * @param   object  $targetClient  Tareget client.
+	 * 
+	 * @return  Boolean
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	public function checkCompatibility($sourceClient, $targetClient)
+	{
+		if ($sourceClient && $targetClient)
+		{
+			BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
+
+			$sourceFieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+			$sourceFieldsModel->setState('filter.client', $sourceClient);
+			$targetFieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+			$targetFieldsModel->setState('filter.client', $targetClient);
+
+			$sourceFields = $sourceFieldsModel->getItems();
+			$targetFields = $targetFieldsModel->getItems();
+
+			foreach ($sourceFields as $sourceField)
+			{
+				$prefix = str_replace(".", "_", $sourceClient);
+				$sourceFieldName = explode($prefix . "_", $sourceField->name);
+
+				$flag = 0;
+
+				foreach ($targetFields as $targetField)
+				{
+					$prefix = str_replace(".", "_", $targetClient);
+					$targetFieldName = explode($prefix . "_", $targetField->name);
+
+					if ($sourceFieldName == $targetFieldName)
+					{
+							$flag = 1;
+							continue;
+					}
+				}
+			}
+
+			if ($flag == 0)
+			{
+				return false;
+			}
+
+			return true;
+		}
 	}
 }
