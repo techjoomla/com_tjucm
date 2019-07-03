@@ -780,9 +780,6 @@ class TjucmControllerItemForm extends JControllerForm
 
 				if ($copyIds)
 				{
-					$dispatcher = JEventDispatcher::getInstance();
-					PluginHelper::importPlugin('tjucm');
-
 					$ucmData = array();
 					$ucmData['id'] = 0;
 					$ucmData['client'] = $targetClient;
