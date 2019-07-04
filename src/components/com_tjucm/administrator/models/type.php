@@ -493,11 +493,11 @@ class TjucmModelType extends JModelAdmin
 							continue;
 					}
 				}
-			}
 
-			if ($flag == 0)
-			{
-				return false;
+				if ($flag == 0)
+				{
+					return false;
+				}
 			}
 
 			return true;
