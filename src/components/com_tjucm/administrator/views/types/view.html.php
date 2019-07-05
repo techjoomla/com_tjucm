@@ -72,6 +72,9 @@ class TjucmViewTypes extends JViewLegacy
 		// Check if the form exists before showing the add/edit buttons
 		$formPath = JPATH_COMPONENT_ADMINISTRATOR . '/views/type';
 
+		$toolbar = JToolbar::getInstance('toolbar');
+		$toolbar->appendButton('Custom', '<a id="tjHouseKeepingFixDatabasebutton" class="btn btn-default hidden"><span class="icon-refresh"></span>' . JText::_('COM_TJUCM_FIX_DATABASE') . '</a>');
+
 		if (file_exists($formPath))
 		{
 			if ($canDo->get('core.create'))
@@ -119,11 +122,8 @@ class TjucmViewTypes extends JViewLegacy
 		{
 			JToolBarHelper::custom('types.export', 'download', '', 'COM_TJUCM_TYPE_EXPORT', false);
 
-			// Get an instance of the Toolbar
-			$toolbar = JToolbar::getInstance('toolbar');
+			// Add import button on UCM Types view
 			$link = "'" . JUri::root() . "administrator/index.php?option=com_tjucm&view=types&layout=import&tmpl=component" . "'";
-
-			// Add New button manage enrollment view
 			$toolbar->appendButton(
 			'Custom', '<a class="modal btn"
 			onclick="tjUcm.admin.openTjUcmSqueezeBox(' . $link . ',40, 38)">
