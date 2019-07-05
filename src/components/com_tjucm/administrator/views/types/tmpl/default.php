@@ -23,6 +23,8 @@ $saveOrder = $listOrder == 'a.`ordering`';
 
 $document = JFactory::getDocument();
 $document->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/tjucm.js');
+$document->addScript(JUri::root(true) . '/libraries/techjoomla/assets/js/houseKeeping.js');
+$document->addScriptDeclaration("var tjHouseKeepingView='types';");
 
 if ($saveOrder)
 {
@@ -107,6 +109,7 @@ if (!empty($this->extra_sidebar))
 	<?php else : ?>
 		<div id="j-main-container">
 	<?php endif; ?>
+		<div class="tjBs3">
 			<div id="filter-bar" class="btn-toolbar">
 				<div class="filter-search btn-group pull-left">
 					<label for="filter_search" class="element-invisible">
@@ -300,4 +303,5 @@ if (!empty($this->extra_sidebar))
 			<input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>"/>
 			<?php echo JHtml::_('form.token'); ?>
 		</div>
+	</div>
 </form>

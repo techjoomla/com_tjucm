@@ -19,6 +19,8 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\Filesystem\File;
 
+JLoader::register('TjControllerHouseKeeping', JPATH_SITE . "/libraries/techjoomla/controller/houseKeeping.php");
+
 /**
  * Types list controller class.
  *
@@ -26,6 +28,8 @@ use Joomla\CMS\Filesystem\File;
  */
 class TjucmControllerTypes extends JControllerAdmin
 {
+	use TjControllerHouseKeeping;
+	
 	/**
 	 * Method to clone existing Types
 	 *
