@@ -793,13 +793,13 @@ class TjucmControllerItemForm extends JControllerForm
 					foreach ($copyIds as $contentId)
 					{
 						// UCM table Data
-						$ucmTable = $model->getTable();
-						$ucmTable->load($contentId);
+						$ucmItemTable = $model->getTable();
+						$ucmItemTable->load($contentId);
 
-						$ucmData['ordering'] = $ucmTable->ordering;
-						$ucmData['state'] = $ucmTable->state;
-						$ucmData['created_by'] = $ucmTable->created_by;
-						$ucmData['draft'] = $ucmTable->draft;
+						$ucmData['ordering'] = $ucmItemTable->ordering;
+						$ucmData['state'] = $ucmItemTable->state;
+						$ucmData['created_by'] = $ucmItemTable->created_by;
+						$ucmData['draft'] = $ucmItemTable->draft;
 
 						// Tjfield values
 						$data['content_id']  = $contentId;
@@ -830,7 +830,7 @@ class TjucmControllerItemForm extends JControllerForm
 										$ucmSubFormData['client'] = $this->client;
 										$ucmSubFormData['view'] = $sourceClientName[1];
 										$ucmSubFormData['layout'] = 'default';
-										$ucmSubFormData['content_id'] = $ucmTable->id;
+										$ucmSubFormData['content_id'] = $ucmItemTable->id;
 
 										$resultSubFormData = $this->loadFormDataExtra($ucmSubFormData);
 
