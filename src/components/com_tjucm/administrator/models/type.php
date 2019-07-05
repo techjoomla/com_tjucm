@@ -487,7 +487,7 @@ class TjucmModelType extends JModelAdmin
 					$prefix = str_replace(".", "_", $targetClient);
 					$targetFieldName = explode($prefix . "_", $targetField->name);
 
-					if ($sourceFieldName == $targetFieldName)
+					if ($sourceFieldName == $targetFieldName && $sourceField->type == $targetField->type)
 					{
 							$flag = 1;
 							continue;

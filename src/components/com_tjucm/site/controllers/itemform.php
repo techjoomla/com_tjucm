@@ -774,6 +774,8 @@ class TjucmControllerItemForm extends JControllerForm
 		// Attempt to save the data
 		try
 		{
+			$flag = 0;
+
 			if ($result)
 			{
 				$copyIds = $post->get('cid');
@@ -947,9 +949,9 @@ class TjucmControllerItemForm extends JControllerForm
 						{
 							$subFormContentIds = $model->saveUcmSubFormRecords($ucmData, $ucmSubFormDataSet);
 
-							if (empty($subFormContentIds))
+							if (!empty($subFormContentIds))
 							{
-								$flag = 0;
+								$flag = 1;
 							}
 						}
 					}
@@ -959,19 +961,8 @@ class TjucmControllerItemForm extends JControllerForm
 					$url = (empty($item->link) ? 'index.php?option=com_tjucm&view=items' : $item->link);
 
 					// Redirect to the list screen
-					$this->setMessage(Text::_('COM_TJUCM_ITEM_COPY_SUCCESSFULLY'));
-					$this->setRedirect(Route::_($url . $this->appendUrl, false));
-
-					return false;
+					Factory::getApplication()->redirect(Route::_($url . $this->appendUrl), Text::_('COM_TJUCM_ITEM_COPY_SUCCESSFULLY'), 'success');
 				}
-				else
-				{
-					$flag = 0;
-				}
-			}
-			else
-			{
-				$flag = 0;
 			}
 		}
 		catch (Exception $e)
