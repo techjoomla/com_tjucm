@@ -9,7 +9,6 @@
 
 // No direct access
 defined('_JEXEC') or die;
-use Joomla\CMS\Language\Text;
 $app = JFactory::getApplication();
 $user = JFactory::getUser();
 JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
@@ -23,6 +22,7 @@ $fieldLayout['Checkbox'] = "checkbox";
 $fieldLayout['Radio'] = "list";
 $fieldLayout['List'] = "list";
 $fieldLayout['Itemcategory'] = "itemcategory";
+$fieldLayout['Video'] = "video";
 
 // Get Field table
 $fieldTableData = new stdClass;
@@ -147,18 +147,11 @@ if ($this->form_extra)
 								<div class="row">
 									<div class="col-xs-4"><?php echo $field->label; ?>:</div>
 									<div class="col-xs-8">
-										<?php 
+										<?php
 										$layout = new JLayoutFile($layoutToUse, JPATH_ROOT .'/components/com_tjfields/layouts/fields');
 										$mediaLink = $layout->render(array('fieldValue' => $field->value));
 										$output = $layout->render(array('fieldXml' => $xmlField, 'field' => $field));
-										if ($field->type == 'Video')
-										{?>
-											<a href="<?php echo $output; ?>" target="_blank"><?php echo Text::_('COM_TJUCM_VIDEO_FIELD_VALUE');?><a/>
-										<?php }
-										else
-										{
-											echo $output;
-										}
+										echo $output;
 										?>
 									</div>
 								</div>
