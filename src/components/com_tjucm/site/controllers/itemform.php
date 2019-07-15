@@ -15,6 +15,9 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Router\Route;
+use Joomla\Registry\Registry;
+use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 
 jimport('joomla.filesystem.file');
 
@@ -744,5 +747,217 @@ class TjucmControllerItemForm extends JControllerForm
 
 		// Redirect to the edit screen.
 		$this->setRedirect(Route::_($link . '&Itemid=' . $itemId . $cluster . $this->getRedirectToItemAppend(), false));
+	}
+
+	/**
+	 * Method to copy items
+	 *
+	 * @return  void
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	public function copyItems()
+	{
+		Session::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+		$app = Factory::getApplication();
+		$post = $app->input->post;
+		$model = $this->getModel();
+		$sourceClient = $this->client;
+		$targetClient = $post->get('target_client');
+		BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$typeModel = BaseDatabaseModel::getInstance('Type', 'TjucmModel', array('ignore_request' => true));
+		$result = $typeModel->checkCompatibility($this->client, $targetClient);
+
+		// Attempt to save the data
+		try
+		{
+			$flag = 0;
+
+			if ($result)
+			{
+				$copyIds = $post->get('cid');
+				$model->setClient($targetClient);
+				JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
+				$tjFieldsHelper = new TjfieldsHelper;
+
+				if ($copyIds)
+				{
+					$ucmData = array();
+					$ucmData['id'] = 0;
+					$ucmData['client'] = $targetClient;
+
+					foreach ($copyIds as $contentId)
+					{
+						// UCM table Data
+						$ucmItemTable = $model->getTable();
+						$ucmItemTable->load($contentId);
+						$ucmData['ordering'] = $ucmItemTable->ordering;
+						$ucmData['state'] = $ucmItemTable->state;
+						$ucmData['created_by'] = $ucmItemTable->created_by;
+						$ucmData['draft'] = $ucmItemTable->draft;
+
+						// Tjfield values
+						$data['content_id']  = $contentId;
+						$data['user_id']     = JFactory::getUser()->id;
+						$data['client']      = $sourceClient;
+						$extraFieldsData = $tjFieldsHelper->FetchDatavalue($data);
+						$ucmExtraData = array();
+
+						foreach ($extraFieldsData as $extraData)
+						{
+							$prefixSourceClient = str_replace(".", "_", $sourceClient);
+							$fieldName = explode($prefixSourceClient . "_", $extraData->name);
+							$prefixTargetClient = str_replace(".", "_", $targetClient);
+							$targetFieldName = $prefixTargetClient . '_' . $fieldName[1];
+							$ucmExtraData[$targetFieldName] = new stdClass;
+
+							if (!is_array($extraData->value))
+							{
+									if ($extraData->type === 'ucmsubform')
+									{
+										$sourceClientName = explode('.', $this->client);
+										$ucmSubFormData = array();
+										$ucmSubFormData['clientComponent'] = 'com_tjucm';
+										$ucmSubFormData['client'] = $this->client;
+										$ucmSubFormData['view'] = $sourceClientName[1];
+										$ucmSubFormData['layout'] = 'default';
+										$ucmSubFormData['content_id'] = $ucmItemTable->id;
+										$resultSubFormData = $this->loadFormDataExtra($ucmSubFormData);
+
+										foreach ($resultSubFormData as $key => $subFormData)
+										{
+											if ($key == $extraData->name)
+											{
+												$prefixSourceClient = str_replace(".", "_", $this->client);
+												$fieldName = explode($prefixSourceClient . "_", $key);
+												$prefixTargetClient = str_replace(".", "_", $targetClient);
+												$targetFieldName = $prefixTargetClient . '_' . $fieldName[1];
+												$tjFieldsTable = $tjFieldsHelper->getFieldData($targetFieldName);
+												$params = json_decode($tjFieldsTable->params)->formsource;
+												$subFormClient = explode('components/com_tjucm/models/forms/', $params);
+												$subFormClient = explode('form_extra.xml', $subFormClient[1]);
+												$ucmExtraData[$targetFieldName] = 'com_tjucm.' . $subFormClient[0];
+												$subFormData = (array) json_decode($subFormData);
+												$formDataArray = array();
+
+												foreach ($subFormData as $subKey => $formData)
+												{
+													$prefixSourceClient = str_replace(".", "_", $this->client);
+													$fieldName = explode($prefixSourceClient . "_", $subKey);
+													$prefixTargetClient = str_replace(".", "_", $targetClient);
+													$targetSubFieldName = $prefixTargetClient . '_' . $fieldName[1];
+													$subFormClientData = (array) $formData;
+													$subFormFieldsArray = array();
+
+													foreach ($subFormClientData as $subFormKey => $subFormValue)
+													{
+														$prefixSourceClient = str_replace(".", "_", $extraData->value);
+														$fieldName = explode($prefixSourceClient . "_", $subFormKey);
+														$prefixTargetClient = 'com_tjucm_' . $subFormClient[0];
+														$fieldName = $prefixTargetClient . '_' . $fieldName[1];
+
+														if ($subFormKey == $prefixSourceClient . '_contentid')
+														{
+															unset($fieldName);
+															unset($subFormValue);
+														}
+
+														if ($subFormValue)
+														{
+															if (is_array($subFormValue))
+															{
+																$subFormValue = $subFormValue[0]->value;
+															}
+
+															$subFormFieldsArray[$fieldName] = $subFormValue;
+														}
+													}
+
+													$formDataArray[$targetSubFieldName] = (array) $subFormFieldsArray;
+												}
+											}
+										}
+
+										$extrasSubFormFieldsData[$targetFieldName] = $formDataArray;
+									}
+									else
+									{
+										$ucmExtraData[$targetFieldName] = trim($extraData->value);
+									}
+							}
+							else
+							{
+								if ($extraData->type === 'tjlist')
+								{
+									$fieldTypeParam = new Registry($extraData->params);
+									$extraData->type = $fieldTypeParam->get('multiple') ? 'multi_select' : 'single_select';
+								}
+
+								$temp = array();
+
+								switch ($extraData->type)
+								{
+									case 'multi_select':
+										foreach ($extraData->value as $option)
+										{
+											$temp[] = trim($option->value);
+										}
+
+										if (!empty($temp))
+										{
+											$ucmExtraData[$targetFieldName] = $temp;
+										}
+									break;
+									case 'single_select':
+									case 'radio':
+									default:
+										foreach ($extraData->value as $option)
+										{
+											$ucmExtraData[$targetFieldName] = trim($option->value);
+										}
+									break;
+								}
+							}
+						}
+
+						$ucmData['status'] = 'save';
+
+						// Get sorted dataset of submitted ucmsubform records as per their client
+						$ucmSubFormDataSet = $model->getFormattedUcmSubFormRecords($ucmData, $extrasSubFormFieldsData);
+						$recordId = $model->save($ucmData, $ucmExtraData);
+						$ucmData['parent_id'] = $recordId;
+
+						// Save ucmSubForm records
+						if (!empty($ucmSubFormDataSet))
+						{
+							$subFormContentIds = $model->saveUcmSubFormRecords($ucmData, $ucmSubFormDataSet);
+
+							if (!empty($subFormContentIds))
+							{
+								$flag = 1;
+							}
+						}
+					}
+
+					$menu = $app->getMenu();
+					$item = $menu->getActive();
+					$url = (empty($item->link) ? 'index.php?option=com_tjucm&view=items' : $item->link);
+
+					// Redirect to the list screen
+					Factory::getApplication()->redirect(Route::_($url . $this->appendUrl), Text::_('COM_TJUCM_ITEM_COPY_SUCCESSFULLY'), 'success');
+				}
+			}
+		}
+		catch (Exception $e)
+		{
+			$errorType = ($e->getCode() == '404' || '403') ? 'error' : 'warning';
+			$this->setMessage(Text::_('COM_TJUCM_ITEM_NOT_COPY_SUCCESSFULLY'), $errorType);
+			$this->setRedirect(Route::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+		}
+		if ($flag == 0)
+		{
+			$this->setMessage(Text::_('COM_TJUCM_ITEM_NOT_COPY_SUCCESSFULLY'), 'error');
+			$this->setRedirect(Route::_('index.php?option=com_tjucm&view=items' . $this->appendUrl, false));
+		}
 	}
 }
