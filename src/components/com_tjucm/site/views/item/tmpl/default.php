@@ -9,6 +9,7 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\Language\Text;
 $app = JFactory::getApplication();
 $user = JFactory::getUser();
 JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
@@ -150,7 +151,14 @@ if ($this->form_extra)
 										$layout = new JLayoutFile($layoutToUse, JPATH_ROOT .'/components/com_tjfields/layouts/fields');
 										$mediaLink = $layout->render(array('fieldValue' => $field->value));
 										$output = $layout->render(array('fieldXml' => $xmlField, 'field' => $field));
-										echo $output;
+										if ($field->type == 'Video')
+										{?>
+											<a href="<?php echo $output; ?>" target="_blank"><?php echo Text::_('COM_TJUCM_VIDEO_FIELD_VALUE');?><a/>
+										<?php }
+										else
+										{
+											echo $output;
+										}
 										?>
 									</div>
 								</div>
