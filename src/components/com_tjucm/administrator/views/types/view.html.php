@@ -1,10 +1,11 @@
 <?php
 /**
- * @version    SVN: <svn_id>
- * @package    Com_Tjucm
- * @author     Techjoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
- * @license    GNU General Public License version 2 or later.
+ * @package     TJ-UCM
+ * @subpackage  com_tjucm
+ *
+ * @author      Techjoomla <extensions@techjoomla.com>
+ * @copyright   Copyright (C) 2009 - 2019 Techjoomla. All rights reserved.
+ * @license     http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 // No direct access
@@ -73,7 +74,9 @@ class TjucmViewTypes extends JViewLegacy
 		$formPath = JPATH_COMPONENT_ADMINISTRATOR . '/views/type';
 
 		$toolbar = JToolbar::getInstance('toolbar');
-		$toolbar->appendButton('Custom', '<a id="tjHouseKeepingFixDatabasebutton" class="btn btn-default hidden"><span class="icon-refresh"></span>' . JText::_('COM_TJUCM_FIX_DATABASE') . '</a>');
+		$toolbar->appendButton(
+		'Custom', '<a id="tjHouseKeepingFixDatabasebutton" class="btn btn-default hidden"><span class="icon-refresh"></span>'
+		. JText::_('COM_TJUCM_FIX_DATABASE') . '</a>');
 
 		if (file_exists($formPath))
 		{
