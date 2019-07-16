@@ -29,7 +29,6 @@ if (!class_exists('TjucmFunList'))
 	JLoader::load('TjucmFunList');
 }
 
-
 // Load backend helper
 $path = JPATH_ADMINISTRATOR . '/components/com_tjucm/helpers/tjucm.php';
 

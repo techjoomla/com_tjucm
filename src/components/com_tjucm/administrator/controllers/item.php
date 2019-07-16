@@ -330,7 +330,7 @@ class TjucmControllerItem extends JControllerForm
 							"clientComponent" => 'com_tjucm',
 							"client" => $this->client,
 							"view" => $client[1],
-							"layout" => 'edit')
+							"layout" => 'edit', )
 							);
 
 			if (!$formExtra)

@@ -81,7 +81,7 @@ class TjucmApiResourceItem extends ApiResource
 
 		unset($tjFields);
 
-		// Mapping field name with its value 
+		// Mapping field name with its value
 		foreach ($fields as $k => $field)
 		{
 			$extra_jform_data[$fieldsAssoc[(int) $field["id"]]] = $field["value"];

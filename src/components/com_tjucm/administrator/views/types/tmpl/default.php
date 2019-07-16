@@ -178,14 +178,14 @@ if (!empty($this->extra_sidebar))
 						<?php endif; ?>
 
 						<th class='left'>
-							<?php echo JHtml::_('grid.sort',  'COM_TJUCM_TYPES_ID', 'a.`id`', $listDirn, $listOrder); ?>
+							<?php echo JHtml::_('grid.sort', 'COM_TJUCM_TYPES_ID', 'a.`id`', $listDirn, $listOrder); ?>
 						</th>
 
 						<th class='left'>
-							<?php echo JHtml::_('grid.sort',  'COM_TJUCM_TYPES_TITLE', 'a.`title`', $listDirn, $listOrder); ?>
+							<?php echo JHtml::_('grid.sort', 'COM_TJUCM_TYPES_TITLE', 'a.`title`', $listDirn, $listOrder); ?>
 
 						<th class='left'>
-							<?php echo JHtml::_('grid.sort',  'COM_TJUCM_TYPES_ALIAS', 'a.`alias`', $listDirn, $listOrder); ?>
+							<?php echo JHtml::_('grid.sort', 'COM_TJUCM_TYPES_ALIAS', 'a.`alias`', $listDirn, $listOrder); ?>
 						</th>
 
 						<th class='center'>
@@ -265,7 +265,7 @@ if (!empty($this->extra_sidebar))
 								<?php endif; ?>
 
 								<?php if ($canEdit) : ?>
-									<a href="<?php echo JRoute::_('index.php?option=com_tjucm&task=type.edit&id='.(int) $item->id); ?>">
+									<a href="<?php echo JRoute::_('index.php?option=com_tjucm&task=type.edit&id=' . (int) $item->id); ?>">
 										<?php echo $this->escape($item->title); ?>
 									</a>
 								<?php else : ?>

@@ -269,7 +269,7 @@ class TjucmModelItems extends JModelList
 
 		foreach ($items as $item)
 		{
-			if (!empty ($item->field_values))
+			if (!empty($item->field_values))
 			{
 				$explode_field_values = explode($this->records_separator, $item->field_values);
 

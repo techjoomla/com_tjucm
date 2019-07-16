@@ -34,7 +34,7 @@ abstract class JHtmlListhelper
 	{
 		$states = array(
 			0 => array('icon-remove', JText::_('Toggle'), 'inactive btn-danger'),
-			1 => array('icon-checkmark', JText::_('Toggle'), 'active btn-success')
+			1 => array('icon-checkmark', JText::_('Toggle'), 'active btn-success'),
 		);
 
 		$state  = \Joomla\Utilities\ArrayHelper::getValue($states, (int) $value, $states[0]);

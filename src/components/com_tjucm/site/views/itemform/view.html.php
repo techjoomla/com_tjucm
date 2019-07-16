@@ -221,7 +221,7 @@ class TjucmViewItemform extends JViewLegacy
 			"client" => $this->client,
 			"view" => $view[1],
 			"layout" => 'edit',
-			"content_id" => $this->id)
+			"content_id" => $this->id, )
 			);
 
 		// Check if draft save is enabled for the form

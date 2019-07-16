@@ -172,7 +172,7 @@ class TjucmModelItems extends JModelList
 
 		// Join over the users for the checked out user
 		$query->select($db->quoteName('uc.name', 'uEditor'));
-		$query->join("LEFT",  $db->quoteName('#__users', 'uc') . ' ON (' . $db->quoteName('uc.id') . ' = ' . $db->quoteName('a.checked_out') . ')');
+		$query->join("LEFT", $db->quoteName('#__users', 'uc') . ' ON (' . $db->quoteName('uc.id') . ' = ' . $db->quoteName('a.checked_out') . ')');
 
 		// Join over the foreign key 'type_id'
 		$query->join("INNER", $db->quoteName('#__tj_ucm_types', 'types') .
@@ -182,20 +182,20 @@ class TjucmModelItems extends JModelList
 		// Join over the user field 'created_by'
 
 		$query->select($db->quoteName('ucby.name', 'created_by_name'));
-		$query->join("INNER",  $db->quoteName('#__users', 'ucby') . ' ON (' . $db->quoteName('ucby.id') .
+		$query->join("INNER", $db->quoteName('#__users', 'ucby') . ' ON (' . $db->quoteName('ucby.id') .
 		' = ' . $db->quoteName('a.created_by') . ')');
 
 		// Join over the user field 'modified_by'
 		$query->select($db->quoteName('um.name', 'modified_by_name'));
-		$query->join("LEFT",  $db->quoteName('#__users', 'um') .
+		$query->join("LEFT", $db->quoteName('#__users', 'um') .
 		' ON (' . $db->quoteName('um.id') . ' = ' . $db->quoteName('a.modified_by') . ')');
 
 		// Join over the tjfield
-		$query->join("INNER",  $db->quoteName('#__tjfields_fields', 'fields') .
+		$query->join("INNER", $db->quoteName('#__tjfields_fields', 'fields') .
 		' ON (' . $db->quoteName('fields.client') . ' = ' . $db->quoteName('a.client') . ')');
 
 		// Join over the tjfield value
-		$query->join("INNER",  $db->quoteName('#__tjfields_fields_value', 'fieldValue') .
+		$query->join("INNER", $db->quoteName('#__tjfields_fields_value', 'fieldValue') .
 		' ON (' . $db->quoteName('fieldValue.content_id') . ' = ' . $db->quoteName('a.id') . ')');
 
 		$this->client = $this->getState('ucm.client');
@@ -324,7 +324,7 @@ class TjucmModelItems extends JModelList
 
 		foreach ($items as $item)
 		{
-			if (!empty ($item->field_values))
+			if (!empty($item->field_values))
 			{
 				$explode_field_values = explode($this->records_separator, $item->field_values);
 

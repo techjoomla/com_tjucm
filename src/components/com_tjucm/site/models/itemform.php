@@ -362,7 +362,7 @@ class TjucmModelItemForm extends JModelForm
 		$form = $this->loadForm(
 			'com_tjucm.itemform', 'itemform',
 			array('control' => 'jform',
-				'load_data' => $loadData
+				'load_data' => $loadData,
 			)
 		);
 

@@ -42,11 +42,11 @@ class TjucmApiResourceType extends ApiResource
 
 		// Variable to store creator name and id
 		$created_by = JFactory::getUser($ucmType->created_by);
-		$ucmType->created_by = array("id" => $created_by->id,"name" => $created_by->name);
+		$ucmType->created_by = array("id" => $created_by->id, "name" => $created_by->name);
 
 		// Variable to store modifier name and id
 		$modified_by = JFactory::getUser($ucmType->modified_by);
-		$ucmType->modified_by = array("id" => $modified_by->id,"name" => $modified_by->name);
+		$ucmType->modified_by = array("id" => $modified_by->id, "name" => $modified_by->name);
 
 		$tjFieldsModelGroups = JModelLegacy::getInstance('Groups', 'TjfieldsModel', array('ignore_request' => true));
 		$tjFieldsModelGroups->setState('list.ordering', 'a.ordering');

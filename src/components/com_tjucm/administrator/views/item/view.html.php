@@ -56,7 +56,7 @@ class TjucmViewItem extends JViewLegacy
 			"client" => $this->client,
 			"view" => $view[1],
 			"layout" => 'default',
-			"content_id" => $id)
+			"content_id" => $id, )
 			);
 
 		$this->form_extra = array_filter($this->form_extra);

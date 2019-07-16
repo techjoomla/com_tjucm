@@ -38,36 +38,36 @@ class Pkg_UcmInstallerScript extends TJInstaller
 	private $oldversion = "";
 
 	/** @var  array  The list of extra modules and plugins to install */
-	protected $installationQueue = array (
+	protected $installationQueue = array(
 		'postflight' => array(
 			'files' => array(
-				'tj_strapper' => 1
+				'tj_strapper' => 1,
 			),
 
-			'libraries' => array (
-				'techjoomla' => 1
-			)
-		)
+			'libraries' => array(
+				'techjoomla' => 1,
+			),
+		),
 	);
 
 	/** @var  array  The list of extra modules and plugins to uninstall */
-	protected $uninstallQueue = array (
+	protected $uninstallQueue = array(
 		/*plugins => { (folder) => { (element) => (published) }}*/
-		'plugins' => array ()
+		'plugins' => array(),
 	);
 
 	/** @var array The list of obsolete extra modules and plugins to uninstall when upgrading the component */
-	protected $obsoleteExtensionsUninstallationQueue = array (
+	protected $obsoleteExtensionsUninstallationQueue = array(
 		// @modules => { (folder) => { (module) }* }*
-		'modules' => array (
-			'admin' => array (
+		'modules' => array(
+			'admin' => array(
 			),
-			'site' => array (
-			)
+			'site' => array(
+			),
 		),
 		// @plugins => { (folder) => { (element) }* }*
-		'plugins' => array (
-		)
+		'plugins' => array(
+		),
 	);
 
 	/**
@@ -77,14 +77,14 @@ class Pkg_UcmInstallerScript extends TJInstaller
 	 *
 	 * @var array
 	 */
-	protected $extensionsToEnable = array ();
+	protected $extensionsToEnable = array();
 
 	/** @var array Obsolete files and folders to remove*/
 	private $removeFilesAndFolders = array(
 		'files'	=> array(
 		),
 		'folders' => array(
-		)
+		),
 	);
 
 	/**

@@ -103,8 +103,8 @@ if ($this->form_extra)
 																// If field type is file
 																if ($fieldTableData->tjFieldFieldTable->type == 'file' || $fieldTableData->tjFieldFieldTable->type == 'image')
 																{
-																	$layout = new JLayoutFile($fieldTableData->tjFieldFieldTable->type, JPATH_ROOT .'/components/com_tjfields/layouts/fields');
-																	$mediaLink = $layout->render(array('fieldValue'=>$value, 'isSubformField'=>'1', 'content_id'=>$app->input->get('id', '', 'INT'), 'subformFieldId'=>$formData->id,'subformFileFieldName'=>$name));
+																	$layout = new JLayoutFile($fieldTableData->tjFieldFieldTable->type, JPATH_ROOT . '/components/com_tjfields/layouts/fields');
+																	$mediaLink = $layout->render(array('fieldValue'=>$value, 'isSubformField'=>'1', 'content_id'=>$app->input->get('id', '', 'INT'), 'subformFieldId'=>$formData->id, 'subformFileFieldName'=>$name));
 																	echo $mediaLink;
 																}
 																// If field type is checkbox
@@ -148,7 +148,7 @@ if ($this->form_extra)
 									<div class="col-xs-4"><?php echo $field->label; ?>:</div>
 									<div class="col-xs-8">
 										<?php
-										$layout = new JLayoutFile($layoutToUse, JPATH_ROOT .'/components/com_tjfields/layouts/fields');
+										$layout = new JLayoutFile($layoutToUse, JPATH_ROOT . '/components/com_tjfields/layouts/fields');
 										$mediaLink = $layout->render(array('fieldValue' => $field->value));
 										$output = $layout->render(array('fieldXml' => $xmlField, 'field' => $field));
 										echo $output;
@@ -188,7 +188,7 @@ else
 		<?php
 	}
 
-	if ($user->authorise('core.type.deleteitem','com_tjucm.type.' . $this->ucmTypeId))
+	if ($user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this->ucmTypeId))
 	{
 		$redirectURL = JRoute::_('index.php?option=com_tjucm&task=item.remove&id=' . $this->item->id . '&client=' . $this->client, false);
 		?>

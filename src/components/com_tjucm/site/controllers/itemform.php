@@ -13,7 +13,6 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Joomla\CMS\User\User;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Router\Route;
 
@@ -326,7 +325,7 @@ class TjucmControllerItemForm extends JControllerForm
 							"clientComponent" => 'com_tjucm',
 							"client" => $this->client,
 							"view" => $client[1],
-							"layout" => 'edit')
+							"layout" => 'edit', )
 							);
 
 			if (!$formExtra)
