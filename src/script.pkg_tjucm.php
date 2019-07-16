@@ -5,7 +5,7 @@
  *
  * @author      Techjoomla <extensions@techjoomla.com>
  * @copyright   Copyright (C) 2009 - 2019 Techjoomla. All rights reserved.
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @license     http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 // No direct access.
