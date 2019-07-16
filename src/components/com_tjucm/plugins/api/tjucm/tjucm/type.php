@@ -1,11 +1,11 @@
 <?php
 /**
- * @package     TjUcm
- * @subpackage  Plg_Api_ucm
- * 
+ * @package     TJ-UCM
+ * @subpackage  com_tjucm
+ *
  * @author      Techjoomla <extensions@techjoomla.com>
- * @copyright   Copyright (c) 2009-2019 TechJoomla. All rights reserved.
- * @license     GNU General Public License version 2 or later.
+ * @copyright   Copyright (C) 2009 - 2019 Techjoomla. All rights reserved.
+ * @license     http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die;
@@ -42,11 +42,11 @@ class TjucmApiResourceType extends ApiResource
 
 		// Variable to store creator name and id
 		$created_by = JFactory::getUser($ucmType->created_by);
-		$ucmType->created_by = array("id" => $created_by->id,"name" => $created_by->name);
+		$ucmType->created_by = array("id" => $created_by->id, "name" => $created_by->name);
 
 		// Variable to store modifier name and id
 		$modified_by = JFactory::getUser($ucmType->modified_by);
-		$ucmType->modified_by = array("id" => $modified_by->id,"name" => $modified_by->name);
+		$ucmType->modified_by = array("id" => $modified_by->id, "name" => $modified_by->name);
 
 		$tjFieldsModelGroups = JModelLegacy::getInstance('Groups', 'TjfieldsModel', array('ignore_request' => true));
 		$tjFieldsModelGroups->setState('list.ordering', 'a.ordering');

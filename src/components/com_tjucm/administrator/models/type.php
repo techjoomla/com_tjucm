@@ -1,10 +1,11 @@
 <?php
 /**
- * @version    SVN: <svn_id>
- * @package    Com_Tjucm
- * @author     Techjoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2018 TechJoomla. All rights reserved.
- * @license    GNU General Public License version 2 or later.
+ * @package     TJ-UCM
+ * @subpackage  com_tjucm
+ *
+ * @author      Techjoomla <extensions@techjoomla.com>
+ * @copyright   Copyright (C) 2009 - 2019 Techjoomla. All rights reserved.
+ * @license     http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 // No direct access.
@@ -88,7 +89,7 @@ class TjucmModelType extends JModelAdmin
 		$form = $this->loadForm(
 			'com_tjucm.type', 'type',
 			array('control' => 'jform',
-				'load_data' => $loadData
+				'load_data' => $loadData,
 			)
 		);
 
@@ -344,7 +345,13 @@ class TjucmModelType extends JModelAdmin
 			$tjFieldsGroupModel = JModelLegacy::getInstance('Group', 'TjfieldsModel', array('ignore_request' => true));
 			$tjFieldsGroupModel->save($fieldGroup);
 			$fieldGroupId = (int) $tjFieldsGroupModel->getState($tjFieldsGroupModel->getName() . '.id');
-			$field = array("label" => "contentid", "name" => "contentid", "type" => "hidden", "client" => $data['unique_identifier'], "state" => 1, "group_id" => $fieldGroupId);
+			$field = array(
+			"label" => "contentid",
+			"name" => "contentid",
+			"type" => "hidden",
+			"client" => $data['unique_identifier'],
+			"state" => 1,
+			"group_id" => $fieldGroupId, );
 			$tjFieldsFieldModel = JModelLegacy::getInstance('Field', 'TjfieldsModel', array('ignore_request' => true));
 			$input->post->set('client_type', end(explode(".", $data['unique_identifier'])));
 			$tjFieldsFieldModel->save($field);

@@ -15,7 +15,7 @@ JHtml::_('behavior.formvalidation');
 JHtml::_('formbehavior.chosen', 'select');
 JHtml::_('behavior.keepalive');
 
-JHtml::script( JUri::root().'administrator/components/com_tjucm/assets/js/tjucm_type.js' );
+JHtml::script(JUri::root() . 'administrator/components/com_tjucm/assets/js/tjucm_type.js');
 ?>
 <script type="text/javascript">
 	js = jQuery.noConflict();
@@ -75,7 +75,7 @@ JHtml::script( JUri::root().'administrator/components/com_tjucm/assets/js/tjucm_
 				</div>
 			<?php echo JHtml::_('bootstrap.endTab'); ?>
 
-			<?php if (JFactory::getUser()->authorise('core.admin','tjucm')) : ?>
+			<?php if (JFactory::getUser()->authorise('core.admin', 'tjucm')) : ?>
 				<?php echo JHtml::_('bootstrap.addTab', 'myTab', 'permissions', JText::_('JGLOBAL_ACTION_PERMISSIONS_LABEL', true)); ?>
 				<?php echo $this->form->getInput('rules'); ?>
 				<?php echo JHtml::_('bootstrap.endTab'); ?>
