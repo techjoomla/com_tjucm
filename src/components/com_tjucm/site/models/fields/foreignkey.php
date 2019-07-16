@@ -94,7 +94,7 @@ class JFormFieldForeignKey extends JFormField
 			->select(
 				array(
 					$db->quoteName($this->key_field),
-					$fk_value
+					$fk_value,
 				)
 			)
 			->from($this->table);

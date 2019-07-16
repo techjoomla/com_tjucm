@@ -86,7 +86,7 @@ class TjucmViewItem extends JViewLegacy
 			"client" => $this->client,
 			"view" => $view[1],
 			"layout" => 'default',
-			"content_id" => $this->id)
+			"content_id" => $this->id, )
 			);
 
 		// Check for errors.

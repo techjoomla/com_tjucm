@@ -118,7 +118,7 @@ class TjucmModelItem extends JModelAdmin
 		$form = $this->loadForm(
 			'com_tjucm.item', 'item',
 			array('control' => 'jform',
-				'load_data' => $loadData
+				'load_data' => $loadData,
 			)
 		);
 

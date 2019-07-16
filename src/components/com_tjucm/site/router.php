@@ -25,9 +25,9 @@ Table::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables')
  */
 class TjUcmRouter extends JComponentRouterBase
 {
-	private  $views = array('itemform', 'items', 'item');
+	private $views = array('itemform', 'items', 'item');
 
-	private  $menu_views = array('itemform', 'items');
+	private $menu_views = array('itemform', 'items');
 
 	/**
 	 * Build the route for the com_tjucm component

@@ -89,7 +89,7 @@ class TjucmModelType extends JModelAdmin
 		$form = $this->loadForm(
 			'com_tjucm.type', 'type',
 			array('control' => 'jform',
-				'load_data' => $loadData
+				'load_data' => $loadData,
 			)
 		);
 
@@ -351,7 +351,7 @@ class TjucmModelType extends JModelAdmin
 			"type" => "hidden",
 			"client" => $data['unique_identifier'],
 			"state" => 1,
-			"group_id" => $fieldGroupId);
+			"group_id" => $fieldGroupId, );
 			$tjFieldsFieldModel = JModelLegacy::getInstance('Field', 'TjfieldsModel', array('ignore_request' => true));
 			$input->post->set('client_type', end(explode(".", $data['unique_identifier'])));
 			$tjFieldsFieldModel->save($field);
