@@ -9,6 +9,7 @@
 
 // No direct access
 defined('_JEXEC') or die;
+
 $app = JFactory::getApplication();
 $user = JFactory::getUser();
 JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
@@ -24,6 +25,8 @@ $fieldLayout['List'] = "list";
 $fieldLayout['Itemcategory'] = "itemcategory";
 $fieldLayout['Video'] = "video";
 
+$csrf = "&" . JSession::getFormToken() . '=1';
+
 // Get Field table
 $fieldTableData = new stdClass;
 JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
@@ -37,7 +40,6 @@ foreach ($this->formXml as $k => $xmlFieldSet)
 	$xmlFieldSets[$count] = $xmlFieldSet;
 	$count++;
 }
-
 if ($this->form_extra)
 {
 	$fieldSets = $this->form_extra->getFieldsets();
@@ -187,10 +189,16 @@ else
 		<a class="btn btn-default" href="<?php echo $redirectURL; ?>"><?php echo JText::_("COM_TJUCM_EDIT_ITEM"); ?></a>
 		<?php
 	}
-
-	if ($user->authorise('core.type.deleteitem','com_tjucm.type.' . $this->ucmTypeId))
+	
+	$deleteOwn = false;
+	if ($user->authorise('core.type.deleteownitem','com_tjucm.type.' . $this->ucmTypeId))
 	{
-		$redirectURL = JRoute::_('index.php?option=com_tjucm&task=item.remove&id=' . $this->item->id . '&client=' . $this->client, false);
+		$deleteOwn = (JFactory::getUser()->id == $this->item->created_by ? true : false);
+	}
+
+	if ($user->authorise('core.type.deleteitem','com_tjucm.type.' . $this->ucmTypeId) || $deleteOwn)
+	{
+		$redirectURL = JRoute::_('index.php?option=com_tjucm&task=itemform.remove&id=' . $this->item->id . '&client=' . $this->client . $csrf, false);
 		?>
 		<a class="btn btn-default" href="<?php echo $redirectURL; ?>"><?php echo JText::_("COM_TJUCM_DELETE_ITEM"); ?></a>
 		<?php
