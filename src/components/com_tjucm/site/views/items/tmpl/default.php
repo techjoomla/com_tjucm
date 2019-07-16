@@ -116,6 +116,12 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 						$editown = (JFactory::getUser()->id == $item->created_by ? true : false);
 					}
 
+					$deleteOwn = false;
+					if ($this->canDeleteOwn)
+					{
+						$deleteOwn = (JFactory::getUser()->id == $item->created_by ? true : false);
+					}
+					
 					?>
 					<tr class="row<?php echo $i % 2; ?>">
 						<?php
@@ -196,7 +202,7 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 								}
 							}
 
-							if ($this->canEdit || $this->canDelete || $editown)
+							if ($this->canEdit || $this->canDelete || $editown || $deleteOwn)
 							{
 								?>
 								<td class="center">
@@ -207,7 +213,7 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 									<a target="_blank" href="<?php echo 'index.php?option=com_tjucm&task=itemform.edit&id=' . $item->id . $appendUrl; ?>" class="btn btn-mini" type="button"><i class="icon-apply" aria-hidden="true"></i></a>
 									<?php
 								}
-								if ($this->canDelete)
+								if ($this->canDelete || $deleteOwn)
 								{
 									?>
 									<a href="<?php echo 'index.php?option=com_tjucm&task=itemform.remove' . '&id=' . $item->id . $appendUrl . $csrf; ?>" class="btn btn-mini delete-button" type="button"><i class="icon-delete" aria-hidden="true"></i></a>

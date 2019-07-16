@@ -654,8 +654,15 @@ class TjucmModelItemForm extends JModelForm
 		$table = $this->getTable();
 		$table->load($contentId);
 		$canDelete = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $table->type_id);
+		$canDeleteown = $user->authorise('core.type.deleteownitem', 'com_tjucm.type.' . $table->type_id);
 
-		if ($canDelete)
+		$deleteOwn = false;
+		if ($this->canDeleteOwn)
+		{
+			$deleteOwn = (JFactory::getUser()->id == $table->created_by ? true : false);
+		}
+
+		if ($canDelete || $deleteOwn)
 		{
 			$id = (!empty($contentId)) ? $contentId : (int) $this->getState('item.id');
 			$table = $this->getTable();
