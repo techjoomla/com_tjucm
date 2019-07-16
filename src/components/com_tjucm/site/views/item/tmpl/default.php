@@ -22,6 +22,7 @@ $fieldLayout['Checkbox'] = "checkbox";
 $fieldLayout['Radio'] = "list";
 $fieldLayout['List'] = "list";
 $fieldLayout['Itemcategory'] = "itemcategory";
+$fieldLayout['Video'] = "video";
 
 // Get Field table
 $fieldTableData = new stdClass;
@@ -146,7 +147,7 @@ if ($this->form_extra)
 								<div class="row">
 									<div class="col-xs-4"><?php echo $field->label; ?>:</div>
 									<div class="col-xs-8">
-										<?php 
+										<?php
 										$layout = new JLayoutFile($layoutToUse, JPATH_ROOT .'/components/com_tjfields/layouts/fields');
 										$mediaLink = $layout->render(array('fieldValue' => $field->value));
 										$output = $layout->render(array('fieldXml' => $xmlField, 'field' => $field));
