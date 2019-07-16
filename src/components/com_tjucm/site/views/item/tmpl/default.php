@@ -24,6 +24,7 @@ $fieldLayout['Radio'] = "list";
 $fieldLayout['List'] = "list";
 $fieldLayout['Itemcategory'] = "itemcategory";
 $fieldLayout['Video'] = "video";
+$fieldLayout['Calendar'] = "calendar";
 
 $csrf = "&" . JSession::getFormToken() . '=1';
 
