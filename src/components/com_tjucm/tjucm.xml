@@ -16,9 +16,10 @@
 		</sql>
 	</install>
 	<update>
-		<sql>
-			<file driver="mysql" charset="utf8">sql/update.mysql.utf8.sql</file>
-		</sql>
+		<!-- Runs on update -->
+		<schemas>
+			<schemapath type="mysql">sql/updates/mysql</schemapath>
+		</schemas>
 	</update>
 	<uninstall>
 		<sql>
@@ -54,6 +55,7 @@
 			<folder>classes</folder>
 			<folder>helpers</folder>
 			<folder>models</folder>
+			<folder>houseKeeping</folder>
 			<folder>sql</folder>
 			<folder>tables</folder>
 			<folder>views</folder>

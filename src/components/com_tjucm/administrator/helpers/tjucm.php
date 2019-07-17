@@ -32,12 +32,6 @@ class TjucmHelper extends JHelperContent
 			'index.php?option=com_tjucm&view=types',
 			$vName == 'types'
 		);
-
-		JHtmlSidebar::addEntry(
-			JText::_('COM_TJUCM_TITLE_ITEMS'),
-			'index.php?option=com_tjucm&view=items',
-			$vName == 'items'
-		);
 	}
 
 	/**
