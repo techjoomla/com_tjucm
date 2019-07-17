@@ -1,10 +1,11 @@
 <?php
 /**
- * @version    SVN: <svn_id>
- * @package    Com_Tjucm
- * @author     Techjoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
- * @license    GNU General Public License version 2 or later.
+ * @package     TJ-UCM
+ * @subpackage  com_tjucm
+ *
+ * @author      Techjoomla <extensions@techjoomla.com>
+ * @copyright   Copyright (C) 2009 - 2019 Techjoomla. All rights reserved.
+ * @license     http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 // No direct access.
@@ -361,7 +362,7 @@ class TjucmModelItemForm extends JModelForm
 		$form = $this->loadForm(
 			'com_tjucm.itemform', 'itemform',
 			array('control' => 'jform',
-				'load_data' => $loadData
+				'load_data' => $loadData,
 			)
 		);
 
@@ -484,7 +485,8 @@ class TjucmModelItemForm extends JModelForm
 			return false;
 		}
 
-		$ucmTypeData = $this->common->getDataValues('#__tj_ucm_types', 'id AS type_id, params', 'unique_identifier = "' . $data['client'] . '"', 'loadAssoc');
+		$ucmTypeData = $this->common->getDataValues('#__tj_ucm_types', 'id AS type_id, params', 'unique_identifier = "'
+		. $data['client'] . '"', 'loadAssoc');
 
 		$data['type_id'] = empty($data['type_id']) ? $ucmTypeData['type_id'] : $data['type_id'];
 
@@ -654,8 +656,15 @@ class TjucmModelItemForm extends JModelForm
 		$table = $this->getTable();
 		$table->load($contentId);
 		$canDelete = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $table->type_id);
+		$canDeleteown = $user->authorise('core.type.deleteownitem', 'com_tjucm.type.' . $table->type_id);
 
-		if ($canDelete)
+		$deleteOwn = false;
+		if ($canDeleteown)
+		{
+			$deleteOwn = (JFactory::getUser()->id == $table->created_by ? true : false);
+		}
+
+		if ($canDelete || $deleteOwn)
 		{
 			$id = (!empty($contentId)) ? $contentId : (int) $this->getState('item.id');
 			$table = $this->getTable();
@@ -1242,19 +1251,14 @@ class TjucmModelItemForm extends JModelForm
 						{
 							foreach ($ucmSubFormfields as $ucmSubFormfield)
 							{
-								$fieldParams = new Registry($ucmSubFormfield->params);
+								$options = $tjFieldsModelField->getRelatedFieldOptions($ucmSubFormfield->id);
 
-								if ($ucmSubFormfield->type == 'related' && !empty($fieldParams->get('showParentRecordsOnly', '')))
-								{
-									$options = $tjFieldsModelField->getRelatedFieldOptions($ucmSubFormfield->id);
-
-									// This is required to replace the options of related field of subform in the DOM
-									$ucmSubFormFieldElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . $i .'__' . $ucmSubFormfield->name;
-									$ucmSubFormFieldElementId = str_replace('-', '_', $ucmSubFormFieldElementId);
-									$ucmSubFormFieldTemplateElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . 'XXX_XXX__' . $ucmSubFormfield->name;
-									$ucmSubFormFieldTemplateElementId = str_replace('-', '_', $ucmSubFormFieldTemplateElementId);
-									$returnData[] = array('templateId' => $ucmSubFormFieldTemplateElementId, 'elementId' => $ucmSubFormFieldElementId, 'options' => $options);
-								}
+								// This is required to replace the options of related field of subform in the DOM
+								$ucmSubFormFieldElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . $i . '__' . $ucmSubFormfield->name;
+								$ucmSubFormFieldElementId = str_replace('-', '_', $ucmSubFormFieldElementId);
+								$ucmSubFormFieldTemplateElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . 'XXX_XXX__' . $ucmSubFormfield->name;
+								$ucmSubFormFieldTemplateElementId = str_replace('-', '_', $ucmSubFormFieldTemplateElementId);
+								$returnData[] = array('templateId' => $ucmSubFormFieldTemplateElementId, 'elementId' => $ucmSubFormFieldElementId, 'options' => $options);
 							}
 						}
 					}

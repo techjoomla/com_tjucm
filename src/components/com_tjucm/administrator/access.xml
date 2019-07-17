@@ -19,5 +19,6 @@
 		<action name="core.type.edititemstate" title="COM_TJUCM_PERMISSION_TYPE_ITEM_EDITSTATE" description="COM_TJUCM_PERMISSION_TYPE_ITEM_EDITSTATE_DESC" />
 		<action name="core.type.editownitem" title="COM_TJUCM_PERMISSION_TYPE_ITEM_EDITOWN" description="COM_TJUCM_PERMISSION_TYPE_ITEM_EDITOWN_DESC" />
 		<action name="core.type.deleteitem" title="COM_TJUCM_PERMISSION_TYPE_ITEM_DELETE" description="COM_TJUCM_PERMISSION_TYPE_ITEM_DELETE_DESC" />
+		<action name="core.type.deleteownitem" title="COM_TJUCM_PERMISSION_TYPE_ITEM_DELETEOWN" description="COM_TJUCM_PERMISSION_TYPE_ITEM_DELETEOWN_DESC" />
 	</section>
 </access>

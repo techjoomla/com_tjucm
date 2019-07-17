@@ -9,6 +9,7 @@
 
 // No direct access
 defined('_JEXEC') or die;
+
 $app = JFactory::getApplication();
 $user = JFactory::getUser();
 JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
@@ -22,6 +23,10 @@ $fieldLayout['Checkbox'] = "checkbox";
 $fieldLayout['Radio'] = "list";
 $fieldLayout['List'] = "list";
 $fieldLayout['Itemcategory'] = "itemcategory";
+$fieldLayout['Video'] = "video";
+$fieldLayout['Calendar'] = "calendar";
+
+$csrf = "&" . JSession::getFormToken() . '=1';
 
 // Get Field table
 $fieldTableData = new stdClass;
@@ -36,7 +41,6 @@ foreach ($this->formXml as $k => $xmlFieldSet)
 	$xmlFieldSets[$count] = $xmlFieldSet;
 	$count++;
 }
-
 if ($this->form_extra)
 {
 	$fieldSets = $this->form_extra->getFieldsets();
@@ -102,8 +106,8 @@ if ($this->form_extra)
 																// If field type is file
 																if ($fieldTableData->tjFieldFieldTable->type == 'file' || $fieldTableData->tjFieldFieldTable->type == 'image')
 																{
-																	$layout = new JLayoutFile($fieldTableData->tjFieldFieldTable->type, JPATH_ROOT .'/components/com_tjfields/layouts/fields');
-																	$mediaLink = $layout->render(array('fieldValue'=>$value, 'isSubformField'=>'1', 'content_id'=>$app->input->get('id', '', 'INT'), 'subformFieldId'=>$formData->id,'subformFileFieldName'=>$name));
+																	$layout = new JLayoutFile($fieldTableData->tjFieldFieldTable->type, JPATH_ROOT . '/components/com_tjfields/layouts/fields');
+																	$mediaLink = $layout->render(array('fieldValue'=>$value, 'isSubformField'=>'1', 'content_id'=>$app->input->get('id', '', 'INT'), 'subformFieldId'=>$formData->id, 'subformFileFieldName'=>$name));
 																	echo $mediaLink;
 																}
 																// If field type is checkbox
@@ -146,8 +150,8 @@ if ($this->form_extra)
 								<div class="row">
 									<div class="col-xs-4"><?php echo $field->label; ?>:</div>
 									<div class="col-xs-8">
-										<?php 
-										$layout = new JLayoutFile($layoutToUse, JPATH_ROOT .'/components/com_tjfields/layouts/fields');
+										<?php
+										$layout = new JLayoutFile($layoutToUse, JPATH_ROOT . '/components/com_tjfields/layouts/fields');
 										$mediaLink = $layout->render(array('fieldValue' => $field->value));
 										$output = $layout->render(array('fieldXml' => $xmlField, 'field' => $field));
 										echo $output;
@@ -186,10 +190,16 @@ else
 		<a class="btn btn-default" href="<?php echo $redirectURL; ?>"><?php echo JText::_("COM_TJUCM_EDIT_ITEM"); ?></a>
 		<?php
 	}
-
-	if ($user->authorise('core.type.deleteitem','com_tjucm.type.' . $this->ucmTypeId))
+	
+	$deleteOwn = false;
+	if ($user->authorise('core.type.deleteownitem','com_tjucm.type.' . $this->ucmTypeId))
 	{
-		$redirectURL = JRoute::_('index.php?option=com_tjucm&task=item.remove&id=' . $this->item->id . '&client=' . $this->client, false);
+		$deleteOwn = (JFactory::getUser()->id == $this->item->created_by ? true : false);
+	}
+
+	if ($user->authorise('core.type.deleteitem','com_tjucm.type.' . $this->ucmTypeId) || $deleteOwn)
+	{
+		$redirectURL = JRoute::_('index.php?option=com_tjucm&task=itemform.remove&id=' . $this->item->id . '&client=' . $this->client . $csrf, false);
 		?>
 		<a class="btn btn-default" href="<?php echo $redirectURL; ?>"><?php echo JText::_("COM_TJUCM_DELETE_ITEM"); ?></a>
 		<?php
