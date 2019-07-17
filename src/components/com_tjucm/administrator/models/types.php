@@ -61,7 +61,7 @@ class TjucmModelTypes extends JModelList
 	 *
 	 * @throws Exception
 	 */
-	protected function populateState($ordering = null, $direction = null)
+	protected function populateState($ordering = 'a.id', $direction = 'DESC')
 	{
 		// Initialise variables.
 		$app = JFactory::getApplication('administrator');
@@ -78,7 +78,7 @@ class TjucmModelTypes extends JModelList
 		$this->setState('params', $params);
 
 		// List state information.
-		parent::populateState('a.title', 'asc');
+		parent::populateState($ordering, $direction);
 	}
 
 	/**
@@ -174,17 +174,5 @@ class TjucmModelTypes extends JModelList
 		}
 
 		return $query;
-	}
-
-	/**
-	 * Get an array of data items
-	 *
-	 * @return mixed Array of data items on success, false on failure.
-	 */
-	public function getItems()
-	{
-		$items = parent::getItems();
-
-		return $items;
 	}
 }

@@ -337,7 +337,12 @@ class TjucmModelType extends JModelAdmin
 		$params['layout'] = $data['layout'];
 
 		// If UCM type is a subform then need to add content_id as hidden field in the form - For flat subform storage
-		if ($params['is_subform'] == 1 && empty($data['id']))
+		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
+		$db = JFactory::getDbo();
+		$tjfieldsFieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
+		$tjfieldsFieldTable->load(array('name' => str_replace('.', '_', $data['unique_identifier']) . '_contentid'));
+
+		if ($params['is_subform'] == 1 && empty($tjfieldsFieldTable->id))
 		{
 			JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
 			$fieldGroup = array("name" => "hidden", "title" => "hidden", "client" => $data['unique_identifier'], "state" => 1);
