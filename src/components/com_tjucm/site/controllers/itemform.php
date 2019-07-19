@@ -815,67 +815,54 @@ class TjucmControllerItemForm extends JControllerForm
 							{
 									if ($extraData->type === 'ucmsubform')
 									{
-										$sourceClientName = explode('.', $this->client);
-										$ucmSubFormData = array();
-										$ucmSubFormData['clientComponent'] = 'com_tjucm';
-										$ucmSubFormData['client'] = $this->client;
-										$ucmSubFormData['view'] = $sourceClientName[1];
-										$ucmSubFormData['layout'] = 'default';
-										$ucmSubFormData['content_id'] = $ucmItemTable->id;
-										$resultSubFormData = $this->loadFormDataExtra($ucmSubFormData);
+										$ucmSubFormFieldData = $model->getUcmSubFormFieldDataJson($contentId, $extraData);
+										$subFormData = (array) json_decode($ucmSubFormFieldData);
 
-										foreach ($resultSubFormData as $key => $subFormData)
+										$prefixSourceClient = str_replace(".", "_", $this->client);
+										$fieldName = explode($prefixSourceClient . "_", $extraData->name);
+										$prefixTargetClient = str_replace(".", "_", $targetClient);
+										$targetFieldName = $prefixTargetClient . '_' . $fieldName[1];
+										$tjFieldsTable = $tjFieldsHelper->getFieldData($targetFieldName);
+										$params = json_decode($tjFieldsTable->params)->formsource;
+										$subFormClient = explode('components/com_tjucm/models/forms/', $params);
+										$subFormClient = explode('form_extra.xml', $subFormClient[1]);
+										$ucmExtraData[$targetFieldName] = 'com_tjucm.' . $subFormClient[0];
+										$formDataArray = array();
+
+										foreach ($subFormData as $subKey => $formData)
 										{
-											if ($key == $extraData->name)
+											$prefixSourceClient = str_replace(".", "_", $this->client);
+											$fieldName = explode($prefixSourceClient . "_", $subKey);
+											$prefixTargetClient = str_replace(".", "_", $targetClient);
+											$targetSubFieldName = $prefixTargetClient . '_' . $fieldName[1];
+											$subFormClientData = (array) $formData;
+											$subFormFieldsArray = array();
+
+											foreach ($subFormClientData as $subFormKey => $subFormValue)
 											{
-												$prefixSourceClient = str_replace(".", "_", $this->client);
-												$fieldName = explode($prefixSourceClient . "_", $key);
-												$prefixTargetClient = str_replace(".", "_", $targetClient);
-												$targetFieldName = $prefixTargetClient . '_' . $fieldName[1];
-												$tjFieldsTable = $tjFieldsHelper->getFieldData($targetFieldName);
-												$params = json_decode($tjFieldsTable->params)->formsource;
-												$subFormClient = explode('components/com_tjucm/models/forms/', $params);
-												$subFormClient = explode('form_extra.xml', $subFormClient[1]);
-												$ucmExtraData[$targetFieldName] = 'com_tjucm.' . $subFormClient[0];
-												$subFormData = (array) json_decode($subFormData);
-												$formDataArray = array();
+												$prefixSourceClient = str_replace(".", "_", $extraData->value);
+												$fieldName = explode($prefixSourceClient . "_", $subFormKey);
+												$prefixTargetClient = 'com_tjucm_' . $subFormClient[0];
+												$fieldName = $prefixTargetClient . '_' . $fieldName[1];
 
-												foreach ($subFormData as $subKey => $formData)
+												if ($subFormKey == $prefixSourceClient . '_contentid')
 												{
-													$prefixSourceClient = str_replace(".", "_", $this->client);
-													$fieldName = explode($prefixSourceClient . "_", $subKey);
-													$prefixTargetClient = str_replace(".", "_", $targetClient);
-													$targetSubFieldName = $prefixTargetClient . '_' . $fieldName[1];
-													$subFormClientData = (array) $formData;
-													$subFormFieldsArray = array();
+													unset($fieldName);
+													unset($subFormValue);
+												}
 
-													foreach ($subFormClientData as $subFormKey => $subFormValue)
+												if ($subFormValue)
+												{
+													if (is_array($subFormValue))
 													{
-														$prefixSourceClient = str_replace(".", "_", $extraData->value);
-														$fieldName = explode($prefixSourceClient . "_", $subFormKey);
-														$prefixTargetClient = 'com_tjucm_' . $subFormClient[0];
-														$fieldName = $prefixTargetClient . '_' . $fieldName[1];
-
-														if ($subFormKey == $prefixSourceClient . '_contentid')
-														{
-															unset($fieldName);
-															unset($subFormValue);
-														}
-
-														if ($subFormValue)
-														{
-															if (is_array($subFormValue))
-															{
-																$subFormValue = $subFormValue[0]->value;
-															}
-
-															$subFormFieldsArray[$fieldName] = $subFormValue;
-														}
+														$subFormValue = $subFormValue[0]->value;
 													}
 
-													$formDataArray[$targetSubFieldName] = (array) $subFormFieldsArray;
+													$subFormFieldsArray[$fieldName] = $subFormValue;
 												}
 											}
+
+											$formDataArray[$targetSubFieldName] = (array) $subFormFieldsArray;
 										}
 
 										$extrasSubFormFieldsData[$targetFieldName] = $formDataArray;
