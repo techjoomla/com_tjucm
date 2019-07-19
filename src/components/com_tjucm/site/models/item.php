@@ -54,6 +54,25 @@ class TjucmModelItem extends JModelAdmin
 		// Get UCM type id from uniquue identifier
 		$ucmType = $app->input->get('client', '');
 
+		if (empty($ucmType))
+		{
+			// Get the active item
+			$menuitem   = $app->getMenu()->getActive();
+
+			// Get the params
+			$menuparams = $menuitem->params;
+
+			if (!empty($menuparams))
+			{
+				$ucm_type   = $menuparams->get('ucm_type');
+
+				if (!empty($ucm_type))
+				{
+					$ucmType     = 'com_tjucm.' . $ucm_type;
+				}
+			}
+		}
+
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
 		$ucmId = $tjUcmModelType->getTypeId($ucmType);
