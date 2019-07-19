@@ -76,6 +76,27 @@ class TjucmViewItem extends JViewLegacy
 		/* Get model instance here */
 		$model = $this->getModel();
 		$this->client  = JFactory::getApplication()->input->get('client');
+
+		// If did not get the client from url then get if from menu param
+		if (empty($this->client))
+		{
+			// Get the active item
+			$menuItem = $app->getMenu()->getActive();
+
+			// Get the params
+			$this->menuparams = $menuItem->params;
+
+			if (!empty($this->menuparams))
+			{
+				$this->ucm_type   = $this->menuparams->get('ucm_type');
+
+				if (!empty($this->ucm_type))
+				{
+					$this->client     = 'com_tjucm.' . $this->ucm_type;
+				}
+			}
+		}
+
 		$this->id = JFactory::getApplication()->input->get('id');
 		$view = explode('.', $this->client);
 
