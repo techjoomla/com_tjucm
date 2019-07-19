@@ -1,10 +1,11 @@
 <?php
 /**
- * @version    SVN: <svn_id>
- * @package    Com_Tjucm
- * @author     Techjoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
- * @license    GNU General Public License version 2 or later.
+ * @package     TJ-UCM
+ * @subpackage  com_tjucm
+ *
+ * @author      Techjoomla <extensions@techjoomla.com>
+ * @copyright   Copyright (C) 2009 - 2019 Techjoomla. All rights reserved.
+ * @license     http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 // No direct access.
@@ -361,7 +362,7 @@ class TjucmModelItemForm extends JModelForm
 		$form = $this->loadForm(
 			'com_tjucm.itemform', 'itemform',
 			array('control' => 'jform',
-				'load_data' => $loadData
+				'load_data' => $loadData,
 			)
 		);
 
@@ -484,7 +485,8 @@ class TjucmModelItemForm extends JModelForm
 			return false;
 		}
 
-		$ucmTypeData = $this->common->getDataValues('#__tj_ucm_types', 'id AS type_id, params', 'unique_identifier = "' . $data['client'] . '"', 'loadAssoc');
+		$ucmTypeData = $this->common->getDataValues('#__tj_ucm_types', 'id AS type_id, params', 'unique_identifier = "'
+		. $data['client'] . '"', 'loadAssoc');
 
 		$data['type_id'] = empty($data['type_id']) ? $ucmTypeData['type_id'] : $data['type_id'];
 
@@ -654,8 +656,15 @@ class TjucmModelItemForm extends JModelForm
 		$table = $this->getTable();
 		$table->load($contentId);
 		$canDelete = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $table->type_id);
+		$canDeleteown = $user->authorise('core.type.deleteownitem', 'com_tjucm.type.' . $table->type_id);
 
-		if ($canDelete)
+		$deleteOwn = false;
+		if ($canDeleteown)
+		{
+			$deleteOwn = (JFactory::getUser()->id == $table->created_by ? true : false);
+		}
+
+		if ($canDelete || $deleteOwn)
 		{
 			$id = (!empty($contentId)) ? $contentId : (int) $this->getState('item.id');
 			$table = $this->getTable();
@@ -879,6 +888,11 @@ class TjucmModelItemForm extends JModelForm
 		// Sort all the ucmsubform records as per client
 		foreach ($ucmSubFormFields as $ucmSubFormField)
 		{
+			if (!isset($extra_jform_data[$ucmSubFormField->name]))
+			{
+				continue;
+			}
+
 			$subformRecords = $extra_jform_data[$ucmSubFormField->name];
 
 			if (!empty($subformRecords))
@@ -934,6 +948,7 @@ class TjucmModelItemForm extends JModelForm
 	 */
 	public function saveUcmSubFormRecords(&$validData, $ucmSubFormDataSet)
 	{
+		$db = JFactory::getDbo();
 		$subFormContentIds = array();
 
 		$isNew = empty($validData['id']) ? 1 : 0;
@@ -941,7 +956,6 @@ class TjucmModelItemForm extends JModelForm
 		// Delete removed subform details
 		if (!$isNew)
 		{
-			$db = JFactory::getDbo();
 			$query = $db->getQuery(true);
 			$query->select('id');
 			$query->from($db->quoteName('#__tj_ucm_data'));
@@ -950,6 +964,8 @@ class TjucmModelItemForm extends JModelForm
 			$oldSubFormContentIds = $db->loadColumn();
 		}
 
+		JLoader::import('components.com_tjfields.tables.fieldsvalue', JPATH_ADMINISTRATOR);
+		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
 
@@ -984,7 +1000,26 @@ class TjucmModelItemForm extends JModelForm
 						$subFormContentIds[] = array('elementName' => $ucmSubformContentFieldElementId, 'content_id' => $insertedId);
 
 						$ucmSubFormData[$ucmSubformContentIdFieldName] = $insertedId;
-						$this->save($validData, $ucmSubFormData);
+
+						// Get field id of contentid field
+						$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
+						$fieldTable->load(array('name' => $ucmSubformContentIdFieldName));
+
+						// Add-Update the value of content id field in the fields value table - start
+						$fieldsValueTable = JTable::getInstance('Fieldsvalue', 'TjfieldsTable', array('dbo', $db));
+						$fieldsValueTable->load(array('field_id' => $fieldTable->id, 'content_id' => $insertedId, 'client' => $validData['client']));
+
+						if (empty($fieldsValueTable->id))
+						{
+							$fieldsValueTable->field_id = $fieldTable->id;
+							$fieldsValueTable->value = $fieldsValueTable->content_id = $insertedId;
+							$fieldsValueTable->client = $validData['client'];
+						}
+
+						$fieldsValueTable->user_id = JFactory::getUser()->id;
+						$fieldsValueTable->store();
+
+						// Add-Update the value of content id field in the fields value table - end
 					}
 				}
 			}
@@ -1131,97 +1166,95 @@ class TjucmModelItemForm extends JModelForm
 			}
 			elseif ($field->type == 'ucmsubform')
 			{
-				// This is to get the options of related fields in the subforms of the parent UCM
-				$sfFieldName = $field->name;
-
-				// Get fields of the subform of the parent form
-				$tjFieldsModelFields = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
-				$tjFieldsModelFields->setState("filter.client", $ucmData[$field->id]->value);
-				$tjFieldsModelFields->setState("filter.state", 1);
-				$ucmSubFormfields = $tjFieldsModelFields->getItems();
-
-				// Get the content_id of the subform records of the parent record
-				$query = $db->getQuery(true);
-				$query->select('id');
-				$query->from($db->quoteName('#__tj_ucm_data'));
-				$query->where($db->quoteName('parent_id') . '=' . $contentId);
-				$query->where($db->quoteName('client') . '=' . $db->quote($ucmData[$field->id]->value));
-				$db->setQuery($query);
-				$subFormContentIds = $db->loadColumn();
-
-				if (!empty($subFormContentIds))
+				if (isset($ucmData[$field->id]) && !empty($ucmData[$field->id]->value))
 				{
-					$count = 0;
+					// This is to get the options of related fields in the subforms of the parent UCM
+					$sfFieldName = $field->name;
 
-					// Loop through the subform data to get the updated options of the subform related fields
-					foreach ($subFormContentIds as $subFormContentId)
+					// Get fields of the subform of the parent form
+					$tjFieldsModelFields = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+					$tjFieldsModelFields->setState("filter.client", $ucmData[$field->id]->value);
+					$tjFieldsModelFields->setState("filter.state", 1);
+					$ucmSubFormfields = $tjFieldsModelFields->getItems();
+
+					// Get the content_id of the subform records of the parent record
+					$query = $db->getQuery(true);
+					$query->select('id');
+					$query->from($db->quoteName('#__tj_ucm_data'));
+					$query->where($db->quoteName('parent_id') . '=' . $contentId);
+					$query->where($db->quoteName('client') . '=' . $db->quote($ucmData[$field->id]->value));
+					$db->setQuery($query);
+					$subFormContentIds = $db->loadColumn();
+
+					if (!empty($subFormContentIds))
 					{
-						$ucmSubFormData = $tjFieldsHelper->FetchDatavalue(array('client' => $ucmData[$field->id]->value, 'content_id' => $subFormContentId));
+						$count = 0;
 
-						foreach ($ucmSubFormfields as $ucmSubFormfield)
+						// Loop through the subform data to get the updated options of the subform related fields
+						foreach ($subFormContentIds as $subFormContentId)
 						{
-							$fieldParams = new Registry($ucmSubFormfield->params);
+							$ucmSubFormData = $tjFieldsHelper->FetchDatavalue(array('client' => $ucmData[$field->id]->value, 'content_id' => $subFormContentId));
 
-							if ($ucmSubFormfield->type == 'related' && !empty($fieldParams->get('showParentRecordsOnly', '')))
+							foreach ($ucmSubFormfields as $ucmSubFormfield)
 							{
-								$options = $tjFieldsModelField->getRelatedFieldOptions($ucmSubFormfield->id);
-								$selectedValues = $ucmSubFormData[$ucmSubFormfield->id]->value;
+								$fieldParams = new Registry($ucmSubFormfield->params);
 
-								// Mark previously selected options as selected
-								if (is_array($selectedValues))
+								if ($ucmSubFormfield->type == 'related' && !empty($fieldParams->get('showParentRecordsOnly', '')))
 								{
-									foreach ($options as &$option)
+									$options = $tjFieldsModelField->getRelatedFieldOptions($ucmSubFormfield->id);
+									$selectedValues = $ucmSubFormData[$ucmSubFormfield->id]->value;
+
+									// Mark previously selected options as selected
+									if (is_array($selectedValues))
 									{
-										foreach ($selectedValues as $selectedValue)
+										foreach ($options as &$option)
 										{
-											if ($option['value'] == $selectedValue->value)
+											foreach ($selectedValues as $selectedValue)
+											{
+												if ($option['value'] == $selectedValue->value)
+												{
+													$option['selected'] = 1;
+												}
+											}
+										}
+									}
+									else
+									{
+										foreach ($options as &$option)
+										{
+											if ($option['value'] == $selectedValues)
 											{
 												$option['selected'] = 1;
 											}
 										}
 									}
-								}
-								else
-								{
-									foreach ($options as &$option)
-									{
-										if ($option['value'] == $selectedValues)
-										{
-											$option['selected'] = 1;
-										}
-									}
-								}
 
-								// This is required to replace the options of related field of subform in the DOM
-								$ucmSubFormFieldElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . $count . '__' . $ucmSubFormfield->name;
-								$ucmSubFormFieldElementId = str_replace('-', '_', $ucmSubFormFieldElementId);
-								$ucmSubFormFieldTemplateElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . 'XXX_XXX__' . $ucmSubFormfield->name;
-								$ucmSubFormFieldTemplateElementId = str_replace('-', '_', $ucmSubFormFieldTemplateElementId);
-								$returnData[] = array('templateId' => $ucmSubFormFieldTemplateElementId, 'elementId' => $ucmSubFormFieldElementId, 'options' => $options);
+									// This is required to replace the options of related field of subform in the DOM
+									$ucmSubFormFieldElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . $count . '__' . $ucmSubFormfield->name;
+									$ucmSubFormFieldElementId = str_replace('-', '_', $ucmSubFormFieldElementId);
+									$ucmSubFormFieldTemplateElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . 'XXX_XXX__' . $ucmSubFormfield->name;
+									$ucmSubFormFieldTemplateElementId = str_replace('-', '_', $ucmSubFormFieldTemplateElementId);
+									$returnData[] = array('templateId' => $ucmSubFormFieldTemplateElementId, 'elementId' => $ucmSubFormFieldElementId, 'options' => $options);
+								}
 							}
+
+							$count++;
 						}
-
-						$count++;
 					}
-				}
-				else
-				{
-					$parentUcmFieldParams = new Registry($field->params);
-
-					$minimumUcmRecords = $parentUcmFieldParams->get('min', 0, 'INT');
-
-					for ($i = 0; $i <= $minimumUcmRecords; $i++)
+					else
 					{
-						foreach ($ucmSubFormfields as $ucmSubFormfield)
-						{
-							$fieldParams = new Registry($ucmSubFormfield->params);
+						$parentUcmFieldParams = new Registry($field->params);
 
-							if ($ucmSubFormfield->type == 'related' && !empty($fieldParams->get('showParentRecordsOnly', '')))
+						$minimumUcmRecords = $parentUcmFieldParams->get('min', 0, 'INT');
+
+						for ($i = 0; $i <= $minimumUcmRecords; $i++)
+						{
+							foreach ($ucmSubFormfields as $ucmSubFormfield)
 							{
 								$options = $tjFieldsModelField->getRelatedFieldOptions($ucmSubFormfield->id);
 
 								// This is required to replace the options of related field of subform in the DOM
-								$ucmSubFormFieldElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . $i .'__' . $ucmSubFormfield->name;
+								$ucmSubFormFieldElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . $i . '__' . $ucmSubFormfield->name;
 								$ucmSubFormFieldElementId = str_replace('-', '_', $ucmSubFormFieldElementId);
 								$ucmSubFormFieldTemplateElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . 'XXX_XXX__' . $ucmSubFormfield->name;
 								$ucmSubFormFieldTemplateElementId = str_replace('-', '_', $ucmSubFormFieldTemplateElementId);

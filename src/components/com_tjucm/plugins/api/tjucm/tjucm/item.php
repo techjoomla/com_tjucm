@@ -1,11 +1,11 @@
 <?php
 /**
- * @package     TjUcm
- * @subpackage  Plg_Api_ucm
- * 
+ * @package     TJ-UCM
+ * @subpackage  com_tjucm
+ *
  * @author      Techjoomla <extensions@techjoomla.com>
- * @copyright   Copyright (c) 2009-2019 TechJoomla. All rights reserved.
- * @license     GNU General Public License version 2 or later.
+ * @copyright   Copyright (C) 2009 - 2019 Techjoomla. All rights reserved.
+ * @license     http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die;
@@ -81,7 +81,7 @@ class TjucmApiResourceItem extends ApiResource
 
 		unset($tjFields);
 
-		// Mapping field name with its value 
+		// Mapping field name with its value
 		foreach ($fields as $k => $field)
 		{
 			$extra_jform_data[$fieldsAssoc[(int) $field["id"]]] = $field["value"];

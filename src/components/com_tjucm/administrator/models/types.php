@@ -1,10 +1,11 @@
 <?php
 /**
- * @version    SVN: <svn_id>
- * @package    Com_Tjucm
- * @author     Techjoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
- * @license    GNU General Public License version 2 or later.
+ * @package     TJ-UCM
+ * @subpackage  com_tjucm
+ *
+ * @author      Techjoomla <extensions@techjoomla.com>
+ * @copyright   Copyright (C) 2009 - 2019 Techjoomla. All rights reserved.
+ * @license     http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined('_JEXEC') or die;
@@ -61,7 +62,7 @@ class TjucmModelTypes extends JModelList
 	 *
 	 * @throws Exception
 	 */
-	protected function populateState($ordering = null, $direction = null)
+	protected function populateState($ordering = 'a.id', $direction = 'DESC')
 	{
 		// Initialise variables.
 		$app = JFactory::getApplication('administrator');
@@ -78,7 +79,7 @@ class TjucmModelTypes extends JModelList
 		$this->setState('params', $params);
 
 		// List state information.
-		parent::populateState('a.title', 'asc');
+		parent::populateState($ordering, $direction);
 	}
 
 	/**
@@ -174,17 +175,5 @@ class TjucmModelTypes extends JModelList
 		}
 
 		return $query;
-	}
-
-	/**
-	 * Get an array of data items
-	 *
-	 * @return mixed Array of data items on success, false on failure.
-	 */
-	public function getItems()
-	{
-		$items = parent::getItems();
-
-		return $items;
 	}
 }

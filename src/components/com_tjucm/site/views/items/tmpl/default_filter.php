@@ -59,7 +59,7 @@ $customOptions = array(
 	'filtersHidden'       => isset($options['filtersHidden']) ? $options['filtersHidden'] : empty($data['view']->activeFilters) && !$filtered,
 	'defaultLimit'        => isset($options['defaultLimit']) ? $options['defaultLimit'] : JFactory::getApplication()->get('list_limit', 20),
 	'searchFieldSelector' => '#filter_search',
-	'orderFieldSelector'  => '#list_fullordering'
+	'orderFieldSelector'  => '#list_fullordering',
 );
 
 $data['options'] = array_unique(array_merge($customOptions, $data['options']));

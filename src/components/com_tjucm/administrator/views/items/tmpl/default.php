@@ -179,7 +179,7 @@ if (!empty($this->extra_sidebar))
 							<?php endif; ?>
 
 							<th class='left'>
-								<?php echo JHtml::_('grid.sort',  'COM_TJUCM_ITEMS_ID', 'a.`id`', $listDirn, $listOrder); ?>
+								<?php echo JHtml::_('grid.sort', 'COM_TJUCM_ITEMS_ID', 'a.`id`', $listDirn, $listOrder); ?>
 							</th>
 							<?php
 							if (!empty($this->listcolumn))
@@ -251,7 +251,7 @@ if (!empty($this->extra_sidebar))
 								</td>
 
 								<?php
-								if (!empty ($item->field_values))
+								if (!empty($item->field_values))
 								{
 									foreach ($item->field_values as $field_values)
 									{?>
