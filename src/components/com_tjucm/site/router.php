@@ -115,15 +115,6 @@ class TjUcmRouter extends JComponentRouterBase
 			unset($query['client']);
 		}
 
-		if ($view == 'item')
-		{
-			if (isset($query['id']))
-			{
-				$segments[] = (INT) $query['id'];
-				unset($query['id']);
-			}
-		}
-
 		return $segments;
 	}
 
@@ -163,11 +154,6 @@ class TjUcmRouter extends JComponentRouterBase
 			if ($ucmTypeTable->id)
 			{
 				$vars['client'] = $ucmTypeTable->unique_identifier;
-
-				if (!empty($segments[2]))
-				{
-					$vars['id'] = $segments[2];
-				}
 			}
 		}
 
