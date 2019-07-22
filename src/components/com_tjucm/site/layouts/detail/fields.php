@@ -20,13 +20,11 @@ $user = JFactory::getUser();
 
 // Layout for field types
 $fieldLayout = array();
-$fieldLayout['File'] = "file";
-$fieldLayout['Image'] = "file";
+$fieldLayout['File'] = $fieldLayout['Image'] = "file";
 $fieldLayout['Checkbox'] = "checkbox";
-$fieldLayout['Radio'] = "list";
-$fieldLayout['List'] = "list";
+$fieldLayout['Radio'] = $fieldLayout['List'] = "list";
 $fieldLayout['Itemcategory'] = "itemcategory";
-$fieldLayout['Video'] = "video";
+$fieldLayout['Video'] = $fieldLayout['Audio'] = $fieldLayout['Url'] = "link";
 $fieldLayout['Calendar'] = "calendar";
 
 // Load the tj-fields helper
@@ -135,6 +133,7 @@ foreach ($fieldSets as $fieldName => $fieldset)
 									// Call the JLayout recursively to render fields of ucmsubform
 									$layout = new JLayoutFile('fields', JPATH_ROOT . '/components/com_tjucm/layouts/detail');
 									echo $layout->render(array('xmlFormObject' => $ucmSubFormXmlFieldSets, 'formObject' => $ucmSubformFormObject, 'itemData' => $this->item, 'isSubForm' => 1));
+									echo "<hr>";
 								}
 							}
 							?>
