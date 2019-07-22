@@ -20,13 +20,11 @@ $user = JFactory::getUser();
 
 // Layout for field types
 $fieldLayout = array();
-$fieldLayout['File'] = "file";
-$fieldLayout['Image'] = "file";
+$fieldLayout['File'] = $fieldLayout['Image'] = "file";
 $fieldLayout['Checkbox'] = "checkbox";
-$fieldLayout['Radio'] = "list";
-$fieldLayout['List'] = "list";
+$fieldLayout['Radio'] = $fieldLayout['List'] = "list";
 $fieldLayout['Itemcategory'] = "itemcategory";
-$fieldLayout['Video'] = "video";
+$fieldLayout['Video'] = $fieldLayout['Audio'] = $fieldLayout['Url'] = "link";
 $fieldLayout['Calendar'] = "calendar";
 
 // Load the tj-fields helper
@@ -57,11 +55,10 @@ foreach ($fieldSets as $fieldName => $fieldset)
 {
 	$xmlFieldSet = $xmlFormObject[$count];
 	$count++;
+	$fieldCount = 0;
 	?>
 	<div class="row">
 		<?php
-		$fieldCount = 0;
-
 		foreach ($formObject->getFieldset($fieldset->name) as $field)
 		{
 			// Get the field data by field name to check the field type
@@ -75,15 +72,15 @@ foreach ($fieldSets as $fieldName => $fieldset)
 
 			if ($canView || ($itemData->created_by == $user->id))
 			{
-				if ($field->hidden)
-				{
-					echo $field->input;
-				}
-
 				// Get xml for the field
 				$xmlField = $xmlFieldSet->field[$fieldCount];
 				$fieldCount++;
 
+				if ($field->hidden)
+				{
+					echo $field->input;
+					continue;
+				}
 
 				if ($field->type == 'Subform' || $field->type == 'Ucmsubform')
 				{
@@ -93,7 +90,7 @@ foreach ($fieldSets as $fieldName => $fieldset)
 						<div class="col-xs-8">
 							<?php
 							$count = 0;
-							$xmlFieldSets = array();
+							$ucmSubFormXmlFieldSets = array();
 
 							// Call to extra fields
 							JLoader::import('components.com_tjucm.models.item', JPATH_SITE);
@@ -114,7 +111,7 @@ foreach ($fieldSets as $fieldName => $fieldset)
 								{
 									$contentIdFieldname = str_replace('.', '_', $ucmSubFormClient) . '_contentid';
 
-									$ucmsubform_form_extra = $tjucmItemModel->getFormExtra(
+									$ucmSubformFormObject = $tjucmItemModel->getFormExtra(
 										array(
 											"clientComponent" => 'com_tjucm',
 											"client" => $ucmSubFormClient,
@@ -125,15 +122,18 @@ foreach ($fieldSets as $fieldName => $fieldset)
 
 									$ucmSubFormFormXml = simplexml_load_file($field->formsource);
 
-									foreach ($ucmSubFormFormXml as $k => $xmlFieldSet)
+									$ucmSubFormCount = 0;
+
+									foreach ($ucmSubFormFormXml as $ucmSubFormXmlFieldSet)
 									{
-										$xmlFieldSets[$count] = $xmlFieldSet;
-										$count++;
+										$ucmSubFormXmlFieldSets[$ucmSubFormCount] = $ucmSubFormXmlFieldSet;
+										$ucmSubFormCount++;
 									}
 
 									// Call the JLayout recursively to render fields of ucmsubform
 									$layout = new JLayoutFile('fields', JPATH_ROOT . '/components/com_tjucm/layouts/detail');
-									echo $layout->render(array('xmlFormObject' => $xmlFieldSets, 'formObject' => $ucmsubform_form_extra, 'itemData' => $this->item, 'isSubForm' => 1));
+									echo $layout->render(array('xmlFormObject' => $ucmSubFormXmlFieldSets, 'formObject' => $ucmSubformFormObject, 'itemData' => $this->item, 'isSubForm' => 1));
+									echo "<hr>";
 								}
 							}
 							?>
@@ -150,7 +150,6 @@ foreach ($fieldSets as $fieldName => $fieldset)
 						<div class="<?php echo $controlDivClass;?>">
 							<?php
 							$layout = new JLayoutFile($layoutToUse, JPATH_ROOT . '/components/com_tjfields/layouts/fields');
-							$mediaLink = $layout->render(array('fieldValue' => $field->value));
 							$output = $layout->render(array('fieldXml' => $xmlField, 'field' => $field));
 							echo $output;
 							?>
