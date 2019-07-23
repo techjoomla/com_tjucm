@@ -33,6 +33,7 @@
 		<filename>router.php</filename>
 		<folder>views</folder>
 		<folder>models</folder>
+		<folder>layouts</folder>
 		<folder>controllers</folder>
 		<folder>helpers</folder>
 	</files>

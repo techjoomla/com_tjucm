@@ -40,7 +40,6 @@ class TjucmViewItem extends JViewLegacy
 	public function display($tpl = null)
 	{
 		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
 
 		// Load tj-fields language file
 		$lang = JFactory::getLanguage();
