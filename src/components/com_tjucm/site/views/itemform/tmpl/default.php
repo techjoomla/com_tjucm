@@ -180,12 +180,12 @@ $itemState                 = $this->item->state;
 				?>
 				<input type="button" class="btn btn-width150 br-0 btn-default font-normal" id="draftSave"
 				value="<?php echo JText::_("COM_TJUCM_SAVE_AS_DRAFT_ITEM"); ?>"
-				onclick="javascript: this.disabled=true; steppedFormSave(this.form.id, 'draft');" />
+				onclick="javascript: this.disabled=true; steppedFormSave(this.form.id, 'draft', 1);" />
 				<?php
 			}
 			?>
 			<input type="button" class="btn btn-success" value="<?php echo JText::_("COM_TJUCM_SAVE_ITEM"); ?>"
-			id="finalSave" onclick="javascript: this.disabled=true; steppedFormSave(this.form.id, 'save');" />
+			id="finalSave" onclick="javascript: this.disabled=true; steppedFormSave(this.form.id, 'save', 1);" />
 			<?php
 		}
 		?>
