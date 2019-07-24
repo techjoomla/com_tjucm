@@ -3,9 +3,9 @@ $(function() {
         return
     }
     $('a').bind('click', function(evt) {
-        let href = $(evt.target).closest('a').attr('href');
-        let response = '';
-        let msg = '';
+        var href = $(evt.target).closest('a').attr('href');
+        var response = '';
+        var msg = '';
         if (href !== undefined && !(href.match(/^#/) || href.trim() == '')) {
             response = $(window).triggerHandler('beforeunload', response);
             if (response && response != "") {

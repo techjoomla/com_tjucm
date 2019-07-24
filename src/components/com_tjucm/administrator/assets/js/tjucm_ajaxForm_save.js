@@ -5,30 +5,28 @@ var tjucmRelatedFieldUpdatedOptions = '';
 jQuery(document).ready(function()
 {
 	/*Code to get item state*/
-	let itemState = jQuery('#itemState').val();
+	var itemState = jQuery('#itemState').val();
 
 	/*Code for auto save on blur event add new record or editing draft record only*/
 	if (itemState == '' || itemState === 0)
 	{
-		let showDraftSuccessMsg = "0";
-
-		let tjUcmAutoSave = jQuery('#item-form #tjucm-autosave').val();
+		var tjUcmAutoSave = jQuery('#item-form #tjucm-autosave').val();
 
 		/*Check if auto save is enabled for UCM type*/
 		if (tjUcmAutoSave == 1)
 		{
 			/* Save form values */
 			jQuery("#item-form").on("change select", ":input", function(){
-				steppedFormSave(this.form.id, "draft", showDraftSuccessMsg);
+				steppedFormSave(this.form.id, "draft", 0);
 			});
 
 			/* To save calendar field value */
 			jQuery("#item-form .field-calendar input:text").blur(function(){
-				let tjUcmFormDirty = jQuery('#item-form').hasClass('dirty');
+				var tjUcmFormDirty = jQuery('#item-form').hasClass('dirty');
 
 				if (tjUcmFormDirty === true)
 				{
-					steppedFormSave(this.form.id, "draft", showDraftSuccessMsg);
+					steppedFormSave(this.form.id, "draft", 0);
 				}
 			});
 		}
@@ -36,25 +34,25 @@ jQuery(document).ready(function()
 
 	/*Update the options of related field for new record of subform*/
 	jQuery(document).on('subform-row-add', function(event, row){
-		let count = jQuery(row).attr('data-group').replace(jQuery(row).attr('data-base-name'), "");
+		var tjucmSubFormCount = jQuery(row).attr('data-group').replace(jQuery(row).attr('data-base-name'), "");
 
 		jQuery.each(tjucmRelatedFieldUpdatedOptions, function(index, value) {
 			if (value.templateId)
 			{
-				let newTemplateId = value.templateId.replace("XXX_XXX", count);
-				jQuery(row).find("#"+newTemplateId).html('');
+				var tjucmNewTemplateId = value.templateId.replace("XXX_XXX", tjucmSubFormCount);
+				jQuery(row).find("#"+tjucmNewTemplateId).html('');
 				jQuery.each(value.options, function(i, val) {
-					jQuery(row).find("#"+newTemplateId).append('<option value="'+val.value+'">'+val.text+'</option>');
+					jQuery(row).find("#"+tjucmNewTemplateId).append('<option value="'+val.value+'">'+val.text+'</option>');
 				});
 
-				jQuery(row).find("#"+newTemplateId).trigger("liszt:updated");
+				jQuery(row).find("#"+tjucmNewTemplateId).trigger("liszt:updated");
 			}
 		});
 	});
 });
 
 /* This function carries stepped saving via ajax */
-function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
+function steppedFormSave(form_id, status, showDraftSuccessMsg)
 {
 	/* For AJAX save need to add this to prevent popup message for page unload*/
 	window.onbeforeunload = null;
@@ -100,7 +98,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 			datatype:'JSON',
 			async: false,
 			success: function(data) {
-				let returnedData = JSON.parse(data);
+				var returnedData = JSON.parse(data);
 
 				if (returnedData.messages !== null)
 				{
@@ -146,9 +144,9 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 					}
 
 					/* Update item id in the URL if the data is stored successfully */
-					let url = window.location.href.split('#')[0];
-					let separator = (url.indexOf("?")===-1)?"?":"&";
-					let newParam = "id=" + returnedData.data.id;
+					var tjucmUrl = window.location.href.split('#')[0];
+					var tjucmUrlSeparator = (tjucmUrl.indexOf("?")===-1)?"?":"&";
+					var tjucmNewParam = "id=" + returnedData.data.id;
 
 					/* Add content_id in ucmsubform records */
 					jQuery.each(returnedData.data.childContentIds, function(i, val) {
@@ -161,24 +159,24 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg = "1")
 						jQuery("#"+value.elementId).html('');
 
 						jQuery.each(value.options, function(i, val) {
-							let selected = '';
+							var tjucmSelectedFieldOption = '';
 
 							if (val.selected == '1'){
-								selected = ' selected="selected" ';
+								tjucmSelectedFieldOption = ' selected="selected" ';
 							}
 
-							jQuery("#"+value.elementId).append('<option value="'+val.value+'" '+selected+'>'+val.text+'</option>');
+							jQuery("#"+value.elementId).append('<option value="'+val.value+'" '+tjucmSelectedFieldOption+'>'+val.text+'</option>');
 						});
 
 						jQuery("#"+value.elementId).trigger("liszt:updated");
 					});
 
-					if (!(url.indexOf(newParam) >= 0))
+					if (!(tjucmUrl.indexOf(tjucmNewParam) >= 0))
 					{
-						url+=separator+newParam;
+						tjucmUrl+=tjucmUrlSeparator+tjucmNewParam;
 					}
 
-					history.pushState(null, null, url);
+					history.pushState(null, null, tjucmUrl);
 				}
 
 				jQuery('#draftSave').attr('disabled', false);
@@ -205,7 +203,7 @@ function itemformactions(tab_id, navDirection)
 	var prevTabName = jQuery('ul#' + getTabId).find('li.active').prev('li').children('a').attr('href');
 
 	/* Once all fields are validated, enable Final Save*/
-	steppedFormSave('item-form', 'draft');
+	steppedFormSave('item-form', 'draft', 1);
 
 	if (navDirection == "next")
 	{
