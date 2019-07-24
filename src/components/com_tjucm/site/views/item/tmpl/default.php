@@ -18,7 +18,7 @@ $TjfieldsHelper = new TjfieldsHelper;
 // Layout for field types
 $fieldLayout = array();
 $fieldLayout['File'] = "file";
-$fieldLayout['Image'] = "file";
+$fieldLayout['Image'] = "image";
 $fieldLayout['Checkbox'] = "checkbox";
 $fieldLayout['Radio'] = "list";
 $fieldLayout['List'] = "list";
@@ -190,7 +190,7 @@ else
 		<a class="btn btn-default" href="<?php echo $redirectURL; ?>"><?php echo JText::_("COM_TJUCM_EDIT_ITEM"); ?></a>
 		<?php
 	}
-	
+
 	$deleteOwn = false;
 	if ($user->authorise('core.type.deleteownitem','com_tjucm.type.' . $this->ucmTypeId))
 	{
