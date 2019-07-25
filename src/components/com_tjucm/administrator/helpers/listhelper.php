@@ -1,10 +1,11 @@
 <?php
 /**
- * @version    SVN: <svn_id>
- * @package    Com_Tjucm
- * @author     Techjoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
- * @license    GNU General Public License version 2 or later.
+ * @package     TJ-UCM
+ * @subpackage  com_tjucm
+ *
+ * @author      Techjoomla <extensions@techjoomla.com>
+ * @copyright   Copyright (C) 2009 - 2019 Techjoomla. All rights reserved.
+ * @license     http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 // No direct access
@@ -33,7 +34,7 @@ abstract class JHtmlListhelper
 	{
 		$states = array(
 			0 => array('icon-remove', JText::_('Toggle'), 'inactive btn-danger'),
-			1 => array('icon-checkmark', JText::_('Toggle'), 'active btn-success')
+			1 => array('icon-checkmark', JText::_('Toggle'), 'active btn-success'),
 		);
 
 		$state  = \Joomla\Utilities\ArrayHelper::getValue($states, (int) $value, $states[0]);

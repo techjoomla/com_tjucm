@@ -1,10 +1,11 @@
 <?php
 /**
- * @version    SVN: <svn_id>
- * @package    Com_Tjucm
- * @author     Techjoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2018 TechJoomla. All rights reserved.
- * @license    GNU General Public License version 2 or later.
+ * @package     TJ-UCM
+ * @subpackage  com_tjucm
+ *
+ * @author      Techjoomla <extensions@techjoomla.com>
+ * @copyright   Copyright (C) 2009 - 2019 Techjoomla. All rights reserved.
+ * @license     http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 // No direct access.
@@ -88,7 +89,7 @@ class TjucmModelType extends JModelAdmin
 		$form = $this->loadForm(
 			'com_tjucm.type', 'type',
 			array('control' => 'jform',
-				'load_data' => $loadData
+				'load_data' => $loadData,
 			)
 		);
 
@@ -337,14 +338,25 @@ class TjucmModelType extends JModelAdmin
 		$params['layout'] = $data['layout'];
 
 		// If UCM type is a subform then need to add content_id as hidden field in the form - For flat subform storage
-		if ($params['is_subform'] == 1 && empty($data['id']))
+		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
+		$db = JFactory::getDbo();
+		$tjfieldsFieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
+		$tjfieldsFieldTable->load(array('name' => str_replace('.', '_', $data['unique_identifier']) . '_contentid'));
+
+		if ($params['is_subform'] == 1 && empty($tjfieldsFieldTable->id))
 		{
 			JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
 			$fieldGroup = array("name" => "hidden", "title" => "hidden", "client" => $data['unique_identifier'], "state" => 1);
 			$tjFieldsGroupModel = JModelLegacy::getInstance('Group', 'TjfieldsModel', array('ignore_request' => true));
 			$tjFieldsGroupModel->save($fieldGroup);
 			$fieldGroupId = (int) $tjFieldsGroupModel->getState($tjFieldsGroupModel->getName() . '.id');
-			$field = array("label" => "contentid", "name" => "contentid", "type" => "hidden", "client" => $data['unique_identifier'], "state" => 1, "group_id" => $fieldGroupId);
+			$field = array(
+			"label" => "contentid",
+			"name" => "contentid",
+			"type" => "hidden",
+			"client" => $data['unique_identifier'],
+			"state" => 1,
+			"group_id" => $fieldGroupId, );
 			$tjFieldsFieldModel = JModelLegacy::getInstance('Field', 'TjfieldsModel', array('ignore_request' => true));
 			$input->post->set('client_type', end(explode(".", $data['unique_identifier'])));
 			$tjFieldsFieldModel->save($field);

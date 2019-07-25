@@ -1,10 +1,11 @@
 <?php
 /**
- * @version    SVN: <svn_id>
- * @package    Com_Tjucm
- * @author     Techjoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
- * @license    GNU General Public License version 2 or later.
+ * @package     TJ-UCM
+ * @subpackage  com_tjucm
+ *
+ * @author      Techjoomla <extensions@techjoomla.com>
+ * @copyright   Copyright (C) 2009 - 2019 Techjoomla. All rights reserved.
+ * @license     http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 // No direct access.
@@ -39,7 +40,6 @@ class TjucmModelItem extends JModelAdmin
 	 * @return void
 	 *
 	 * @since    1.6
-	 *
 	 */
 	protected function populateState()
 	{
@@ -53,6 +53,25 @@ class TjucmModelItem extends JModelAdmin
 
 		// Get UCM type id from uniquue identifier
 		$ucmType = $app->input->get('client', '');
+
+		if (empty($ucmType))
+		{
+			// Get the active item
+			$menuitem   = $app->getMenu()->getActive();
+
+			// Get the params
+			$menuparams = $menuitem->params;
+
+			if (!empty($menuparams))
+			{
+				$ucm_type   = $menuparams->get('ucm_type');
+
+				if (!empty($ucm_type))
+				{
+					$ucmType     = 'com_tjucm.' . $ucm_type;
+				}
+			}
+		}
 
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
@@ -92,7 +111,6 @@ class TjucmModelItem extends JModelAdmin
 	 * @return  object|boolean|JException  Menu item data object on success, boolean false or JException instance on error
 	 * 
 	 * @since    _DEPLOY_VERSION_
-	 * 
 	 */
 	public function getItem($pk = null)
 	{
@@ -105,12 +123,12 @@ class TjucmModelItem extends JModelAdmin
 
 		// Variable to store creator name and id
 		$created_by = JFactory::getUser($item->created_by);
-		$created_by = array("id" => $created_by->id,"name" => $created_by->name);
+		$created_by = array("id" => $created_by->id, "name" => $created_by->name);
 		$item->created_by = $created_by;
 
 		// Variable to store modifier name and id
 		$modified_by = JFactory::getUser($item->modified_by);
-		$modified_by = array("id" => $modified_by->id,"name" => $modified_by->name);
+		$modified_by = array("id" => $modified_by->id, "name" => $modified_by->name);
 		$item->modified_by = $modified_by;
 
 		// Getting UCM Type Details

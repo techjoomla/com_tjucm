@@ -1,10 +1,11 @@
 <?php
 /**
- * @package	TJ-UCM
+ * @package     TJ-UCM
+ * @subpackage  com_tjucm
  *
- * @author	 TechJoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2019 TechJoomla. All rights reserved.
- * @license	GNU General Public License version 2 or later; see LICENSE.txt
+ * @author      Techjoomla <extensions@techjoomla.com>
+ * @copyright   Copyright (C) 2009 - 2019 Techjoomla. All rights reserved.
+ * @license     http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 // No direct access.
@@ -20,13 +21,13 @@ Table::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables')
  *
  * @subpackage  com_tjucm
  *
- * @since	   _DEPLOY_VERSION_
+ * @since       _DEPLOY_VERSION_
  */
-class tjUcmRouter extends JComponentRouterBase
+class TjUcmRouter extends JComponentRouterBase
 {
-	private  $views = array('itemform', 'items', 'item');
+	private $views = array('itemform', 'items', 'item');
 
-	private  $menu_views = array('itemform', 'items');
+	private $menu_views = array('itemform', 'items');
 
 	/**
 	 * Build the route for the com_tjucm component
@@ -114,15 +115,6 @@ class tjUcmRouter extends JComponentRouterBase
 			unset($query['client']);
 		}
 
-		if ($view == 'item')
-		{
-			if (isset($query['id']))
-			{
-				$segments[] = (INT) $query['id'];
-				unset($query['id']);
-			}
-		}
-
 		return $segments;
 	}
 
@@ -162,11 +154,6 @@ class tjUcmRouter extends JComponentRouterBase
 			if ($ucmTypeTable->id)
 			{
 				$vars['client'] = $ucmTypeTable->unique_identifier;
-
-				if (!empty($segments[2]))
-				{
-					$vars['id'] = $segments[2];
-				}
 			}
 		}
 

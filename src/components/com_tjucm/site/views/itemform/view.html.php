@@ -1,10 +1,11 @@
 <?php
 /**
- * @version    SVN: <svn_id>
- * @package    Com_Tjucm
- * @author     Techjoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
- * @license    GNU General Public License version 2 or later.
+ * @package     TJ-UCM
+ * @subpackage  com_tjucm
+ *
+ * @author      Techjoomla <extensions@techjoomla.com>
+ * @copyright   Copyright (C) 2009 - 2019 Techjoomla. All rights reserved.
+ * @license     http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 // No direct access
@@ -220,7 +221,7 @@ class TjucmViewItemform extends JViewLegacy
 			"client" => $this->client,
 			"view" => $view[1],
 			"layout" => 'edit',
-			"content_id" => $this->id)
+			"content_id" => $this->id, )
 			);
 
 		// Check if draft save is enabled for the form

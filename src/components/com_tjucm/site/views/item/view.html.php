@@ -1,10 +1,11 @@
 <?php
 /**
- * @version    SVN: <svn_id>
- * @package    Com_Tjucm
- * @author     Techjoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2017 TechJoomla. All rights reserved.
- * @license    GNU General Public License version 2 or later.
+ * @package     TJ-UCM
+ * @subpackage  com_tjucm
+ *
+ * @author      Techjoomla <extensions@techjoomla.com>
+ * @copyright   Copyright (C) 2009 - 2019 Techjoomla. All rights reserved.
+ * @license     http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 // No direct access
@@ -39,7 +40,6 @@ class TjucmViewItem extends JViewLegacy
 	public function display($tpl = null)
 	{
 		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
 
 		// Load tj-fields language file
 		$lang = JFactory::getLanguage();
@@ -75,6 +75,27 @@ class TjucmViewItem extends JViewLegacy
 		/* Get model instance here */
 		$model = $this->getModel();
 		$this->client  = JFactory::getApplication()->input->get('client');
+
+		// If did not get the client from url then get if from menu param
+		if (empty($this->client))
+		{
+			// Get the active item
+			$menuItem = $app->getMenu()->getActive();
+
+			// Get the params
+			$this->menuparams = $menuItem->params;
+
+			if (!empty($this->menuparams))
+			{
+				$this->ucm_type   = $this->menuparams->get('ucm_type');
+
+				if (!empty($this->ucm_type))
+				{
+					$this->client     = 'com_tjucm.' . $this->ucm_type;
+				}
+			}
+		}
+
 		$this->id = JFactory::getApplication()->input->get('id');
 		$view = explode('.', $this->client);
 
@@ -85,7 +106,7 @@ class TjucmViewItem extends JViewLegacy
 			"client" => $this->client,
 			"view" => $view[1],
 			"layout" => 'default',
-			"content_id" => $this->id)
+			"content_id" => $this->id, )
 			);
 
 		// Check for errors.
