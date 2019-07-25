@@ -61,6 +61,9 @@ foreach ($fieldSets as $fieldName => $fieldset)
 		<?php
 		foreach ($formObject->getFieldset($fieldset->name) as $field)
 		{
+			// No need to show tooltip/description for field on details view
+			$field->description = '';
+		
 			// Get the field data by field name to check the field type
 			$fieldTableData->tjFieldFieldTable->load(array('name' => $field->__get("fieldname")));
 			$canView = false;
