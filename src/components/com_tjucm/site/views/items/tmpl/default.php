@@ -35,6 +35,7 @@ if (!empty($this->client))
 
 $link = 'index.php?option=com_tjucm&view=items' . $appendUrl;
 $itemId = $tjUcmFrontendHelper->getItemId($link);
+
 ?>
 <form action="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>" method="post" name="adminForm" id="adminForm">
 	<table class="table table-striped" id="itemList">
@@ -71,16 +72,10 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 						<?php
 					}
 				}
-
-				if ($this->canEdit || $this->canDelete)
-				{
 					?>
 					<th class="center">
 						<?php echo JText::_('COM_TJUCM_ITEMS_ACTIONS'); ?>
 					</th>
-				<?php
-				}
-				?>
 			</tr>
 		</thead>
 		<?php
@@ -106,126 +101,15 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 		{
 			if (!empty($this->items))
 			{
+				$xmlFileName = explode(".", $this->client);
+				$xmlFilePath = JPATH_SITE . "/administrator/components/com_tjucm/models/forms/" . $xmlFileName[1] . "_extra" . ".xml";
+				$formXml = simplexml_load_file($xmlFilePath);
+
 				foreach ($this->items as $i => $item)
 				{
-					$link = JRoute::_('index.php?option=com_tjucm&view=item&id=' . $item->id . "&client=" . $this->client . '&Itemid=' . $itemId, false);
-
-					$editown = false;
-					if ($this->canEditOwn)
-					{
-						$editown = (JFactory::getUser()->id == $item->created_by ? true : false);
-					}
-
-					$deleteOwn = false;
-					if ($this->canDeleteOwn)
-					{
-						$deleteOwn = (JFactory::getUser()->id == $item->created_by ? true : false);
-					}
-					
-					?>
-					<tr class="row<?php echo $i % 2; ?>">
-						<?php
-						if (isset($this->items[0]->state))
-						{
-							$class = ($this->canChange) ? 'active' : 'disabled'; ?>
-							<td class="center">
-								<a class="<?php echo $class; ?>" href="<?php echo ($this->canChange) ? 'index.php?option=com_tjucm&task=item.publish&id=' . $item->id . '&state=' . (($item->state + 1) % 2) . $appendUrl . $csrf : '#'; ?>">
-								<?php
-								if ($item->state == 1)
-								{
-									?><i class="icon-publish"></i><?php
-								}
-								else
-								{
-									?><i class="icon-unpublish"></i><?php
-								}
-								?>
-								</a>
-							</td>
-						<?php
-						}
-						?>
-						<td>
-							<?php
-							if (isset($item->checked_out) && $item->checked_out)
-							{
-								echo JHtml::_('jgrid.checkedout', $i, $item->uEditor, $item->checked_out_time, 'items.', $canCheckin);
-							}
-							?>
-							<a href="<?php echo JRoute::_('index.php?option=com_tjucm&view=item&id=' . (int) $item->id . "&client=" . $this->client . '&Itemid=' . $itemId, false); ?>">
-								<?php echo $this->escape($item->id); ?>
-							</a>
-						</td>
-						<?php
-							if (!empty($item->field_values))
-							{
-								foreach ($item->field_values as $field_values)
-								{
-									?>
-									<td>
-									<?php
-									if (is_array(json_decode($field_values, true)))
-									{
-										$subFormData = json_decode($field_values);
-
-										foreach ($subFormData as $subFormDataRow)
-										{
-											?>
-											<table class="table table-bordered">
-											<?php
-											foreach ($subFormDataRow as $key => $subFormDataColumn)
-											{
-												?>
-												<tr>
-												<?php
-												echo !empty($subFormDataColumn) ? '<td>' . $key . '</td><td>' . $subFormDataColumn . '</td>' : '';
-												?>
-												</tr>
-												<?php
-											}
-											?>
-											</table>
-											<?php
-										}
-									}
-									else
-									{
-										?>
-										<a href="<?php echo $link;?>">
-											<?php echo $field_values; ?>
-										</a>
-										<?php
-									}
-									?>
-									</td>
-									<?php
-								}
-							}
-
-							if ($this->canEdit || $this->canDelete || $editown || $deleteOwn)
-							{
-								?>
-								<td class="center">
-								<?php
-								if ($this->canEdit || $editown)
-								{
-									?>
-									<a target="_blank" href="<?php echo 'index.php?option=com_tjucm&task=itemform.edit&id=' . $item->id . $appendUrl; ?>" class="btn btn-mini" type="button"><i class="icon-apply" aria-hidden="true"></i></a>
-									<?php
-								}
-								if ($this->canDelete || $deleteOwn)
-								{
-									?>
-									<a href="<?php echo 'index.php?option=com_tjucm&task=itemform.remove' . '&id=' . $item->id . $appendUrl . $csrf; ?>" class="btn btn-mini delete-button" type="button"><i class="icon-delete" aria-hidden="true"></i></a>
-									<?php
-								}
-								?>
-								</td>
-							<?php
-							}
-							?>
-					</tr>
-				<?php
+					// Call the JLayout to render the fields in the details view
+					$layout = new JLayoutFile('list', JPATH_ROOT . '/components/com_tjucm/layouts/detail');
+					echo $layout->render(array('itemsData' => $item, 'created_by' => $this->created_by, 'client' => $this->client, 'xmlFormObject' => $formXml, 'ucmTypeId' => $this->ucmTypeId));
 				}
 			}
 			else
