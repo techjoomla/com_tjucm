@@ -108,7 +108,7 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 				foreach ($this->items as $i => $item)
 				{
 					// Call the JLayout to render the fields in the details view
-					$layout = new JLayoutFile('list', JPATH_ROOT . '/components/com_tjucm/layouts/detail');
+					$layout = new JLayoutFile('list', JPATH_ROOT . '/components/com_tjucm/layouts/list');
 					echo $layout->render(array('itemsData' => $item, 'created_by' => $this->created_by, 'client' => $this->client, 'xmlFormObject' => $formXml, 'ucmTypeId' => $this->ucmTypeId));
 				}
 			}
