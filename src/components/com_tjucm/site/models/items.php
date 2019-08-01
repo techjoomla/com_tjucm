@@ -270,7 +270,7 @@ class TjucmModelItems extends JModelList
 	public function getFields()
 	{
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
-		$items_model = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request'=> true));
+		$items_model = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
 		$items_model->setState('filter.showonlist', 1);
 		$items_model->setState('filter.state', 1);
 		$this->client = $this->getState('ucm.client');
