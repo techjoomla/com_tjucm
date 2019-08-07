@@ -67,27 +67,19 @@ class TjucmModelItems extends JModelList
 	 *
 	 * @since    1.6
 	 */
-	protected function populateState($ordering = null, $direction = null)
+	protected function populateState($ordering = "a.id", $direction = "DESC")
 	{
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		$db = JFactory::getDbo();
 
+		// Load the filter state.
+		$search = $app->getUserStateFromRequest($this->context . '.filter.search', 'filter_search', '', 'STRING');
+		$this->setState('filter.search', $search);
+
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
 
-		$list = $app->getUserState($this->context . '.list');
-
-		$ordering  = isset($list['filter_order'])     ? $list['filter_order']     : null;
-		$direction = isset($list['filter_order_Dir']) ? $list['filter_order_Dir'] : null;
-
-		$list['limit']     = (int) JFactory::getConfig()->get('list_limit', 20);
-		$list['start']     = $app->input->getInt('start', 0);
-		$list['ordering']  = $ordering;
-		$list['direction'] = $direction;
-
-		$app->setUserState($this->context . '.list', $list);
-		$app->input->set('list', null);
 		$typeId = $app->input->get('id', "", "INT");
 
 		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
@@ -123,6 +115,13 @@ class TjucmModelItems extends JModelList
 		if (empty($typeId))
 		{
 			$typeId = $tjUcmModelType->getTypeId($ucmType);
+		}
+
+		$clusterId = $app->getUserStateFromRequest($this->context . '.cluster', 'cluster');
+
+		if ($clusterId)
+		{
+			$this->setState('filter.cluster_id', $clusterId);
 		}
 
 		$this->setState('ucm.client', $ucmType);
@@ -164,7 +163,9 @@ class TjucmModelItems extends JModelList
 		$query->select(
 			$this->getState(
 				'list.select', 'DISTINCT ' . $db->quoteName('a.id') . ', '
-				. $db->quoteName('a.state') . ', ' . $db->quoteName('a.created_by') . ',' . $group_concat
+				. $db->quoteName('a.state') . ', '
+				. $db->quoteName('a.cluster_id') . ', '
+				. $db->quoteName('a.created_by') . ',' . $group_concat
 			)
 		);
 
@@ -246,6 +247,14 @@ class TjucmModelItems extends JModelList
 			{
 				$search = $db->quote('%' . $db->escape($search, true) . '%');
 			}
+		}
+
+		// Filter by cluster
+		$clusterId = (int) $this->getState('filter.cluster_id');
+
+		if ($clusterId)
+		{
+			$query->where($db->quoteName('a.cluster_id') . ' = ' . $clusterId);
 		}
 
 		$query->group('fieldValue.content_id');
