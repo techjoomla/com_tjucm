@@ -50,6 +50,9 @@ class TjucmModelItems extends JModelList
 		$this->fields_separator = "#:";
 		$this->records_separator = "#=>";
 
+		// Load fields model
+		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
+
 		parent::__construct($config);
 	}
 
@@ -239,13 +242,49 @@ class TjucmModelItems extends JModelList
 
 		if (!empty($search))
 		{
+			$search = $db->escape(trim($search), true);
+
 			if (stripos($search, 'id:') === 0)
 			{
-				$query->where($db->quoteName('a.id') . ' = ' . (int) substr($search, 3));
+				$query->where($db->quoteName('a.id') . ' = ' . (int) $search);
 			}
 			else
 			{
-				$search = $db->quote('%' . $db->escape($search, true) . '%');
+				$fields = $this->getFields();
+				$filterFieldFound = 0;
+				$searchString = '';
+
+				if (!empty($fields))
+				{
+					$fieldCount = 0;
+
+					foreach ($fields as $fieldId => $field)
+					{
+						$fieldCount++;
+						$searchString .= $db->quoteName('field_values') . ' LIKE ' . $db->q('%' . $fieldId . '#:' . $search . '%');
+
+						if ($fieldCount < count($fields))
+						{
+							$searchString .= ' OR ';
+						}
+
+						// For field specific search 
+						if (stripos($search, $field . ':') === 0)
+						{
+							$search = trim(str_replace($field . ':', '', $search));
+							$query->having($db->quoteName('field_values') . ' LIKE ' . $db->q('%' . $fieldId . '#:' . $search . '%'));
+							$filterFieldFound = 1;
+
+							break;
+						}
+					}
+				}
+
+				// For generic search
+				if ($filterFieldFound == 0)
+				{
+					$query->having($searchString);
+				}
 			}
 		}
 
@@ -278,7 +317,6 @@ class TjucmModelItems extends JModelList
 	 */
 	public function getFields()
 	{
-		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
 		$items_model = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request'=> true));
 		$items_model->setState('filter.showonlist', 1);
 		$items_model->setState('filter.state', 1);

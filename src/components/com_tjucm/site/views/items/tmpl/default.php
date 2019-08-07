@@ -35,6 +35,10 @@ if (!empty($this->client))
 	$appendUrl .= "&client=" . $this->client;
 }
 
+$tmpListColumn = $this->listcolumn;
+reset($tmpListColumn);
+$firstListColumn = key($tmpListColumn);
+
 $link = 'index.php?option=com_tjucm&view=items' . $appendUrl;
 $itemId = $tjUcmFrontendHelper->getItemId($link);
 ?>
@@ -42,9 +46,9 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 	<div id="filter-progress-bar">
 		<div class="pull-left">
 			<input type="text" name="filter_search" id="filter_search"
-				placeholder="<?php echo JText::_('JSEARCH_FILTER'); ?>"
+				title="<?php echo empty($firstListColumn) ? JText::_('JSEARCH_FILTER') : JText::sprintf('COM_TJUCM_ITEMS_SEARCH_TITLE', $this->listcolumn[$firstListColumn]); ?>"
 				value="<?php echo $this->escape($this->state->get('filter.search')); ?>"
-				title="<?php echo JText::_('JSEARCH_FILTER'); ?>"/>
+				placeholder="<?php echo JText::_('JSEARCH_FILTER'); ?>"/>
 		</div>
 		<div class="pull-left">
 			<button class="btn btn-default" type="submit" title="<?php echo JText::_('JSEARCH_FILTER_SUBMIT'); ?>"><span class="icon-search"></span></button>
