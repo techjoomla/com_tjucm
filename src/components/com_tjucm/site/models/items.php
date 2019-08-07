@@ -268,6 +268,7 @@ class TjucmModelItems extends JModelList
 							$searchString .= ' OR ';
 						}
 
+						// For field specific search 
 						if (stripos($search, $field . ':') === 0)
 						{
 							$search = trim(str_replace($field . ':', '', $search));
@@ -279,13 +280,11 @@ class TjucmModelItems extends JModelList
 					}
 				}
 
+				// For generic search
 				if ($filterFieldFound == 0)
 				{
 					$query->having($searchString);
 				}
-
-				//$search = $db->quote('%' . str_replace(' ', '%', $search . '%'));
-				//$query->having('field_values LIKE ' . $db->q('%85#:film19%') . ' OR ' . 'field_values LIKE ' . $db->q('%87#:film19%'));
 			}
 		}
 
