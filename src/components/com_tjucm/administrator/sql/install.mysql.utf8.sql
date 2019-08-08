@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS `#__tj_ucm_types` (
 `modified_by` INT(11)  NOT NULL ,
 `modified_date` DATETIME NOT NULL ,
 PRIMARY KEY (`id`)
-) DEFAULT COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=1;
 
 CREATE TABLE IF NOT EXISTS `#__tj_ucm_data` (
 `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -35,4 +35,4 @@ CREATE TABLE IF NOT EXISTS `#__tj_ucm_data` (
 `modified_by` INT(11)  NOT NULL ,
 `modified_date` DATETIME NOT NULL ,
 PRIMARY KEY (`id`)
-) DEFAULT COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=1;
