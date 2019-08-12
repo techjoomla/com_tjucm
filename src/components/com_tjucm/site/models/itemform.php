@@ -669,6 +669,12 @@ class TjucmModelItemForm extends JModelForm
 			$id = (!empty($contentId)) ? $contentId : (int) $this->getState('item.id');
 			$table = $this->getTable();
 
+			// Do not allow to delete if id is passes as empty
+			if (empty($id))
+			{
+				return false;
+			}
+
 			// If there are child records then delete child records first
 			$db = JFactory::getDbo();
 			$query = $db->getQuery(true);

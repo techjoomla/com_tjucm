@@ -261,7 +261,7 @@ class TjucmModelItems extends JModelList
 					foreach ($fields as $fieldId => $field)
 					{
 						$fieldCount++;
-						$searchString .= $db->quoteName('field_values') . ' LIKE ' . $db->q('%' . $fieldId . '#:' . $search . '%');
+						$searchString .= $db->quoteName('field_values') . ' LIKE ' . $db->q('%' . $fieldId . '#:%' . $search . '%');
 
 						if ($fieldCount < count($fields))
 						{
@@ -272,7 +272,7 @@ class TjucmModelItems extends JModelList
 						if (stripos($search, $field . ':') === 0)
 						{
 							$search = trim(str_replace($field . ':', '', $search));
-							$query->having($db->quoteName('field_values') . ' LIKE ' . $db->q('%' . $fieldId . '#:' . $search . '%'));
+							$query->having($db->quoteName('field_values') . ' LIKE ' . $db->q('%' . $fieldId . '#:%' . $search . '%'));
 							$filterFieldFound = 1;
 
 							break;
