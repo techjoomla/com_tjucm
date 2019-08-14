@@ -12,6 +12,8 @@ defined('_JEXEC') or die;
 
 jimport('joomla.application.component.modellist');
 
+use Joomla\CMS\Component\ComponentHelper;
+
 /**
  * Methods supporting a list of Tjucm records.
  *
@@ -181,7 +183,7 @@ class TjucmModelItems extends JModelList
 		// Join over the foreign key 'type_id'
 		$query->join("INNER", $db->quoteName('#__tj_ucm_types', 'types') .
 		' ON (' . $db->quoteName('types.id') . ' = ' . $db->quoteName('a.type_id') . ')');
-		$query->where('(' . $db->quoteName('types.state') . ' IN (1))');
+		$query->where('(' . $db->quoteName('types.state') . ' = 1)');
 
 		// Join over the user field 'created_by'
 
@@ -223,6 +225,38 @@ class TjucmModelItems extends JModelList
 		if (!empty($createdBy))
 		{
 			$query->where($db->quoteName('a.created_by') . ' = ' . (INT) $createdBy);
+		}
+
+		// Show records belonging to users cluster if com_cluster is installed and enabled - start
+		$clusterExist = ComponentHelper::getComponent('com_cluster', true)->enabled;
+
+		if ($clusterExist)
+		{
+			JLoader::import('components.com_tjfields.table.field', JPATH_ADMINISTRATOR);
+			$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
+			$fieldTable->load(array('client' => $this->client, 'type' => 'cluster'));
+
+			if ($fieldTable->id)
+			{
+				JFormHelper::addFieldPath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models/fields/');
+				$cluster = JFormHelper::loadFieldType('cluster', false);
+				$clusterList = $cluster->getOptionsExternally();
+
+				if (!empty($clusterList))
+				{
+					$usersClusters = array();
+
+					foreach ($clusterList as $clusterList)
+					{
+						if (!empty($clusterList->value))
+						{
+							$usersClusters[] = $clusterList->value;
+						}
+					}
+				}
+
+				$query->where($db->quoteName('a.cluster_id') . ' IN (' . implode(",", $usersClusters) . ')');
+			}
 		}
 
 		// Filter by published state
