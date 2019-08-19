@@ -33,6 +33,9 @@ public class adminObject extends BasicClass {
 	@FindBy(how = How.XPATH, using ="//*[@id=\"toolbar-new\"]/button")
 	public static WebElement newType;  
 	
+	@FindBy(how = How.XPATH, using ="//a[text()='Types']")
+	public static WebElement Type; 
+	
 	@FindBy(how = How.NAME, using="jform[title]")
 	public static WebElement titleName;
 	
@@ -99,6 +102,9 @@ public class adminObject extends BasicClass {
 	@FindBy(how =How.XPATH, using = "//button[@class='btn btn-small button-save-new']")
 	public static WebElement text_save;
 
+	@FindBy(how =How.XPATH, using = "//button[@class='btn btn-small button-save']")
+	public static WebElement saveandclose;
+	
 	@FindBy(how = How.XPATH, using = "//input[@id='jform_label']")
 	public static WebElement lable;
 	
@@ -108,11 +114,23 @@ public class adminObject extends BasicClass {
 	@FindBy(how = How.XPATH, using = "//ul/li[text()='Text']")
 	public static WebElement selectfield1;
 	
+	@FindBy(how = How.XPATH, using = "//ul/li[text()='Video']")
+	public static WebElement selectVideo;
+	
+	@FindBy(how = How.XPATH, using = "//ul/li[text()='Audio']")
+	public static WebElement selectAudio;
+	
+	@FindBy(how = How.XPATH, using = "//ul/li[text()='Audio']")
+	public static WebElement selectCluster;
+		
 	@FindBy(how = How.XPATH, using = "//input[@id='jform_name']")
 	public static WebElement radio_name;
 	
 	@FindBy(how = How.XPATH, using ="//ul/li[text()='Radio']")
 	public static WebElement select_radio;
+
+	@FindBy(how = How.XPATH, using = "//button[@id='add']")
+	public static WebElement radiobutton;
 	
 	@FindBy(how = How.XPATH, using = "//input[@id='tjfields_optionname_0']")
 	public static WebElement optionvalue1;
@@ -120,13 +138,10 @@ public class adminObject extends BasicClass {
 	@FindBy(how = How.XPATH, using = "//input[@id='tjfields_optionvalue_0']")
 	public static WebElement optionname1; 
 	
-	@FindBy(how = How.XPATH, using = "//button[@id='add']")
-	public static WebElement radiobutton;
-	
 	@FindBy(how = How.XPATH, using ="//input[@id='tjfields_optionname_1']")
 	public static WebElement optionvalue2;
 	
-	@FindBy(how = How.XPATH, using ="//input[@id='tjfields_optionvalue_1")
+	@FindBy(how = How.XPATH, using ="//input[@id='tjfields_optionvalue_1']")
 	public static WebElement optionname2;
 	
 	@FindBy(how = How.XPATH, using = "//input[@id='jform_name']")
@@ -153,8 +168,8 @@ public class adminObject extends BasicClass {
 	@FindBy(how = How.XPATH,using = "//input[@id='jform_name']")
 	public static WebElement Nationalityname;	
 	
-	@FindBy(how = How.XPATH,using = "//ul/li[text()='Single Select']")
-	public static WebElement select_singl;	
+	@FindBy(how = How.XPATH,using =       "//ul/li[text()=\"Single Select (Deprecated. Use Field Type 'List')\"]")
+	public static WebElement select_singl;
 	
 	@FindBy(how = How.XPATH,using = "//input[@id='tjfields_optionname_0']")
 	public static WebElement countryname1;	
@@ -183,7 +198,7 @@ public class adminObject extends BasicClass {
 	@FindBy(how = How.XPATH,using = "//input[@id='jform_name']")
 	public static WebElement languagevalue;	
 	
-	@FindBy(how = How.XPATH,using = "//ul/li[text()='Multi Select']")
+	@FindBy(how = How.XPATH,using = "//ul/li[text()=\"Multi Select  (Deprecated. Use Field Type 'List')\"]")
 	public static WebElement select_multiselect;	
 	
 	@FindBy(how = How.XPATH,using = "//input[@id='tjfields_optionname_0']")
@@ -250,12 +265,12 @@ public class adminObject extends BasicClass {
 	public static WebElement subformName;
 	
 	@FindBy(how = How.XPATH,using = "//ul/li[text()='UCM Subform']")
-	public static WebElement select_subform;
+	public static WebElement select_ucm_subform;
 	
-	@FindBy(how = How.XPATH,using = "//div[@id='jformparamsformsource_chzn']//a[@class='chzn-single']\"")
+	@FindBy(how = How.XPATH,using = "//div[@id='jformparamsformsource_chzn']//a[@class='chzn-single']")
 	public static WebElement singlesubForm;
 	
-	@FindBy(how = How.XPATH,using = "//ul/li[text()='A UCM SUB FORM']")
+	@FindBy(how = How.XPATH,using = "//ul/li[text()='Sub form']")
 	public static WebElement selectsubform;
 
 	@FindBy(how = How.XPATH,using = "//input[@id='jform_name']")
@@ -298,12 +313,15 @@ public class adminObject extends BasicClass {
 	@FindBy(how = How.XPATH, using = "//li[@class='active-result'][text()='Registered']")
 	public static WebElement select_register;
 	
-	@FindBy(how = How.XPATH, using = "//a[@class='btn btn-primary']")
+	@FindBy(how = How.XPATH, using = "//button[@class='btn btn-primary']")
+	public static WebElement select_button_primary;
+		
+	@FindBy(how = How.XPATH, using = "//id[@class='btn btn-primary']")
 	public static WebElement select_primary;
 	
-	@FindBy(how = How.XPATH, using = "//div[@class='accordion-heading']//a[text()='TJ - UCM']")
+	@FindBy(how = How.XPATH, using = "//*[@id=\"collapseTypes\"]/div[11]/div[1]/strong/a")
 	public static WebElement select_header;
-	
+		
 	@FindBy(how = How.XPATH, using = "//a[@title='Show a form to add or edit a Item']")
 	public static WebElement show_edit_text;
 	
@@ -313,10 +331,9 @@ public class adminObject extends BasicClass {
 	@FindBy(how = How.XPATH, using = "//div[@id='jform_params_ucm_type_chzn']")
 	public static WebElement select_ucmtype;
 	
-	@FindBy(how = How.XPATH, using = "//ul[@class='chzn-results']/li[text()='Type tilte']")
+	@FindBy(how = How.XPATH, using = "//ul[@class='chzn-results']/li[text()='POM form ']")
 	public static WebElement select_typeTitle;
 	
-
 	@FindBy(how = How.XPATH, using = "//a[text()='Details']")
 	public static WebElement menu_details;
 	
@@ -348,10 +365,20 @@ public class adminObject extends BasicClass {
 	@FindBy(how = How.XPATH, using = "//input[@id='jform_password2']")
 	public static WebElement pwd2;
 	
-
-	@FindBy(how = How.XPATH, using = "//button [@class='btn btn-small button-apply btn-success']")
+	@FindBy(how = How.XPATH, using = "//button [@class='btn btn-small button-save']")
 	public static WebElement create_user;
 	
+	@FindBy(how = How.XPATH, using = "//input[@id='jform_email']")
+	public static WebElement user_email;
+	
+	@FindBy(how = How.XPATH, using = "//fieldset[@id='jform_is_subform']//label[@for='jform_is_subform1']")
+	public static WebElement is_sub_form;
+	
+	@FindBy(how = How.XPATH, using = "//input[@id='jform_allowed_count']")
+	public static WebElement allow_count;
+	
+	@FindBy(how = How.XPATH, using = "//*[@id=\"toolbar-apply\"]/button")
+	public static WebElement save;
 	
 	public adminObject(WebDriver driver) {
 

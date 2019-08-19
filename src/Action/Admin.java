@@ -1,5 +1,7 @@
 package Action;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
 import java.util.List;
@@ -22,12 +24,81 @@ public class Admin {
 		//return true;
 	}
 	
-	public static void CreateType (WebDriver driver)throws Exception {
-		Thread.sleep(3000);
-		adminObject.components.click();
-		adminObject.tjucm.click();
+	public static void CreateSubForm (WebDriver driver)throws Exception {
+
+		// create sub form 1st
 		adminObject.newType.click();
+		adminObject.titleName.sendKeys(ExcellPath.getCellData(70,1));
+		adminObject.is_sub_form.click();
+		adminObject.allow_count.sendKeys(ExcellPath.getCellData(74,1));
+		adminObject.save.click();
+		adminObject.permission.click();
+		
+		WebElement createsubItem = adminObject.permissionselect;
+		Select s1= new Select(createsubItem);
+		s1.selectByValue("1");
+		
+		adminObject.permission2.click();
+		
+		WebElement SubcreateItem = adminObject.permission_2;
+		Select s2= new Select(SubcreateItem);
+		s2.selectByValue("1");
+		
+		WebElement SubviewAllItem = adminObject.viewAll;  
+		Select s3 = new Select(SubviewAllItem);
+		s3.selectByValue("1");
+		
+		WebElement Subeditownitem = adminObject.EditOwnItem; 
+		Select s4 = new Select(Subeditownitem);
+		s4.selectByValue("1");
+		adminObject.save_closetype.click();
+		
+		List<WebElement> NumberofTypesfield = adminObject.field_groupcount;
+		for(int i=0;i<NumberofTypesfield.size();i++)
+		{
+			
+			if(i==0)
+			{
+				WebElement singleFieldgroup = NumberofTypesfield.get(i);
+				Thread.sleep(2000);
+				singleFieldgroup.click();
+			}
+		}
+		Thread.sleep(1000);
+		adminObject.save_field_group.click();
+		adminObject.group_name.sendKeys(ExcellPath.getCellData(71, 1));
+		adminObject.save_groupname.click();
+		adminObject.click_type.click();
+
+		List<WebElement> NumberOfTypesForFieldssub = adminObject.field_typecount;
+		for (int j=0; j<NumberOfTypesForFieldssub.size();j++)
+		{
+//			if(j==NumberOfTypesForFields.size()-1){if want to select the last field 
+				if(j==0){
+				WebElement singleField = NumberOfTypesForFieldssub.get(j); 
+				Thread.sleep(2000);
+				singleField.click();
+			}
+		}
+		adminObject.click_field.click();
+//		Create field for the form 
+		adminObject.form_label.sendKeys(ExcellPath.getCellData(72, 1));
+	    adminObject.form_name.sendKeys(ExcellPath.getCellData(74, 1)); 
+	    adminObject.click_field_type.click();
+		adminObject.select_field.click();
+		adminObject.text_required.click();
+		adminObject.saveandclose.click();
+		adminObject.Type.click();
+	}
+	
+	public static void CreateType (WebDriver driver)throws Exception {
+		
+		adminObject.newType.click();
+		Thread.sleep(2000);
 		adminObject.titleName.sendKeys(ExcellPath.getCellData(1,1));
+//		adminObject.allow_count.sendKeys(ExcellPath.getCellData(74,1));
+		driver.findElement(By.xpath("//input[@id='jform_allowed_count']")).sendKeys("0");
+		adminObject.save.click();
 		adminObject.permission.click();
 		
 		WebElement createItem = adminObject.permissionselect;
@@ -51,15 +122,14 @@ public class Admin {
 		adminObject.save_closetype.click();
 		
 		// create group
-		
 		List<WebElement> NumberofTypes = adminObject.field_groupcount;
 		for(int i=0;i<NumberofTypes.size();i++)
 		{
 			
-			if(i==NumberofTypes.size()-1)
+			if(i==0)
 			{
 				WebElement singleFieldgroup = NumberofTypes.get(i);
-				Thread.sleep(3000);
+				Thread.sleep(2000);
 				singleFieldgroup.click();
 			}
 		}
@@ -68,15 +138,15 @@ public class Admin {
 		adminObject.group_name.sendKeys(ExcellPath.getCellData(2, 1));
 		adminObject.save_groupname.click();
 		adminObject.click_type.click();
-		
-	// Create fields
-		
+				
+		//create field 
 		List<WebElement> NumberOfTypesForFields = adminObject.field_typecount;
 		for (int j=0; j<NumberOfTypesForFields.size();j++)
 		{
-			if(j==NumberOfTypesForFields.size()-1){
+//			if(j==NumberOfTypesForFields.size()-1){if want to select the last field 
+				if(j==0){
 				WebElement singleField = NumberOfTypesForFields.get(j); 
-				Thread.sleep(3000);
+				Thread.sleep(2000);
 				singleField.click();
 			}
 		}
@@ -84,18 +154,20 @@ public class Admin {
 //		Create field for the form 
 		adminObject.form_label.sendKeys(ExcellPath.getCellData(3, 1));
 	    adminObject.form_name.sendKeys(ExcellPath.getCellData(4, 1)); 
+	  
+	    JavascriptExecutor js2 = (JavascriptExecutor) driver; // for scroll
+	    js2.executeScript("window.scrollBy(0,10000)");
+	    
 	    adminObject.click_field_type.click();
 		adminObject.select_field.click();
 		adminObject.text_required.click();
-		adminObject.text_showonlist.click();
 		adminObject.text_save.click();
-		
+				
 		adminObject.lable.sendKeys(ExcellPath.getCellData(5,1));
 		adminObject.lastname.sendKeys(ExcellPath.getCellData(6, 1));
 		adminObject.click_field_type.click();
 		adminObject.selectfield1.click();
 		adminObject.text_required.click(); 
-		adminObject.text_showonlist.click();
 		adminObject.text_save.click();
 		
 		adminObject.lable.sendKeys(ExcellPath.getCellData(7,1));
@@ -108,7 +180,6 @@ public class Admin {
 		adminObject.optionvalue2.sendKeys(ExcellPath.getCellData(11,1));
 		adminObject.optionname2.sendKeys(ExcellPath.getCellData(12,1));
 		adminObject.text_required.click();
-		adminObject.text_showonlist.click();
 		adminObject.text_save.click();
 		
 		adminObject.lable.sendKeys(ExcellPath.getCellData(13,1));
@@ -117,7 +188,6 @@ public class Admin {
 		adminObject.select_number.click();
 		adminObject.minNumber.sendKeys(ExcellPath.getCellData(15,1));
 		adminObject.text_required.click();
-		adminObject.text_showonlist.click();
 		adminObject.text_save.click();
 		
 		adminObject.lable.sendKeys(ExcellPath.getCellData(16, 1));
@@ -125,17 +195,15 @@ public class Admin {
 		adminObject.click_field_type.click();
 		adminObject.select_email.click();
 		adminObject.text_required.click();
-		adminObject.text_showonlist.click();
 		adminObject.text_save.click();
 		
-		adminObject.lable.sendKeys(ExcellPath.getCellData(17, 1));
-		adminObject.datename.sendKeys(ExcellPath.getCellData(18, 1));
+		adminObject.lable.sendKeys(ExcellPath.getCellData(75,1));
+		adminObject.datename.sendKeys(ExcellPath.getCellData(75, 1));
 		adminObject.click_field_type.click();
 		adminObject.select_clender.click();
 		adminObject.text_required.click();
-		adminObject.text_showonlist.click();
 		adminObject.text_save.click();
-		
+	
 		adminObject.lable.sendKeys(ExcellPath.getCellData(18, 1));
 		adminObject.Nationalityname.sendKeys(ExcellPath.getCellData(19, 1));
 		adminObject.click_field_type.click();
@@ -151,11 +219,9 @@ public class Admin {
 		adminObject.radiobutton.click();
 		adminObject.countryname4.sendKeys(ExcellPath.getCellData(26, 1));
 		adminObject.countryvalue4.sendKeys(ExcellPath.getCellData(27, 1));
-		adminObject.text_required.click();
-		adminObject.text_showonlist.click();
 		adminObject.text_save.click();
 		
-		adminObject.lable.sendKeys(ExcellPath.getCellData(28, 1));
+	    adminObject.lable.sendKeys(ExcellPath.getCellData(28, 1));
 		adminObject.languagevalue.sendKeys(ExcellPath.getCellData(29, 1));
 		adminObject.click_field_type.click();
 		adminObject.select_multiselect.click();
@@ -167,9 +233,7 @@ public class Admin {
 		adminObject.radiobutton.click();
 		adminObject.languageName3.sendKeys(ExcellPath.getCellData(34, 1));
 		adminObject.languageValue3.sendKeys(ExcellPath.getCellData(35, 1));
-		adminObject.radiobutton.click();
 		adminObject.text_required.click();
-		adminObject.text_showonlist.click();
 		adminObject.text_save.click();
 		
 		adminObject.lable.sendKeys(ExcellPath.getCellData(36, 1));
@@ -179,7 +243,6 @@ public class Admin {
 		adminObject.row20.sendKeys(ExcellPath.getCellData(38,1));
 		adminObject.coloum20.sendKeys(ExcellPath.getCellData(39, 1));
 		adminObject.text_required.click();
-		adminObject.text_showonlist.click();
 		adminObject.text_save.click();
 		
 		adminObject.lable.sendKeys(ExcellPath.getCellData(40, 1));
@@ -187,7 +250,6 @@ public class Admin {
 		adminObject.click_field_type.click();
 		adminObject.selectseditor.click();
 		adminObject.text_required.click();
-		adminObject.text_showonlist.click();
 		adminObject.text_save.click();
 		
 		adminObject.lable.sendKeys(ExcellPath.getCellData(42, 1));
@@ -195,7 +257,6 @@ public class Admin {
 		adminObject.click_field_type.click();
 		adminObject.selectFile.click();
 		adminObject.file_accpted.sendKeys(ExcellPath.getCellData(44, 1));
-		adminObject.text_showonlist.click();
 		adminObject.text_save.click();
 		
 		adminObject.lable.sendKeys(ExcellPath.getCellData(45, 1));
@@ -204,30 +265,18 @@ public class Admin {
 		adminObject.selecttextareacc.click();
 		adminObject.row20.sendKeys(ExcellPath.getCellData(38,1));
 		adminObject.coloum20.sendKeys(ExcellPath.getCellData(39, 1));
-		adminObject.max_len.sendKeys(ExcellPath.getCellData(47,1));
-		adminObject.min_len.sendKeys(ExcellPath.getCellData(48,1));
+		adminObject.max_len.sendKeys("100");
+		adminObject.min_len.sendKeys("10");
 		adminObject.hint.sendKeys(ExcellPath.getCellData(49, 1));
 		adminObject.text_required.click();
-		adminObject.text_showonlist.click();
 		adminObject.text_save.click();
 		
-		adminObject.lable.sendKeys(ExcellPath.getCellData(50, 1));
-		adminObject.subformName.sendKeys(ExcellPath.getCellData(51, 1));
-		adminObject.click_field_type.click();
-		adminObject.select_subform.click();
-		adminObject.singlesubForm.click();
-		adminObject.selectsubform.click();
-		adminObject.text_required.click();
-		adminObject.text_showonlist.click();
-		adminObject.text_save.click();
-	
 		adminObject.lable.sendKeys(ExcellPath.getCellData(52, 1));
 		adminObject.sqlname.sendKeys(ExcellPath.getCellData(53,1));
 		adminObject.click_field_type.click();
 		adminObject.selectSql.click();
 		adminObject.sendSQL.sendKeys(ExcellPath.getCellData(54, 1));
 		adminObject.text_required.click();
-		adminObject.text_showonlist.click();
 		adminObject.text_save.click();
 		
 		adminObject.lable.sendKeys(ExcellPath.getCellData(55, 1));
@@ -235,8 +284,41 @@ public class Admin {
 		adminObject.click_field_type.click();
 		adminObject.selectcheckbox.click();
 		adminObject.text_required.click();
+		adminObject.text_save.click();
+		
+		adminObject.lable.sendKeys(ExcellPath.getCellData(64,1));
+		adminObject.lastname.sendKeys(ExcellPath.getCellData(65, 1));
+		adminObject.click_field_type.click();
+		adminObject.selectVideo.click();
+		adminObject.text_required.click(); 
+		adminObject.text_save.click();
+		
+		adminObject.lable.sendKeys(ExcellPath.getCellData(66,1));
+		adminObject.lastname.sendKeys(ExcellPath.getCellData(67, 1));
+		adminObject.click_field_type.click();
+		adminObject.selectAudio.click();
+		adminObject.text_required.click(); 
+		adminObject.text_save.click();
+		
+		adminObject.lable.sendKeys(ExcellPath.getCellData(50, 1));
+		adminObject.subformName.sendKeys(ExcellPath.getCellData(51, 1));
+		adminObject.click_field_type.click();
+		adminObject.select_ucm_subform.click();
+		adminObject.singlesubForm.click();
+		adminObject.selectsubform.click();
+		adminObject.text_required.click();
+		adminObject.saveandclose.click();			
+	
+		/*	
+		adminObject.lable.sendKeys(ExcellPath.getCellData(68,1));
+		adminObject.lastname.sendKeys(ExcellPath.getCellData(69, 1));
+		adminObject.click_field_type.click();
+		adminObject.selectCluster.click();
+		adminObject.text_required.click(); 
 		adminObject.text_showonlist.click();
 		adminObject.text_save.click();
+		*/
+		
 	}
 	
 	public static void CreateMenu (WebDriver driver)throws Exception {
@@ -245,34 +327,34 @@ public class Admin {
 		adminObject.click_newmenu.click();
 		
 		adminObject.menu_name.sendKeys(ExcellPath.getCellData(57, 1));
-		adminObject. menu_type.click();
+		adminObject.menu_type.click();
 	    adminObject.select_mainmenu.click();
-		adminObject.menu_name.click();
+		adminObject.create_viewformaccess.click();
 		adminObject.select_register.click();
-		adminObject.select_primary.click();
+		adminObject.select_button_primary.click();
 		
 		driver.switchTo().frame("Menu Item Type"); // switch to iFrame
+		Thread.sleep(1000);
 		adminObject.select_header.click();
+		Thread.sleep(2000);
 		adminObject.show_edit_text.click();	
 		driver.switchTo().defaultContent();
 		adminObject.ucm_config.click();
 		adminObject.select_ucmtype.click();
 		adminObject.select_typeTitle.click();
 		Thread.sleep(3000);
-		adminObject.text_save.click();
-		adminObject.menu_details.click();
+		adminObject.saveandclose.click();
+		adminObject.click_newmenu.click();
 		
 		Thread.sleep(3000);
 		adminObject.create_viewform.sendKeys(ExcellPath.getCellData(58, 1));
-			/*driver.findElement(By.xpath("//div[@id='jform_access_chzn']")).click();
-		driver.findElement(By.xpath("//ul[@class='chzn-results']/li[text()='Main Menu']")).click(); */
 		adminObject.create_viewformaccess.click();
 		adminObject.create_activeresult.click();				
-		adminObject.select_primary.click();
+		adminObject.select_button_primary.click();
 		driver.switchTo().frame("Menu Item Type"); // switch to iFrame
+		Thread.sleep(1000);
 		adminObject.select_header.click();
-		//here is the issue
-		Thread.sleep(5000);
+		Thread.sleep(2000);
 		adminObject.create_showlist.click();	
 		driver.switchTo().defaultContent(); //close the iFrame
 		adminObject.ucm_config.click();
@@ -287,11 +369,11 @@ public class Admin {
 		adminObject.select_menuUser.click();
 		adminObject.select_menuManager.click();
 		adminObject.save_field_group.click();
-		adminObject.lable.sendKeys(ExcellPath.getCellData(59, 1));
+		adminObject.numbername.sendKeys(ExcellPath.getCellData(59, 1));
 		adminObject.insert_username.sendKeys(ExcellPath.getCellData(60, 1));
+		adminObject.user_email.sendKeys(ExcellPath.getCellData(60, 1));
 		adminObject.pwd1.sendKeys(ExcellPath.getCellData(61, 1));
 		adminObject.pwd2.sendKeys(ExcellPath.getCellData(62, 1));
-		adminObject.create_user.sendKeys(ExcellPath.getCellData(63, 1));
 		adminObject.create_user.click();
 	}
 

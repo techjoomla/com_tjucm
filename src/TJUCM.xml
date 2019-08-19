@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="ucm Suite" verbose="1" >
+	<test name="ucm Regression suite 1">
+		<classes>
+			<class name="testScript.TestSuite">
+			<methods>
+				<include name="frontendLogIn" />
+				<exclude name="formFill" />
+			</methods>
+		</class>
+		</classes>
+	</test>
+</suite>
+
+
