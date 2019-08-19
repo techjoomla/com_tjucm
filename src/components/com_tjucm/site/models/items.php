@@ -302,7 +302,7 @@ class TjucmModelItems extends JModelList
 							$searchString .= ' OR ';
 						}
 
-						// For field specific search 
+						// For field specific search
 						if (stripos($search, $field . ':') === 0)
 						{
 							$search = trim(str_replace($field . ':', '', $search));
@@ -351,7 +351,7 @@ class TjucmModelItems extends JModelList
 	 */
 	public function getFields()
 	{
-		$items_model = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request'=> true));
+		$items_model = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
 		$items_model->setState('filter.showonlist', 1);
 		$items_model->setState('filter.state', 1);
 		$this->client = $this->getState('ucm.client');
