@@ -159,18 +159,13 @@ class TjucmModelItems extends JModelList
 		$db    = $this->getDbo();
 		$query = $db->getQuery(true);
 
-		$group_concat = 'GROUP_CONCAT(CONCAT_WS("' . $this->fields_separator . '",
-		' . $db->quoteName('fields.id') . ',' . $db->quoteName('fieldValue.value') . ')';
-
-		$group_concat .= 'SEPARATOR "' . $this->records_separator . '") AS field_values';
-
 		// Select the required fields from the table.
 		$query->select(
 			$this->getState(
 				'list.select', 'DISTINCT ' . $db->quoteName('a.id') . ', '
 				. $db->quoteName('a.state') . ', '
 				. $db->quoteName('a.cluster_id') . ', '
-				. $db->quoteName('a.created_by') . ',' . $group_concat
+				. $db->quoteName('a.created_by')
 			)
 		);
 
@@ -185,33 +180,12 @@ class TjucmModelItems extends JModelList
 		' ON (' . $db->quoteName('types.id') . ' = ' . $db->quoteName('a.type_id') . ')');
 		$query->where('(' . $db->quoteName('types.state') . ' = 1)');
 
-		// Join over the user field 'created_by'
-
-		$query->select($db->quoteName('ucby.name', 'created_by_name'));
-		$query->join("INNER", $db->quoteName('#__users', 'ucby') . ' ON (' . $db->quoteName('ucby.id') .
-		' = ' . $db->quoteName('a.created_by') . ')');
-
-		// Join over the user field 'modified_by'
-		$query->select($db->quoteName('um.name', 'modified_by_name'));
-		$query->join("LEFT", $db->quoteName('#__users', 'um') .
-		' ON (' . $db->quoteName('um.id') . ' = ' . $db->quoteName('a.modified_by') . ')');
-
-		// Join over the tjfield
-		$query->join("INNER", $db->quoteName('#__tjfields_fields', 'fields') .
-		' ON (' . $db->quoteName('fields.client') . ' = ' . $db->quoteName('a.client') . ')');
-
-		// Join over the tjfield value
-		$query->join("INNER", $db->quoteName('#__tjfields_fields_value', 'fieldValue') .
-		' ON (' . $db->quoteName('fieldValue.content_id') . ' = ' . $db->quoteName('a.id') . ')');
-
 		$this->client = $this->getState('ucm.client');
 
 		if (!empty($this->client))
 		{
 			$query->where($db->quoteName('a.client') . ' = ' . $db->quote($db->escape($this->client)));
 		}
-
-		$query->where($db->quoteName('fields.id') . ' = ' . $db->quoteName('fieldValue.field_id'));
 
 		$ucmType = $this->getState('ucmType.id', '', 'INT');
 
@@ -330,8 +304,6 @@ class TjucmModelItems extends JModelList
 			$query->where($db->quoteName('a.cluster_id') . ' = ' . $clusterId);
 		}
 
-		$query->group('fieldValue.content_id');
-
 		// Add the list ordering clause.
 		$orderCol  = $this->state->get('list.ordering');
 		$orderDirn = $this->state->get('list.direction');
@@ -403,49 +375,62 @@ class TjucmModelItems extends JModelList
 		}
 
 		$items = parent::getItems();
+		$itemsArray = (array) $items;
+		$contentIds = array_column($itemsArray, 'id');
+		$fieldValues = $this->getFieldsData($contentIds);
 
-		foreach ($items as $item)
+		foreach ($items as &$item)
 		{
-			if (!empty($item->field_values))
+			$item->field_values = array();
+
+			foreach ($fieldValues as $key => &$fieldValue)
 			{
-				$explode_field_values = explode($this->records_separator, $item->field_values);
-
-				$colValue = array();
-
-				foreach ($explode_field_values as $field_values)
+				if ($item->id == $fieldValue->content_id)
 				{
-					$explode_explode_field_values = explode($this->fields_separator, $field_values);
-
-					$fieldId = $explode_explode_field_values[0];
-					$fieldValue = $explode_explode_field_values[1];
-
-					$colValue[$fieldId] = $fieldValue;
-				}
-
-				$listcolumns = $this->getFields();
-
-				if (!empty($listcolumns))
-				{
-					$fieldData = array();
-
-					foreach ($listcolumns as $col_id => $col_name)
-					{
-						if (array_key_exists($col_id, $colValue))
-						{
-							$fieldData[$col_id] = $colValue[$col_id];
-						}
-						else
-						{
-							$fieldData[$col_id] = "";
-						}
-
-						$item->field_values = $fieldData;
-					}
+					$item->field_values[$fieldValue->field_id] = $fieldValue->value;
+					unset($fieldValues[$key]);
 				}
 			}
 		}
 
+		$listcolumns = $this->getFields();
+
+		foreach ($items as &$item)
+		{
+			$fieldValues = array();
+
+			foreach ($listcolumns as $fieldId => $fieldValue)
+			{
+				if (!array_key_exists($fieldId, $item->field_values))
+				{
+					$fieldValues[$fieldId] = "";
+				}
+				else
+				{
+					$fieldValues[$fieldId] = $item->field_values[$fieldId];
+				}
+			}
+
+			$item->field_values = $fieldValues;
+		}
+
 		return $items;
+	}
+
+	private function getFieldsData($contentIds)
+	{
+		$contentIds = implode(',', $contentIds);
+
+		$db = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('*');
+		$query->from($db->quoteName('#__tjfields_fields_value', 'fv'));
+		$query->join('INNER', $db->qn('#__tjfields_fields', 'f') . ' ON (' . $db->qn('f.id') . ' = ' . $db->qn('fv.field_id') . ')');
+		$query->where($db->qn('f.state') . '=1');
+		$query->where($db->qn('fv.content_id') . ' IN (' . $contentIds . ')');
+		$db->setQuery($query);
+
+		return $db->loadObjectList();
 	}
 
 	/**
