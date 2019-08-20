@@ -147,8 +147,6 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 				{
 					foreach ($this->items as $i => $item)
 					{
-						$link = JRoute::_('index.php?option=com_tjucm&view=item&id=' . $item->id . "&client=" . $this->client . '&Itemid=' . $itemId, false);
-
 						$editown = false;
 						if ($this->canEditOwn)
 						{
@@ -229,11 +227,7 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 										}
 										else
 										{
-											?>
-											<a href="<?php echo $link;?>">
-												<?php echo $field_values; ?>
-											</a>
-											<?php
+											echo $field_values;
 										}
 										?>
 										</td>
