@@ -61,16 +61,24 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 		// Check if com_cluster component is installed
 		if (ComponentHelper::getComponent('com_cluster', true)->enabled)
 		{
-			JFormHelper::addFieldPath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models/fields/');
-			$cluster           = JFormHelper::loadFieldType('cluster', false);
-			$this->clusterList = $cluster->getOptionsExternally();
-			?>
-			<div class="btn-group pull-right hidden-xs">
-				<?php
-					echo JHtml::_('select.genericlist', $this->clusterList, "cluster", 'class="input-medium" size="1" onchange="this.form.submit();"', "value", "text", $this->state->get('filter.cluster_id', '', 'INT'));
+
+			JLoader::import('components.com_tjfields.table.field', JPATH_ADMINISTRATOR);
+			$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
+			$fieldTable->load(array('client' => $this->client, 'type' => 'cluster'));
+
+			if ($fieldTable->id)
+			{
+				JFormHelper::addFieldPath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models/fields/');
+				$cluster           = JFormHelper::loadFieldType('cluster', false);
+				$this->clusterList = $cluster->getOptionsExternally();
 				?>
-			</div>
-			<?php
+				<div class="btn-group pull-right hidden-xs">
+					<?php
+						echo JHtml::_('select.genericlist', $this->clusterList, "cluster", 'class="input-medium" size="1" onchange="this.form.submit();"', "value", "text", $this->state->get('filter.cluster_id', '', 'INT'));
+					?>
+				</div>
+				<?php
+			}
 		}
 		?>
 	</div>

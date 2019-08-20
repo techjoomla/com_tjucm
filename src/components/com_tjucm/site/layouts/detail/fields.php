@@ -26,6 +26,7 @@ $fieldLayout['Radio'] = $fieldLayout['List'] = "list";
 $fieldLayout['Itemcategory'] = "itemcategory";
 $fieldLayout['Video'] = $fieldLayout['Audio'] = $fieldLayout['Url'] = "link";
 $fieldLayout['Calendar'] = "calendar";
+$fieldLayout['Cluster'] = "cluster";
 
 // Load the tj-fields helper
 JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
