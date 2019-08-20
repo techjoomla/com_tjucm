@@ -199,7 +199,7 @@ class TjucmModelItems extends JModelList
 
 		if ($clusterExist)
 		{
-			JLoader::import('components.com_tjfields.table.field', JPATH_ADMINISTRATOR);
+			JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
 			$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
 			$fieldTable->load(array('client' => $this->client, 'type' => 'cluster'));
 
@@ -341,7 +341,7 @@ class TjucmModelItems extends JModelList
 	{
 		// Load fields model
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
-		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request'=> true));
+		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
 		$fieldsModel->setState('filter.showonlist', 1);
 		$fieldsModel->setState('filter.state', 1);
 		$this->client = $this->getState('ucm.client');
