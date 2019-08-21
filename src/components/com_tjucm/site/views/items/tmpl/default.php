@@ -62,7 +62,7 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 		if (ComponentHelper::getComponent('com_cluster', true)->enabled)
 		{
 
-			JLoader::import('components.com_tjfields.table.field', JPATH_ADMINISTRATOR);
+			JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
 			$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
 			$fieldTable->load(array('client' => $this->client, 'type' => 'cluster'));
 
