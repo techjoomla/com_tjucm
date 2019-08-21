@@ -457,7 +457,18 @@ class TjucmModelItemForm extends JModelForm
 				$itemDetails = Table::getInstance('Item', 'TjucmTable');
 				$itemDetails->load(array('id' => $typeItemId));
 
-				$data['created_by'] = $itemDetails->created_by;
+				// If there is ownership field in form and the field is assigned some value then update created_by for the record
+				$client = explode(".", $itemDetails->client);
+				$createdByField = $client[0] . '_' . $client[1] . '_ownershipcreatedby';
+
+				if (isset($extra_jform_data[$createdByField]) && !empty($extra_jform_data[$createdByField])) 
+				{
+					$data['created_by'] = $extra_jform_data[$createdByField];
+				}
+				else
+				{
+					$data['created_by'] = $itemDetails->created_by;
+				}
 
 				if ($canEdit)
 				{

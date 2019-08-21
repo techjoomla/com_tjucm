@@ -61,16 +61,24 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 		// Check if com_cluster component is installed
 		if (ComponentHelper::getComponent('com_cluster', true)->enabled)
 		{
-			JFormHelper::addFieldPath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models/fields/');
-			$cluster           = JFormHelper::loadFieldType('cluster', false);
-			$this->clusterList = $cluster->getOptionsExternally();
-			?>
-			<div class="btn-group pull-right hidden-xs">
-				<?php
-					echo JHtml::_('select.genericlist', $this->clusterList, "cluster", 'class="input-medium" size="1" onchange="this.form.submit();"', "value", "text", $this->state->get('filter.cluster_id', '', 'INT'));
+
+			JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
+			$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
+			$fieldTable->load(array('client' => $this->client, 'type' => 'cluster'));
+
+			if ($fieldTable->id)
+			{
+				JFormHelper::addFieldPath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models/fields/');
+				$cluster           = JFormHelper::loadFieldType('cluster', false);
+				$this->clusterList = $cluster->getOptionsExternally();
 				?>
-			</div>
-			<?php
+				<div class="btn-group pull-right hidden-xs">
+					<?php
+						echo JHtml::_('select.genericlist', $this->clusterList, "cluster", 'class="input-medium" size="1" onchange="this.form.submit();"', "value", "text", $this->state->get('filter.cluster_id', '', 'INT'));
+					?>
+				</div>
+				<?php
+			}
 		}
 		?>
 	</div>
@@ -147,8 +155,6 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 				{
 					foreach ($this->items as $i => $item)
 					{
-						$link = JRoute::_('index.php?option=com_tjucm&view=item&id=' . $item->id . "&client=" . $this->client . '&Itemid=' . $itemId, false);
-
 						$editown = false;
 						if ($this->canEditOwn)
 						{
@@ -229,11 +235,7 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 										}
 										else
 										{
-											?>
-											<a href="<?php echo $link;?>">
-												<?php echo $field_values; ?>
-											</a>
-											<?php
+											echo $field_values;
 										}
 										?>
 										</td>
