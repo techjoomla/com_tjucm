@@ -151,7 +151,11 @@ public class Admin {
 			}
 		}
 		adminObject.click_field.click();
-//		Create field for the form 
+	}
+
+		public static void CreateTextField (WebDriver driver)throws Exception {
+		
+		//		Create text field for first and last name
 		adminObject.form_label.sendKeys(ExcellPath.getCellData(3, 1));
 	    adminObject.form_name.sendKeys(ExcellPath.getCellData(4, 1)); 
 	  
@@ -169,7 +173,11 @@ public class Admin {
 		adminObject.selectfield1.click();
 		adminObject.text_required.click(); 
 		adminObject.text_save.click();
+	}
 		
+		public static void CreateRadioField (WebDriver driver)throws Exception {
+
+			// create radio field for gender
 		adminObject.lable.sendKeys(ExcellPath.getCellData(7,1));
 		adminObject.radio_name.sendKeys(ExcellPath.getCellData(8,1));	
 		adminObject.click_field_type.click();
@@ -181,7 +189,9 @@ public class Admin {
 		adminObject.optionname2.sendKeys(ExcellPath.getCellData(12,1));
 		adminObject.text_required.click();
 		adminObject.text_save.click();
-		
+	}
+		public static void CreateNumberField (WebDriver driver)throws Exception {
+			// create number field for phone number
 		adminObject.lable.sendKeys(ExcellPath.getCellData(13,1));
 		adminObject.numbername.sendKeys(ExcellPath.getCellData(14,1));
 		adminObject.click_field_type.click();
@@ -189,21 +199,27 @@ public class Admin {
 		adminObject.minNumber.sendKeys(ExcellPath.getCellData(15,1));
 		adminObject.text_required.click();
 		adminObject.text_save.click();
-		
+	}
+		public static void CreateEmailField (WebDriver driver)throws Exception {
+			//create email field
 		adminObject.lable.sendKeys(ExcellPath.getCellData(16, 1));
 		adminObject.emailname.sendKeys(ExcellPath.getCellData(17, 1));
 		adminObject.click_field_type.click();
 		adminObject.select_email.click();
 		adminObject.text_required.click();
 		adminObject.text_save.click();
-		
+	}
+		public static void CreateDateField (WebDriver driver)throws Exception {
+			//create date field
 		adminObject.lable.sendKeys(ExcellPath.getCellData(75,1));
 		adminObject.datename.sendKeys(ExcellPath.getCellData(75, 1));
 		adminObject.click_field_type.click();
 		adminObject.select_clender.click();
 		adminObject.text_required.click();
 		adminObject.text_save.click();
-	
+	}
+		public static void CreateSingleSelectField (WebDriver driver)throws Exception {
+			//create single select for country dropdown
 		adminObject.lable.sendKeys(ExcellPath.getCellData(18, 1));
 		adminObject.Nationalityname.sendKeys(ExcellPath.getCellData(19, 1));
 		adminObject.click_field_type.click();
@@ -220,8 +236,10 @@ public class Admin {
 		adminObject.countryname4.sendKeys(ExcellPath.getCellData(26, 1));
 		adminObject.countryvalue4.sendKeys(ExcellPath.getCellData(27, 1));
 		adminObject.text_save.click();
-		
-	    adminObject.lable.sendKeys(ExcellPath.getCellData(28, 1));
+	}
+		public static void CreateMultiSelectField (WebDriver driver)throws Exception {
+			// create multiselect for selecting languages
+		adminObject.lable.sendKeys(ExcellPath.getCellData(28, 1));
 		adminObject.languagevalue.sendKeys(ExcellPath.getCellData(29, 1));
 		adminObject.click_field_type.click();
 		adminObject.select_multiselect.click();
@@ -235,7 +253,9 @@ public class Admin {
 		adminObject.languageValue3.sendKeys(ExcellPath.getCellData(35, 1));
 		adminObject.text_required.click();
 		adminObject.text_save.click();
-		
+	}
+		public static void CreateTextAreaField (WebDriver driver)throws Exception {
+			//create text area
 		adminObject.lable.sendKeys(ExcellPath.getCellData(36, 1));
 		adminObject.textareaname.sendKeys(ExcellPath.getCellData(37, 1));
 		adminObject.click_field_type.click();
@@ -244,21 +264,27 @@ public class Admin {
 		adminObject.coloum20.sendKeys(ExcellPath.getCellData(39, 1));
 		adminObject.text_required.click();
 		adminObject.text_save.click();
-		
+	}
+		public static void CreateEditorField (WebDriver driver)throws Exception {
+			// create editor field 
 		adminObject.lable.sendKeys(ExcellPath.getCellData(40, 1));
 		adminObject.editorname.sendKeys(ExcellPath.getCellData(41, 1));
 		adminObject.click_field_type.click();
 		adminObject.selectseditor.click();
 		adminObject.text_required.click();
 		adminObject.text_save.click();
-		
+	}
+		public static void CreateFileField (WebDriver driver)throws Exception {
+			// create file field 
 		adminObject.lable.sendKeys(ExcellPath.getCellData(42, 1));
 		adminObject.fileName.sendKeys(ExcellPath.getCellData(43, 1));
 		adminObject.click_field_type.click();
 		adminObject.selectFile.click();
 		adminObject.file_accpted.sendKeys(ExcellPath.getCellData(44, 1));
 		adminObject.text_save.click();
-		
+	}
+		public static void CreateTextareaCounterField (WebDriver driver)throws Exception {
+			// create textarea counterfield
 		adminObject.lable.sendKeys(ExcellPath.getCellData(45, 1));
 		adminObject.cctextname.sendKeys(ExcellPath.getCellData(46, 1));
 		adminObject.click_field_type.click();
@@ -270,7 +296,9 @@ public class Admin {
 		adminObject.hint.sendKeys(ExcellPath.getCellData(49, 1));
 		adminObject.text_required.click();
 		adminObject.text_save.click();
-		
+	}
+		public static void CreateSQLField (WebDriver driver)throws Exception {
+			// create sql field
 		adminObject.lable.sendKeys(ExcellPath.getCellData(52, 1));
 		adminObject.sqlname.sendKeys(ExcellPath.getCellData(53,1));
 		adminObject.click_field_type.click();
@@ -278,28 +306,36 @@ public class Admin {
 		adminObject.sendSQL.sendKeys(ExcellPath.getCellData(54, 1));
 		adminObject.text_required.click();
 		adminObject.text_save.click();
-		
+		}	
+		public static void CreateCheckboxField (WebDriver driver)throws Exception {
+			// create checkbox field 
 		adminObject.lable.sendKeys(ExcellPath.getCellData(55, 1));
 		adminObject.checkboxname.sendKeys(ExcellPath.getCellData(56, 1));
 		adminObject.click_field_type.click();
 		adminObject.selectcheckbox.click();
 		adminObject.text_required.click();
 		adminObject.text_save.click();
-		
+	}
+		public static void CreateVideoField (WebDriver driver)throws Exception {
+			// create video field
 		adminObject.lable.sendKeys(ExcellPath.getCellData(64,1));
 		adminObject.lastname.sendKeys(ExcellPath.getCellData(65, 1));
 		adminObject.click_field_type.click();
 		adminObject.selectVideo.click();
 		adminObject.text_required.click(); 
 		adminObject.text_save.click();
-		
+	}
+		public static void CreateAudioField (WebDriver driver)throws Exception {
+			// create Audio field
 		adminObject.lable.sendKeys(ExcellPath.getCellData(66,1));
 		adminObject.lastname.sendKeys(ExcellPath.getCellData(67, 1));
 		adminObject.click_field_type.click();
 		adminObject.selectAudio.click();
 		adminObject.text_required.click(); 
 		adminObject.text_save.click();
-		
+		}
+		public static void CreateUCMSubForm (WebDriver driver)throws Exception {
+			//create UCM SubForm
 		adminObject.lable.sendKeys(ExcellPath.getCellData(50, 1));
 		adminObject.subformName.sendKeys(ExcellPath.getCellData(51, 1));
 		adminObject.click_field_type.click();
@@ -308,24 +344,13 @@ public class Admin {
 		adminObject.selectsubform.click();
 		adminObject.text_required.click();
 		adminObject.saveandclose.click();			
-	
-		/*	
-		adminObject.lable.sendKeys(ExcellPath.getCellData(68,1));
-		adminObject.lastname.sendKeys(ExcellPath.getCellData(69, 1));
-		adminObject.click_field_type.click();
-		adminObject.selectCluster.click();
-		adminObject.text_required.click(); 
-		adminObject.text_showonlist.click();
-		adminObject.text_save.click();
-		*/
-		
 	}
 	
-	public static void CreateMenu (WebDriver driver)throws Exception {
+	public static void CreateViewMenu (WebDriver driver)throws Exception {
+	    	// create menu for view the form
 		adminObject.click_menu.click();
 		adminObject.click_allmenu.click();
 		adminObject.click_newmenu.click();
-		
 		adminObject.menu_name.sendKeys(ExcellPath.getCellData(57, 1));
 		adminObject.menu_type.click();
 	    adminObject.select_mainmenu.click();
@@ -345,7 +370,9 @@ public class Admin {
 		Thread.sleep(3000);
 		adminObject.saveandclose.click();
 		adminObject.click_newmenu.click();
-		
+	}
+	public static void CreateListMenu (WebDriver driver)throws Exception {
+			// create menu for list menu
 		Thread.sleep(3000);
 		adminObject.create_viewform.sendKeys(ExcellPath.getCellData(58, 1));
 		adminObject.create_viewformaccess.click();

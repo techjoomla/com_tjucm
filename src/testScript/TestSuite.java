@@ -27,29 +27,113 @@ public class TestSuite {
 			Admin.CreateType(driver);
 		}
 		
-	
 		@Test(priority = 4)
-		private void CreateMenu()throws Exception{
-			Admin.CreateMenu(driver);
+		private void CreateTextField()throws Exception{
+			Admin.CreateTextField(driver);
 		}
 		
+		
 		@Test(priority = 5)
+		private void CreateRadioField()throws Exception{
+			Admin.CreateRadioField(driver);
+		}
+		
+		@Test(priority = 6)
+		private void CreateNumberField()throws Exception{
+			Admin.CreateNumberField(driver);
+		}
+		
+		@Test(priority = 7)
+		private void CreateEmailField()throws Exception{
+			Admin.CreateEmailField(driver);
+		}
+		
+		@Test(priority = 8)
+		private void CreateDateField()throws Exception{
+			Admin.CreateDateField(driver);
+		}
+		
+		@Test(priority = 9)
+		private void CreateSingleSelectField()throws Exception{
+			Admin.CreateSingleSelectField(driver);
+		}
+		
+		@Test(priority = 10)
+		private void CreateMultiSelectField()throws Exception{
+			Admin.CreateMultiSelectField(driver);
+		}
+			
+		@Test(priority = 11)
+		private void CreateTextAreaField()throws Exception{
+			Admin.CreateTextAreaField(driver);
+		}
+		
+		@Test(priority = 12)
+		private void CreateEditorField()throws Exception{
+			Admin.CreateEditorField(driver);
+		}
+		
+		@Test(priority = 13)
+		private void CreateFileField()throws Exception{
+			Admin.CreateFileField(driver);
+		}
+		
+		@Test(priority = 13)
+		private void CreateTextareaCounterField()throws Exception{
+			Admin.CreateTextareaCounterField(driver);
+		}
+		
+		@Test(priority = 14)
+		private void CreateSQLField()throws Exception{
+			Admin.CreateSQLField(driver);
+		}
+		
+		@Test(priority = 15)
+		private void CreateCheckboxField()throws Exception{
+			Admin.CreateCheckboxField(driver);
+		}
+			
+		@Test(priority = 16)
+		private void CreateVideoField()throws Exception{
+			Admin.CreateVideoField(driver);
+		}
+		
+		@Test(priority = 17)
+		private void CreateAudioField()throws Exception{
+			Admin.CreateAudioField(driver);
+		}
+		
+		@Test(priority = 18)
+		private void CreateUCMSubForm()throws Exception{
+			Admin.CreateUCMSubForm(driver);
+		}
+		
+		@Test(priority = 19)
+		private void CreateViewMenu()throws Exception{
+			Admin.CreateViewMenu(driver);
+		}
+		
+		@Test(priority = 20)
+		private void CreateListMenu()throws Exception{
+			Admin.CreateListMenu(driver);
+		}
+		@Test(priority = 21)
 		private void Createuser()throws Exception {
 			Admin.Createuser(driver);
 		}
 		
-		@Test(priority = 6)
+		@Test(priority = 22)
 		public void frontendLogIn() throws Exception {
 			driver.get(Constant.URL_front);
 			frontEnd.frontLogin(driver);
 		}
 		
-		@Test(priority = 7)
+		@Test(priority = 23)
 		public void formFillnagative() throws Exception {
 			frontEnd.formFillnagative(driver);
 		}
 		
-		@Test(priority = 8)
+		@Test(priority = 24)
 		public void formFill() throws Exception {
 			frontEnd.formFill(driver);
 		}
