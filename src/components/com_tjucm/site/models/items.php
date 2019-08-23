@@ -83,6 +83,19 @@ class TjucmModelItems extends JModelList
 		$typeTable->load(array('id' => $typeId));
 		$ucmType = $typeTable->unique_identifier;
 
+		// Set state for field filters
+		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
+		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+		$fieldsModel->setState('filter.client', $this->client);
+		$fieldsModel->setState('filter.filterable', 1);
+		$fields = $fieldsModel->getItems();
+
+		foreach ($fields as $field)
+		{
+			$filterValue = $app->getUserStateFromRequest($this->context . '.' . $field->name, $field->name, '', 'STRING');
+			$this->setState('filter.field.' . $field->name, $filterValue);			
+		}
+
 		if (empty($ucmType))
 		{
 			// Get the active item
@@ -238,7 +251,7 @@ class TjucmModelItems extends JModelList
 			$query->where(($db->quoteName('(a.state) ') . ' IN (0, 1)'));
 		}
 
-		// Filter by search in title
+		// Search by content id
 		$search = $this->getState('filter.search');
 
 		if (!empty($search))
@@ -255,10 +268,18 @@ class TjucmModelItems extends JModelList
 		// Search on fields data
 		$filteredItemIds = $this->filterContent();
 
-		if (!empty($filteredItemIds))
+		if (is_array($filteredItemIds))
 		{
-			$filteredItemIds = implode(',', $filteredItemIds);
-			$query->where($db->quoteName('a.id') . ' IN (' . $filteredItemIds . ')');
+			if (!empty($filteredItemIds))
+			{
+				$filteredItemIds = implode(',', $filteredItemIds);
+				$query->where($db->quoteName('a.id') . ' IN (' . $filteredItemIds . ')');
+			}
+			else
+			{
+				// If no search results found then do not return any record
+				$query->where($db->quoteName('a.id') . '=0');	
+			}
 		}
 
 		// Filter by cluster
@@ -291,13 +312,14 @@ class TjucmModelItems extends JModelList
 	private function filterContent()
 	{
 		$filterFieldFound = 0;
+		$filterApplied = 0;
 
 		// Apply search filter
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
-		$query->select('content_id');
-		$query->from($db->quoteName('#__tjfields_fields_value', 'fv'));
-		$query->join('INNER', $db->qn('#__tjfields_fields', 'f') . ' ON (' . $db->qn('fv.field_id') . ' = ' . $db->qn('f.id') . ')');
+		$query->select('fv1.content_id');
+		$query->from($db->quoteName('#__tjfields_fields_value', 'fv1'));
+		$query->join('INNER', $db->qn('#__tjfields_fields', 'f') . ' ON (' . $db->qn('fv1.field_id') . ' = ' . $db->qn('f.id') . ')');
 		$query->where($db->quoteName('f.state') . ' =1');
 		$query->where($db->quoteName('f.client') . ' = ' . $db->quote($this->client));
 
@@ -312,9 +334,10 @@ class TjucmModelItems extends JModelList
 				if (stripos($search, $field . ':') === 0)
 				{
 					$search = trim(str_replace($field . ':', '', $search));
-					$query->where($db->qn('fv.field_id') . ' = ' . $fieldId);
-					$query->where($db->qn('fv.value') . ' LIKE ' . $db->q('%' . $search . '%'));
+					$query->where($db->qn('fv1.field_id') . ' = ' . $fieldId);
+					$query->where($db->qn('fv1.value') . ' LIKE ' . $db->q('%' . $search . '%'));
 					$filterFieldFound = 1;
+					$filterApplied = 1;
 
 					break;
 				}
@@ -324,12 +347,54 @@ class TjucmModelItems extends JModelList
 		// For generic search
 		if ($filterFieldFound == 0 && !empty($search))
 		{
-			$query->where($db->quoteName('fv.value') . ' LIKE ' . $db->q('%' . $search . '%'));
+			$query->where($db->quoteName('fv1.value') . ' LIKE ' . $db->q('%' . $search . '%'));
+			$filterApplied = 1;
 		}
 
-		$db->setQuery($query);
+		// For filterable fields
+		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
+		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+		$fieldsModel->setState('filter.client', $this->client);
+		$fieldsModel->setState('filter.filterable', 1);
+		$fields = $fieldsModel->getItems();
 
-		return $db->loadColumn();
+		$filterFieldsCount = 0;
+
+		foreach ($fields as $field)
+		{
+			$filterValue = $this->getState('filter.field.' . $field->name);
+
+			if ($filterValue != '')
+			{
+				$filterFieldsCount++;
+
+				if ($filterFieldsCount == 1)
+				{
+					$query->where($db->qn('fv1.field_id') . ' = ' . $field->id);
+					$query->where($db->qn('fv1.value') . ' = ' . $db->q($filterValue));
+					$filterApplied = 1;
+				}
+				else
+				{
+					$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' . ($filterFieldsCount-1).'.content_id') . ' = ' . $db->qn('fv'.$filterFieldsCount.'.content_id') . ')');
+					$query->where($db->qn('fv'.$filterFieldsCount.'.field_id') . ' = ' . $field->id);
+					$query->where($db->qn('fv'.$filterFieldsCount.'.value') . ' = ' . $db->q($filterValue));
+					$filterApplied = 1;	
+				}
+			}
+		}
+
+		// If there is any filter applied then only execute the query
+		if ($filterApplied)
+		{
+			$db->setQuery($query);
+
+			return $db->loadColumn();
+		}
+		else
+		{
+			return fasle;
+		}
 	}
 
 	/**

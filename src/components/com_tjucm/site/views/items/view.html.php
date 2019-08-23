@@ -88,20 +88,13 @@ class TjucmViewItems extends JViewLegacy
 		$model              = $this->getModel("Items");
 		$this->ucmTypeId    = $id = $model->getState('ucmType.id');
 		$this->client       = $model->getState('ucm.client');
-		$canCreate          = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$canView            = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$canEdit            = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$canChange          = $user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $this->ucmTypeId);
-		$canEditOwn         = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$canDelete          = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$canDeleteOwn       = $user->authorise('core.type.deleteownitem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$this->canCreate    = $canCreate;
-		$this->canView      = $canView;
-		$this->canEdit      = $canEdit;
-		$this->canChange    = $canChange;
-		$this->canEditOwn   = $canEditOwn;
-		$this->canDelete    = $canDelete;
-		$this->canDeleteOwn = $canDeleteOwn;
+		$this->canCreate    = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$this->canView      = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$this->canEdit      = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$this->canChange    = $user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $this->ucmTypeId);
+		$this->canEditOwn   = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$this->canDelete    = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$this->canDeleteOwn = $user->authorise('core.type.deleteownitem', 'com_tjucm.type.' . $this->ucmTypeId);
 
 		// If did not get the client from url then get if from menu param
 		if (empty($this->client))
