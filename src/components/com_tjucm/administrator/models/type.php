@@ -336,6 +336,8 @@ class TjucmModelType extends JModelAdmin
 		$params['publish_items'] = $data['publish_items'];
 		$params['allowed_count'] = $data['allowed_count'];
 		$params['layout'] = $data['layout'];
+		$params['details_layout'] = $data['details_layout'];
+		$params['list_layout'] = $data['list_layout'];
 
 		// If UCM type is a subform then need to add content_id as hidden field in the form - For flat subform storage
 		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
