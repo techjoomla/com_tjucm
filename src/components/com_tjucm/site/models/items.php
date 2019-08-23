@@ -260,7 +260,6 @@ class TjucmModelItems extends JModelList
 
 			if (stripos($search, 'id:') === 0)
 			{
-				$this->setState('filter.search', '');
 				$query->where($db->quoteName('a.id') . ' = ' . (int) str_replace('id:', '', $search));
 			}
 		}
@@ -311,8 +310,14 @@ class TjucmModelItems extends JModelList
 	 */
 	private function filterContent()
 	{
+		// Flag to mark if field specific search is done from the search box
 		$filterFieldFound = 0;
+
+		// Flag to mark if any filter is applied or not
 		$filterApplied = 0;
+
+		// Variable to store count of the self joins on the fields_value table
+		$filterFieldsCount = 0;
 
 		// Apply search filter
 		$db = JFactory::getDbo();
@@ -326,16 +331,23 @@ class TjucmModelItems extends JModelList
 		// Filter by field value
 		$search = $this->getState('filter.search');
 
-		if (!empty($this->fields))
+		if (!empty($this->fields) && (stripos($search, 'id:') !== 0))
 		{
 			foreach ($this->fields as $fieldId => $field)
 			{
 				// For field specific search
 				if (stripos($search, $field . ':') === 0)
 				{
+					$filterFieldsCount++;
+
+					if ($filterFieldsCount > 1)
+					{
+						$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' . ($filterFieldsCount-1).'.content_id') . ' = ' . $db->qn('fv'.$filterFieldsCount.'.content_id') . ')');
+					}
+
 					$search = trim(str_replace($field . ':', '', $search));
-					$query->where($db->qn('fv1.field_id') . ' = ' . $fieldId);
-					$query->where($db->qn('fv1.value') . ' LIKE ' . $db->q('%' . $search . '%'));
+					$query->where($db->qn('fv'.$filterFieldsCount.'.field_id') . ' = ' . $fieldId);
+					$query->where($db->qn('fv'.$filterFieldsCount.'.value') . ' LIKE ' . $db->q('%' . $search . '%'));
 					$filterFieldFound = 1;
 					$filterApplied = 1;
 
@@ -345,11 +357,18 @@ class TjucmModelItems extends JModelList
 		}
 
 		// For generic search
-		if ($filterFieldFound == 0 && !empty($search))
+		if ($filterFieldFound == 0 && !empty($search)  && (stripos($search, 'id:') !== 0))
 		{
-			$query->where($db->quoteName('fv1.value') . ' LIKE ' . $db->q('%' . $search . '%'));
+			$filterFieldsCount++;
+
+			if ($filterFieldsCount > 1)
+			{
+				$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' . ($filterFieldsCount-1).'.content_id') . ' = ' . $db->qn('fv'.$filterFieldsCount.'.content_id') . ')');
+			}
+
+			$query->where($db->quoteName('fv'.$filterFieldsCount.'.value') . ' LIKE ' . $db->q('%' . $search . '%'));
 			$filterApplied = 1;
-		}
+		}	
 
 		// For filterable fields
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
@@ -357,8 +376,6 @@ class TjucmModelItems extends JModelList
 		$fieldsModel->setState('filter.client', $this->client);
 		$fieldsModel->setState('filter.filterable', 1);
 		$fields = $fieldsModel->getItems();
-
-		$filterFieldsCount = 0;
 
 		foreach ($fields as $field)
 		{
@@ -368,21 +385,18 @@ class TjucmModelItems extends JModelList
 			{
 				$filterFieldsCount++;
 
-				if ($filterFieldsCount == 1)
-				{
-					$query->where($db->qn('fv1.field_id') . ' = ' . $field->id);
-					$query->where($db->qn('fv1.value') . ' = ' . $db->q($filterValue));
-					$filterApplied = 1;
-				}
-				else
+				if ($filterFieldsCount > 1)
 				{
 					$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' . ($filterFieldsCount-1).'.content_id') . ' = ' . $db->qn('fv'.$filterFieldsCount.'.content_id') . ')');
-					$query->where($db->qn('fv'.$filterFieldsCount.'.field_id') . ' = ' . $field->id);
-					$query->where($db->qn('fv'.$filterFieldsCount.'.value') . ' = ' . $db->q($filterValue));
-					$filterApplied = 1;	
 				}
+
+				$query->where($db->qn('fv'.$filterFieldsCount.'.field_id') . ' = ' . $field->id);
+				$query->where($db->qn('fv'.$filterFieldsCount.'.value') . ' = ' . $db->q($filterValue));
+				$filterApplied = 1;
 			}
 		}
+
+		$query->setLimit($this->getState('list.limit'));
 
 		// If there is any filter applied then only execute the query
 		if ($filterApplied)
