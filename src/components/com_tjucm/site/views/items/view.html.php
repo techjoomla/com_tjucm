@@ -129,13 +129,18 @@ class TjucmViewItems extends JViewLegacy
 		$input->set("content_id", $id);
 		$this->created_by = $input->get("created_by", '', 'INT');
 
-		// Get if user is allowed to save the content
-		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
-		$typeId = $tjUcmModelType->getTypeId($this->client);
+		// Get ucm type data
+		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
+		$typeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+		$typeTable->load(array('unique_identifier' => $this->client));
+		$typeParams = json_decode($typeTable->params);
 
-		$TypeData = $tjUcmModelType->getItem($typeId);
+		if (isset($typeParams->list_layout) && !empty($typeParams->list_layout))
+		{
+			$this->setLayout($typeParams->list_layout);
+		}
 
-		$allowedCount = (!empty($TypeData->allowed_count))?$TypeData->allowed_count:'0';
+		$allowedCount = (!empty($typeTable->allowed_count))?$typeTable->allowed_count:'0';
 		$userId = $user->id;
 
 		if (empty($this->id))
