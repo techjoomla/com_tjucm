@@ -116,7 +116,7 @@ public class TestSuite {
 			Admin.CreateUCMSubForm(driver);
 		}
 		
-		/*@Test(priority = 21)
+		@Test(priority = 21)
 		private void CreateViewMenu()throws Exception{
 			Admin.CreateViewMenu(driver);
 		}
@@ -128,7 +128,7 @@ public class TestSuite {
 		@Test(priority = 23)
 		private void Createuser()throws Exception {
 			Admin.Createuser(driver);
-		}*/
+		}
 		//Starting with frontend 
 		
 		@Test(priority = 24)
