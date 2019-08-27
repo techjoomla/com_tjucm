@@ -6,6 +6,7 @@ import org.testng.annotations.Test;
 import Excel.Constant;
 import Action.Admin;
 import Action.frontEnd;
+import Action.Database; 
 import config.BasicClass;
 
 public class TestSuite {
@@ -115,7 +116,7 @@ public class TestSuite {
 			Admin.CreateUCMSubForm(driver);
 		}
 		
-		@Test(priority = 21)
+		/*@Test(priority = 21)
 		private void CreateViewMenu()throws Exception{
 			Admin.CreateViewMenu(driver);
 		}
@@ -127,7 +128,7 @@ public class TestSuite {
 		@Test(priority = 23)
 		private void Createuser()throws Exception {
 			Admin.Createuser(driver);
-		}
+		}*/
 		//Starting with frontend 
 		
 		@Test(priority = 24)
@@ -152,5 +153,27 @@ public class TestSuite {
 			frontEnd.formFill(driver);
 		}
 		
+		@Test(priority = 28)
+		public void Deleteucmtype() throws Exception {
+			Database.Deleteucmtype(driver);
 	}
-}
+		
+		@Test(priority = 29)
+		public void Deleteucmdata() throws Exception {
+			Database.Deleteucmdata(driver);
+	}
+		@Test(priority = 30)
+		public void DeleteTjfieldsGroups() throws Exception {
+			Database.DeleteTjfieldsGroups(driver);
+	}
+		
+		@Test(priority = 31)
+		public void DeleteTjfieldsOption() throws Exception {
+			Database.DeleteTjfieldsOption(driver);
+	}
+		@Test(priority = 32)
+		public void DeleteTjfields() throws Exception {
+			Database.DeleteTjfields(driver);
+	}
+			}
+					}
