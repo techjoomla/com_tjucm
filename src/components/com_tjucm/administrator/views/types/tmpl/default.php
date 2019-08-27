@@ -40,6 +40,17 @@ $sortFields = $this->getSortFields();
 		{
 			tjUcm.types.export();
 		}
+		else if (task == 'types.delete')
+		{
+			if(confirm("<?php echo JText::_('COM_TJUCM_TYPE_DELETE_CONFIRMATION'); ?>"))
+			{
+				Joomla.submitform(task);
+			}
+			else
+			{
+				return false;
+			}
+		}
 		else
 		{
 			Joomla.submitform(task);

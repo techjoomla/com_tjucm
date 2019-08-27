@@ -181,11 +181,6 @@ class TjucmModelItems extends JModelList
 		$query->select($db->quoteName('uc.name', 'uEditor'));
 		$query->join("LEFT", $db->quoteName('#__users', 'uc') . ' ON (' . $db->quoteName('uc.id') . ' = ' . $db->quoteName('a.checked_out') . ')');
 
-		// Join over the foreign key 'type_id'
-		$query->join("INNER", $db->quoteName('#__tj_ucm_types', 'types') .
-		' ON (' . $db->quoteName('types.id') . ' = ' . $db->quoteName('a.type_id') . ')');
-		$query->where($db->quoteName('types.state') . ' = 1');
-
 		$this->client = $this->getState('ucm.client');
 
 		if (!empty($this->client))
@@ -407,7 +402,7 @@ class TjucmModelItems extends JModelList
 		}
 		else
 		{
-			return fasle;
+			return false;
 		}
 	}
 
@@ -527,7 +522,7 @@ class TjucmModelItems extends JModelList
 
 		if (empty($contentIds))
 		{
-			return fasle;
+			return false;
 		}
 
 		$db = JFactory::getDbo();

@@ -175,7 +175,7 @@ $itemState                 = $this->item->state;
 
 		if ($calledFrom == 'frontend')
 		{
-			if (!$this->allow_auto_save && $this->allow_draft_save && empty($itemState))
+			if (($this->allow_auto_save || $this->allow_draft_save) && empty($itemState))
 			{
 				?>
 				<input type="button" class="btn btn-width150 br-0 btn-default font-normal" id="draftSave"
