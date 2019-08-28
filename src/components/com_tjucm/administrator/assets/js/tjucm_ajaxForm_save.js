@@ -122,6 +122,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 				if (returnedData.data !== null)
 				{
 					jQuery('#item-form').removeClass('dirty');
+					jQuery("#recordId").val(returnedData.data.id);
 
 					if ('save' == status)
 					{
@@ -133,7 +134,6 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 					}
 					else
 					{
-						jQuery("#recordId").val(returnedData.data.id);
 						promise = true;
 
 						if (showDraftSuccessMsg === "1")

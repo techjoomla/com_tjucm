@@ -459,11 +459,19 @@ class TjucmModelItemForm extends JModelForm
 
 				// If there is ownership field in form and the field is assigned some value then update created_by for the record
 				$client = explode(".", $itemDetails->client);
-				$createdByField = $client[0] . '_' . $client[1] . '_ownershipcreatedby';
+				$ownershipField = $client[0] . '_' . $client[1] . '_ownershipcreatedby';
 
-				if (isset($extra_jform_data[$createdByField]) && !empty($extra_jform_data[$createdByField])) 
+				if (isset($extra_jform_data[$ownershipField]) && !empty($extra_jform_data[$ownershipField]))
 				{
-					$data['created_by'] = $extra_jform_data[$createdByField];
+					JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
+					$ownershipFieldData = Table::getInstance('Field', 'TjfieldsTable');
+					$ownershipFieldData->load(array('name' => $ownershipField));
+					$ownershipFieldParams = json_decode($ownershipFieldData->params);
+
+					if ($ownershipFieldParams->ucmItemOwner == 1)
+					{
+						$data['created_by'] = $extra_jform_data[$ownershipField];
+					}
 				}
 				else
 				{
@@ -819,20 +827,25 @@ class TjucmModelItemForm extends JModelForm
 	 */
 	public function setClusterData(&$validData, $data)
 	{
-		$clusterField = $createdByField = '';
+		$clusterField = $ownershipField = '';
 
 		// To get type of UCM
 		if (!empty($this->client))
 		{
 			$client = explode(".", $this->client);
 			$clusterField = $client[0] . '_' . $client[1] . '_clusterclusterid';
-			$createdByField = $client[0] . '_' . $client[1] . '_ownershipcreatedby';
+			$ownershipField = $client[0] . '_' . $client[1] . '_ownershipcreatedby';
 		}
 
+		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
+		$ownershipFieldData = Table::getInstance('Field', 'TjfieldsTable');
+		$ownershipFieldData->load(array('name' => $ownershipField));
+		$ownershipFieldParams = json_decode($ownershipFieldData->params);
+
 		// Save created_by field by ownership user field (To save form on behalf of someone)
-		if (!empty($data[$createdByField]) && empty($data[$clusterField]))
+		if (!empty($data[$ownershipField]) && empty($data[$clusterField]) && ($ownershipFieldParams->ucmItemOwner == 1))
 		{
-			$validData['created_by'] = $data[$createdByField];
+			$validData['created_by'] = $data[$ownershipField];
 		}
 
 		// Cluster Id store in UCM data
@@ -861,7 +874,7 @@ class TjucmModelItemForm extends JModelForm
 			{
 				$validData['cluster_id'] = $data[$clusterField];
 
-				if (!empty($data[$createdByField]))
+				if (!empty($data[$ownershipField]))
 				{
 					$clusterUsers = array();
 
@@ -870,9 +883,9 @@ class TjucmModelItemForm extends JModelForm
 						$clusterUsers[] = $cluster->user_id;
 					}
 
-					if (in_array($data[$createdByField], $clusterUsers))
+					if (in_array($data[$ownershipField], $clusterUsers) && ($ownershipFieldParams->ucmItemOwner == 1))
 					{
-						$validData['created_by'] = $data[$createdByField];
+						$validData['created_by'] = $data[$ownershipField];
 					}
 				}
 			}
