@@ -1197,14 +1197,25 @@ class TjucmModelItemForm extends JModelForm
 			}
 			elseif ($field->type == 'ucmsubform')
 			{
-				if (isset($ucmData[$field->id]) && !empty($ucmData[$field->id]->value))
+				if (!isset($ucmData[$field->id]) || empty($ucmData[$field->id]->value))
+				{
+					$ucmSubFormFormSource = $fieldParams->get('formsource');
+					$ucmSubFormClient = str_replace('components/com_tjucm/models/forms/', '', $ucmSubFormFormSource);
+					$ucmSubFormClient = 'com_tjucm.' . str_replace('form_extra.xml', '', $ucmSubFormClient);
+				}
+				else
+				{
+					$ucmSubFormClient = $ucmData[$field->id]->value;
+				}
+
+				if (!empty($ucmSubFormClient))
 				{
 					// This is to get the options of related fields in the subforms of the parent UCM
 					$sfFieldName = $field->name;
 
 					// Get fields of the subform of the parent form
 					$tjFieldsModelFields = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
-					$tjFieldsModelFields->setState("filter.client", $ucmData[$field->id]->value);
+					$tjFieldsModelFields->setState("filter.client", $ucmSubFormClient);
 					$tjFieldsModelFields->setState("filter.state", 1);
 					$ucmSubFormfields = $tjFieldsModelFields->getItems();
 
@@ -1213,7 +1224,7 @@ class TjucmModelItemForm extends JModelForm
 					$query->select('id');
 					$query->from($db->quoteName('#__tj_ucm_data'));
 					$query->where($db->quoteName('parent_id') . '=' . $contentId);
-					$query->where($db->quoteName('client') . '=' . $db->quote($ucmData[$field->id]->value));
+					$query->where($db->quoteName('client') . '=' . $db->quote($ucmSubFormClient));
 					$db->setQuery($query);
 					$subFormContentIds = $db->loadColumn();
 
@@ -1224,7 +1235,7 @@ class TjucmModelItemForm extends JModelForm
 						// Loop through the subform data to get the updated options of the subform related fields
 						foreach ($subFormContentIds as $subFormContentId)
 						{
-							$ucmSubFormData = $tjFieldsHelper->FetchDatavalue(array('client' => $ucmData[$field->id]->value, 'content_id' => $subFormContentId));
+							$ucmSubFormData = $tjFieldsHelper->FetchDatavalue(array('client' => $ucmSubFormClient, 'content_id' => $subFormContentId));
 
 							foreach ($ucmSubFormfields as $ucmSubFormfield)
 							{
@@ -1282,14 +1293,17 @@ class TjucmModelItemForm extends JModelForm
 						{
 							foreach ($ucmSubFormfields as $ucmSubFormfield)
 							{
-								$options = $tjFieldsModelField->getRelatedFieldOptions($ucmSubFormfield->id);
+								if ($ucmSubFormfield->type == 'related')
+								{
+									$options = $tjFieldsModelField->getRelatedFieldOptions($ucmSubFormfield->id);
 
-								// This is required to replace the options of related field of subform in the DOM
-								$ucmSubFormFieldElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . $i . '__' . $ucmSubFormfield->name;
-								$ucmSubFormFieldElementId = str_replace('-', '_', $ucmSubFormFieldElementId);
-								$ucmSubFormFieldTemplateElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . 'XXX_XXX__' . $ucmSubFormfield->name;
-								$ucmSubFormFieldTemplateElementId = str_replace('-', '_', $ucmSubFormFieldTemplateElementId);
-								$returnData[] = array('templateId' => $ucmSubFormFieldTemplateElementId, 'elementId' => $ucmSubFormFieldElementId, 'options' => $options);
+									// This is required to replace the options of related field of subform in the DOM
+									$ucmSubFormFieldElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . $i . '__' . $ucmSubFormfield->name;
+									$ucmSubFormFieldElementId = str_replace('-', '_', $ucmSubFormFieldElementId);
+									$ucmSubFormFieldTemplateElementId = 'jform_' . $sfFieldName . '__' . $sfFieldName . 'XXX_XXX__' . $ucmSubFormfield->name;
+									$ucmSubFormFieldTemplateElementId = str_replace('-', '_', $ucmSubFormFieldTemplateElementId);
+									$returnData[] = array('templateId' => $ucmSubFormFieldTemplateElementId, 'elementId' => $ucmSubFormFieldElementId, 'options' => $options);
+								}
 							}
 						}
 					}
