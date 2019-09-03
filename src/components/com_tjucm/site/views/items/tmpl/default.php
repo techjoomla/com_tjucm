@@ -125,7 +125,6 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 						{
 							$deleteOwn = (JFactory::getUser()->id == $item->created_by ? true : false);
 						}
-						
 						?>
 						<tr class="row<?php echo $i % 2; ?>">
 							<?php
@@ -137,11 +136,11 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 									<?php
 									if ($item->state == 1)
 									{
-										?><span class="icon-publish"></span><?php
+										?><span class="icon-checkmark-circle"></span><?php
 									}
 									else
 									{
-										?><span class="icon-unpublish"></span><?php
+										?><span class="icon-cancel-circle"></span><?php
 									}
 									?>
 									</a>
