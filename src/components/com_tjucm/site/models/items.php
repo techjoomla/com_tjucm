@@ -93,7 +93,7 @@ class TjucmModelItems extends JModelList
 		foreach ($fields as $field)
 		{
 			$filterValue = $app->getUserStateFromRequest($this->context . '.' . $field->name, $field->name, '', 'STRING');
-			$this->setState('filter.field.' . $field->name, $filterValue);			
+			$this->setState('filter.field.' . $field->name, $filterValue);
 		}
 
 		if (empty($ucmType))
@@ -230,7 +230,7 @@ class TjucmModelItems extends JModelList
 					}
 				}
 
-				$query->where($db->quoteName('a.cluster_id') . ' IN (' . implode(",", $usersClusters) . ')');
+				$query->where($db->quoteName('a.cluster_id') . " IN ('" . implode("','", $usersClusters) . "')");
 			}
 		}
 
@@ -272,7 +272,7 @@ class TjucmModelItems extends JModelList
 			else
 			{
 				// If no search results found then do not return any record
-				$query->where($db->quoteName('a.id') . '=0');	
+				$query->where($db->quoteName('a.id') . '=0');
 			}
 		}
 
@@ -337,12 +337,13 @@ class TjucmModelItems extends JModelList
 
 					if ($filterFieldsCount > 1)
 					{
-						$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' . ($filterFieldsCount-1).'.content_id') . ' = ' . $db->qn('fv'.$filterFieldsCount.'.content_id') . ')');
+						$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' .
+						$db->qn('fv' . ($filterFieldsCount - 1) . '.content_id') . ' = ' . $db->qn('fv' . $filterFieldsCount . '.content_id') . ')');
 					}
 
 					$search = trim(str_replace($field . ':', '', $search));
-					$query->where($db->qn('fv'.$filterFieldsCount.'.field_id') . ' = ' . $fieldId);
-					$query->where($db->qn('fv'.$filterFieldsCount.'.value') . ' LIKE ' . $db->q('%' . $search . '%'));
+					$query->where($db->qn('fv' . $filterFieldsCount . '.field_id') . ' = ' . $fieldId);
+					$query->where($db->qn('fv' . $filterFieldsCount . '.value') . ' LIKE ' . $db->q('%' . $search . '%'));
 					$filterFieldFound = 1;
 					$filterApplied = 1;
 
@@ -358,12 +359,13 @@ class TjucmModelItems extends JModelList
 
 			if ($filterFieldsCount > 1)
 			{
-				$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' . ($filterFieldsCount-1).'.content_id') . ' = ' . $db->qn('fv'.$filterFieldsCount.'.content_id') . ')');
+				$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' .
+				$db->qn('fv' . ($filterFieldsCount - 1) . '.content_id') . ' = ' . $db->qn('fv' . $filterFieldsCount . '.content_id') . ')');
 			}
 
-			$query->where($db->quoteName('fv'.$filterFieldsCount.'.value') . ' LIKE ' . $db->q('%' . $search . '%'));
+			$query->where($db->quoteName('fv' . $filterFieldsCount . '.value') . ' LIKE ' . $db->q('%' . $search . '%'));
 			$filterApplied = 1;
-		}	
+		}
 
 		// For filterable fields
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
@@ -382,11 +384,12 @@ class TjucmModelItems extends JModelList
 
 				if ($filterFieldsCount > 1)
 				{
-					$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' . ($filterFieldsCount-1).'.content_id') . ' = ' . $db->qn('fv'.$filterFieldsCount.'.content_id') . ')');
+					$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' .
+					$db->qn('fv' . ($filterFieldsCount - 1) . '.content_id') . ' = ' . $db->qn('fv' . $filterFieldsCount . '.content_id') . ')');
 				}
 
-				$query->where($db->qn('fv'.$filterFieldsCount.'.field_id') . ' = ' . $field->id);
-				$query->where($db->qn('fv'.$filterFieldsCount.'.value') . ' = ' . $db->q($filterValue));
+				$query->where($db->qn('fv' . $filterFieldsCount . '.field_id') . ' = ' . $field->id);
+				$query->where($db->qn('fv' . $filterFieldsCount . '.value') . ' = ' . $db->q($filterValue));
 				$filterApplied = 1;
 			}
 		}
