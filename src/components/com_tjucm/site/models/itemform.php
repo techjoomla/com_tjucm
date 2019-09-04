@@ -862,7 +862,7 @@ class TjucmModelItemForm extends JModelForm
 			$ClusterModel->setState('filter.published', 1);
 			$ClusterModel->setState('filter.cluster_id', (int) $data[$clusterField]);
 
-			if (!$isSuperUser && !$user->authorise('core.manageall.cluster', 'com_cluster'))
+			if (!$isSuperUser && !$user->authorise('core.manageall', 'com_cluster'))
 			{
 				$ClusterModel->setState('filter.user_id', $user->id);
 			}
