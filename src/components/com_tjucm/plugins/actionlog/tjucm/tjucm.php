@@ -235,7 +235,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 			$tjucmTableType->load(array('id' => $pk));
 
 			$message = array(
-					'action'      => $action,
+					/*'action'      => $action,*/
 					'id'          => $tjucmTableType->id,
 					'title'       => $tjucmTableType->title,
 					'identifier'  => $tjucmTableType->unique_identifier,
