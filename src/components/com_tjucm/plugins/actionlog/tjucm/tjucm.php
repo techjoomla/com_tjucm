@@ -132,7 +132,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 	 * This method logs who created/edited UCM type ,user's data
 	 *
 	 * @param   string  $context  com_jticketing.
-	 * @param   Object  $type     Holds the coupon data.
+	 * @param   Object  $table    Holds the coupon data.
 	 *
 	 * @return  void
 	 *
@@ -185,7 +185,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 		$user    = Factory::getUser();
 
 		$tjucmTableType = Table::getInstance('type', 'TjucmTable', array());
-		$tjucmTableType->load(array('id' => $pk));
+		$tjucmTableType->load(array('id' => $pks));
 
 		$messageLanguageKey = 'PLG_ACTIONLOG_TJUCM_TYPE_IMPORTED';
 		$message = array(
