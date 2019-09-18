@@ -163,8 +163,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 
 	/**
 	 * On deleting UCM type data - logging method
-	 *
-	 * Method is called after user data is stored in the database.
+	 * Method is called after user data is stored in the database
 	 * This method logs who created/edited UCM type ,user's data
 	 *
 	 * @param   Object  $pks  Holds the UCM type data.
@@ -188,7 +187,10 @@ class PlgActionlogTjUcm extends CMSPlugin
 		$tjucmTableType->load(array('id' => $pks));
 
 		$messageLanguageKey = 'PLG_ACTIONLOG_TJUCM_TYPE_IMPORTED';
-		$message = array(
+
+		if ($tjucmTableType != null)
+		{
+			$message = array(
 				'action'      => 'import',
 				'id'          => $tjucmTableType->id,
 				'title'       => $tjucmTableType->title,
@@ -198,8 +200,8 @@ class PlgActionlogTjUcm extends CMSPlugin
 				'username'    => $user->username,
 				'accountlink' => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
 			);
-
-		$this->addLog(array($message), $messageLanguageKey, $context, $user->id);
+			$this->addLog(array($message), $messageLanguageKey, $context, $user->id);
+		}
 	}
 
 	/**
@@ -230,21 +232,24 @@ class PlgActionlogTjUcm extends CMSPlugin
 
 		$tjucmTableType = Table::getInstance('type', 'TjucmTable', array());
 
-		foreach ($pks as $pk)
+		if ($tjucmTableType != null)
 		{
-			$tjucmTableType->load(array('id' => $pk));
+			foreach ($pks as $pk)
+			{
+				$tjucmTableType->load(array('id' => $pk));
 
-			$message = array(
-					'id'          => $tjucmTableType->id,
-					'title'       => $tjucmTableType->title,
-					'identifier'  => $tjucmTableType->unique_identifier,
-					'itemlink'    => 'index.php?option=com_tjucm&view=type&layout=edit&id=' . $tjucmTableType->id,
-					'userid'      => $userId,
-					'username'    => $userName,
-					'accountlink' => 'index.php?option=com_users&task=user.edit&id=' . $userId,
-				);
+				$message = array(
+						'id'          => $tjucmTableType->id,
+						'title'       => $tjucmTableType->title,
+						'identifier'  => $tjucmTableType->unique_identifier,
+						'itemlink'    => 'index.php?option=com_tjucm&view=type&layout=edit&id=' . $tjucmTableType->id,
+						'userid'      => $userId,
+						'username'    => $userName,
+						'accountlink' => 'index.php?option=com_users&task=user.edit&id=' . $userId,
+					);
 
-			$this->addLog(array($message), $messageLanguageKey, $context, $userId);
+				$this->addLog(array($message), $messageLanguageKey, $context, $userId);
+			}
 		}
 	}
 
