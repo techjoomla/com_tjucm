@@ -67,7 +67,6 @@ class PlgActionlogTjUcm extends CMSPlugin
 	{
 		JLoader::register('ActionlogsModelActionlog', JPATH_ADMINISTRATOR . '/components/com_actionlogs/models/actionlog.php');
 
-		// ActionlogsModelActionlog
 		$model = BaseDatabaseModel::getInstance('Actionlog', 'ActionlogsModel');
 		$model->addLog($messages, $messageLanguageKey, $context, $userId);
 	}
