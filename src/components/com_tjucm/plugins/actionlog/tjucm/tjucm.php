@@ -67,7 +67,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 	{
 		JLoader::register('ActionlogsModelActionlog', JPATH_ADMINISTRATOR . '/components/com_actionlogs/models/actionlog.php');
 
-		/* @var ActionlogsModelActionlog $model */
+		// ActionlogsModelActionlog
 		$model = BaseDatabaseModel::getInstance('Actionlog', 'ActionlogsModel');
 		$model->addLog($messages, $messageLanguageKey, $context, $userId);
 	}
@@ -185,6 +185,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 		$user    = Factory::getUser();
 
 		$tjucmTableType = Table::getInstance('type', 'TjucmTable', array());
+
 		$tjucmTableType->load(array('id' => $pks));
 
 		$messageLanguageKey = 'PLG_ACTIONLOG_TJUCM_TYPE_IMPORTED';
@@ -235,7 +236,6 @@ class PlgActionlogTjUcm extends CMSPlugin
 			$tjucmTableType->load(array('id' => $pk));
 
 			$message = array(
-					'action'      => $action,
 					'id'          => $tjucmTableType->id,
 					'title'       => $tjucmTableType->title,
 					'identifier'  => $tjucmTableType->unique_identifier,
