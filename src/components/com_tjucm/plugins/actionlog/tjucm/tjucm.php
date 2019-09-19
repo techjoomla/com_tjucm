@@ -74,11 +74,11 @@ class PlgActionlogTjUcm extends CMSPlugin
 	/**
 	 * On saving UCM type data - logging method
 	 *
-	 * Method is called after user data is stored in the database.
+	 * Method is called when ucm type is to be stored in the database.
 	 * This method logs who created/edited any data of UCM type
 	 *
-	 * @param   Object   $type   Holds the report data
-	 * @param   Boolean  $isNew  True if a new report is stored.
+	 * @param   Array    $type   Holds the ucm type data
+	 * @param   Boolean  $isNew  True if a new type is stored.
 	 *
 	 * @return  void
 	 *
@@ -114,8 +114,6 @@ class PlgActionlogTjUcm extends CMSPlugin
 			'action'      => $action,
 			'id'          => $type['id'],
 			'title'       => $type['title'],
-			'identifier'  => $type['unique_identifier'],
-			'itemlink'    => 'index.php?option=com_tjucm&view=type&layout=edit&id=' . $type['id'],
 			'userid'      => $user->id,
 			'username'    => $user->username,
 			'accountlink' => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
@@ -130,7 +128,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 	 * Method is called after user data is stored in the database.
 	 * This method logs who created/edited UCM type ,user's data
 	 *
-	 * @param   string  $context  com_jticketing.
+	 * @param   String  $context  com_tjucm
 	 * @param   Object  $table    Holds the coupon data.
 	 *
 	 * @return  void
@@ -166,7 +164,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 	 * Method is called after user data is stored in the database
 	 * This method logs who created/edited UCM type ,user's data
 	 *
-	 * @param   Object  $pks  Holds the UCM type data.
+	 * @param   Int  $pks  Holds the UCM type data.
 	 *
 	 * @return  void
 	 *
@@ -210,7 +208,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 	 * Method is called after user data is stored in the database.
 	 * This method logs who created/edited UCM type ,user's data
 	 *
-	 * @param   Object  $pks  Holds the UCM type data.
+	 * @param   Array  $pks  Holds the UCM type data.
 	 *
 	 * @return  void
 	 *
@@ -259,9 +257,9 @@ class PlgActionlogTjUcm extends CMSPlugin
 	 * Method is called after user data is stored in the database.
 	 * This method logs who changed state of UCM type
 	 *
-	 * @param   String  $context  com_jgive
-	 * @param   array   $pks      Holds array of primary key.
-	 * @param   int     $value    Switch case value.
+	 * @param   String  $context  com_tjucm
+	 * @param   Array   $pks      Holds array of primary key.
+	 * @param   Int     $value    Switch case value.
 	 *
 	 * @return  void
 	 *
