@@ -189,12 +189,15 @@ class PlgActionlogTjUcm extends CMSPlugin
 
 		if ($tjucmTableType != null)
 		{
+			$ucmid             = $tjucmTableType->id;
+			$title             = $tjucmTableType->title;
+			$unique_identifier = $tjucmTableType->unique_identifier;
 			$message = array(
 				'action'      => 'import',
-				'id'          => $tjucmTableType->id,
-				'title'       => $tjucmTableType->title,
-				'identifier'  => $tjucmTableType->unique_identifier,
-				'itemlink'    => 'index.php?option=com_tjucm&view=type&layout=edit&id=' . $tjucmTableType->id,
+				'id'          => $ucmid,
+				'title'       => $title,
+				'identifier'  => $unique_identifier,
+				'itemlink'    => 'index.php?option=com_tjucm&view=type&layout=edit&id=' . $ucmid,
 				'userid'      => $user->id,
 				'username'    => $user->username,
 				'accountlink' => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
