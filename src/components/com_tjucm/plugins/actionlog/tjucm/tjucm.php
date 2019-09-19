@@ -112,11 +112,12 @@ class PlgActionlogTjUcm extends CMSPlugin
 
 		$message = array(
 			'action'      => $action,
-			'id'          => $type['id'],
+			'id'          => $type['typeId'],
 			'title'       => $type['title'],
 			'userid'      => $user->id,
 			'username'    => $user->username,
 			'accountlink' => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
+			'typelink'    => 'index.php?option=com_tjucm&view=type&layout=edit&id=' . $type['typeId'],
 		);
 
 		$this->addLog(array($message), $messageLanguageKey, $context, $user->id);

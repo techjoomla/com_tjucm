@@ -384,6 +384,8 @@ class TjucmModelType extends JModelAdmin
 
 		if (parent::save($data))
 		{
+			$id = (int) $this->getState($this->getName() . '.id');
+			$data['typeId'] = $id;
 			$dispatcher = JDispatcher::getInstance();
 			JPluginHelper::importPlugin('actionlog', 'tjucm');
 			$isNew = ($data['id'] != 0) ? false : true;
