@@ -468,7 +468,16 @@ class TjucmModelItems extends JModelList
 
 		$items = parent::getItems();
 		$itemsArray = (array) $items;
-		$contentIds = array_column($itemsArray, 'id');
+		$contentIds = array();
+
+		if (!empty($itemsArray))
+		{
+			foreach ($itemsArray as $row)
+			{
+				$contentIds[] = $row->id;
+			}
+		}
+
 		$fieldValues = $this->getFieldsData($contentIds);
 
 		foreach ($items as &$item)
