@@ -17,13 +17,13 @@ use Joomla\CMS\Language\Text;
  * Class for get TjUCM
  *
  * @package     Com_TjUcm
- * @subpackage  component
+ * @subpackage  Plugin
  * @since       __DEPLOY_VERSION__
  */
 class TjucmApiResourceItems extends ApiResource
 {
 	/**
-	 * Get UCM Type Data
+	 * Get UCM Items Data
 	 *
 	 * @return  void
 	 *
@@ -35,7 +35,7 @@ class TjucmApiResourceItems extends ApiResource
 		$input  = $app->input;
 		$user   = Factory::getUser();
 
-		// Get Parameter
+		// Get Filter Parameter
 		$client          = $input->get('client');
 		$typeId          = $input->get('typeId');
 		$filterProcess   = $input->get('filter_process', 'myprocess', "String");
