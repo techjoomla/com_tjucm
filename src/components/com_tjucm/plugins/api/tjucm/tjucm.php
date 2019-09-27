@@ -20,7 +20,7 @@ $lang->load('com_tjucm', JPATH_ADMINISTRATOR);
  *
  * @package     TjUcm
  * @subpackage  Plg_Api_ucm
- * @since       _DEPLOY_VERSION_
+ * @since       __DEPLOY_VERSION__
  */
 
 class PlgAPITjucm extends ApiPlugin
