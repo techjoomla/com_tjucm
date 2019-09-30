@@ -46,7 +46,6 @@ class TjucmApiResourceItems extends ApiResource
 		$field_value     = $input->get('field_value', '', 'String');
 
 		// Store result
-		$result = array();
 		$return = array();
 
 		BaseDatabaseModel::addIncludePath(JPATH_SITE . '/components/com_tjucm/models');
@@ -66,7 +65,6 @@ class TjucmApiResourceItems extends ApiResource
 		$tjfieldsModel->setState("filter.client", $client);
 		$tjfieldsModel->setState("filter.filterable", 1);
 		$fields = $tjfieldsModel->getItems();
-		$itemid = $typeId . ':' . $app->input->getInt('Itemid', 0);
 
 		if (!empty($selectedFieldId))
 		{
