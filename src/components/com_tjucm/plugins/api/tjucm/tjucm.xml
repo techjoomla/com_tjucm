@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension version="3.0" type="plugin" group="api" method="upgrade">
-	<name>Api - Tjucm</name>
+	<name>PLG_API_TJUCM</name>
 	<version>1.0.0</version>
 	<creationDate>25th Septemeber 2019</creationDate>
 	<author>Techjoomla</author>

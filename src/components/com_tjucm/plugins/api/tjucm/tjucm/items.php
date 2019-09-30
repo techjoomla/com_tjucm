@@ -1,11 +1,12 @@
 <?php
 /**
- * @version    SVN: <svn_id>
- * @package    Com_TjUcm
- * @author     Techjoomla <extensions@techjoomla.com>
- * @copyright  Copyright (c) 2009-2019 TechJoomla. All rights reserved.
- * @license    GNU General Public License version 2 or later.
- */
+* @package Tjucm
+* @subpackage com_tjucm
+*
+* @author Techjoomla <extensions@techjoomla.com>
+* @copyright Copyright (C) 2009 - 2019 Techjoomla. All rights reserved.
+* @license GNU General Public License version 2 or later; see LICENSE.txt
+*/
 
 defined('_JEXEC') or die;
 use Joomla\CMS\Plugin\PluginHelper;
