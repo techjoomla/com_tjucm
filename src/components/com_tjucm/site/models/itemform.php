@@ -28,7 +28,7 @@ use Joomla\Registry\Registry;
  *
  * @since  1.6
  */
-class TjucmModelItemForm extends JModelForm
+class TjucmModelItemForm extends JModelAdmin
 {
 	private $item = null;
 
@@ -375,6 +375,151 @@ class TjucmModelItemForm extends JModelForm
 	}
 
 	/**
+	 * Method to get the field form object.
+	 *
+	 * @param   array    $data      An optional array of data for the form to interogate.
+	 * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not.
+	 *
+	 * @return  JForm  A JForm object on success, false on failure
+	 *
+	 * @since    1.6
+	 */
+	public function getFieldForm($data = array(), $loadData = true)
+	{
+		// Path of empty form XML to create form object dynamically
+		$formPath = JPATH_SITE . '/components/com_tjucm/models/forms/fielddata.xml';
+
+		// Get the form.
+		$form = $this->loadForm(
+			array_key_first($data), $formPath,
+			array('control' => 'jform',
+				'load_data' => $loadData,
+			)
+		);
+
+		if (empty($form))
+		{
+			return false;
+		}
+		else
+		{
+			$form->addFieldPath('administrator/components/com_tjfields/models/fields');
+			$form->addRulePath('administrator/components/com_tjfields/models/rules');
+
+			$fieldName = array_key_first($data);
+			$fieldNamePart = explode('_', str_replace('com_tjucm_', '', $fieldName));
+			unset($fieldNamePart[array_key_last($fieldNamePart)]);
+			$parentFormPath = JPATH_SITE . "/administrator/components/com_tjucm/models/forms/" . implode("_", $fieldNamePart) . "_extra.xml";
+
+			// Get parent form.
+			$parentForm = $this->loadForm(
+				'com_tjucm.itemform', $parentFormPath,
+				array('control' => 'jform',
+					'load_data' => false,
+				)
+			);
+
+			// Get the field XML from parent form
+			$fieldXml = $parentForm->getFieldXml($fieldName);
+
+			// Set the field XML to the field form
+			$form->setField($fieldXml);
+			$form->setvalue($fieldName, '', $data[$fieldName]);
+		}
+
+		return $form;
+	}
+
+	public function getTypeForm($data = array(), $loadData = true)
+	{
+		$clientPart = explode(".", $data['client']);
+
+		// Path of empty form XML to create form object dynamically
+		$formPath = JPATH_SITE . '/components/com_tjucm/models/forms/' . $clientPart[1] . 'form_extra.xml';
+
+		// Get the form.
+		$form = $this->loadForm(
+			$data['client'], $formPath,
+			array('control' => 'jform',
+				'load_data' => $loadData,
+			)
+		);
+
+		if (empty($form))
+		{
+			return false;
+		}
+
+		return $form;
+	}
+
+	public function getSectionForm($data = array(), $loadData = true)
+	{
+		if (empty($data['client']) || empty($data['section']))
+		{
+			return false;
+		}
+
+		// Create xml with the fieldset of provided section
+		$newXML = new SimpleXMLElement('<form></form>');
+		$newXmlFilePath = JPATH_SITE . '/components/com_tjucm/models/forms/tempfieldsetform.xml';
+
+		// Get path of parent UCM type XML
+		$fieldNamePart = explode('.', $data['client']);
+		$parentFormPath = JPATH_SITE . "/administrator/components/com_tjucm/models/forms/" . $fieldNamePart[1] . "_extra.xml";
+
+		// Get parent form.
+		$parentForm = $this->loadForm(
+			'com_tjucm.itemform', $parentFormPath,
+			array('control' => 'jform',
+				'load_data' => false,
+			)
+		);
+
+		// Get the fieldset XML from parent form
+		$formXml = $parentForm->getXml();
+		$fieldsetXml = $formXml->xpath('//fieldset[@name="' . $data['section'] . '" and not(ancestor::field/form/*)]');
+
+		if ($fieldsetXml[0] instanceof \SimpleXMLElement)
+		{
+			$newFieldsetXml = $newXML->addChild('fieldset');
+
+			foreach ($fieldsetXml[0]->children() as $child)
+			{
+				$fieldXml = $newFieldsetXml->addChild('field');
+
+				foreach ($child->attributes() as $attributeName => $attributeValue)
+				{
+					$fieldXml->addAttribute($attributeName, $attributeValue);
+				}
+			}
+		}
+
+		$newXML->asXML($newXmlFilePath);
+
+		// Get parent form.
+		$sectionForm = $this->loadForm(
+			'com_tjucm.itemform.section', $newXmlFilePath,
+			array('control' => 'jform',
+				'load_data' => false,
+			)
+		);
+
+		// Delete temp xml once its object is created
+		if (JFile::exists($newXmlFilePath))
+		{
+			JFile::delete($newXmlFilePath);
+		}
+
+		if (empty($sectionForm))
+		{
+			return false;
+		}
+
+		return $sectionForm;
+	}
+
+	/**
 	 * Method to get the data that should be injected in the form.
 	 *
 	 * @return   mixed  The data for the form.
@@ -402,6 +547,157 @@ class TjucmModelItemForm extends JModelForm
 	/**
 	 * Method to save the form data.
 	 *
+	 * @param   array  $data  The form data.
+	 *
+	 * @return  boolean  True on success.
+	 *
+	 * @since   1.6
+	 */
+	public function save($data)
+	{
+		$user = JFactory::getUser();
+
+		// Guest users are not allowed to add the records
+		if (empty($user->id))
+		{
+			$this->setError(JText::_('COM_TJUCM_FORM_SAVE_FAILED_AUTHORIZATION_ERROR'));
+
+			return false;
+		}
+
+		// Get instance of UCM type table
+		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
+		$tjUcmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', Factory::getDbo()));
+
+		// Check and assign valid client and type_id to the record
+		if (!empty($data['type_id']) || !empty($data['client']))
+		{
+			if ($data['client'] != '')
+			{
+				$tjUcmTypeTable->load(array('unique_identifier' => $data['client']));
+				$data['type_id'] = $tjUcmTypeTable->id;
+			}
+			else
+			{
+				$tjUcmTypeTable->load(array('id' => $data['type_id']));
+				$data['client'] = $tjUcmTypeTable->unique_identifier;
+			}
+		}
+		else
+		{
+			$this->setError(JText::_('COM_TJUCM_FORM_SAVE_FAILED_CLIENT_REQUIRED'));
+
+			return false;
+		}
+
+		$ucmTypeParams = new Registry($tjUcmTypeTable->params);
+
+		// Check if user is allowed to add/edit the record
+		if (empty($data['id']))
+		{
+			$allowedCount = $ucmTypeParams->get('allowed_count', 0, 'INT');
+
+			// Check if the user is allowed to add record for given UCM type
+			$canAdd = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $data['type_id']);
+
+			if (!$canAdd)
+			{
+				$this->setError(JText::_('COM_TJUCM_FORM_SAVE_FAILED_AUTHORIZATION_ERROR'));
+
+				return false;
+			}
+
+			// Check allowed limit if its set for given UCM type
+			if (!empty($allowedCount))
+			{
+				$canAdd = $this->allowedToAddTypeData($user->id, $data['client'], $allowedCount);
+
+				if (!$canAdd)
+				{
+					$this->setError(JText::sprintf('COM_TJUCM_ALLOWED_COUNT_LIMIT', $allowedCount));
+
+					return false;
+				}
+			}
+		}
+		else
+		{
+			// Check if the user can edit this record
+			$canEdit = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $data['type_id']);
+			$canEditOwn = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $data['type_id']);
+
+			$itemTable = $this->getTable();
+			$itemTable->load(array('id' => $data['id']));
+
+			if ($canEdit)
+			{
+				$authorised = true;
+			}
+			elseif (($canEditOwn) && ($itemTable->created_by == $user->id))
+			{
+				$authorised = true;
+			}
+
+			if (!$authorised)
+			{
+				$this->setError(JText::_('COM_TJUCM_FORM_SAVE_FAILED_AUTHORIZATION_ERROR'));
+
+				return false;
+			}
+		}
+
+		return parent::save($data);
+	}
+
+	/**
+	 * Method to save the form fields data.
+	 *
+	 * @param   array  $fieldData  The form data.
+	 *
+	 * @return  boolean  True on success.
+	 *
+	 * @since   1.2.1
+	 */
+	public function saveExtraFields($fieldData)
+	{
+		// If the data contain data related to cluster field or ownership field then update the ucm_data table accordingly
+		if (!empty($fieldData['fieldsvalue']) && !empty($fieldData['content_id']))
+		{
+			$clusterFieldName = str_replace('.', '_', $fieldData['client']) . '_clusterclusterid';
+			$ownerShipFieldName = str_replace('.', '_', $fieldData['client']) . '_ownershipcreatedby';
+			$itemCategoryFieldName = str_replace('.', '_', $fieldData['client']) . '_itemcategory';
+
+			if (array_key_exists($clusterFieldName, $fieldData['fieldsvalue']) || array_key_exists($ownerShipFieldName, $fieldData['fieldsvalue']) || array_key_exists($itemCategoryFieldName, $fieldData['fieldsvalue']))
+			{
+				JLoader::import('components.com_tjucm.tables.item', JPATH_ADMINISTRATOR);
+				$ucmItemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', JFactory::getDbo()));
+				$ucmItemTable->load(array('id' => $fieldData['content_id']));
+
+				if (!empty($fieldData['fieldsvalue'][$clusterFieldName]))
+				{
+					$ucmItemTable->cluster_id = $fieldData['fieldsvalue'][$clusterFieldName];
+				}
+
+				if (!empty($fieldData['fieldsvalue'][$ownerShipFieldName]))
+				{
+					$ucmItemTable->created_by = $fieldData['fieldsvalue'][$ownerShipFieldName];
+				}
+
+				if (!empty($fieldData['fieldsvalue'][$itemCategoryFieldName]))
+				{
+					$ucmItemTable->category_id = $fieldData['fieldsvalue'][$itemCategoryFieldName];
+				}
+
+				$ucmItemTable->store();
+			}
+		}
+
+		return TjfieldsFilterField::saveExtraFields($fieldData);
+	}
+
+	/**
+	 * Method to save the form data.
+	 *
 	 * @param   array  $data              The form data.
 	 * @param   array  $extra_jform_data  Exra field data.
 	 *
@@ -409,7 +705,7 @@ class TjucmModelItemForm extends JModelForm
 	 *
 	 * @since   1.6
 	 */
-	public function save($data, $extra_jform_data = '')
+	public function saveTOBEDELETED($data, $extra_jform_data = '')
 	{
 		$app = JFactory::getApplication();
 		$user = JFactory::getUser();
@@ -1128,26 +1424,26 @@ class TjucmModelItemForm extends JModelForm
 	 *
 	 * @return ARRAY
 	 */
-	public function getUdatedRelatedFieldOptions($contentId)
+	public function getUdatedRelatedFieldOptions($client, $contentId)
 	{
-		$db = JFactory::getDbo();
+		if (empty($client) || empty($contentId))
+		{
+			return false;
+		}
 
-		// Get UCM details from the content id
-		JLoader::import('components.com_tjucm.tables.item', JPATH_ADMINISTRATOR);
-		$ucmItemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', $db));
-		$ucmItemTable->load(array('id' => $contentId));
+		$db = JFactory::getDbo();
 
 		// Get all the fields of the UCM type
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
 		$tjFieldsModelFields = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
-		$tjFieldsModelFields->setState("filter.client", $ucmItemTable->client);
+		$tjFieldsModelFields->setState("filter.client", $client);
 		$tjFieldsModelFields->setState("filter.state", 1);
 		$fields = $tjFieldsModelFields->getItems();
 
 		// Get data of the UCM form for given content id and ucm client
 		JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
 		$tjFieldsHelper = new TjfieldsHelper;
-		$ucmData = $tjFieldsHelper->FetchDatavalue(array('client' => $ucmItemTable->client, 'content_id' => $contentId));
+		$ucmData = $tjFieldsHelper->FetchDatavalue(array('client' => $client, 'content_id' => $contentId));
 
 		// Get object of TJ-Fields field model
 		JLoader::import('components.com_tjfields.models.field', JPATH_ADMINISTRATOR);

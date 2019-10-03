@@ -21,7 +21,7 @@ $lang = JFactory::getLanguage();
 $lang->load('com_tjucm', JPATH_SITE);
 $doc = JFactory::getDocument();
 $doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/jquery.form.js');
-$doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/tjucm_ajaxForm_save.js');
+$doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/itemform.js');
 $doc->addScript(JUri::root() . 'administrator/components/com_tjfields/assets/js/tjfields.js');
 JHtml::_('stylesheet', 'administrator/components/com_tjucm/assets/css/tjucm.css');
 
@@ -161,11 +161,11 @@ $itemState                 = $this->item->state;
 			if (!empty($this->allow_draft_save))
 			{
 				?>
-				<button type="button" class="btn btn-primary" id="previous_button" onclick="itemformactions('tjucm_myTab','prev')">
+				<button type="button" class="btn btn-primary" id="previous_button" >
+					<i class="icon-arrow-left-2"></i>
 					<?php echo JText::_('COM_TJUCM_PREVIOUS_BUTTON'); ?>
-					<i class="icon-arrow-right-2"></i>
 				</button>
-				<button type="button" class="btn btn-primary" id="next_button" onclick="itemformactions('tjucm_myTab','next')">
+				<button type="button" class="btn btn-primary" id="next_button" >
 					<?php echo JText::_('COM_TJUCM_NEXT_BUTTON'); ?>
 					<i class="icon-arrow-right-2"></i>
 				</button>
@@ -178,14 +178,14 @@ $itemState                 = $this->item->state;
 			if (($this->allow_auto_save || $this->allow_draft_save) && empty($itemState))
 			{
 				?>
-				<input type="button" class="btn btn-width150 br-0 btn-default font-normal" id="draftSave"
+				<input type="button" class="btn btn-width150 br-0 btn-default font-normal" id="tjUcmSectionDraftSave"
 				value="<?php echo JText::_("COM_TJUCM_SAVE_AS_DRAFT_ITEM"); ?>"
-				onclick="javascript: this.disabled=true; steppedFormSave(this.form.id, 'draft', 1);" />
+				onclick="javascript: this.disabled=true; tjUcmItemForm.saveSectionData();" />
 				<?php
 			}
 			?>
 			<input type="button" class="btn btn-success" value="<?php echo JText::_("COM_TJUCM_SAVE_ITEM"); ?>"
-			id="finalSave" onclick="javascript: this.disabled=true; steppedFormSave(this.form.id, 'save', 1);" />
+			id="finalSave" onclick="javascript: this.disabled=true; tjUcmItemForm.saveUcmFormData();" />
 			<?php
 		}
 		?>
