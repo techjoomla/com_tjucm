@@ -51,7 +51,7 @@ if ($this->item->id)
 }
 else
 {
-	$itemState = ($this->allow_auto_save) ? 1 : 0;
+	$itemState = ($this->allow_auto_save || $this->allow_draft_save) ? 1 : 0;
 }
 ?>
 <script type="text/javascript">

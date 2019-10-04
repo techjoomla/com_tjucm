@@ -13,10 +13,10 @@ var tjUcmCurrentAutoSaveState = 0;
 jQuery(window).load(function()
 {
 	/*Code to get item state*/
-	var tjUcmItemInDraftState = Number(jQuery('#itemState').val());
+	var tjUcmCurrentDraftSaveState = Number(jQuery('#itemState').val());
 
 	/* If record is submitted and no longet in the draft state then dont allow autosave to work*/
-	if (tjUcmItemInDraftState === 1)
+	if (tjUcmCurrentDraftSaveState === 1)
 	{
 		var tjUcmAllowAutoSave = jQuery('#item-form #tjucm-autosave').val();
 
@@ -88,14 +88,6 @@ jQuery(window).load(function()
 					}
 				},7000);
 			}
-
-			/* To save calendar field value */
-			jQuery("#item-form .field-calendar input:text").blur(function(){
-				if (tjUcmCurrentAutoSaveState)
-				{
-					tjUcmItemForm.onUcmFormChange(this);
-				}
-			});
 		}
 	}
 	else
@@ -152,6 +144,34 @@ jQuery(window).load(function()
 			{
 				tjUcmItemForm.saveSectionData(jQuery('#tjucm_myTabTabs > .active a').attr('href'));
 			}
+			else
+			{
+				var tjUcmSectionInputElements = jQuery(jQuery('#tjucm_myTabTabs > .active a').attr('href')).find('input, textarea, select, fieldset');
+
+				if (tjUcmItemForm.validateSection(tjUcmSectionInputElements))
+				{
+					/* Clear the error messages first if any before processing the data*/
+					jQuery("#system-message-container").html("");
+	
+					if (tjUcmClickedOnNext)
+					{
+						tjUcmClickedOnNext = 0;
+						jQuery('#tjucm_myTabTabs > .active').next('li').find('a').trigger('click');
+						tjUcmItemForm.setVisibilityOfNavigationButtons();
+					}
+			
+					if (tjUcmClickedOnPrev)
+					{
+						tjUcmClickedOnPrev = 0;
+						jQuery('#tjucm_myTabTabs > .active').prev('li').find('a').trigger('click');
+						tjUcmItemForm.setVisibilityOfNavigationButtons();
+					}
+				}
+				else
+				{
+					jQuery("html, body").animate({ scrollTop: 0 }, "slow");
+				}
+			}
 		}
 		else
 		{
@@ -168,7 +188,7 @@ jQuery(window).load(function()
 					jQuery('#tjucm_myTabTabs > .active').next('li').find('a').trigger('click');
 					tjUcmItemForm.setVisibilityOfNavigationButtons();
 				}
-		
+
 				if (tjUcmClickedOnPrev)
 				{
 					tjUcmClickedOnPrev = 0;
