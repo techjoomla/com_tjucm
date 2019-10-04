@@ -15,6 +15,7 @@ use Joomla\CMS\User\User;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Router\Route;
+use Joomla\Registry\Registry;
 
 jimport('joomla.filesystem.file');
 
@@ -120,7 +121,7 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	public function save($key = null, $urlVar = null)
 	{
-		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
 		$post = Factory::getApplication()->input->post;
 		$model = $this->getModel('itemform');
@@ -135,13 +136,18 @@ class TjucmControllerItemForm extends JControllerForm
 			// For new record if there is no client specified or invalid client is given then do not process the request
 			if ($client == '' || empty($this->typeId))
 			{
-				echo new JResponseJson('', JText::_('COM_TJUCM_FORM_SAVE_FAILED_CLIENT_REQUIRED'), true);
+				echo new JResponseJson('', Text::_('COM_TJUCM_FORM_SAVE_FAILED_CLIENT_REQUIRED'), true);
 			}
+
+			// Set the state of record as per UCM type config
+			$typeTable = $model->getTable('type');
+			$typeTable->load(array('unique_identifier' => $client));
+			$typeParams = new Registry($typeTable->params);
+			$data['state'] = $typeParams->get('publish_items', 0);
 
 			$data['client'] = $client;
 		}
 
-		$data['state'] = $post->get('state', 0, 'INT');
 		$data['draft'] = $post->get('draft', 0, 'INT');
 		$data['parent_id'] = $post->get('parent_id', 0, 'INT');
 
@@ -155,21 +161,20 @@ class TjucmControllerItemForm extends JControllerForm
 				$errors = $model->getErrors();
 				$this->processErrors($errors);
 
-				echo new JResponseJson('', JText::_('COM_TJUCM_FORM_VALIDATATION_FAILED'), true);
+				echo new JResponseJson('', Text::_('COM_TJUCM_FORM_VALIDATATION_FAILED'), true);
 			}
 
 			if ($model->save($data))
 			{
 				$result['id'] = $model->getState($model->getName() . '.id');
 
-
-				echo new JResponseJson($result, JText::_('COM_TJUCM_ITEM_SAVED_SUCCESSFULLY'));
+				echo new JResponseJson($result, Text::_('COM_TJUCM_ITEM_SAVED_SUCCESSFULLY'));
 			}
 			else
 			{
 				$errors = $model->getErrors();
 				$this->processErrors($errors);
-				echo new JResponseJson('', JText::_('COM_TJUCM_FORM_SAVE_FAILED'), true);
+				echo new JResponseJson('', Text::_('COM_TJUCM_FORM_SAVE_FAILED'), true);
 			}
 		}
 		catch (Exception $e)
@@ -178,9 +183,16 @@ class TjucmControllerItemForm extends JControllerForm
 		}
 	}
 
+	/**
+	 * Method to save single field data.
+	 *
+	 * @return  void
+	 *
+	 * @since   1.2.1
+	 */
 	public function saveFieldData()
 	{
-		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
 		$app       = Factory::getApplication();
 		$post      = $app->input->post;
@@ -197,7 +209,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 		if (empty($fieldData))
 		{
-			$app->enqueueMessage(JText::_('COM_TJUCM_FORM_VALIDATATION_FAILED'), 'error');
+			$app->enqueueMessage(Text::_('COM_TJUCM_FORM_VALIDATATION_FAILED'), 'error');
 			echo new JResponseJson(null);
 		}
 
@@ -237,9 +249,16 @@ class TjucmControllerItemForm extends JControllerForm
 		}
 	}
 
+	/**
+	 * Method to save form data.
+	 *
+	 * @return  void
+	 *
+	 * @since   1.2.1
+	 */
 	public function saveFormData()
 	{
-		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
 		$app       = Factory::getApplication();
 		$post      = $app->input->post;
@@ -249,10 +268,11 @@ class TjucmControllerItemForm extends JControllerForm
 		$filesData = $app->input->files->get('jform', array(), 'ARRAY');
 		$formData  = array_merge_recursive($formData, $filesData);
 		$section   = $post->get('tjUcmFormSection', '', 'STRING');
+		$draft     = $post->get('draft', 0, 'INT');
 
 		if (empty($formData) || empty($client))
 		{
-			$app->enqueueMessage(JText::_('COM_TJUCM_FORM_VALIDATATION_FAILED'), 'error');
+			$app->enqueueMessage(Text::_('COM_TJUCM_FORM_VALIDATATION_FAILED'), 'error');
 			echo new JResponseJson(null);
 		}
 
@@ -295,8 +315,18 @@ class TjucmControllerItemForm extends JControllerForm
 
 			// If data is valid then save the data into DB
 			$response = $model->saveExtraFields($formData);
+			$msg = null;
 
-			echo new JResponseJson($response);
+			if ($response && empty($section) && empty($draft))
+			{
+				$msg = ($response) ? Text::_("COM_TJUCM_ITEM_SAVED_SUCCESSFULLY") : Text::_("COM_TJUCM_FORM_SAVE_FAILED");
+
+				// Disable the draft mode of the item if full f)orm is submitted
+				$table->draft = 0;
+				$table->store();
+			}
+
+			echo new JResponseJson($response, $msg);
 		}
 		catch (Exception $e)
 		{
@@ -312,11 +342,11 @@ class TjucmControllerItemForm extends JControllerForm
 	 *
 	 * @return  boolean  true or false
 	 *
-	 * @since 1.0.0
+	 * @since 1.2.1
 	 */
 	public function saveItemFieldData($key = null, $urlVar = null)
 	{
-		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
 		$post = Factory::getApplication()->input->post;
 		$model = $this->getModel('itemform');
@@ -331,7 +361,7 @@ class TjucmControllerItemForm extends JControllerForm
 			// For new record if there is no client specified then do not process the request
 			if ($client == '')
 			{
-				echo new JResponseJson('', JText::_('COM_TJUCM_FORM_SAVE_FAILED'), true);
+				echo new JResponseJson('', Text::_('COM_TJUCM_FORM_SAVE_FAILED'), true);
 			}
 
 			$data['created_by'] = Factory::getUser()->id;
@@ -357,20 +387,20 @@ class TjucmControllerItemForm extends JControllerForm
 				$errors = $model->getErrors();
 				$this->processErrors($errors);
 
-				echo new JResponseJson('', JText::_('COM_TJUCM_FORM_VALIDATATION_FAILED'), true);
+				echo new JResponseJson('', Text::_('COM_TJUCM_FORM_VALIDATATION_FAILED'), true);
 			}
 
 			if ($model->save($data))
 			{
 				$result['id'] = $model->getState($model->getName() . '.id');
 
-				echo new JResponseJson($result, JText::_('COM_TJUCM_ITEM_SAVED_SUCCESSFULLY'));
+				echo new JResponseJson($result, Text::_('COM_TJUCM_ITEM_SAVED_SUCCESSFULLY'));
 			}
 			else
 			{
 				$errors = $model->getErrors();
 				$this->processErrors($errors);
-				echo new JResponseJson('', JText::_('COM_TJUCM_FORM_SAVE_FAILED'), true);
+				echo new JResponseJson('', Text::_('COM_TJUCM_FORM_SAVE_FAILED'), true);
 			}
 		}
 		catch (Exception $e)
@@ -417,7 +447,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 	public function getRelatedFieldOptions()
 	{
-		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
 		$app = Factory::getApplication();
 		$post = $app->input->post;

@@ -44,8 +44,15 @@ $calledFrom                = (strpos($baseUrl, 'administrator')) ? 'backend' : '
 $layout                    = ($calledFrom == 'frontend') ? 'default' : 'edit';
 $fieldsets_counter_deafult = 0;
 $setnavigation             = false;
-$itemState                 = $this->item->state;
 
+if ($this->item->id)
+{
+	$itemState = ($this->item->draft && $this->allow_auto_save) ? 1 : 0;
+}
+else
+{
+	$itemState = ($this->allow_auto_save) ? 1 : 0;
+}
 ?>
 <script type="text/javascript">
 
@@ -82,10 +89,10 @@ $itemState                 = $this->item->state;
 </script>
 <form action="<?php echo JRoute::_('index.php');?>" method="post" enctype="multipart/form-data" name="adminForm" id="item-form" class="form-validate">
 	<?php
-	if ($itemState === '1' && $this->allow_auto_save == '1')
+	if ($this->allow_auto_save == '1')
 	{
 	?>
-	<div class="alert alert-info" style="display: block;">
+	<div class="alert alert-info" style="display:none;" id="tjucm-auto-save-disabled-msg">
 		<a class="close" data-dismiss="alert">×</a>
 		<div class="msg">
 			<div>
@@ -104,7 +111,7 @@ $itemState                 = $this->item->state;
 			<input type="hidden" name="jform[client]" value="<?php echo $this->client;?>" />
 			<input type="hidden" name="jform[checked_out]" value="<?php echo $this->item->checked_out; ?>" />
 			<input type="hidden" name="jform[checked_out_time]" value="<?php echo $this->item->checked_out_time; ?>" />
-			<input type="hidden" name="itemState" id="itemState" value="<?php echo $this->item->state; ?>"/>
+			<input type="hidden" name="itemState" id="itemState" value="<?php echo $itemState; ?>"/>
 			<?php echo $this->form->renderField('created_by'); ?>
 			<?php echo $this->form->renderField('created_date'); ?>
 			<?php echo $this->form->renderField('modified_by'); ?>
@@ -175,17 +182,17 @@ $itemState                 = $this->item->state;
 
 		if ($calledFrom == 'frontend')
 		{
-			if (($this->allow_auto_save || $this->allow_draft_save) && empty($itemState))
+			if (($this->allow_auto_save || $this->allow_draft_save) && !empty($itemState))
 			{
 				?>
 				<input type="button" class="btn btn-width150 br-0 btn-default font-normal" id="tjUcmSectionDraftSave"
 				value="<?php echo JText::_("COM_TJUCM_SAVE_AS_DRAFT_ITEM"); ?>"
-				onclick="javascript: this.disabled=true; tjUcmItemForm.saveSectionData();" />
+				onclick="tjUcmItemForm.saveUcmFormData();" />
 				<?php
 			}
 			?>
 			<input type="button" class="btn btn-success" value="<?php echo JText::_("COM_TJUCM_SAVE_ITEM"); ?>"
-			id="finalSave" onclick="javascript: this.disabled=true; tjUcmItemForm.saveUcmFormData();" />
+			id="tjUcmSectionFinalSave" onclick="tjUcmItemForm.saveUcmFormData();" />
 			<?php
 		}
 		?>

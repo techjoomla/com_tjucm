@@ -1,33 +1,46 @@
 /*Variable to store the updated options of related field*/
 var tjucmRelatedFieldUpdatedOptions = '';
+/*Variable to store the data of editor field*/
 var tjUcmTinyMCEFieldIds = new Array();
+/*Variable to store if the next button is clicked*/
 var tjUcmClickedOnNext = 0;
+/*Variable to store if the prev button is clicked*/
 var tjUcmClickedOnPrev = 0;
+/*Variable to store if autosave is currently allowed for the form*/
+var tjUcmCurrentAutoSaveState = 0;
 
 /* This function executes for autosave form */
 jQuery(window).load(function()
 {
 	/*Code to get item state*/
-	var itemState = Number(jQuery('#itemState').val());
+	var tjUcmItemInDraftState = Number(jQuery('#itemState').val());
 
-	/*Code for auto save on blur event add new record or editing draft record only*/
-	if (itemState == '' || itemState === 0)
+	/* If record is submitted and no longet in the draft state then dont allow autosave to work*/
+	if (tjUcmItemInDraftState === 1)
 	{
-		var tjUcmAutoSave = jQuery('#item-form #tjucm-autosave').val();
+		var tjUcmAllowAutoSave = jQuery('#item-form #tjucm-autosave').val();
 
 		/*Check if auto save is enabled for UCM type*/
-		if (tjUcmAutoSave == 1)
+		if (tjUcmAllowAutoSave == 1)
 		{
+			tjUcmCurrentAutoSaveState = 1;
+
 			/* Save form values */
 			jQuery("#item-form").on("change select", ":input", function(){
-				tjUcmItemForm.onUcmFormChange(this);
+				if (tjUcmCurrentAutoSaveState)
+				{
+					tjUcmItemForm.onUcmFormChange(this);
+				}
 			});
 
 			/* To save calendar field value */
 			jQuery("#item-form .field-calendar input:text").blur(function(){
 				if (jQuery('#item-form').hasClass('dirty'))
 				{
-					tjUcmItemForm.onUcmFormChange(this);
+					if (tjUcmCurrentAutoSaveState)
+					{
+						tjUcmItemForm.onUcmFormChange(this);
+					}
 				}
 			});
 
@@ -78,10 +91,16 @@ jQuery(window).load(function()
 
 			/* To save calendar field value */
 			jQuery("#item-form .field-calendar input:text").blur(function(){
-				tjUcmItemForm.onUcmFormChange(this);
-				//steppedFormSave(this.form.id, "draft", 0);
+				if (tjUcmCurrentAutoSaveState)
+				{
+					tjUcmItemForm.onUcmFormChange(this);
+				}
 			});
 		}
+	}
+	else
+	{
+		jQuery("#tjucm-auto-save-disabled-msg").show();
 	}
 
 	/*Update the options of related field for new record of subform*/
@@ -118,7 +137,6 @@ jQuery(window).load(function()
 
 	/* Handle next and previous button click on the form*/
 	jQuery("#next_button, #previous_button").on('click', function (){
-
 		if (jQuery(this).attr('id') == 'next_button')
 		{
 			tjUcmClickedOnNext = 1;
@@ -128,12 +146,49 @@ jQuery(window).load(function()
 			tjUcmClickedOnPrev = 1;
 		}
 
-		tjUcmItemForm.saveSectionData(jQuery('#tjucm_myTabTabs > .active a').attr('href'));
+		if (jQuery('#item-form').hasClass('dirty'))
+		{
+			if (tjUcmCurrentAutoSaveState)
+			{
+				tjUcmItemForm.saveSectionData(jQuery('#tjucm_myTabTabs > .active a').attr('href'));
+			}
+		}
+		else
+		{
+			var tjUcmSectionInputElements = jQuery(jQuery('#tjucm_myTabTabs > .active a').attr('href')).find('input, textarea, select, fieldset');
+
+			if (tjUcmItemForm.validateSection(tjUcmSectionInputElements))
+			{
+				/* Clear the error messages first if any before processing the data*/
+				jQuery("#system-message-container").html("");
+
+				if (tjUcmClickedOnNext)
+				{
+					tjUcmClickedOnNext = 0;
+					jQuery('#tjucm_myTabTabs > .active').next('li').find('a').trigger('click');
+					tjUcmItemForm.setVisibilityOfNavigationButtons();
+				}
+		
+				if (tjUcmClickedOnPrev)
+				{
+					tjUcmClickedOnPrev = 0;
+					jQuery('#tjucm_myTabTabs > .active').prev('li').find('a').trigger('click');
+					tjUcmItemForm.setVisibilityOfNavigationButtons();
+				}
+			}
+			else
+			{
+				jQuery("html, body").animate({ scrollTop: 0 }, "slow");
+			}
+		}
 	});
 });
 
 var tjUcmItemForm = {
 	onUcmFormChange: function (fieldObj){
+		/* Disable the action buttons before performing the action*/
+		jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
+
 		var tjUcmParentClient = jQuery('#item-form').find("input[name='jform[client]']").val();
 
 		var getParentRecordid = new Promise(function(resolve, reject) {
@@ -205,6 +260,9 @@ var tjUcmItemForm = {
 		});
 	},
 	initUcmFormFieldDataSave: function (fieldObj, tjUcmParentClient, tjUcmParentRecordId){
+		/* Disable the action buttons before performing the action*/
+		jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
+
 		var childRecordContentIdFieldId = '';
 		var tjUcmItemFormData = new FormData();
 
@@ -289,6 +347,8 @@ var tjUcmItemForm = {
 		}
 	},
 	saveUcmFormFieldData: function (tjUcmClient, tjUcmRecordId, fieldObj){
+		/* Disable the action buttons before performing the action*/
+		jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
 		var tjUcmItemFieldFormData = new FormData();
 
 		/* Add CSRF token to the form*/
@@ -305,52 +365,77 @@ var tjUcmItemForm = {
 			tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj)[0].files[0]);
 		}
 
-		com_tjucm.Services.Item.saveFieldData(tjUcmItemFieldFormData, tjUcmItemForm.afterFieldDataSave);
+		com_tjucm.Services.Item.saveFieldData(tjUcmItemFieldFormData, tjUcmItemForm.afterDataSave);
 
 		return true;
 	},
-	afterFieldDataSave: function (error, response){
+	afterDataSave: function (error, response){
 		/* Remove the dirty class fromt the form once the field data is saved*/
 		jQuery('#item-form').removeClass('dirty');
 
-		/* Enable the sce button once the field data is saved*/
-		jQuery('#finalSave').attr('disabled', false);
-		jQuery('#draftSave').attr('disabled', false);
+		if (response == null)
+		{
+			return false;
+		}
+
+		/* Enable the save buttons once the field data is saved*/
+		jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
 
 		/* Add content_id in ucmsubform records */
-		if (response.data.childContentIds)
+		if (response.data != null)
 		{
-			jQuery.each(response.data.childContentIds, function(elementId, val) {
-				jQuery("#"+elementId).val(val);
-			});
+			if (response.data.childContentIds)
+			{
+				jQuery.each(response.data.childContentIds, function(elementId, val) {
+					jQuery("#"+elementId).val(val);
+				});
+			}
 		}
 
 		if (tjUcmClickedOnNext)
 		{
 			tjUcmClickedOnNext = 0;
 			jQuery('#tjucm_myTabTabs > .active').next('li').find('a').trigger('click');
-			tjUcmItemForm.setVisibilityOfNavigationButtons();
 		}
 
 		if (tjUcmClickedOnPrev)
 		{
 			tjUcmClickedOnPrev = 0;
 			jQuery('#tjucm_myTabTabs > .active').prev('li').find('a').trigger('click');
-			tjUcmItemForm.setVisibilityOfNavigationButtons();
 		}
 
+		tjUcmItemForm.setVisibilityOfNavigationButtons();
+
 		/* Update the options of related field */
-		var tjUcmParentClient = jQuery('#item-form').find("input[name='jform[client]']").val();
-		var tjucmParentRecordId = jQuery('#item-form').find("input[name='jform[id]']").val();
-		tjUcmItemForm.updateRelatedFieldsOptions(tjUcmParentClient, tjucmParentRecordId);
+		if (response.data)
+		{
+			var tjUcmParentClient = jQuery('#item-form').find("input[name='jform[client]']").val();
+			var tjucmParentRecordId = jQuery('#item-form').find("input[name='jform[id]']").val();
+			tjUcmItemForm.updateRelatedFieldsOptions(tjUcmParentClient, tjucmParentRecordId);
+		}
 
 		/* If there are errors in the response then show them on the screen*/
-		tjUcmItemForm.displayFormErrors(response);
+		tjUcmItemForm.renderResponseMessages(response);
 	},
-	displayFormErrors: function (response)
+	renderResponseMessages: function (response)
 	{
 		if (response != null)
 		{
+			if (response.message !== null)
+			{
+				if (response.data)
+				{
+					tjUcmItemForm.afterItemSaveSuccess();
+					Joomla.renderMessages({'success':[response.message]});
+				}
+				else
+				{
+					Joomla.renderMessages({'error':[response.message]});
+				}
+
+				jQuery("html, body").animate({ scrollTop: 0 }, "slow");
+			}
+
 			if (response.messages !== null)
 			{
 				if (response.messages.error !== null)
@@ -363,6 +448,12 @@ var tjUcmItemForm = {
 				}
 			}
 		}
+	},
+	afterItemSaveSuccess: function (){
+		jQuery("#tjucm-auto-save-disabled-msg").show();
+		jQuery("#itemState").val(0);
+		jQuery("#tjUcmSectionDraftSave").remove();
+		tjUcmCurrentAutoSaveState = 0;
 	},
 	updateRelatedFieldsOptions: function (tjUcmParentClient, tjUcmParentRecordId) {
 		var tjUcmItemFormData = new FormData();
@@ -397,13 +488,27 @@ var tjUcmItemForm = {
 		com_tjucm.Services.Item.getUpdatedRelatedFieldsOptions(tjUcmItemFormData, tjUcmUpdateRelatedFieldsOptions);
 	},
 	saveUcmFormData: function(){
+		/* Disable the action buttons before performing the action*/
+		jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
+		var tjUcmFormSubmitCallingButtonId = event.target.id;
+
+		if (tjUcmFormSubmitCallingButtonId == 'tjUcmSectionFinalSave')
+		{
+			if(!confirm(Joomla.JText._("COM_TJUCM_ITEMFORM_SUBMIT_ALERT")))
+			{
+				jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
+
+				return false;
+			}
+		}
+
 		if (document.formvalidator.isValid(document.getElementById('item-form')))
 		{
+			/* Clear the error messages first if any before processing the data*/
+			jQuery("#system-message-container").html("");
+
 			/* Disable the save button till the record is saved*/
-			jQuery('#finalSave').attr('disabled', true);
-			jQuery('#draftSave').attr('disabled', true);
-			jQuery('#previous_button').attr('disabled', true);
-			jQuery('#next_button').attr('disabled', true);
+			jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
 
 			/* For AJAX save need to assign values to the editor field containers*/
 			jQuery("#item-form .toggle-editor a").each(function(index) {
@@ -487,7 +592,12 @@ var tjUcmItemForm = {
 				tjUcmItemFormData.append('client', tjUcmClient);
 				tjUcmItemFormData.append('recordid', tjUcmRecordId);
 
-				com_tjucm.Services.Item.saveFormData(tjUcmItemFormData, tjUcmItemForm.afterFieldDataSave);
+				if (tjUcmFormSubmitCallingButtonId == 'tjUcmSectionDraftSave')
+				{
+					tjUcmItemFormData.append('draft', 1);
+				}
+
+				com_tjucm.Services.Item.saveFormData(tjUcmItemFormData, tjUcmItemForm.afterDataSave);
 
 				return true;
 			}).catch(function (error){
@@ -499,19 +609,24 @@ var tjUcmItemForm = {
 		else
 		{
 			tjUcmItemForm.setVisibilityOfNavigationButtons();
-			jQuery('#finalSave').attr('disabled', false);
-			jQuery('#draftSave').attr('disabled', false);
+			jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
 			jQuery("html, body").animate({ scrollTop: 0 }, "slow");
 
 			return false;
 		}
 	},
 	saveSectionData: function (tabId){
+		/* Disable the action buttons before performing the action*/
+		jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
+
 		var tjUcmSectionFormData = new FormData();
 		var tjUcmSectionInputElements = jQuery(tabId).find('input, textarea, select, fieldset');
 
 		if (tjUcmItemForm.validateSection(tjUcmSectionInputElements))
 		{
+			/* Clear the error messages first if any before processing the data*/
+			jQuery("#system-message-container").html("");
+
 			/* For AJAX save need to assign values to the editor field containers*/
 			jQuery("#item-form .toggle-editor a").each(function(index) {
 				this.click();
@@ -538,10 +653,7 @@ var tjUcmItemForm = {
 			}
 
 			/* Disable the save button till the record is saved*/
-			jQuery('#finalSave').attr('disabled', true);
-			jQuery('#draftSave').attr('disabled', true);
-			jQuery('#previous_button').attr('disabled', true);
-			jQuery('#next_button').attr('disabled', true);
+			jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
 
 			var tjUcmParentClient = jQuery('#item-form').find("input[name='jform[client]']").val();
 			var getParentRecordid = new Promise(function(resolve, reject) {
@@ -614,7 +726,7 @@ var tjUcmItemForm = {
 				tjUcmSectionFormData.append('recordid', tjUcmRecordId);
 				tjUcmSectionFormData.append('tjUcmFormSection', jQuery("a[href='"+tabId+"']").html());
 
-				com_tjucm.Services.Item.saveFormData(tjUcmSectionFormData, tjUcmItemForm.afterFieldDataSave);
+				com_tjucm.Services.Item.saveFormData(tjUcmSectionFormData, tjUcmItemForm.afterDataSave);
 
 				return true;
 			}).catch(function (error){
@@ -714,8 +826,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 
 			if (!document.formvalidator.isValid('#item-form'))
 			{
-				jQuery('#finalSave').attr('disabled', false);
-				jQuery('#draftSave').attr('disabled', false);
+				jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
 				jQuery("html, body").animate({ scrollTop: 0 }, "slow");
 
 				return false;
@@ -723,8 +834,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 		}
 		else
 		{
-			jQuery('#draftSave').attr('disabled', false);
-			jQuery('#finalSave').attr('disabled', false);
+			jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
 			jQuery("html, body").animate({ scrollTop: 0 }, "slow");
 
 			return false;
@@ -764,7 +874,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 
 					if ('save' == status)
 					{
-						jQuery("#finalSave").attr("disabled", "disabled");
+						jQuery("#tjUcmSectionFinalSave").attr("disabled", "disabled");
 						Joomla.renderMessages({'success':[Joomla.JText._('COM_TJUCM_MSG_ON_SAVED_FORM')]});
 						jQuery('html, body').animate({
 							scrollTop: jQuery("#system-message-container").offset().top-40
@@ -817,8 +927,8 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 					history.pushState(null, null, tjucmUrl);
 				}
 
-				jQuery('#draftSave').attr('disabled', false);
-				jQuery('#finalSave').attr('disabled', false);
+				jQuery('#tjUcmSectionDraftSave').attr('disabled', false);
+				jQuery('#tjUcmSectionFinalSave').attr('disabled', false);
 
 				/* After AJAX save need to toggle back the editors as we had previoussly toggled them to post the values*/
 				jQuery("#item-form .toggle-editor a").each(function(index) {

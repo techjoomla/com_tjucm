@@ -12,6 +12,9 @@
 			<option value="-2">JTRASHED</option>
 		</field>
 		<field name="type_id" type="number" readonly="true" class="readonly"/>
+		<field name="draft" type="hidden"/>
+		<field name="category_id" type="number"/>
+		<field name="cluster_id" type="number"/>
 		<field name="checked_out" type="hidden" filter="unset"/>
 		<field name="checked_out_time" default="0000-00-00 00:00:00" type="hidden" filter="unset"/>
 		<field name="created_by" type="createdby" default="0" hidden="true"/>
