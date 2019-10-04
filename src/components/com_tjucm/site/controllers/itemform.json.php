@@ -317,12 +317,19 @@ class TjucmControllerItemForm extends JControllerForm
 			$response = $model->saveExtraFields($formData);
 			$msg = null;
 
-			if ($response && empty($section) && empty($draft))
+			if ($response && empty($section))
 			{
-				$msg = ($response) ? Text::_("COM_TJUCM_ITEM_SAVED_SUCCESSFULLY") : Text::_("COM_TJUCM_FORM_SAVE_FAILED");
+				if ($draft)
+				{
+					$msg = ($response) ? Text::_("COM_TJUCM_ITEM_DRAFT_SAVED_SUCCESSFULLY") : Text::_("COM_TJUCM_FORM_SAVE_FAILED");
+				}
+				else
+				{
+					$msg = ($response) ? Text::_("COM_TJUCM_ITEM_SAVED_SUCCESSFULLY") : Text::_("COM_TJUCM_FORM_SAVE_FAILED");
+				}
 
 				// Disable the draft mode of the item if full f)orm is submitted
-				$table->draft = 0;
+				$table->draft = $draft;
 				$table->store();
 			}
 

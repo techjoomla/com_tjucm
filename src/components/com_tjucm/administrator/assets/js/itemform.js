@@ -8,6 +8,8 @@ var tjUcmClickedOnNext = 0;
 var tjUcmClickedOnPrev = 0;
 /*Variable to store if autosave is currently allowed for the form*/
 var tjUcmCurrentAutoSaveState = 0;
+/*Variable to store if form is submited for final save*/
+var tjUcmFormFinalSave = 0;
 
 /* This function executes for autosave form */
 jQuery(window).load(function()
@@ -95,6 +97,27 @@ jQuery(window).load(function()
 		jQuery("#tjucm-auto-save-disabled-msg").show();
 	}
 
+	/* Set the visibility of navigation buttons on tab change*/
+	jQuery("#tjucm_myTabTabs a").on('click', function(){
+		if (jQuery(this).parent().next('li').length)
+		{
+			jQuery("#next_button").attr('disabled', false);
+		}
+		else
+		{
+			jQuery("#next_button").attr('disabled', true);
+		}
+
+		if (jQuery(this).parent().prev('li').length)
+		{
+			jQuery("#previous_button").attr('disabled', false);
+		}
+		else
+		{
+			jQuery("#previous_button").attr('disabled', true);
+		}
+	});
+
 	/*Update the options of related field for new record of subform*/
 	jQuery(document).on('subform-row-add', function(event, row){
 		var tjucmSubFormCount = jQuery(row).attr('data-group').replace(jQuery(row).attr('data-base-name'), "");
@@ -142,7 +165,17 @@ jQuery(window).load(function()
 		{
 			if (tjUcmCurrentAutoSaveState)
 			{
-				tjUcmItemForm.saveSectionData(jQuery('#tjucm_myTabTabs > .active a').attr('href'));
+				var tjUcmSectionInputElements = jQuery(jQuery('#tjucm_myTabTabs > .active a').attr('href')).find('input, textarea, select, fieldset');
+
+				if (tjUcmItemForm.validateSection(tjUcmSectionInputElements))
+				{
+					tjUcmItemForm.saveSectionData(jQuery('#tjucm_myTabTabs > .active a').attr('href'));
+				}
+				else
+				{
+					tjUcmClickedOnNext = 0;
+					tjUcmClickedOnPrev = 0;
+				}
 			}
 			else
 			{
@@ -152,14 +185,14 @@ jQuery(window).load(function()
 				{
 					/* Clear the error messages first if any before processing the data*/
 					jQuery("#system-message-container").html("");
-	
+
 					if (tjUcmClickedOnNext)
 					{
 						tjUcmClickedOnNext = 0;
 						jQuery('#tjucm_myTabTabs > .active').next('li').find('a').trigger('click');
 						tjUcmItemForm.setVisibilityOfNavigationButtons();
 					}
-			
+
 					if (tjUcmClickedOnPrev)
 					{
 						tjUcmClickedOnPrev = 0;
@@ -169,8 +202,11 @@ jQuery(window).load(function()
 				}
 				else
 				{
-					jQuery("html, body").animate({ scrollTop: 0 }, "slow");
+					tjUcmClickedOnNext = 0;
+					tjUcmClickedOnPrev = 0;
 				}
+
+				jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
 			}
 		}
 		else
@@ -198,8 +234,11 @@ jQuery(window).load(function()
 			}
 			else
 			{
-				jQuery("html, body").animate({ scrollTop: 0 }, "slow");
+				tjUcmClickedOnNext = 0;
+				tjUcmClickedOnPrev = 0;
 			}
+
+			jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
 		}
 	});
 });
@@ -412,6 +451,15 @@ var tjUcmItemForm = {
 			}
 		}
 
+		if (response.data && tjUcmFormFinalSave)
+		{
+			jQuery("#tjucm-auto-save-disabled-msg").show();
+			jQuery("#itemState").val(0);
+			jQuery("#tjUcmSectionDraftSave").remove();
+			tjUcmCurrentAutoSaveState = 0;
+			tjUcmFormFinalSave = 0;
+		}
+
 		if (tjUcmClickedOnNext)
 		{
 			tjUcmClickedOnNext = 0;
@@ -445,7 +493,6 @@ var tjUcmItemForm = {
 			{
 				if (response.data)
 				{
-					tjUcmItemForm.afterItemSaveSuccess();
 					Joomla.renderMessages({'success':[response.message]});
 				}
 				else
@@ -453,7 +500,7 @@ var tjUcmItemForm = {
 					Joomla.renderMessages({'error':[response.message]});
 				}
 
-				jQuery("html, body").animate({ scrollTop: 0 }, "slow");
+				jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
 			}
 
 			if (response.messages !== null)
@@ -464,16 +511,10 @@ var tjUcmItemForm = {
 						Joomla.renderMessages({'error':[value]});
 					});
 
-					jQuery("html, body").animate({ scrollTop: 0 }, "slow");
+					jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
 				}
 			}
 		}
-	},
-	afterItemSaveSuccess: function (){
-		jQuery("#tjucm-auto-save-disabled-msg").show();
-		jQuery("#itemState").val(0);
-		jQuery("#tjUcmSectionDraftSave").remove();
-		tjUcmCurrentAutoSaveState = 0;
 	},
 	updateRelatedFieldsOptions: function (tjUcmParentClient, tjUcmParentRecordId) {
 		var tjUcmItemFormData = new FormData();
@@ -617,6 +658,11 @@ var tjUcmItemForm = {
 					tjUcmItemFormData.append('draft', 1);
 				}
 
+				if (tjUcmFormSubmitCallingButtonId == 'tjUcmSectionFinalSave')
+				{
+					tjUcmFormFinalSave = 1;
+				}
+
 				com_tjucm.Services.Item.saveFormData(tjUcmItemFormData, tjUcmItemForm.afterDataSave);
 
 				return true;
@@ -630,7 +676,7 @@ var tjUcmItemForm = {
 		{
 			tjUcmItemForm.setVisibilityOfNavigationButtons();
 			jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
-			jQuery("html, body").animate({ scrollTop: 0 }, "slow");
+			jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
 
 			return false;
 		}
@@ -757,7 +803,7 @@ var tjUcmItemForm = {
 		}
 		else
 		{
-			jQuery("html, body").animate({ scrollTop: 0 }, "slow");
+			jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
 
 			return false;
 		}
@@ -802,22 +848,25 @@ var tjUcmItemForm = {
 	setVisibilityOfNavigationButtons: function(){
 		var tjUcmCurrentFormTab = jQuery('#tjucm_myTabTabs').find('li.active');
 
-		if (jQuery(tjUcmCurrentFormTab).next('li').length)
+		if (jQuery(tjUcmCurrentFormTab).length)
 		{
-			jQuery("#next_button").attr('disabled', false);
-		}
-		else
-		{
-			jQuery("#next_button").attr('disabled', true);
-		}
-
-		if (jQuery(tjUcmCurrentFormTab).prev('li').length)
-		{
-			jQuery("#previous_button").attr('disabled', false);
-		}
-		else
-		{
-			jQuery("#previous_button").attr('disabled', true);
+			if (jQuery(tjUcmCurrentFormTab).next('li').length)
+			{
+				jQuery("#next_button").attr('disabled', false);
+			}
+			else
+			{
+				jQuery("#next_button").attr('disabled', true);
+			}
+	
+			if (jQuery(tjUcmCurrentFormTab).prev('li').length)
+			{
+				jQuery("#previous_button").attr('disabled', false);
+			}
+			else
+			{
+				jQuery("#previous_button").attr('disabled', true);
+			}
 		}
 	}
 };
@@ -847,7 +896,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 			if (!document.formvalidator.isValid('#item-form'))
 			{
 				jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
-				jQuery("html, body").animate({ scrollTop: 0 }, "slow");
+				jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
 
 				return false;
 			}
@@ -855,7 +904,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 		else
 		{
 			jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
-			jQuery("html, body").animate({ scrollTop: 0 }, "slow");
+			jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
 
 			return false;
 		}
@@ -877,7 +926,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 							Joomla.renderMessages({'error':[value]});
 						});
 
-						jQuery("html, body").animate({ scrollTop: 0 }, "slow");
+						jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
 					}
 				}
 
@@ -885,7 +934,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 				{
 					Joomla.renderMessages({'info':[returnedData.message]});
 
-					jQuery("html, body").animate({ scrollTop: 0 }, "slow");
+					jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
 				}
 
 				if (returnedData.data !== null)
