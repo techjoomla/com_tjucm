@@ -33,217 +33,217 @@ if (!empty($this->client))
 	$appendUrl .= "&client=" . $this->client;
 }
 
+$tmpListColumn = $this->listcolumn;
+reset($tmpListColumn);
+$firstListColumn = key($tmpListColumn);
+
 $link = 'index.php?option=com_tjucm&view=items' . $appendUrl;
 $itemId = $tjUcmFrontendHelper->getItemId($link);
 ?>
 <form action="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>" method="post" name="adminForm" id="adminForm">
-	<table class="table table-striped" id="itemList">
-		<?php
-		if (!empty($this->showList))
-		{
-			if (!empty($this->items))
-			{?>
-		<thead>
-			<tr>
-				<?php
-				if (isset($this->items[0]->state))
-				{
-					?>
-					<th width="5%">
-						<?php echo JHtml::_('grid.sort', 'JPUBLISHED', 'a.state', $listDirn, $listOrder); ?>
-					</th>
+	<?php echo $this->loadTemplate('filters'); ?>
+	<div>
+		<table class="table table-striped" id="itemList">
+			<?php
+			if (!empty($this->showList))
+			{
+				if (!empty($this->items))
+				{?>
+			<thead>
+				<tr>
 					<?php
-				}
-				?>
-				<th class=''>
-					<?php echo JHtml::_('grid.sort', 'COM_TJUCM_ITEMS_ID', 'a.id', $listDirn, $listOrder); ?>
-				</th>
-				<?php
-
-				if (!empty($this->listcolumn))
-				{
-					foreach ($this->listcolumn as $col_name)
+					if (isset($this->items[0]->state))
 					{
 						?>
-						<th class='left'>
-							<?php echo htmlspecialchars($col_name, ENT_COMPAT, 'UTF-8'); ?>
+						<th width="5%">
+							<?php echo JHtml::_('grid.sort', 'JPUBLISHED', 'a.state', $listDirn, $listOrder); ?>
 						</th>
 						<?php
 					}
-				}
-
-				if ($this->canEdit || $this->canDelete)
-				{
 					?>
-					<th class="center">
-						<?php echo JText::_('COM_TJUCM_ITEMS_ACTIONS'); ?>
+					<th class=''>
+						<?php echo JHtml::_('grid.sort', 'COM_TJUCM_ITEMS_ID', 'a.id', $listDirn, $listOrder); ?>
 					</th>
-				<?php
+					<?php
+
+					if (!empty($this->listcolumn))
+					{
+						foreach ($this->listcolumn as $col_name)
+						{
+							?>
+							<th class='left'>
+								<?php echo htmlspecialchars($col_name, ENT_COMPAT, 'UTF-8'); ?>
+							</th>
+							<?php
+						}
+					}
+
+					if ($this->canEdit || $this->canDelete)
+					{
+						?>
+						<th class="center">
+							<?php echo JText::_('COM_TJUCM_ITEMS_ACTIONS'); ?>
+						</th>
+					<?php
+					}
+					?>
+				</tr>
+			</thead>
+			<?php
 				}
-				?>
-			</tr>
-		</thead>
-		<?php
-			}
-		}?>
-		<?php
-		if (!empty($this->items))
-		{
-		?>
-		<tfoot>
-			<tr>
-				<td colspan="<?php echo isset($this->items[0]) ? count(get_object_vars($this->items[0])) : 10; ?>">
-					<?php echo $this->pagination->getListFooter(); ?>
-				</td>
-			</tr>
-		</tfoot>
-		<?php
-		}
-		?>
-		<tbody>
-		<?php
-		if (!empty($this->showList))
-		{
+			}?>
+			<?php
 			if (!empty($this->items))
 			{
-				foreach ($this->items as $i => $item)
+			?>
+			<tfoot>
+				<tr>
+					<td colspan="<?php echo isset($this->items[0]) ? count($this->items[0]->field_values)+3 : 10; ?>">
+						<?php echo $this->pagination->getListFooter(); ?>
+					</td>
+				</tr>
+			</tfoot>
+			<?php
+			}
+			?>
+			<tbody>
+			<?php
+			if (!empty($this->showList))
+			{
+				if (!empty($this->items))
 				{
-					$link = JRoute::_('index.php?option=com_tjucm&view=item&id=' . $item->id . "&client=" . $this->client . '&Itemid=' . $itemId, false);
-
-					$editown = false;
-					if ($this->canEditOwn)
+					foreach ($this->items as $i => $item)
 					{
-						$editown = (JFactory::getUser()->id == $item->created_by ? true : false);
-					}
-
-					$deleteOwn = false;
-					if ($this->canDeleteOwn)
-					{
-						$deleteOwn = (JFactory::getUser()->id == $item->created_by ? true : false);
-					}
-					
-					?>
-					<tr class="row<?php echo $i % 2; ?>">
-						<?php
-						if (isset($this->items[0]->state))
+						$editown = false;
+						if ($this->canEditOwn)
 						{
-							$class = ($this->canChange) ? 'active' : 'disabled'; ?>
-							<td class="center">
-								<a class="<?php echo $class; ?>" href="<?php echo ($this->canChange) ? 'index.php?option=com_tjucm&task=item.publish&id=' . $item->id . '&state=' . (($item->state + 1) % 2) . $appendUrl . $csrf : '#'; ?>">
-								<?php
-								if ($item->state == 1)
-								{
-									?><i class="icon-publish"></i><?php
-								}
-								else
-								{
-									?><i class="icon-unpublish"></i><?php
-								}
-								?>
-								</a>
-							</td>
-						<?php
+							$editown = (JFactory::getUser()->id == $item->created_by ? true : false);
+						}
+
+						$deleteOwn = false;
+						if ($this->canDeleteOwn)
+						{
+							$deleteOwn = (JFactory::getUser()->id == $item->created_by ? true : false);
 						}
 						?>
-						<td>
+						<tr class="row<?php echo $i % 2; ?>">
 							<?php
-							if (isset($item->checked_out) && $item->checked_out)
+							if (isset($this->items[0]->state))
 							{
-								echo JHtml::_('jgrid.checkedout', $i, $item->uEditor, $item->checked_out_time, 'items.', $canCheckin);
-							}
-							?>
-							<a href="<?php echo JRoute::_('index.php?option=com_tjucm&view=item&id=' . (int) $item->id . "&client=" . $this->client . '&Itemid=' . $itemId, false); ?>">
-								<?php echo $this->escape($item->id); ?>
-							</a>
-						</td>
-						<?php
-							if (!empty($item->field_values))
-							{
-								foreach ($item->field_values as $field_values)
-								{
-									?>
-									<td>
+								$class = ($this->canChange) ? 'active' : 'disabled'; ?>
+								<td class="center">
+									<a class="<?php echo $class; ?>" href="<?php echo ($this->canChange) ? 'index.php?option=com_tjucm&task=item.publish&id=' . $item->id . '&state=' . (($item->state + 1) % 2) . $appendUrl . $csrf : '#'; ?>">
 									<?php
-									if (is_array(json_decode($field_values, true)))
+									if ($item->state == 1)
 									{
-										$subFormData = json_decode($field_values);
-
-										foreach ($subFormData as $subFormDataRow)
-										{
-											?>
-											<table class="table table-bordered">
-											<?php
-											foreach ($subFormDataRow as $key => $subFormDataColumn)
-											{
-												?>
-												<tr>
-												<?php
-												echo !empty($subFormDataColumn) ? '<td>' . $key . '</td><td>' . $subFormDataColumn . '</td>' : '';
-												?>
-												</tr>
-												<?php
-											}
-											?>
-											</table>
-											<?php
-										}
+										?><span class="icon-checkmark-circle"></span><?php
 									}
 									else
 									{
-										?>
-										<a href="<?php echo $link;?>">
-											<?php echo $field_values; ?>
-										</a>
-										<?php
+										?><span class="icon-cancel-circle"></span><?php
 									}
 									?>
-									</td>
-									<?php
-								}
-							}
-
-							if ($this->canEdit || $this->canDelete || $editown || $deleteOwn)
-							{
-								?>
-								<td class="center">
-								<?php
-								if ($this->canEdit || $editown)
-								{
-									?>
-									<a target="_blank" href="<?php echo 'index.php?option=com_tjucm&task=itemform.edit&id=' . $item->id . $appendUrl; ?>" class="btn btn-mini" type="button"><i class="icon-apply" aria-hidden="true"></i></a>
-									<?php
-								}
-								if ($this->canDelete || $deleteOwn)
-								{
-									?>
-									<a href="<?php echo 'index.php?option=com_tjucm&task=itemform.remove' . '&id=' . $item->id . $appendUrl . $csrf; ?>" class="btn btn-mini delete-button" type="button"><i class="icon-delete" aria-hidden="true"></i></a>
-									<?php
-								}
-								?>
+									</a>
 								</td>
 							<?php
 							}
 							?>
-					</tr>
+							<td>
+								<?php
+								if (isset($item->checked_out) && $item->checked_out)
+								{
+									echo JHtml::_('jgrid.checkedout', $i, $item->uEditor, $item->checked_out_time, 'items.', $canCheckin);
+								}
+								?>
+								<a href="<?php echo JRoute::_('index.php?option=com_tjucm&view=item&id=' . (int) $item->id . "&client=" . $this->client . '&Itemid=' . $itemId, false); ?>">
+									<?php echo $this->escape($item->id); ?>
+								</a>
+							</td>
+							<?php
+								if (!empty($item->field_values))
+								{
+									foreach ($item->field_values as $field_values)
+									{
+										?>
+										<td>
+										<?php
+										if (is_array(json_decode($field_values, true)))
+										{
+											$subFormData = json_decode($field_values);
+
+											foreach ($subFormData as $subFormDataRow)
+											{
+												?>
+												<table class="table table-bordered">
+												<?php
+												foreach ($subFormDataRow as $key => $subFormDataColumn)
+												{
+													?>
+													<tr>
+													<?php
+													echo !empty($subFormDataColumn) ? '<td>' . $key . '</td><td>' . $subFormDataColumn . '</td>' : '';
+													?>
+													</tr>
+													<?php
+												}
+												?>
+												</table>
+												<?php
+											}
+										}
+										else
+										{
+											echo $field_values;
+										}
+										?>
+										</td>
+										<?php
+									}
+								}
+
+								if ($this->canEdit || $this->canDelete || $editown || $deleteOwn)
+								{
+									?>
+									<td class="center">
+									<?php
+									if ($this->canEdit || $editown)
+									{
+										?>
+										<a target="_blank" href="<?php echo 'index.php?option=com_tjucm&task=itemform.edit&id=' . $item->id . $appendUrl; ?>" class="btn btn-mini" type="button"><i class="icon-apply" aria-hidden="true"></i></a>
+										<?php
+									}
+									if ($this->canDelete || $deleteOwn)
+									{
+										?>
+										<a href="<?php echo 'index.php?option=com_tjucm&task=itemform.remove' . '&id=' . $item->id . $appendUrl . $csrf; ?>" class="btn btn-mini delete-button" type="button"><i class="icon-delete" aria-hidden="true"></i></a>
+										<?php
+									}
+									?>
+									</td>
+								<?php
+								}
+								?>
+						</tr>
+					<?php
+					}
+				}
+				else
+				{
+					?>
+					<div class="alert alert-warning"><?php echo JText::_('COM_TJUCM_NO_DATA_FOUND');?></div>
 				<?php
 				}
 			}
 			else
 			{
-				?>
+			?>
 				<div class="alert alert-warning"><?php echo JText::_('COM_TJUCM_NO_DATA_FOUND');?></div>
 			<?php
 			}
-		}
-		else
-		{
-		?>
-			<div class="alert alert-warning"><?php echo JText::_('COM_TJUCM_NO_DATA_FOUND');?></div>
-		<?php
-		}
-		?>
-		</tbody>
-	</table>
+			?>
+			</tbody>
+		</table>
+	</div>
 	<?php
 	if ($this->allowedToAdd)
 	{

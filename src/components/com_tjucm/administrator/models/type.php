@@ -336,6 +336,8 @@ class TjucmModelType extends JModelAdmin
 		$params['publish_items'] = $data['publish_items'];
 		$params['allowed_count'] = $data['allowed_count'];
 		$params['layout'] = $data['layout'];
+		$params['details_layout'] = $data['details_layout'];
+		$params['list_layout'] = $data['list_layout'];
 
 		// If UCM type is a subform then need to add content_id as hidden field in the form - For flat subform storage
 		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
@@ -459,5 +461,93 @@ class TjucmModelType extends JModelAdmin
 		$table->load(array('unique_identifier' => $client));
 
 		return $table->id;
+	}
+
+	/**
+	 * Method to delete one or more records.
+	 *
+	 * @param   array  &$pks  An array of record primary keys.
+	 *
+	 * @return  boolean  True if successful, false if an error occurs.
+	 *
+	 * @since   1.2.1
+	 */
+	public function delete(&$pks)
+	{
+		$pks = (array) $pks;
+
+		if (empty($pks))
+		{
+			return false;
+		}
+
+		// Load the required files in the delete operation
+		JLoader::import('components.com_tjfields.models.groups', JPATH_ADMINISTRATOR);
+		JLoader::import('components.com_tjfields.models.group', JPATH_ADMINISTRATOR);
+		JLoader::import('components.com_tjucm.models.items', JPATH_SITE);
+		JLoader::import('components.com_tjucm.models.itemform', JPATH_SITE);
+
+		// Delete related field groups and fields and items data related to the UCM Type
+		foreach ($pks as $pk)
+		{
+			if (empty($pk))
+			{
+				continue;
+			}
+
+			// Get ucm data
+			$table = $this->getTable();
+			$table->load(array('id' => $pk));
+
+			// Get all field groups in the UCM type
+			$fieldGroupsModel = JModelLegacy::getInstance('Groups', 'TjfieldsModel', array('ignore_request' => true));
+			$fieldGroupsModel->setState("filter.client", $table->unique_identifier);
+			$fieldGroups = $fieldGroupsModel->getItems();
+
+			if (!empty($fieldGroups))
+			{
+				$tjFieldsGroupModel = JModelLegacy::getInstance('group', 'TjfieldsModel', array('ignore_request' => true));
+
+				foreach ($fieldGroups as $fieldGroup)
+				{
+					// Delete field groups in UCM type
+					$status = $tjFieldsGroupModel->delete($fieldGroup->id);
+
+					if ($status === false)
+					{
+						return false;
+					}
+				}
+			}
+
+			// Get all field records related to the UCM type
+			$itemsModel = JModelLegacy::getInstance('Items', 'TjucmModel', array('ignore_request' => true));
+			$itemsModel->setState("ucm.client", $table->unique_identifier);
+			$items = $itemsModel->getItems();
+
+			// Delete records related to the UCM type
+			if (!empty($items))
+			{
+				$itemFormModel = JModelLegacy::getInstance('ItemForm', 'TjucmModel', array('ignore_request' => true));
+
+				foreach ($items as $item)
+				{
+					$status = $itemFormModel->delete($item->id);
+
+					if ($status === false)
+					{
+						return false;
+					}
+				}
+			}
+
+			// Delete UCM type
+			if (!parent::delete($pk))
+			{	
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
