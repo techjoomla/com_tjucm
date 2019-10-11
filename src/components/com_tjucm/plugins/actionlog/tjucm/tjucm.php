@@ -126,8 +126,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 	/**
 	 * On deleting UCM type data - logging method
 	 *
-	 * Method is called after user data is stored in the database.
-	 * This method logs who created/edited UCM type ,user's data
+	 * Method is called after ucm type is deleted in the database.
 	 *
 	 * @param   String  $context  com_tjucm
 	 * @param   Object  $table    Holds the coupon data.
@@ -322,4 +321,72 @@ class PlgActionlogTjUcm extends CMSPlugin
 			$this->addLog(array($message), $messageLanguageKey, $context, $userId);
 		}
 	}
+
+	/**
+	 * On saving UCM item data - logging method
+	 *
+	 * Method is called when ucm item is to be stored in the database.
+	 * This method logs who created/edited any data of UCM item
+	 *
+	 * @param   Integer  $item  Holds the ucm item id
+	 *
+	 * @return  void
+	 *
+	 * @since    __DEPLOY__VERSION__
+	 */
+	public function tjucmOnAfterSaveItem($item)
+	{
+		if (!$this->params->get('tjucmOnAfterSaveItem', 1))
+		{
+			return;
+		}
+
+		$context  = Factory::getApplication()->input->get('option');
+		$user     = Factory::getUser();
+
+		$messageLanguageKey = 'PLG_ACTIONLOG_TJUCM_ITEM_ADDED';
+		$message = array(
+				'action'      => 'add',
+				'id'          => $item,
+				'userid'      => $user->id,
+				'username'    => $user->username,
+				'accountlink' => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
+			);
+
+		$this->addLog(array($message), $messageLanguageKey, $context, $user->id);
+	}
+
+	/**
+	 * On deleting UCM item data - logging method
+	 *
+	 * Method is called after ucm item is deleted in the database.
+	 *
+	 * @param   Object  $item  Holds the item obj.
+	 *
+	 * @return  void
+	 *
+	 * @since    __DEPLOY__VERSION__
+	 */
+	public function TjUcmOnAfterItemDelete($item)
+	{
+		if (!$this->params->get('TjUcmOnAfterItemDelete', 1))
+		{
+			return;
+		}
+
+		$context = Factory::getApplication()->input->get('option');
+		$user    = Factory::getUser();
+
+		$messageLanguageKey = 'PLG_ACTIONLOG_TJUCM_ITEM_DELETED';
+		$message = array(
+				'action'      => 'delete',
+				'id'          => $item->content_id,
+				'userid'      => $user->id,
+				'username'    => $user->username,
+				'accountlink' => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
+			);
+
+		$this->addLog(array($message), $messageLanguageKey, $context, $user->id);
+	}
+
 }

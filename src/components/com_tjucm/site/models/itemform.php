@@ -1018,6 +1018,14 @@ class TjucmModelItemForm extends JModelAdmin
 
 			if ($table->delete($id) === true)
 			{
+				JLoader::import('components.com_tjfields.tables.fieldsvalue', JPATH_ADMINISTRATOR);
+				$itemTable = JTable::getInstance('FieldsValue', 'TjfieldsTable', array('dbo', $db));
+				$itemTable->load(array('content_id' => $contentId));
+
+				$dispatcher = JDispatcher::getInstance();
+				JPluginHelper::importPlugin('actionlog', 'tjucm');
+				$dispatcher->trigger('TjUcmOnAfterItemDelete', array($itemTable));
+
 				$this->deleteExtraFieldsData($id, $table->client);
 
 				return $id;

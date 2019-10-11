@@ -46,6 +46,14 @@
 					<option value="1">JYES</option>
 					<option value="0">JNO</option>
 				</field>
+				<field name="tjucmOnAfterSaveItem" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_ITEM_SAVE" description="PLG_ACTIONLOG_TJUCM_LOG_ACTION_COMMON_DESC" default="0" class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="TjUcmOnAfterItemDelete" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_ITEM_DELETE" description="PLG_ACTIONLOG_TJUCM_LOG_ACTION_COMMON_DESC" default="0" class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
 
 			</fieldset>
 		</fields>
