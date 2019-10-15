@@ -39,6 +39,7 @@ $firstListColumn = key($tmpListColumn);
 
 $link = 'index.php?option=com_tjucm&view=items' . $appendUrl;
 $itemId = $tjUcmFrontendHelper->getItemId($link);
+
 ?>
 <form action="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>" method="post" name="adminForm" id="adminForm">
 	<?php echo $this->loadTemplate('filters'); ?>

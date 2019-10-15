@@ -111,6 +111,7 @@ foreach ($fieldSets as $fieldName => $fieldset)
 
 							if (!empty($ucmSubFormFieldValue))
 							{
+								
 								foreach ($ucmSubFormFieldValue as $ucmSubFormData)
 								{
 									$contentIdFieldname = str_replace('.', '_', $ucmSubFormClient) . '_contentid';
@@ -133,11 +134,21 @@ foreach ($fieldSets as $fieldName => $fieldset)
 										$ucmSubFormXmlFieldSets[$ucmSubFormCount] = $ucmSubFormXmlFieldSet;
 										$ucmSubFormCount++;
 									}
-
-									// Call the JLayout recursively to render fields of ucmsubform
-									$layout = new JLayoutFile('fields', JPATH_ROOT . '/components/com_tjucm/layouts/detail');
-									echo $layout->render(array('xmlFormObject' => $ucmSubFormXmlFieldSets, 'formObject' => $ucmSubformFormObject, 'itemData' => $this->item, 'isSubForm' => 1));
-									echo "<hr>";
+									
+									if($field->type == 'Subform')
+									{
+										// Call the JLayout recursively to render fields of ucmsubform
+										$layout = new JLayoutFile('subform', JPATH_ROOT . '/components/com_tjucm/layouts/detail');
+										echo $layout->render(array('xmlFormObject' => $ucmSubFormXmlFieldSets, 'ucmSubFormData' => $ucmSubFormData, 'isSubForm' => 1));
+										echo "<hr>";
+									}
+									else
+									{
+										// Call the JLayout recursively to render fields of ucmsubform
+										$layout = new JLayoutFile('fields', JPATH_ROOT . '/components/com_tjucm/layouts/detail');
+										echo $layout->render(array('xmlFormObject' => $ucmSubFormXmlFieldSets, 'formObject' => $ucmSubformFormObject, 'itemData' => $this->item, 'isSubForm' => 1));
+										echo "<hr>";
+									}
 								}
 							}
 							?>
