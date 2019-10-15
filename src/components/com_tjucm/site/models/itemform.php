@@ -432,6 +432,7 @@ class TjucmModelItemForm extends JModelAdmin
 
 	public function getTypeForm($data = array(), $loadData = true)
 	{
+		$draft = $data['draft'];
 		$clientPart = explode(".", $data['client']);
 
 		// Path of empty form XML to create form object dynamically
@@ -444,6 +445,20 @@ class TjucmModelItemForm extends JModelAdmin
 				'load_data' => $loadData,
 			)
 		);
+
+		// If data is being saved in draft mode then dont check if the fields are required
+		if ($draft)
+		{
+			$fieldSets = $form->getFieldsets();
+
+			foreach ($fieldSets as $fieldset)
+			{
+				foreach ($form->getFieldset($fieldset->name) as $field)
+				{
+					$form->setFieldAttribute($field->fieldname, 'required', false);
+				}
+			}
+		}
 
 		if (empty($form))
 		{

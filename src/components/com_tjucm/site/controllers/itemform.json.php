@@ -123,7 +123,8 @@ class TjucmControllerItemForm extends JControllerForm
 	{
 		JSession::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
-		$post = Factory::getApplication()->input->post;
+		$app   = Factory::getApplication();
+		$post  = $app->input->post;
 		$model = $this->getModel('itemform');
 
 		$data = array();
@@ -137,6 +138,7 @@ class TjucmControllerItemForm extends JControllerForm
 			if ($client == '' || empty($this->typeId))
 			{
 				echo new JResponseJson('', Text::_('COM_TJUCM_FORM_SAVE_FAILED_CLIENT_REQUIRED'), true);
+				$app->close();
 			}
 
 			// Set the state of record as per UCM type config
@@ -162,6 +164,7 @@ class TjucmControllerItemForm extends JControllerForm
 				$this->processErrors($errors);
 
 				echo new JResponseJson('', Text::_('COM_TJUCM_FORM_VALIDATATION_FAILED'), true);
+				$app->close();
 			}
 
 			if ($model->save($data))
@@ -169,17 +172,20 @@ class TjucmControllerItemForm extends JControllerForm
 				$result['id'] = $model->getState($model->getName() . '.id');
 
 				echo new JResponseJson($result, Text::_('COM_TJUCM_ITEM_SAVED_SUCCESSFULLY'));
+				$app->close();
 			}
 			else
 			{
 				$errors = $model->getErrors();
 				$this->processErrors($errors);
 				echo new JResponseJson('', Text::_('COM_TJUCM_FORM_SAVE_FAILED'), true);
+				$app->close();
 			}
 		}
 		catch (Exception $e)
 		{
 			echo new JResponseJson($e);
+			$app->close();
 		}
 	}
 
@@ -211,6 +217,7 @@ class TjucmControllerItemForm extends JControllerForm
 		{
 			$app->enqueueMessage(Text::_('COM_TJUCM_FORM_VALIDATATION_FAILED'), 'error');
 			echo new JResponseJson(null);
+			$app->close();
 		}
 
 		try
@@ -227,6 +234,7 @@ class TjucmControllerItemForm extends JControllerForm
 				$this->processErrors($errors);
 
 				echo new JResponseJson(null);
+				$app->close();
 			}
 
 			$table = $model->getTable();
@@ -242,10 +250,12 @@ class TjucmControllerItemForm extends JControllerForm
 			$response = $model->saveExtraFields($fieldData);
 
 			echo new JResponseJson($response);
+			$app->close();
 		}
 		catch (Exception $e)
 		{
 			echo new JResponseJson($e);
+			$app->close();
 		}
 	}
 
@@ -274,6 +284,7 @@ class TjucmControllerItemForm extends JControllerForm
 		{
 			$app->enqueueMessage(Text::_('COM_TJUCM_FORM_VALIDATATION_FAILED'), 'error');
 			echo new JResponseJson(null);
+			$app->close();
 		}
 
 		try
@@ -290,6 +301,7 @@ class TjucmControllerItemForm extends JControllerForm
 			}
 			else
 			{
+				$formData['draft'] = $draft;
 				$form  = $model->getTypeForm($formData);
 			}
 
@@ -302,6 +314,7 @@ class TjucmControllerItemForm extends JControllerForm
 				$this->processErrors($errors);
 
 				echo new JResponseJson(null);
+				$app->close();
 			}
 
 			$table = $model->getTable();
@@ -334,10 +347,12 @@ class TjucmControllerItemForm extends JControllerForm
 			}
 
 			echo new JResponseJson($response, $msg);
+			$app->close();
 		}
 		catch (Exception $e)
 		{
 			echo new JResponseJson($e);
+			$app->close();
 		}
 	}
 
@@ -369,6 +384,7 @@ class TjucmControllerItemForm extends JControllerForm
 			if ($client == '')
 			{
 				echo new JResponseJson('', Text::_('COM_TJUCM_FORM_SAVE_FAILED'), true);
+				$app->close();
 			}
 
 			$data['created_by'] = Factory::getUser()->id;
@@ -395,6 +411,7 @@ class TjucmControllerItemForm extends JControllerForm
 				$this->processErrors($errors);
 
 				echo new JResponseJson('', Text::_('COM_TJUCM_FORM_VALIDATATION_FAILED'), true);
+				$app->close();
 			}
 
 			if ($model->save($data))
@@ -402,17 +419,20 @@ class TjucmControllerItemForm extends JControllerForm
 				$result['id'] = $model->getState($model->getName() . '.id');
 
 				echo new JResponseJson($result, Text::_('COM_TJUCM_ITEM_SAVED_SUCCESSFULLY'));
+				$app->close();
 			}
 			else
 			{
 				$errors = $model->getErrors();
 				$this->processErrors($errors);
 				echo new JResponseJson('', Text::_('COM_TJUCM_FORM_SAVE_FAILED'), true);
+				$app->close();
 			}
 		}
 		catch (Exception $e)
 		{
 			echo new JResponseJson($e);
+			$app->close();
 		}
 	}
 
@@ -466,11 +486,13 @@ class TjucmControllerItemForm extends JControllerForm
 		if (empty($client) || empty($contentId))
 		{
 			echo new JResponseJson(null);
+			$app->close();
 		}
 
 		$app->input->set('id', $contentId);
 		$updatedOptionsForRelatedField = $model->getUdatedRelatedFieldOptions($client, $contentId);
 
 		echo new JResponseJson($updatedOptionsForRelatedField);
+		$app->close();
 	}
 }

@@ -47,7 +47,7 @@ $setnavigation             = false;
 
 if ($this->item->id)
 {
-	$itemState = ($this->item->draft && $this->allow_auto_save) ? 1 : 0;
+	$itemState = ($this->item->draft && ($this->allow_auto_save || $this->allow_draft_save)) ? 1 : 0;
 }
 else
 {
@@ -182,7 +182,7 @@ else
 
 		if ($calledFrom == 'frontend')
 		{
-			if (($this->allow_auto_save || $this->allow_draft_save) && !empty($itemState))
+			if (($this->allow_auto_save || $this->allow_draft_save) && $itemState)
 			{
 				?>
 				<input type="button" class="btn btn-width150 br-0 btn-default font-normal" id="tjUcmSectionDraftSave"
