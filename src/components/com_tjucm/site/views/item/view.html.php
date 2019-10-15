@@ -115,6 +115,16 @@ class TjucmViewItem extends JViewLegacy
 			throw new Exception(implode("\n", $errors));
 		}
 
+		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
+		$typeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+		$typeTable->load(array('unique_identifier' => $this->client));
+		$typeParams = json_decode($typeTable->params);
+
+		if (isset($typeParams->details_layout) && !empty($typeParams->details_layout))
+		{
+			$this->setLayout($typeParams->details_layout);
+		}
+
 		// Ucm triggger before item display
 		JPluginHelper::importPlugin('tjucm');
 		$dispatcher = JDispatcher::getInstance();

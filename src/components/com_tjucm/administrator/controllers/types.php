@@ -310,23 +310,21 @@ class TjucmControllerTypes extends JControllerAdmin
 					{
 						foreach ($fields as $field)
 						{
-							$input->post->set('tjfields', '');
+							$fieldOptions = array();
 							$options = $field->options;
 
 							// Format options data
 							if (!empty($options))
 							{
+								$optionCount = 0;
+
 								foreach ($options as &$option)
 								{
-									$option = (array) $option;
-									$option['optionname'] = $option['options'];
-									$option['optionvalue'] = $option['value'];
+									$fieldOptions['fieldoption'.$optionCount] = array("name" => $option->options, "value" => $option->value);
+									$optionCount++;
 								}
-
-								$input->post->set('tjfields', $options);
 							}
 
-							unset($field->options);
 							$field = (array) $field;
 
 							// Cleaning Field data
@@ -340,6 +338,7 @@ class TjucmControllerTypes extends JControllerAdmin
 							$field['params'] = (array) json_decode($field['params']);
 							$tmpName = str_replace('.', '_', $ucmTypeData['unique_identifier']) . '_';
 							$field['name'] = str_replace($tmpName, '', $field['name']);
+							$field['fieldoption'] = $fieldOptions;
 
 							// Special case - Do not insert field with name 'contentid' as this will be added when ucm type for ucmsubform is created
 							if ($field['name'] == 'contentid')
