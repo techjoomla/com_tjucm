@@ -168,9 +168,9 @@ class TjucmControllerItemForm extends JControllerForm
 			{
 				$result['id'] = $model->getState($model->getName() . '.id');
 
-				$dispatcher = JDispatcher::getInstance();
+				/*$dispatcher = JDispatcher::getInstance();
 				JPluginHelper::importPlugin('actionlog', 'tjucm');
-				$dispatcher->trigger('tjucmOnAfterSaveItem', array($result['id']));
+				$dispatcher->trigger('tjucmOnAfterSaveItem', array($result['id']));*/
 
 				echo new JResponseJson($result, Text::_('COM_TJUCM_ITEM_SAVED_SUCCESSFULLY'));
 			}

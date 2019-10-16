@@ -93,7 +93,7 @@ class TjucmModelItems extends JModelList
 		foreach ($fields as $field)
 		{
 			$filterValue = $app->getUserStateFromRequest($this->context . '.' . $field->name, $field->name, '', 'STRING');
-			$this->setState('filter.field.' . $field->name, $filterValue);			
+			$this->setState('filter.field.' . $field->name, $filterValue);
 		}
 
 		if (empty($ucmType))
@@ -272,7 +272,7 @@ class TjucmModelItems extends JModelList
 			else
 			{
 				// If no search results found then do not return any record
-				$query->where($db->quoteName('a.id') . '=0');	
+				$query->where($db->quoteName('a.id') . '=0');
 			}
 		}
 
@@ -363,7 +363,7 @@ class TjucmModelItems extends JModelList
 
 			$query->where($db->quoteName('fv'.$filterFieldsCount.'.value') . ' LIKE ' . $db->q('%' . $search . '%'));
 			$filterApplied = 1;
-		}	
+		}
 
 		// For filterable fields
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);

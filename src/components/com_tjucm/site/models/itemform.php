@@ -646,7 +646,19 @@ class TjucmModelItemForm extends JModelAdmin
 			}
 		}
 
-		return parent::save($data);
+		if (parent::save($data))
+		{
+			$id = (int) $this->getState($this->getName() . '.id');
+			$data['itemId'] = $id;
+			$dispatcher = JDispatcher::getInstance();
+			JPluginHelper::importPlugin('actionlog', 'tjucm');
+			$isNew = ($data['id'] != 0) ? false : true;
+			$dispatcher->trigger('tjucmOnAfterSaveItem', array($data, $isNew));
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -1024,7 +1036,7 @@ class TjucmModelItemForm extends JModelAdmin
 
 				$dispatcher = JDispatcher::getInstance();
 				JPluginHelper::importPlugin('actionlog', 'tjucm');
-				$dispatcher->trigger('TjUcmOnAfterItemDelete', array($itemTable));
+				$dispatcher->trigger('tjUcmOnAfterItemDelete', array($itemTable));
 
 				$this->deleteExtraFieldsData($id, $table->client);
 
