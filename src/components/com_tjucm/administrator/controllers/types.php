@@ -135,6 +135,10 @@ class TjucmControllerTypes extends JControllerAdmin
 
 		$exportData = array();
 
+		$dispatcher = JDispatcher::getInstance();
+		JPluginHelper::importPlugin('actionlog', 'tjucm');
+		$dispatcher->trigger('tjUcmOnAfterTypeExport', array($cids));
+
 		foreach ($cids as $cid)
 		{
 			$ucmTypeTable = Table::getInstance('Type', 'TjucmTable');
@@ -369,6 +373,10 @@ class TjucmControllerTypes extends JControllerAdmin
 						}
 					}
 				}
+
+				$dispatcher = JDispatcher::getInstance();
+				JPluginHelper::importPlugin('actionlog', 'tjucm');
+				$dispatcher->trigger('tjUcmOnAfterTypeImport', array($ucmTypeId));
 			}
 		}
 

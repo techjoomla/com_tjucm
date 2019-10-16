@@ -51,6 +51,9 @@ class TjucmModelType extends JModelAdmin
 		JLoader::import('components.com_tjucm.classes.funlist', JPATH_ADMINISTRATOR);
 		$this->common  = new TjucmFunList;
 
+		$config['event_after_delete'] = 'tjUcmOnAfterTypeDelete';
+		$config['event_change_state'] = 'tjUcmOnAfterTypeChangeState';
+
 		parent::__construct($config);
 	}
 
@@ -381,6 +384,13 @@ class TjucmModelType extends JModelAdmin
 
 		if (parent::save($data))
 		{
+			$id = (int) $this->getState($this->getName() . '.id');
+			$data['typeId'] = $id;
+			$dispatcher = JDispatcher::getInstance();
+			JPluginHelper::importPlugin('actionlog', 'tjucm');
+			$isNew = ($data['id'] != 0) ? false : true;
+			$dispatcher->trigger('tjUcmOnAfterTypeSave', array($data, $isNew));
+
 			return true;
 		}
 

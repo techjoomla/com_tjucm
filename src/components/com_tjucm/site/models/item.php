@@ -109,7 +109,7 @@ class TjucmModelItem extends JModelAdmin
 	 * @param   integer  $pk  The id of the item.
 	 *
 	 * @return  object|boolean|JException  Menu item data object on success, boolean false or JException instance on error
-	 * 
+	 *
 	 * @since    _DEPLOY_VERSION_
 	 */
 	public function getItem($pk = null)
@@ -359,7 +359,16 @@ class TjucmModelItem extends JModelAdmin
 		$table->draft = $state == 1 ? 0 : 1;
 		$table->state = $state;
 
-		return $table->store();
+		if ($table->store())
+		{
+			$dispatcher = JDispatcher::getInstance();
+			JPluginHelper::importPlugin('actionlog', 'tjucm');
+			$dispatcher->trigger('tjUcmOnAfterItemChangeState', array($id,$state));
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
