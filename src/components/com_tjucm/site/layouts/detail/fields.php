@@ -22,11 +22,14 @@ $user = JFactory::getUser();
 $fieldLayout = array();
 $fieldLayout['File'] = $fieldLayout['Image'] = "file";
 $fieldLayout['Checkbox'] = "checkbox";
-$fieldLayout['Radio'] = $fieldLayout['List'] = "list";
+$fieldLayout['multi_select'] = $fieldLayout['single_select'] = $fieldLayout['Radio'] = $fieldLayout['List'] = $fieldLayout['tjlist'] = "list";
 $fieldLayout['Itemcategory'] = "itemcategory";
 $fieldLayout['Video'] = $fieldLayout['Audio'] = $fieldLayout['Url'] = "link";
 $fieldLayout['Calendar'] = "calendar";
 $fieldLayout['Cluster'] = "cluster";
+$fieldLayout['Related'] = $fieldLayout['SQL'] = "sql";
+$fieldLayout['Subform'] = "subform";
+$fieldLayout['Ownership'] = "ownership";
 
 // Load the tj-fields helper
 JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
@@ -44,15 +47,14 @@ $labelDivClass = ($isSubForm) ? 'col-xs-6' : 'col-xs-4';
 $controlDivClass = ($isSubForm) ? 'col-xs-6' : 'col-xs-8';
 
 // Get Field table
-$fieldTableData = new stdClass;
 JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
-$fieldTableData->tjFieldFieldTable = JTable::getInstance('field', 'TjfieldsTable');
+$tjFieldsFieldTable = JTable::getInstance('field', 'TjfieldsTable');
 
 $fieldSets = $formObject->getFieldsets();
 $count = 0;
 
 // Iterate through the normal form fieldsets and display each one
-foreach ($fieldSets as $fieldName => $fieldset)
+foreach ($fieldSets as $fieldset)
 {
 	$xmlFieldSet = $xmlFormObject[$count];
 	$count++;
@@ -64,14 +66,14 @@ foreach ($fieldSets as $fieldName => $fieldset)
 		{
 			// No need to show tooltip/description for field on details view
 			$field->description = '';
-		
+
 			// Get the field data by field name to check the field type
-			$fieldTableData->tjFieldFieldTable->load(array('name' => $field->__get("fieldname")));
+			$tjFieldsFieldTable->load(array('name' => $field->__get("fieldname")));
 			$canView = false;
 
-			if ($user->authorise('core.field.viewfieldvalue', 'com_tjfields.group.' . $fieldTableData->tjFieldFieldTable->group_id))
+			if ($user->authorise('core.field.viewfieldvalue', 'com_tjfields.group.' . $tjFieldsFieldTable->group_id))
 			{
-				$canView = $user->authorise('core.field.viewfieldvalue', 'com_tjfields.field.' . $fieldTableData->tjFieldFieldTable->id);
+				$canView = $user->authorise('core.field.viewfieldvalue', 'com_tjfields.field.' . $tjFieldsFieldTable->id);
 			}
 
 			if ($canView || ($itemData->created_by == $user->id))
@@ -86,7 +88,7 @@ foreach ($fieldSets as $fieldName => $fieldset)
 					continue;
 				}
 
-				if ($field->type == 'Subform' || $field->type == 'Ucmsubform')
+				if ($field->type == 'Ucmsubform')
 				{
 					?>
 					<div class="col-xs-12 col-md-6">
@@ -111,7 +113,6 @@ foreach ($fieldSets as $fieldName => $fieldset)
 
 							if (!empty($ucmSubFormFieldValue))
 							{
-								
 								foreach ($ucmSubFormFieldValue as $ucmSubFormData)
 								{
 									$contentIdFieldname = str_replace('.', '_', $ucmSubFormClient) . '_contentid';
@@ -134,21 +135,11 @@ foreach ($fieldSets as $fieldName => $fieldset)
 										$ucmSubFormXmlFieldSets[$ucmSubFormCount] = $ucmSubFormXmlFieldSet;
 										$ucmSubFormCount++;
 									}
-									
-									if($field->type == 'Subform')
-									{
-										// Call the JLayout recursively to render fields of ucmsubform
-										$layout = new JLayoutFile('subform', JPATH_ROOT . '/components/com_tjucm/layouts/detail');
-										echo $layout->render(array('xmlFormObject' => $ucmSubFormXmlFieldSets, 'ucmSubFormData' => $ucmSubFormData, 'isSubForm' => 1));
-										echo "<hr>";
-									}
-									else
-									{
-										// Call the JLayout recursively to render fields of ucmsubform
-										$layout = new JLayoutFile('fields', JPATH_ROOT . '/components/com_tjucm/layouts/detail');
-										echo $layout->render(array('xmlFormObject' => $ucmSubFormXmlFieldSets, 'formObject' => $ucmSubformFormObject, 'itemData' => $this->item, 'isSubForm' => 1));
-										echo "<hr>";
-									}
+
+									// Call the JLayout recursively to render fields of ucmsubform
+									$layout = new JLayoutFile('fields', JPATH_ROOT . '/components/com_tjucm/layouts/detail');
+									echo $layout->render(array('xmlFormObject' => $ucmSubFormXmlFieldSets, 'formObject' => $ucmSubformFormObject, 'itemData' => $this->item, 'isSubForm' => 1));
+									echo "<hr>";
 								}
 							}
 							?>

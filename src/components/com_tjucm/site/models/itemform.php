@@ -432,7 +432,7 @@ class TjucmModelItemForm extends JModelAdmin
 
 	public function getTypeForm($data = array(), $loadData = true)
 	{
-		$draft = $data['draft'];
+		$draft = isset($data['draft']) ? $data['draft'] : 0;
 		$clientPart = explode(".", $data['client']);
 
 		// Path of empty form XML to create form object dynamically
@@ -973,13 +973,13 @@ class TjucmModelItemForm extends JModelAdmin
 	/**
 	 * Method to delete data
 	 *
-	 * @param   array  $contentId  Data to be deleted
+	 * @param   array  &$contentId  Data to be deleted
 	 *
 	 * @return bool|int If success returns the id of the deleted item, if not false
 	 *
 	 * @throws Exception
 	 */
-	public function delete($contentId)
+	public function delete(&$contentId)
 	{
 		$ucmTypeId = $this->getState('ucmType.id');
 		$user = JFactory::getUser();
