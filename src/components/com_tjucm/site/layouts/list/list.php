@@ -131,7 +131,7 @@ if ($canDeleteOwn)
 					if ($canView || ($item->created_by == $user->id))
 					{
 						$field = $formObject->getField($tjFieldsFieldTable->name);
-						$field->value = $fieldValue;
+						$field->setValue($fieldValue);
 						$layoutToUse = (array_key_exists(ucfirst($tjFieldsFieldTable->type), $fieldLayout)) ? $fieldLayout[ucfirst($tjFieldsFieldTable->type)] : 'field';
 						$layout = new JLayoutFile($layoutToUse, JPATH_ROOT . '/components/com_tjfields/layouts/fields');
 						$output = $layout->render(array('fieldXml' => $fieldXml, 'field' => $field));

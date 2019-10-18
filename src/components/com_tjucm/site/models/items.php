@@ -479,7 +479,22 @@ class TjucmModelItems extends JModelList
 			{
 				if ($item->id == $fieldValue->content_id)
 				{
-					$item->field_values[$fieldValue->field_id] = $fieldValue->value;
+					if (isset($item->field_values[$fieldValue->field_id]))
+					{
+						if (is_array($item->field_values[$fieldValue->field_id]))
+						{
+							$item->field_values[$fieldValue->field_id] = array_merge($item->field_values[$fieldValue->field_id], array($fieldValue->value));
+						}
+						else
+						{
+							$item->field_values[$fieldValue->field_id] = array_merge(array($item->field_values[$fieldValue->field_id]), array($fieldValue->value));
+						}
+					}
+					else
+					{
+						$item->field_values[$fieldValue->field_id] = $fieldValue->value;
+					}
+
 					unset($fieldValues[$key]);
 				}
 			}
