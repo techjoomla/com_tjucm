@@ -39,7 +39,7 @@ $TjfieldsHelper = new TjfieldsHelper;
 $xmlFormObject = $displayData['xmlFormObject'];
 $formObject = $displayData['formObject'];
 $itemData = $displayData['itemData'];
-$isSubForm = $displayData['isSubForm'];
+$isSubForm = isset($displayData['isSubForm']) ? $displayData['isSubForm'] : '';
 
 // Define the classes for subform and normal form rendering
 $controlGroupDivClass = ($isSubForm) ? 'col-xs-12' : 'col-xs-12 col-md-6';
@@ -136,9 +136,11 @@ foreach ($fieldSets as $fieldset)
 										$ucmSubFormCount++;
 									}
 
+									$ucmSubFormRecordData = $tjucmItemModel->getData($ucmSubFormData->$contentIdFieldname);
+
 									// Call the JLayout recursively to render fields of ucmsubform
 									$layout = new JLayoutFile('fields', JPATH_ROOT . '/components/com_tjucm/layouts/detail');
-									echo $layout->render(array('xmlFormObject' => $ucmSubFormXmlFieldSets, 'formObject' => $ucmSubformFormObject, 'itemData' => $this->item, 'isSubForm' => 1));
+									echo $layout->render(array('xmlFormObject' => $ucmSubFormXmlFieldSets, 'formObject' => $ucmSubformFormObject, 'itemData' => $ucmSubFormRecordData, 'isSubForm' => 1));
 									echo "<hr>";
 								}
 							}
