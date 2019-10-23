@@ -40,6 +40,7 @@ $xmlFormObject = $displayData['xmlFormObject'];
 $formObject = $displayData['formObject'];
 $itemData = $displayData['itemData'];
 $isSubForm = isset($displayData['isSubForm']) ? $displayData['isSubForm'] : '';
+$data = $TjfieldsHelper->FetchDatavalue(array('content_id' => $itemData->id, 'client' => $itemData->client));
 
 // Define the classes for subform and normal form rendering
 $controlGroupDivClass = ($isSubForm) ? 'col-xs-12' : 'col-xs-12 col-md-6';
@@ -123,7 +124,7 @@ foreach ($fieldSets as $fieldset)
 											"client" => $ucmSubFormClient,
 											"view" => $view[1],
 											"layout" => 'default',
-											"content_id" => $ucmSubFormData->$contentIdFieldname, )
+											"content_id" => $ucmSubFormData->$contentIdFieldname)
 											);
 
 									$ucmSubFormFormXml = simplexml_load_file($field->formsource);
@@ -157,6 +158,22 @@ foreach ($fieldSets as $fieldset)
 						<div class="<?php echo $labelDivClass;?>"><?php echo $field->label; ?>:</div>
 						<div class="<?php echo $controlDivClass;?>">
 							<?php
+							$valueFound = 0;
+
+							foreach ($data as $fieldData)
+							{
+								if ($field->getAttribute('name') == $fieldData->name)
+								{
+									$valueFound = 1;
+									break;
+								}
+							}
+
+							if (empty($valueFound))
+							{
+								$field->setValue('');
+							}
+
 							$layout = new JLayoutFile($layoutToUse, JPATH_ROOT . '/components/com_tjfields/layouts/fields');
 							$output = $layout->render(array('fieldXml' => $xmlField, 'field' => $field));
 							echo $output;
