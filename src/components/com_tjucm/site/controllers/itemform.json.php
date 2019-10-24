@@ -16,6 +16,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Router\Route;
 use Joomla\Registry\Registry;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 
 jimport('joomla.filesystem.file');
 
@@ -493,6 +494,54 @@ class TjucmControllerItemForm extends JControllerForm
 		$updatedOptionsForRelatedField = $model->getUdatedRelatedFieldOptions($client, $contentId);
 
 		echo new JResponseJson($updatedOptionsForRelatedField);
+		$app->close();
+	}
+
+	/**
+	 * Method to check the compatibility between ucm types
+	 *
+	 * @return  mixed
+	 * 
+	 * @since    __DEPLOY_VERSION__
+	 */
+	public function checkCompatibility()
+	{
+		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
+
+		$app 	= Factory::getApplication();
+		$post 	= $app->input->post;
+		$client = $post->get('client', '', 'STRING');
+
+		if (empty($client))
+		{
+			echo new JResponseJson(null);
+			$app->close();
+		}
+
+		JLoader::import('components.com_tjucm.models.types', JPATH_ADMINISTRATOR);
+		$typesModel = BaseDatabaseModel::getInstance('Types', 'TjucmModel');
+		$typesModel->setState('filter.state', 1);
+		$ucmTypes 	= $typesModel->getItems();
+
+		JLoader::import('components.com_tjucm.models.type', JPATH_ADMINISTRATOR);
+		$typeModel = BaseDatabaseModel::getInstance('Type', 'TjucmModel');
+
+		$validUcmType = array();
+		$validUcmType[0]['value'] = "";
+		$validUcmType[0]['text'] = Text::_('COM_TJUCM_SELECT_UCM_TYPE_DESC');
+
+		foreach ($ucmTypes as $key => $type)
+		{
+			$result = $typeModel->checkCompatibility($client, $type->unique_identifier);
+
+			if ($result)
+			{
+				$validUcmType[$key]['value'] = $type->unique_identifier;
+				$validUcmType[$key]['text']  = $type->title;
+			}
+		}
+
+		echo new JResponseJson($validUcmType);
 		$app->close();
 	}
 }

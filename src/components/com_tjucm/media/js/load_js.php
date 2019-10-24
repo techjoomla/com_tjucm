@@ -21,3 +21,4 @@ JHtml::script(JUri::root() . 'media/com_tjucm/js/core/class.js');
 JHtml::script(JUri::root() . 'media/com_tjucm/js/com_tjucm.js');
 JHtml::script(JUri::root() . 'media/com_tjucm/js/core/base.js');
 JHtml::script(Juri::root() . 'media/com_tjucm/js/services/item.js');
+JHtml::script(Juri::root() . 'media/com_tjucm/js/services/items.js');

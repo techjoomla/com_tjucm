@@ -84,6 +84,9 @@ if ($canDeleteOwn)
 }
 ?>
 <tr class="row<?php echo $item->id?>">
+	<td class="center hidden-phone">
+		<?php echo JHtml::_('grid.id', '', $item->id); ?>
+	</td>
 	<?php
 	if (isset($item->state))
 	{

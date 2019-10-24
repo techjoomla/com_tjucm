@@ -14,6 +14,7 @@ JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
 JHtml::_('bootstrap.tooltip');
 JHtml::_('behavior.multiselect');
 JHtml::_('formbehavior.chosen', 'select');
+JHtml::_('jquery.token');
 
 $user = JFactory::getUser();
 $userId = $user->get('id');
@@ -41,6 +42,27 @@ $link = 'index.php?option=com_tjucm&view=items' . $appendUrl;
 $itemId = $tjUcmFrontendHelper->getItemId($link);
 $fieldsData = array();
 ?>
+<script type="text/javascript">
+	jQuery(window).load(function()
+	{
+		var currentUcmType = new FormData();
+		currentUcmType.append('client', "<?php echo $this->client ?>");
+		var afterCheckCompatibilityOfUcmType = function(error, response){
+			response = JSON.parse(response);
+
+			if (response.data !== null)
+			{
+				jQuery.each(response.data, function(key, value) {
+				 jQuery('#ucm_list').append(jQuery("<option></option>").attr("value",value.value).text(value.text)); 
+				 jQuery('#ucm_list').trigger('liszt:updated');
+				});
+			}
+		};
+
+		// Code to check ucm type compatibility to copy item
+		com_tjucm.Services.Items.chekCompatibility(currentUcmType, afterCheckCompatibilityOfUcmType);
+	});
+</script>
 <form action="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>" method="post" name="adminForm" id="adminForm">
 	<?php echo $this->loadTemplate('filters'); ?>
 	<div>
@@ -52,6 +74,9 @@ $fieldsData = array();
 				{?>
 			<thead>
 				<tr>
+					<th width="1%" class="">
+						<input type="checkbox" name="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
+					</th>
 					<?php
 					if (isset($this->items[0]->state))
 					{
@@ -171,6 +196,12 @@ $fieldsData = array();
 		<a target="_blank" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false, 2); ?>" class="btn btn-success btn-small">
 			<i class="icon-plus"></i><?php echo JText::_('COM_TJUCM_ADD_ITEM'); ?>
 		</a>
+		<a target="_blank" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false, 2); ?>" class="btn btn-success btn-small">
+			<?php echo JText::_('COM_TJUCM_COPY_ITEM'); ?>
+		</a>
+		<a data-toggle="modal" onclick="if (document.adminForm.boxchecked.value==0){alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{jQuery( '#copyModal' ).modal('show'); return true;}" class="btn btn-success btn-small">
+			<?php echo JText::_('COM_TJUCM_COPY_ITEM_TO_OTHER'); ?>
+		</a>
 		<?php
 	}
 	?>
@@ -179,6 +210,30 @@ $fieldsData = array();
 	<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>"/>
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>"/>
 	<?php echo JHtml::_('form.token'); ?>
+	
+	<!-- Modal Pop Up for Copy Item to Other-->
+	<div id="copyModal" class="copyModal modal fade" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close novalidate" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+					<h3>Select Ucm Type</h3>
+				</div>
+				<div class="modal-body">
+						<?php echo JHTML::_('select.genericlist', '', 'filter[ucm_list]', 'class="ucm_list" onchange=""', 'text', 'value',$this->state->get('filter.ucm_list'), 'ucm_list' ); ?>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn" onclick="document.getElementById('ucm_list').value='';" data-dismiss="modal">Cancel</button>
+					<button type="submit" class="btn btn-success" onclick="Joomla.submitbutton('itemform.copyItem');">
+						Process
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </form>
 <?php
 if ($this->canDelete)
