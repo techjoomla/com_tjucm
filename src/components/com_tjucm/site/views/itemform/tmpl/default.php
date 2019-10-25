@@ -53,40 +53,37 @@ else
 {
 	$itemState = ($this->allow_auto_save || $this->allow_draft_save) ? 1 : 0;
 }
-?>
-<script type="text/javascript">
 
-	/* Code to show alert box if form changes are made and user is closing/refreshing/navigating the tab
-	 * without saving the content
-	 */
+JFactory::getDocument()->addScriptDeclaration('
 	jQuery(function() {
-		jQuery('#item-form').areYouSure();
+		jQuery("#item-form").areYouSure();
 	});
 
 	jQuery(window).load(function ()
 	{
-		jQuery('#item-form .nav-tabs li a').first().click();
+		jQuery("#item-form .nav-tabs li a").first().click();
 	});
 
 	Joomla.submitbutton = function (task)
 	{
-		if (task == 'itemform.cancel')
+		if (task == "itemform.cancel")
 		{
-			Joomla.submitform(task, document.getElementById('item-form'));
+			Joomla.submitform(task, document.getElementById("item-form"));
 		}
 		else
 		{
-			if (task != 'itemform.cancel' && document.formvalidator.isValid(document.id('item-form')))
+			if (task != "itemform.cancel" && document.formvalidator.isValid(document.id("item-form")))
 			{
-				Joomla.submitform(task, document.getElementById('item-form'));
+				Joomla.submitform(task, document.getElementById("item-form"));
 			}
 			else
 			{
-				alert('<?php echo $this->escape(JText::_('JGLOBAL_VALIDATION_FORM_FAILED')); ?>');
+				alert("' . $this->escape(JText::_("JGLOBAL_VALIDATION_FORM_FAILED")) . '");
 			}
 		}
-	}
-</script>
+	};
+');
+?>
 <form action="<?php echo JRoute::_('index.php');?>" method="post" enctype="multipart/form-data" name="adminForm" id="item-form" class="form-validate">
 	<?php
 	if ($this->allow_auto_save == '1')

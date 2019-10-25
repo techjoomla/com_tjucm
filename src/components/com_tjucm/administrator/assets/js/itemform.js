@@ -423,7 +423,19 @@ var tjUcmItemForm = {
 		tjUcmItemFieldFormData.append('client', tjUcmClient);
 		tjUcmItemFieldFormData.append('recordid', tjUcmRecordId);
 
-		if (jQuery(fieldObj).attr('type') != 'file')
+
+		if (jQuery(fieldObj).attr('type') == 'checkbox')
+		{
+			if (jQuery(fieldObj).prop('checked') == true)
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), 1);
+			}
+			else
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), 0);
+			}
+		}
+		else if (jQuery(fieldObj).attr('type') != 'file')
 		{
 			tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
 		}
