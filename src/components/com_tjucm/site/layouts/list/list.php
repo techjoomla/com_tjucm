@@ -93,11 +93,11 @@ if ($canDeleteOwn)
 			<?php
 			if ($item->state == 1)
 			{
-				?><span class="icon-checkmark-circle"></span><?php
+				?><span class="icon-checkmark-circle" title="<?php echo JText::_('COM_TJUCM_UNPUBLISH_ITEM');?>"></span><?php
 			}
 			else
 			{
-				?><span class="icon-cancel-circle"></span><?php
+				?><span class="icon-cancel-circle" title="<?php echo JText::_('COM_TJUCM_PUBLISH_ITEM');?>"></span><?php
 			}
 			?>
 			</a>
@@ -145,18 +145,18 @@ if ($canDeleteOwn)
 	{
 		?>
 		<td class="center">
-			<a target="_blank" href="<?php echo $link; ?>" class="btn btn-mini" type="button"><i class="icon-eye-open"></i></a>
+			<a target="_blank" href="<?php echo $link; ?>" class="btn btn-mini" type="button" title="<?php echo JText::_('COM_TJUCM_VIEW_RECORD');?>"><i class="icon-eye-open"></i></a>
 		<?php
 		if ($canEdit || $editown)
 		{
 			?>
-			<a target="_blank" href="<?php echo 'index.php?option=com_tjucm&task=itemform.edit&id=' . $item->id . $appendUrl; ?>" class="btn btn-mini" type="button"><i class="icon-apply" aria-hidden="true"></i></a>
+			<a target="_blank" href="<?php echo 'index.php?option=com_tjucm&task=itemform.edit&id=' . $item->id . $appendUrl; ?>" class="btn btn-mini" type="button" title="<?php echo JText::_('COM_TJUCM_EDIT_ITEM');?>"><i class="icon-apply" aria-hidden="true"></i></a>
 			<?php
 		}
 		if ($canDelete || $deleteOwn)
 		{
 			?>
-			<a href="<?php echo 'index.php?option=com_tjucm&task=itemform.remove' . '&id=' . $item->id . $appendUrl . $csrf; ?>" class="btn btn-mini delete-button" type="button"><i class="icon-delete" aria-hidden="true"></i></a>
+			<a href="<?php echo 'index.php?option=com_tjucm&task=itemform.remove' . '&id=' . $item->id . $appendUrl . $csrf; ?>" class="btn btn-mini delete-button" type="button" title="<?php echo JText::_('COM_TJUCM_DELETE_ITEM');?>"><i class="icon-delete" aria-hidden="true"></i></a>
 			<?php
 		}
 		?>
