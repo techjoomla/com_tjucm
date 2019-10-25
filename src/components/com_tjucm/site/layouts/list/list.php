@@ -126,7 +126,7 @@ if ($canDeleteOwn)
 
 			$fieldXml = $formObject->getFieldXml($tjFieldsFieldTable->name);
 			?>
-			<td>
+			<td style="word-break: break-word;">
 				<?php
 					if ($canView || ($item->created_by == $user->id))
 					{
