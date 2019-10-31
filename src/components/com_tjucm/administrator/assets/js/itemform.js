@@ -423,7 +423,6 @@ var tjUcmItemForm = {
 		tjUcmItemFieldFormData.append('client', tjUcmClient);
 		tjUcmItemFieldFormData.append('recordid', tjUcmRecordId);
 
-
 		if (jQuery(fieldObj).attr('type') == 'checkbox')
 		{
 			if (jQuery(fieldObj).prop('checked') == true)
