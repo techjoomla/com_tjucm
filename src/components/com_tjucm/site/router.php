@@ -148,12 +148,15 @@ class TjUcmRouter extends JComponentRouterBase
 
 		if ($count >= 1)
 		{
-			$ucmTypeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', $db));
-			$ucmTypeTable->load(array('alias' => $segments[1]));
-
-			if ($ucmTypeTable->id)
+			if (isset($segments[1]))
 			{
-				$vars['client'] = $ucmTypeTable->unique_identifier;
+				$ucmTypeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', $db));
+				$ucmTypeTable->load(array('alias' => $segments[1]));
+
+				if ($ucmTypeTable->id)
+				{
+					$vars['client'] = $ucmTypeTable->unique_identifier;
+				}
 			}
 		}
 
