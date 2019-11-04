@@ -244,10 +244,7 @@ jQuery(window).load(function()
 });
 
 var tjUcmItemForm = {
-	onUcmFormChange: function (fieldObj){
-		/* Disable the action buttons before performing the action*/
-		jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
-
+	getUcmParentRecordId: function (draft, callback){
 		var tjUcmParentClient = jQuery('#item-form').find("input[name='jform[client]']").val();
 
 		var getParentRecordid = new Promise(function(resolve, reject) {
@@ -268,6 +265,8 @@ var tjUcmItemForm = {
 
 				/* Callback function after creating the parent UCM record */
 				var afterCreateParentUcmRecord = function (error, response){
+					response = JSON.parse(response);
+
 					if (error == null)
 					{
 						if (response.data !== null && jQuery.isNumeric(response.data.id))
@@ -297,7 +296,7 @@ var tjUcmItemForm = {
 				};
 
 				/* Create the record in draft mode*/
-				tjUcmItemFormData.append('draft', 1);
+				tjUcmItemFormData.append('draft', draft);
 
 				/* Add new UCM parent record for UCM type if its not created yet*/
 				com_tjucm.Services.Item.create(tjUcmItemFormData, afterCreateParentUcmRecord);
@@ -310,12 +309,19 @@ var tjUcmItemForm = {
 
 		// Action on after creating the parent UCM record
 		getParentRecordid.then(function (response){
-			/* Save the field value which was added/changed */
-			tjUcmItemForm.initUcmFormFieldDataSave(fieldObj, tjUcmParentClient, response);
+			callback(response);
 		}).catch(function (error){
 			console.log(error);
-
 			return false;
+		});
+	},
+	onUcmFormChange: function (fieldObj){
+		/* Disable the action buttons before performing the action*/
+		jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
+
+		tjUcmItemForm.getUcmParentRecordId(1, function (tjucmParentRecordId){
+			var tjUcmParentClient = jQuery('#item-form').find("input[name='jform[client]']").val();
+			tjUcmItemForm.initUcmFormFieldDataSave(fieldObj, tjUcmParentClient, tjucmParentRecordId);
 		});
 	},
 	initUcmFormFieldDataSave: function (fieldObj, tjUcmParentClient, tjUcmParentRecordId){
@@ -350,6 +356,8 @@ var tjUcmItemForm = {
 			{
 				/* Callback function after creating the UCM subform record */
 				var afterCreateUcmSubFormRecord = function (error, response){
+					response = JSON.parse(response);
+
 					if (error == null)
 					{
 						if (response.data !== null && jQuery.isNumeric(response.data.id))
@@ -415,7 +423,18 @@ var tjUcmItemForm = {
 		tjUcmItemFieldFormData.append('client', tjUcmClient);
 		tjUcmItemFieldFormData.append('recordid', tjUcmRecordId);
 
-		if (jQuery(fieldObj).attr('type') != 'file')
+		if (jQuery(fieldObj).attr('type') == 'checkbox')
+		{
+			if (jQuery(fieldObj).prop('checked') == true)
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), 1);
+			}
+			else
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), 0);
+			}
+		}
+		else if (jQuery(fieldObj).attr('type') != 'file')
 		{
 			tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
 		}
@@ -429,6 +448,7 @@ var tjUcmItemForm = {
 		return true;
 	},
 	afterDataSave: function (error, response){
+		response = JSON.parse(response);
 		/* Remove the dirty class fromt the form once the field data is saved*/
 		jQuery('#item-form').removeClass('dirty');
 
@@ -520,6 +540,7 @@ var tjUcmItemForm = {
 		var tjUcmItemFormData = new FormData();
 
 		var tjUcmUpdateRelatedFieldsOptions = function (error, response){
+			response = JSON.parse(response);
 			tjucmRelatedFieldUpdatedOptions = response.data;
 
 			if(tjucmRelatedFieldUpdatedOptions == '')
@@ -552,6 +573,7 @@ var tjUcmItemForm = {
 		/* Disable the action buttons before performing the action*/
 		jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
 		var tjUcmFormSubmitCallingButtonId = event.target.id;
+		var tjUcmSaveRecordAsDraft = 1;
 
 		if (tjUcmFormSubmitCallingButtonId == 'tjUcmSectionFinalSave')
 		{
@@ -561,125 +583,75 @@ var tjUcmItemForm = {
 
 				return false;
 			}
-		}
 
-		if (document.formvalidator.isValid(document.getElementById('item-form')))
-		{
-			/* Clear the error messages first if any before processing the data*/
-			jQuery("#system-message-container").html("");
-
-			/* Disable the save button till the record is saved*/
-			jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
-
-			/* For AJAX save need to assign values to the editor field containers*/
-			jQuery("#item-form .toggle-editor a").each(function(index) {
-				this.click();
-			});
-
-			var tjUcmParentClient = jQuery('#item-form').find("input[name='jform[client]']").val();
-			var getParentRecordid = new Promise(function(resolve, reject) {
-				var tjucmParentRecordId = jQuery('#item-form').find("input[name='jform[id]']").val();
-
-				if (tjucmParentRecordId == '')
-				{
-					var tjUcmItemFormData = new FormData();
-
-					/* Set parent client in the data form*/
-					if (tjUcmParentClient != '')
-					{
-						tjUcmItemFormData.append('client', tjUcmParentClient);
-					}
-
-					/* Add CSRF token to the form*/
-					tjUcmItemFormData.append(Joomla.getOptions('csrf.token'), 1);
-
-					/* Callback function after creating the parent UCM record */
-					var afterCreateParentUcmRecord = function (error, response){
-						if (error == null)
-						{
-							if (response.data !== null && jQuery.isNumeric(response.data.id))
-							{
-								/* Set parent record id in the form*/
-								jQuery('#item-form').find("input[name='jform[id]']").val(response.data.id);
-
-								/* Update parent record id in the URL if the parent record is created successfully*/
-								var tjucmUrl = window.location.href.split('#')[0];
-								var tjucmUrlSeparator = (tjucmUrl.indexOf("?")===-1)?"?":"&";
-								var tjucmNewParam = "id=" + response.data.id;
-
-								if (!(tjucmUrl.indexOf(tjucmNewParam) >= 0))
-								{
-									tjucmUrl+=tjucmUrlSeparator+tjucmNewParam;
-								}
-
-								history.pushState(null, null, tjucmUrl);
-
-								resolve(response.data.id);
-							}
-							else
-							{
-								reject(response);
-							}
-						}
-					};
-
-					/* Add new UCM parent record for UCM type if its not created yet*/
-					com_tjucm.Services.Item.create(tjUcmItemFormData, afterCreateParentUcmRecord);
-				}
-				else if (jQuery.isNumeric(tjucmParentRecordId) && tjucmParentRecordId != 0)
-				{
-					resolve(tjucmParentRecordId);
-				}
-			});
-
-			/* Once data is assigned to the textarea toggle the editors*/
-			jQuery("#item-form .toggle-editor a").each(function(index) {
-				this.click();
-			});
-
-			// Action on after creating the parent UCM record
-			getParentRecordid.then(function (response){
-				var myForm = document.getElementById('item-form');
-				var tjUcmItemFormData = new FormData(myForm);
-				tjUcmItemFormData.delete('task');
-				tjUcmItemFormData.delete('option');
-				tjUcmItemFormData.delete('view');
-				tjUcmItemFormData.delete('layout');
-				var tjUcmClient = jQuery('#item-form').find("input[name='jform[client]']").val();
-				var tjUcmRecordId = jQuery('#item-form').find("input[name='jform[id]']").val();
-
-				/* Add CSRF token to the form*/
-				tjUcmItemFormData.append(Joomla.getOptions('csrf.token'), 1);
-				tjUcmItemFormData.append('client', tjUcmClient);
-				tjUcmItemFormData.append('recordid', tjUcmRecordId);
-
-				if (tjUcmFormSubmitCallingButtonId == 'tjUcmSectionDraftSave')
-				{
-					tjUcmItemFormData.append('draft', 1);
-				}
-
-				if (tjUcmFormSubmitCallingButtonId == 'tjUcmSectionFinalSave')
-				{
-					tjUcmFormFinalSave = 1;
-				}
-
-				com_tjucm.Services.Item.saveFormData(tjUcmItemFormData, tjUcmItemForm.afterDataSave);
-
-				return true;
-			}).catch(function (error){
-				console.log(error);
-
+			if (document.formvalidator.isValid(document.getElementById('item-form')))
+			{
+				/* Clear the error messages first if any before processing the data*/
+				jQuery("#system-message-container").html("");
+	
+				/* Disable the save button till the record is saved*/
+				jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
+			}
+			else
+			{
+				tjUcmItemForm.setVisibilityOfNavigationButtons();
+				jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
+				jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+	
 				return false;
-			});
-		}
-		else
-		{
-			tjUcmItemForm.setVisibilityOfNavigationButtons();
-			jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
-			jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+			}
 
-			return false;
+			tjUcmSaveRecordAsDraft = 0;
 		}
+
+		/* For AJAX save need to assign values to the editor field containers*/
+		jQuery("#item-form .toggle-editor a").each(function(index) {
+			this.click();
+		});
+
+		tjUcmItemForm.getUcmParentRecordId(tjUcmSaveRecordAsDraft, function (){
+			var tjUcmForm = document.getElementById('item-form');
+			var tjUcmItemFormData = new FormData(tjUcmForm);
+			tjUcmItemFormData.delete('task');
+			tjUcmItemFormData.delete('option');
+			tjUcmItemFormData.delete('view');
+			tjUcmItemFormData.delete('layout');
+			var tjUcmClient = jQuery('#item-form').find("input[name='jform[client]']").val();
+			var tjUcmRecordId = jQuery('#item-form').find("input[name='jform[id]']").val();
+
+			/* Add CSRF token to the form*/
+			tjUcmItemFormData.append(Joomla.getOptions('csrf.token'), 1);
+			tjUcmItemFormData.append('client', tjUcmClient);
+			tjUcmItemFormData.append('recordid', tjUcmRecordId);
+
+			if (tjUcmFormSubmitCallingButtonId == 'tjUcmSectionDraftSave')
+			{
+				tjUcmItemFormData.append('draft', 1);
+			}
+
+			if (tjUcmFormSubmitCallingButtonId == 'tjUcmSectionFinalSave')
+			{
+				tjUcmFormFinalSave = 1;
+			}
+
+			jQuery('input[type="checkbox"]').each(function (){
+					if (jQuery(this).prop('checked') == true)
+					{
+						tjUcmItemFormData.append(jQuery(this).attr('name'), 1);
+					}
+					else
+					{
+						tjUcmItemFormData.append(jQuery(this).attr('name'), 0);
+					}
+			});
+
+			com_tjucm.Services.Item.saveFormData(tjUcmItemFormData, tjUcmItemForm.afterDataSave);
+		});
+
+		/* Once data is assigned to the textarea toggle the editors*/
+		jQuery("#item-form .toggle-editor a").each(function(index) {
+			this.click();
+		});
 	},
 	saveSectionData: function (tabId){
 		/* Disable the action buttons before performing the action*/
@@ -708,6 +680,17 @@ var tjUcmItemForm = {
 							tjUcmSectionFormData.append(jQuery(this).attr('name'), jQuery(this)[0].files[0]);
 						}
 					}
+					else if(jQuery(this).attr('type') == 'checkbox')
+					{
+						if (jQuery(this).prop('checked') == true)
+						{
+							jQuery(this).val(1);
+						}
+						else
+						{
+							jQuery(this).val(0);
+						}
+					}
 					else
 					{
 						if (jQuery(this).val() != undefined)
@@ -721,64 +704,8 @@ var tjUcmItemForm = {
 			/* Disable the save button till the record is saved*/
 			jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
 
-			var tjUcmParentClient = jQuery('#item-form').find("input[name='jform[client]']").val();
-			var getParentRecordid = new Promise(function(resolve, reject) {
-				var tjucmParentRecordId = jQuery('#item-form').find("input[name='jform[id]']").val();
 
-				if (tjucmParentRecordId == '')
-				{
-					var tjUcmItemFormData = new FormData();
-
-					/* Set parent client in the data form*/
-					if (tjUcmParentClient != '')
-					{
-						tjUcmItemFormData.append('client', tjUcmParentClient);
-					}
-
-					/* Add CSRF token to the form*/
-					tjUcmItemFormData.append(Joomla.getOptions('csrf.token'), 1);
-
-					/* Callback function after creating the parent UCM record */
-					var afterCreateParentUcmRecord = function (error, response){
-						if (error == null)
-						{
-							if (response.data !== null && jQuery.isNumeric(response.data.id))
-							{
-								/* Set parent record id in the form*/
-								jQuery('#item-form').find("input[name='jform[id]']").val(response.data.id);
-
-								/* Update parent record id in the URL if the parent record is created successfully*/
-								var tjucmUrl = window.location.href.split('#')[0];
-								var tjucmUrlSeparator = (tjucmUrl.indexOf("?")===-1)?"?":"&";
-								var tjucmNewParam = "id=" + response.data.id;
-
-								if (!(tjucmUrl.indexOf(tjucmNewParam) >= 0))
-								{
-									tjucmUrl+=tjucmUrlSeparator+tjucmNewParam;
-								}
-
-								history.pushState(null, null, tjucmUrl);
-
-								resolve(response.data.id);
-							}
-							else
-							{
-								reject(response);
-							}
-						}
-					};
-
-					/* Add new UCM parent record for UCM type if its not created yet*/
-					com_tjucm.Services.Item.create(tjUcmItemFormData, afterCreateParentUcmRecord);
-				}
-				else if (jQuery.isNumeric(tjucmParentRecordId) && tjucmParentRecordId != 0)
-				{
-					resolve(tjucmParentRecordId);
-				}
-			});
-
-			// Action on after creating the parent UCM record
-			getParentRecordid.then(function (response){
+			tjUcmItemForm.getUcmParentRecordId(1, function (){
 				tjUcmSectionFormData.delete('task');
 				tjUcmSectionFormData.delete('option');
 				tjUcmSectionFormData.delete('view');
@@ -793,12 +720,6 @@ var tjUcmItemForm = {
 				tjUcmSectionFormData.append('tjUcmFormSection', jQuery("a[href='"+tabId+"']").html());
 
 				com_tjucm.Services.Item.saveFormData(tjUcmSectionFormData, tjUcmItemForm.afterDataSave);
-
-				return true;
-			}).catch(function (error){
-				console.log(error);
-
-				return false;
 			});
 		}
 		else

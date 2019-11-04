@@ -432,6 +432,7 @@ class TjucmModelItemForm extends JModelAdmin
 
 	public function getTypeForm($data = array(), $loadData = true)
 	{
+		$draft = isset($data['draft']) ? $data['draft'] : 0;
 		$clientPart = explode(".", $data['client']);
 
 		// Path of empty form XML to create form object dynamically
@@ -444,6 +445,20 @@ class TjucmModelItemForm extends JModelAdmin
 				'load_data' => $loadData,
 			)
 		);
+
+		// If data is being saved in draft mode then dont check if the fields are required
+		if ($draft)
+		{
+			$fieldSets = $form->getFieldsets();
+
+			foreach ($fieldSets as $fieldset)
+			{
+				foreach ($form->getFieldset($fieldset->name) as $field)
+				{
+					$form->setFieldAttribute($field->fieldname, 'required', false);
+				}
+			}
+		}
 
 		if (empty($form))
 		{
@@ -958,13 +973,13 @@ class TjucmModelItemForm extends JModelAdmin
 	/**
 	 * Method to delete data
 	 *
-	 * @param   array  $contentId  Data to be deleted
+	 * @param   array  &$contentId  Data to be deleted
 	 *
 	 * @return bool|int If success returns the id of the deleted item, if not false
 	 *
 	 * @throws Exception
 	 */
-	public function delete($contentId)
+	public function delete(&$contentId)
 	{
 		$ucmTypeId = $this->getState('ucmType.id');
 		$user = JFactory::getUser();
@@ -1158,7 +1173,7 @@ class TjucmModelItemForm extends JModelAdmin
 			$ClusterModel->setState('filter.published', 1);
 			$ClusterModel->setState('filter.cluster_id', (int) $data[$clusterField]);
 
-			if (!$isSuperUser && !$user->authorise('core.manageall.cluster', 'com_cluster'))
+			if (!$isSuperUser && !$user->authorise('core.manageall', 'com_cluster'))
 			{
 				$ClusterModel->setState('filter.user_id', $user->id);
 			}
