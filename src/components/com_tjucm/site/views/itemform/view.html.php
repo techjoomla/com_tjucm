@@ -239,10 +239,7 @@ class TjucmViewItemform extends JViewLegacy
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{
-			foreach ($errors as $error)
-			{
-				$app->enqueueMessage($error, 'error');
-			}
+			$app->enqueueMessage(Text::_("COM_TJUCM_SOMETHING_WENT_WRONG"), 'error');
 
 			return false;
 		}
