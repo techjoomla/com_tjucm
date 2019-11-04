@@ -30,6 +30,7 @@ $fieldLayout['Cluster'] = "cluster";
 $fieldLayout['Related'] = $fieldLayout['SQL'] = "sql";
 $fieldLayout['Subform'] = "subform";
 $fieldLayout['Ownership'] = "ownership";
+$fieldLayout['Editor'] = "editor";
 
 // Load the tj-fields helper
 JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);

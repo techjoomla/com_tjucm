@@ -31,6 +31,7 @@ $fieldLayout['Calendar'] = "calendar";
 $fieldLayout['Cluster'] = "cluster";
 $fieldLayout['Related'] = $fieldLayout['Sql'] = "sql";
 $fieldLayout['Ownership'] = "ownership";
+$fieldLayout['Editor'] = "editor";
 
 // Load the tj-fields helper
 JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
