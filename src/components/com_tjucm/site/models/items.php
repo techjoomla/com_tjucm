@@ -391,6 +391,9 @@ class TjucmModelItems extends JModelList
 			}
 		}
 
+		$query->order('fv1.content_id DESC');
+		$query->group('fv1.content_id');
+
 		// If there is any filter applied then only execute the query
 		if ($filterApplied)
 		{
