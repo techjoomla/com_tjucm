@@ -162,23 +162,23 @@ JFactory::getDocument()->addScriptDeclaration('
 
 		if (isset($setnavigation) && $setnavigation == true)
 		{
-			if (!empty($this->allow_draft_save))
-			{
-				?>
-				<button type="button" class="btn btn-primary" id="previous_button" >
-					<i class="icon-arrow-left-2"></i>
-					<?php echo JText::_('COM_TJUCM_PREVIOUS_BUTTON'); ?>
-				</button>
-				<button type="button" class="btn btn-primary" id="next_button" >
-					<?php echo JText::_('COM_TJUCM_NEXT_BUTTON'); ?>
-					<i class="icon-arrow-right-2"></i>
-				</button>
-				<?php
-			}
+			?>
+			<button type="button" class="btn btn-primary" id="previous_button" >
+				<i class="icon-arrow-left-2"></i>
+				<?php echo JText::_('COM_TJUCM_PREVIOUS_BUTTON'); ?>
+			</button>
+			<button type="button" class="btn btn-primary" id="next_button" >
+				<?php echo JText::_('COM_TJUCM_NEXT_BUTTON'); ?>
+				<i class="icon-arrow-right-2"></i>
+			</button>
+			<?php
 		}
 
 		if ($calledFrom == 'frontend')
 		{
+			?>
+			<span class="pull-right">
+			<?php
 			if (($this->allow_auto_save || $this->allow_draft_save) && $itemState)
 			{
 				?>
@@ -190,6 +190,8 @@ JFactory::getDocument()->addScriptDeclaration('
 			?>
 			<input type="button" class="btn btn-success" value="<?php echo JText::_("COM_TJUCM_SAVE_ITEM"); ?>"
 			id="tjUcmSectionFinalSave" onclick="tjUcmItemForm.saveUcmFormData();" />
+			<input type="button" class="btn btn-warning" value="<?php echo JText::_("COM_TJUCM_CANCEL_BUTTON"); ?>" onclick="Joomla.submitbutton('itemform.cancel');" />
+			</span>
 			<?php
 		}
 		?>
