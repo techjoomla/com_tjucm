@@ -33,10 +33,6 @@ if (!empty($this->client))
 	$appendUrl .= "&client=" . $this->client;
 }
 
-$tmpListColumn = $this->listcolumn;
-reset($tmpListColumn);
-$firstListColumn = key($tmpListColumn);
-
 $link = 'index.php?option=com_tjucm&view=items' . $appendUrl;
 $itemId = $tjUcmFrontendHelper->getItemId($link);
 $fieldsData = array();

@@ -11,6 +11,10 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Component\ComponentHelper;
+
+$tmpListColumn = $this->listcolumn;
+reset($tmpListColumn);
+$firstListColumn = key($tmpListColumn);
 ?>
 <div id="filter-progress-bar">
 	<div class="pull-left">
