@@ -12,6 +12,8 @@ defined('_JEXEC') or die;
 
 JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
 JHtml::_('bootstrap.tooltip');
+JHtml::_('behavior.keepalive');
+JHtml::_('behavior.formvalidation');
 JHtml::_('behavior.multiselect');
 JHtml::_('formbehavior.chosen', 'select');
 JHtml::_('jquery.token');
@@ -41,19 +43,19 @@ $firstListColumn = key($tmpListColumn);
 $link = 'index.php?option=com_tjucm&view=items' . $appendUrl;
 $itemId = $tjUcmFrontendHelper->getItemId($link);
 $fieldsData = array();
-?>
-<script type="text/javascript">
+JFactory::getDocument()->addScriptDeclaration("
 	jQuery(window).load(function()
 	{
 		var currentUcmType = new FormData();
-		currentUcmType.append('client', "<?php echo $this->client ?>");
+		currentUcmType.append('client', '"  . $this->client . "');
 		var afterCheckCompatibilityOfUcmType = function(error, response){
 			response = JSON.parse(response);
 
 			if (response.data !== null)
 			{
+				jQuery('.copyToOther').removeClass('hide');
 				jQuery.each(response.data, function(key, value) {
-				 jQuery('#ucm_list').append(jQuery("<option></option>").attr("value",value.value).text(value.text)); 
+				 jQuery('#ucm_list').append(jQuery('<option></option>').attr('value',value.value).text(value.text)); 
 				 jQuery('#ucm_list').trigger('liszt:updated');
 				});
 			}
@@ -62,8 +64,33 @@ $fieldsData = array();
 		// Code to check ucm type compatibility to copy item
 		com_tjucm.Services.Items.chekCompatibility(currentUcmType, afterCheckCompatibilityOfUcmType);
 	});
-</script>
-<form action="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>" method="post" name="adminForm" id="adminForm">
+	
+	function copyItem()
+	{
+		var afterCopyItem = function(error, response){
+			response = JSON.parse(response);
+			
+			// Close pop up and display message
+			jQuery( '#copyModal' ).modal('hide');
+			
+			if(response.data !== null)
+			{
+				Joomla.renderMessages({'success':[response.message]});
+			}
+			else
+			{
+				Joomla.renderMessages({'error':[response.message]});
+			}
+		}
+	
+		var copyItemData =  jQuery('#adminForm').serialize();
+		
+		// Code to copy item to ucm type
+		com_tjucm.Services.Items.copyItem(copyItemData, afterCopyItem);
+	}	
+");
+?>
+<form action="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>" enctype="multipart/form-data" method="post" name="adminForm" id="adminForm" class="form-validate">
 	<?php echo $this->loadTemplate('filters'); ?>
 	<div>
 		<table class="table table-striped" id="itemList">
@@ -199,17 +226,16 @@ $fieldsData = array();
 		<a target="_blank" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false, 2); ?>" class="btn btn-success btn-small">
 			<?php echo JText::_('COM_TJUCM_COPY_ITEM'); ?>
 		</a>
-		<a data-toggle="modal" onclick="if (document.adminForm.boxchecked.value==0){alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{jQuery( '#copyModal' ).modal('show'); return true;}" class="btn btn-success btn-small">
+		<a data-toggle="modal" onclick="if(document.adminForm.boxchecked.value==0){alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{jQuery( '#copyModal' ).modal('show'); return true;}" class="btn btn-success btn-small copyToOther hide">
 			<?php echo JText::_('COM_TJUCM_COPY_ITEM_TO_OTHER'); ?>
 		</a>
 		<?php
 	}
 	?>
-	<input type="hidden" name="task" value=""/>
+	<input type="hidden" name="task" value="itemform.copyItem"/>
 	<input type="hidden" name="boxchecked" value="0"/>
 	<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>"/>
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>"/>
-	<?php echo JHtml::_('form.token'); ?>
 	
 	<!-- Modal Pop Up for Copy Item to Other-->
 	<div id="copyModal" class="copyModal modal fade" role="dialog">
@@ -224,16 +250,18 @@ $fieldsData = array();
 				</div>
 				<div class="modal-body">
 						<?php echo JHTML::_('select.genericlist', '', 'filter[ucm_list]', 'class="ucm_list" onchange=""', 'text', 'value',$this->state->get('filter.ucm_list'), 'ucm_list' ); ?>
+						<input type="hidden" name="sourceClient" value="<?php echo $this->client;?>"/>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn" onclick="document.getElementById('ucm_list').value='';" data-dismiss="modal">Cancel</button>
-					<button type="submit" class="btn btn-success" onclick="Joomla.submitbutton('itemform.copyItem');">
+					<a class="btn btn-success" onclick="copyItem()">
 						Process
-					</button>
+					</a>
 				</div>
 			</div>
 		</div>
 	</div>
+	<?php echo JHtml::_('form.token'); ?>
 </form>
 <?php
 if ($this->canDelete)
