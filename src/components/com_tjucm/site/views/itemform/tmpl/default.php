@@ -53,40 +53,37 @@ else
 {
 	$itemState = ($this->allow_auto_save || $this->allow_draft_save) ? 1 : 0;
 }
-?>
-<script type="text/javascript">
 
-	/* Code to show alert box if form changes are made and user is closing/refreshing/navigating the tab
-	 * without saving the content
-	 */
+JFactory::getDocument()->addScriptDeclaration('
 	jQuery(function() {
-		jQuery('#item-form').areYouSure();
+		jQuery("#item-form").areYouSure();
 	});
 
 	jQuery(window).load(function ()
 	{
-		jQuery('#item-form .nav-tabs li a').first().click();
+		jQuery("#item-form .nav-tabs li a").first().click();
 	});
 
 	Joomla.submitbutton = function (task)
 	{
-		if (task == 'itemform.cancel')
+		if (task == "itemform.cancel")
 		{
-			Joomla.submitform(task, document.getElementById('item-form'));
+			Joomla.submitform(task, document.getElementById("item-form"));
 		}
 		else
 		{
-			if (task != 'itemform.cancel' && document.formvalidator.isValid(document.id('item-form')))
+			if (task != "itemform.cancel" && document.formvalidator.isValid(document.id("item-form")))
 			{
-				Joomla.submitform(task, document.getElementById('item-form'));
+				Joomla.submitform(task, document.getElementById("item-form"));
 			}
 			else
 			{
-				alert('<?php echo $this->escape(JText::_('JGLOBAL_VALIDATION_FORM_FAILED')); ?>');
+				alert("' . $this->escape(JText::_("JGLOBAL_VALIDATION_FORM_FAILED")) . '");
 			}
 		}
-	}
-</script>
+	};
+');
+?>
 <form action="<?php echo JRoute::_('index.php');?>" method="post" enctype="multipart/form-data" name="adminForm" id="item-form" class="form-validate">
 	<?php
 	if ($this->allow_auto_save == '1')
@@ -165,23 +162,23 @@ else
 
 		if (isset($setnavigation) && $setnavigation == true)
 		{
-			if (!empty($this->allow_draft_save))
-			{
-				?>
-				<button type="button" class="btn btn-primary" id="previous_button" >
-					<i class="icon-arrow-left-2"></i>
-					<?php echo JText::_('COM_TJUCM_PREVIOUS_BUTTON'); ?>
-				</button>
-				<button type="button" class="btn btn-primary" id="next_button" >
-					<?php echo JText::_('COM_TJUCM_NEXT_BUTTON'); ?>
-					<i class="icon-arrow-right-2"></i>
-				</button>
-				<?php
-			}
+			?>
+			<button type="button" class="btn btn-primary" id="previous_button" >
+				<i class="icon-arrow-left-2"></i>
+				<?php echo JText::_('COM_TJUCM_PREVIOUS_BUTTON'); ?>
+			</button>
+			<button type="button" class="btn btn-primary" id="next_button" >
+				<?php echo JText::_('COM_TJUCM_NEXT_BUTTON'); ?>
+				<i class="icon-arrow-right-2"></i>
+			</button>
+			<?php
 		}
 
 		if ($calledFrom == 'frontend')
 		{
+			?>
+			<span class="pull-right">
+			<?php
 			if (($this->allow_auto_save || $this->allow_draft_save) && $itemState)
 			{
 				?>
@@ -193,6 +190,8 @@ else
 			?>
 			<input type="button" class="btn btn-success" value="<?php echo JText::_("COM_TJUCM_SAVE_ITEM"); ?>"
 			id="tjUcmSectionFinalSave" onclick="tjUcmItemForm.saveUcmFormData();" />
+			<input type="button" class="btn btn-warning" value="<?php echo JText::_("COM_TJUCM_CANCEL_BUTTON"); ?>" onclick="Joomla.submitbutton('itemform.cancel');" />
+			</span>
 			<?php
 		}
 		?>

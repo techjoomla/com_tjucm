@@ -36,10 +36,6 @@ if (!empty($this->client))
 	$appendUrl .= "&client=" . $this->client;
 }
 
-$tmpListColumn = $this->listcolumn;
-reset($tmpListColumn);
-$firstListColumn = key($tmpListColumn);
-
 $link = 'index.php?option=com_tjucm&view=items' . $appendUrl;
 $itemId = $tjUcmFrontendHelper->getItemId($link);
 $fieldsData = array();
@@ -92,7 +88,7 @@ JFactory::getDocument()->addScriptDeclaration("
 ?>
 <form action="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>" enctype="multipart/form-data" method="post" name="adminForm" id="adminForm" class="form-validate">
 	<?php echo $this->loadTemplate('filters'); ?>
-	<div>
+	<div class="table-responsive">
 		<table class="table table-striped" id="itemList">
 			<?php
 			if (!empty($this->showList))
@@ -108,13 +104,13 @@ JFactory::getDocument()->addScriptDeclaration("
 					if (isset($this->items[0]->state))
 					{
 						?>
-						<th width="5%">
+						<th class="center" width="3%">
 							<?php echo JHtml::_('grid.sort', 'JPUBLISHED', 'a.state', $listDirn, $listOrder); ?>
 						</th>
 						<?php
 					}
 					?>
-					<th class=''>
+					<th width="2%">
 						<?php echo JHtml::_('grid.sort', 'COM_TJUCM_ITEMS_ID', 'a.id', $listDirn, $listOrder); ?>
 					</th>
 					<?php
@@ -136,7 +132,7 @@ JFactory::getDocument()->addScriptDeclaration("
 								$fieldsData[$fieldId] = $tjFieldsFieldTable;
 							}
 							?>
-							<th class='left'>
+							<th  style="word-break: break-word;" width="<?php echo 90/count($this->listcolumn).'%';?>">
 								<?php echo htmlspecialchars($col_name, ENT_COMPAT, 'UTF-8'); ?>
 							</th>
 							<?php
@@ -146,7 +142,7 @@ JFactory::getDocument()->addScriptDeclaration("
 					if ($this->canEdit || $this->canDelete)
 					{
 						?>
-						<th class="center">
+						<th class="center" width="5%">
 							<?php echo JText::_('COM_TJUCM_ITEMS_ACTIONS'); ?>
 						</th>
 					<?php

@@ -239,7 +239,9 @@ class TjucmViewItemform extends JViewLegacy
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{
-			throw new Exception(implode("\n", $errors));
+			$app->enqueueMessage(Text::_("COM_TJUCM_SOMETHING_WENT_WRONG"), 'error');
+
+			return false;
 		}
 
 		// Ucm triggger before item form display

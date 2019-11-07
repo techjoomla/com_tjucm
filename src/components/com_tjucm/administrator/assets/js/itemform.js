@@ -423,7 +423,18 @@ var tjUcmItemForm = {
 		tjUcmItemFieldFormData.append('client', tjUcmClient);
 		tjUcmItemFieldFormData.append('recordid', tjUcmRecordId);
 
-		if (jQuery(fieldObj).attr('type') != 'file')
+		if (jQuery(fieldObj).attr('type') == 'checkbox')
+		{
+			if (jQuery(fieldObj).prop('checked') == true)
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), 1);
+			}
+			else
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), 0);
+			}
+		}
+		else if (jQuery(fieldObj).attr('type') != 'file')
 		{
 			tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
 		}
@@ -623,6 +634,17 @@ var tjUcmItemForm = {
 				tjUcmFormFinalSave = 1;
 			}
 
+			jQuery('input[type="checkbox"]').each(function (){
+					if (jQuery(this).prop('checked') == true)
+					{
+						tjUcmItemFormData.append(jQuery(this).attr('name'), 1);
+					}
+					else
+					{
+						tjUcmItemFormData.append(jQuery(this).attr('name'), 0);
+					}
+			});
+
 			com_tjucm.Services.Item.saveFormData(tjUcmItemFormData, tjUcmItemForm.afterDataSave);
 		});
 
@@ -656,6 +678,17 @@ var tjUcmItemForm = {
 						if (jQuery(this)[0].files[0] != undefined)
 						{
 							tjUcmSectionFormData.append(jQuery(this).attr('name'), jQuery(this)[0].files[0]);
+						}
+					}
+					else if(jQuery(this).attr('type') == 'checkbox')
+					{
+						if (jQuery(this).prop('checked') == true)
+						{
+							jQuery(this).val(1);
+						}
+						else
+						{
+							jQuery(this).val(0);
 						}
 					}
 					else
