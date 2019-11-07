@@ -64,52 +64,6 @@ class TjucmControllerItemForm extends JControllerForm
 	}
 
 	/**
-	 * Method to check if you can add a new record.
-	 *
-	 * Extended classes can override this if necessary.
-	 *
-	 * @param   array  $data  An array of input data.
-	 *
-	 * @return  boolean
-	 *
-	 * @since   12.2
-	 */
-	protected function allowAdd($data = array())
-	{
-		$user = Factory::getUser();
-
-		return $user->authorise('core.type.createitem', 'com_tjucm.type.' . $this->ucmTypeId);
-	}
-
-	/**
-	 * Method to check if you can edit an existing record.
-	 *
-	 * Extended classes can override this if necessary.
-	 *
-	 * @param   array   $data  An array of input data.
-	 * @param   string  $key   The name of the key for the primary key; default is id.
-	 *
-	 * @return  boolean
-	 *
-	 * @since   12.2
-	 */
-	protected function allowEdit($data = array(), $key = 'id')
-	{
-		$user = Factory::getUser();
-		$edit = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$editOwn = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $this->ucmTypeId);
-
-		if ($edit || $editOwn)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	/**
 	 * Function to save ucm data item
 	 *
 	 * @param   int  $key     admin approval 1 or 0
@@ -472,6 +426,13 @@ class TjucmControllerItemForm extends JControllerForm
 		}
 	}
 
+	/**
+	 * Method to get updated list of options for related field
+	 *
+	 * @return  void
+	 *
+	 * @since 1.2.1
+	 */
 	public function getRelatedFieldOptions()
 	{
 		JSession::checkToken() or jexit(Text::_('JINVALID_TOKEN'));

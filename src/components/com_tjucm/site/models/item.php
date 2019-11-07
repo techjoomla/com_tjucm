@@ -242,109 +242,6 @@ class TjucmModelItem extends JModelAdmin
 	}
 
 	/**
-	 * Get the id of an item by alias
-	 *
-	 * @param   string  $alias  Item alias
-	 *
-	 * @return  mixed
-	 */
-	public function getItemIdByAlias($alias)
-	{
-		$table = $this->getTable();
-
-		$table->load(array('alias' => $alias));
-
-		return $table->id;
-	}
-
-	/**
-	 * Method to check in an item.
-	 *
-	 * @param   integer  $id  The id of the row to check out.
-	 *
-	 * @return  boolean True on success, false on failure.
-	 *
-	 * @since    1.6
-	 */
-	public function checkin($id = null)
-	{
-		// Get the id.
-		$id = (!empty($id)) ? $id : (int) $this->getState('item.id');
-
-		if ($id)
-		{
-			// Initialise the table
-			$table = $this->getTable();
-
-			// Attempt to check the row in.
-			if (method_exists($table, 'checkin'))
-			{
-				if (!$table->checkin($id))
-				{
-					return false;
-				}
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Method to check out an item for editing.
-	 *
-	 * @param   integer  $id  The id of the row to check out.
-	 *
-	 * @return  boolean True on success, false on failure.
-	 *
-	 * @since    1.6
-	 */
-	public function checkout($id = null)
-	{
-		// Get the user id.
-		$id = (!empty($id)) ? $id : (int) $this->getState('item.id');
-
-		if ($id)
-		{
-			// Initialise the table
-			$table = $this->getTable();
-
-			// Get the current user object.
-			$user = JFactory::getUser();
-
-			// Attempt to check the row out.
-			if (method_exists($table, 'checkout'))
-			{
-				if (!$table->checkout($user->get('id'), $id))
-				{
-					return false;
-				}
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Get the name of a category by id
-	 *
-	 * @param   int  $id  Category id
-	 *
-	 * @return  Object|null	Object if success, null in case of failure
-	 */
-	public function getCategoryName($id)
-	{
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query
-			->select('title')
-			->from('#__categories')
-			->where('id = ' . $id);
-		$db->setQuery($query);
-
-		return $db->loadObject();
-	}
-
-	/**
 	 * Publish the element
 	 *
 	 * @param   int  &$id    Item id
@@ -388,26 +285,6 @@ class TjucmModelItem extends JModelAdmin
 			throw new Exception(JText::_('JERROR_ALERTNOAUTHOR'), 403);
 
 			return false;
-		}
-	}
-
-	/**
-	 * Method to getAliasFieldNameByView
-	 *
-	 * @param   array  $view  An array of record primary keys.
-	 *
-	 * @return  boolean  True if successful, false if an error occurs.
-	 *
-	 * @since   1.0
-	 */
-	public function getAliasFieldNameByView($view)
-	{
-		switch ($view)
-		{
-			case 'type':
-			case 'typeform':
-				return 'alias';
-			break;
 		}
 	}
 
