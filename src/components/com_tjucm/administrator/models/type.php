@@ -567,42 +567,46 @@ class TjucmModelType extends JModelAdmin
 	{
 		$validUcmType = array();
 
-		if ($sourceClient && $targetClient)
+		if (!$sourceClient && !$targetClient)
 		{
-			BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
-			$sourceFieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
-			$sourceFieldsModel->setState('filter.client', $sourceClient);
-			$targetFieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
-			$targetFieldsModel->setState('filter.client', $targetClient);
-			$sourceFields = $sourceFieldsModel->getItems();
-			$targetFields = $targetFieldsModel->getItems();
-
-			$count = 0;
-
-			foreach ($sourceFields as $sourceField)
-			{
-				$prefix = str_replace(".", "_", $sourceClient);
-				$sourceFieldName = explode($prefix . "_", $sourceField->name);
-
-				foreach ($targetFields as $targetField)
-				{
-					$prefix = str_replace(".", "_", $targetClient);
-					$targetFieldName = explode($prefix . "_", $targetField->name);
-
-					if ($sourceFieldName == $targetFieldName && $sourceField->type == $targetField->type)
-					{
-							$count ++;
-							continue;
-					}
-				}
-			}
-
-			if (count($sourceFields) == $count)
-			{
-				return true;
-			}
-
 			return false;
 		}
+
+		// Get the source ucm type and target ucm type fields list
+		BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
+		$sourceFieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+		$sourceFieldsModel->setState('filter.client', $sourceClient);
+		$targetFieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+		$targetFieldsModel->setState('filter.client', $targetClient);
+		$sourceFields = $sourceFieldsModel->getItems();
+		$targetFields = $targetFieldsModel->getItems();
+
+		$count = 0;
+
+		foreach ($sourceFields as $sourceField)
+		{
+			$prefix = str_replace(".", "_", $sourceClient);
+			$sourceFieldName = explode($prefix . "_", $sourceField->name);
+
+			foreach ($targetFields as $targetField)
+			{
+				$prefix = str_replace(".", "_", $targetClient);
+				$targetFieldName = explode($prefix . "_", $targetField->name);
+
+				// Check source and destination field name and field types are equal
+				if ($sourceFieldName == $targetFieldName && $sourceField->type == $targetField->type)
+				{
+						$count ++;
+						continue;
+				}
+			}
+		}
+
+		if (count($sourceFields) == $count)
+		{
+			return true;
+		}
+
+		return false;
 	}
 }
