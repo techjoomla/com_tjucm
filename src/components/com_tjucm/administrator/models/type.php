@@ -574,12 +574,16 @@ class TjucmModelType extends JModelAdmin
 
 		// Get the source ucm type and target ucm type fields list
 		BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
-		$sourceFieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
-		$sourceFieldsModel->setState('filter.client', $sourceClient);
-		$targetFieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
-		$targetFieldsModel->setState('filter.client', $targetClient);
-		$sourceFields = $sourceFieldsModel->getItems();
-		$targetFields = $targetFieldsModel->getItems();
+		$tjFieldsFieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+
+		// Get source UCM Type fields
+		$tjFieldsFieldsModel->setState('filter.client', $sourceClient);
+		$sourceFields = $tjFieldsFieldsModel->getItems();
+
+		// Get destination UCM Type fields
+		$tjFieldsFieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+		$tjFieldsFieldsModel->setState('filter.client', $targetClient);
+		$targetFields = $tjFieldsFieldsModel->getItems();
 
 		$count = 0;
 
