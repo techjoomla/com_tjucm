@@ -459,54 +459,6 @@ class TjucmControllerItemForm extends JControllerForm
 	}
 
 	/**
-	 * Method to check the compatibility between ucm types
-	 *
-	 * @return  mixed
-	 * 
-	 * @since    __DEPLOY_VERSION__
-	 */
-	public function checkCompatibility()
-	{
-		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
-
-		$app 	= Factory::getApplication();
-		$post 	= $app->input->post;
-		$client = $post->get('client', '', 'STRING');
-
-		if (empty($client))
-		{
-			echo new JResponseJson(null);
-			$app->close();
-		}
-
-		JLoader::import('components.com_tjucm.models.types', JPATH_ADMINISTRATOR);
-		$typesModel = BaseDatabaseModel::getInstance('Types', 'TjucmModel');
-		$typesModel->setState('filter.state', 1);
-		$ucmTypes 	= $typesModel->getItems();
-
-		JLoader::import('components.com_tjucm.models.type', JPATH_ADMINISTRATOR);
-		$typeModel = BaseDatabaseModel::getInstance('Type', 'TjucmModel');
-
-		$validUcmType = array();
-		$validUcmType[0]['value'] = "";
-		$validUcmType[0]['text'] = Text::_('COM_TJUCM_SELECT_UCM_TYPE_DESC');
-
-		foreach ($ucmTypes as $key => $type)
-		{
-			$result = $typeModel->checkCompatibility($client, $type->unique_identifier);
-
-			if ($result)
-			{
-				$validUcmType[$key]['value'] = $type->unique_identifier;
-				$validUcmType[$key]['text']  = $type->title;
-			}
-		}
-
-		echo new JResponseJson($validUcmType);
-		$app->close();
-	}
-
-	/**
 	 * Method to copy item
 	 *
 	 * @return  boolean
@@ -527,6 +479,8 @@ class TjucmControllerItemForm extends JControllerForm
 
 		JLoader::import('components.com_tjucm.models.type', JPATH_ADMINISTRATOR);
 		$typeModel = BaseDatabaseModel::getInstance('Type', 'TjucmModel');
+
+		// Server side Validation for source and UCM Type
 		$result = $typeModel->checkCompatibility($sourceClient, $targetClient);
 
 		if ($result)
@@ -547,8 +501,11 @@ class TjucmControllerItemForm extends JControllerForm
 					$ucmOldData['content_id'] = $cid;
 					$ucmOldData['layout'] = 'edit';
 					$ucmOldData['client']     = $sourceClient;
+
+					// Get the field values
 					$extraFieldsData = $model->loadFormDataExtra($ucmOldData);
 
+					// Code to replace source field name with destination field name
 					foreach ($extraFieldsData as $fieldKey => $fieldValue)
 					{
 						$prefixSourceClient = str_replace(".", "_", $sourceClient);
@@ -658,6 +615,7 @@ class TjucmControllerItemForm extends JControllerForm
 					$ucmData['state']		= 0;
 					$ucmData['draft']	 	= 1;
 
+					// Save data into UCM data table
 					$result = $model->save($ucmData);
 					$recordId = $model->getState($model->getName() . '.id');
 
