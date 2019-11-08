@@ -24,7 +24,7 @@ use Joomla\CMS\Component\ComponentHelper;
 use Joomla\Registry\Registry;
 
 /**
- * Tjucm model.
+ * Tjucm model
  *
  * @since  1.0
  */
@@ -609,7 +609,9 @@ class TjucmModelItemForm extends JModelAdmin
 			$ownerShipFieldName = str_replace('.', '_', $fieldData['client']) . '_ownershipcreatedby';
 			$itemCategoryFieldName = str_replace('.', '_', $fieldData['client']) . '_itemcategory';
 
-			if (array_key_exists($clusterFieldName, $fieldData['fieldsvalue']) || array_key_exists($ownerShipFieldName, $fieldData['fieldsvalue']) || array_key_exists($itemCategoryFieldName, $fieldData['fieldsvalue']))
+			if (array_key_exists($clusterFieldName, $fieldData['fieldsvalue'])
+				|| array_key_exists($ownerShipFieldName, $fieldData['fieldsvalue'])
+				|| array_key_exists($itemCategoryFieldName, $fieldData['fieldsvalue']))
 			{
 				JLoader::import('components.com_tjucm.tables.item', JPATH_ADMINISTRATOR);
 				$ucmItemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', JFactory::getDbo()));
