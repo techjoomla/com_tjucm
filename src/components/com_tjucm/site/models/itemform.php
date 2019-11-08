@@ -244,7 +244,7 @@ class TjucmModelItemForm extends JModelAdmin
 	/**
 	 * Get an array of data items
 	 *
-	 * @param   string  $client  client value
+	 * @param   string  $client  client
 	 *
 	 * @return mixed Array of data items on success, false on failure.
 	 */
