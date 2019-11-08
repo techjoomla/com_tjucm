@@ -481,7 +481,7 @@ class TjucmControllerItemForm extends JControllerForm
 		$typeModel = BaseDatabaseModel::getInstance('Type', 'TjucmModel');
 
 		// Server side Validation for source and UCM Type
-		$result = $typeModel->checkCompatibility($sourceClient, $targetClient);
+		$result = $typeModel->getCompatableUcmType($sourceClient, $targetClient);
 
 		if ($result)
 		{

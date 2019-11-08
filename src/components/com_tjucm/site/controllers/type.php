@@ -41,7 +41,7 @@ class TjucmControllerType extends JControllerForm
 	 * 
 	 * @since    __DEPLOY_VERSION__
 	 */
-	public function checkCompatibility()
+	public function getCompatableUcmType()
 	{
 		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
@@ -69,7 +69,7 @@ class TjucmControllerType extends JControllerForm
 
 		foreach ($ucmTypes as $key => $type)
 		{
-			$result = $typeModel->checkCompatibility($client, $type->unique_identifier);
+			$result = $typeModel->getCompatableUcmType($client, $type->unique_identifier);
 
 			if ($result)
 			{

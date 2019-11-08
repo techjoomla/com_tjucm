@@ -563,7 +563,7 @@ class TjucmModelType extends JModelAdmin
 	 *
 	 * @since   __DEPLOY_VERSION__
 	 */
-	public function checkCompatibility($sourceClient, $targetClient)
+	public function getCompatableUcmType($sourceClient, $targetClient)
 	{
 		$validUcmType = array();
 
