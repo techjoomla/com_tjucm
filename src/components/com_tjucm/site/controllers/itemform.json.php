@@ -561,6 +561,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 									if (is_array($d))
 									{
+										// TODO Temprary used switch case need to modify code
 										switch ($fieldTable->type)
 										{
 											case 'tjlist':
@@ -630,14 +631,11 @@ class TjucmControllerItemForm extends JControllerForm
 						$response = $model->saveExtraFields($formData);
 
 						$msg = ($response) ? Text::_("COM_TJUCM_ITEM_COPY_SUCCESSFULLY") : Text::_("COM_TJUCM_FORM_SAVE_FAILED");
-
-						echo new JResponseJson($response, $msg);
-						$app->close();
 					}
-
-					echo new JResponseJson(null);
-					$app->close();
 				}
+				
+				echo new JResponseJson($response, $msg);
+				$app->close();
 			}
 		}
 	}
