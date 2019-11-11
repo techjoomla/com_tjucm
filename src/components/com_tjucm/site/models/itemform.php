@@ -24,7 +24,7 @@ use Joomla\CMS\Component\ComponentHelper;
 use Joomla\Registry\Registry;
 
 /**
- * Tjucm model
+ * Tjucm model.
  *
  * @since  1.0
  */
