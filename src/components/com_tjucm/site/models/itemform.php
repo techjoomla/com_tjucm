@@ -26,7 +26,7 @@ use Joomla\Registry\Registry;
 /**
  * Tjucm model.
  *
- * @since  1.6
+ * @since  1.0
  */
 class TjucmModelItemForm extends JModelAdmin
 {
@@ -34,7 +34,7 @@ class TjucmModelItemForm extends JModelAdmin
 
 	/**
 	 * @var      string    The prefix to use with controller messages.
-	 * @since    1.6
+	 * @since    1.0
 	 */
 	protected $text_prefix = 'COM_TJUCM';
 
@@ -55,7 +55,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 * @param   array  $config  An optional associative array of configuration settings.
 	 *
 	 * @see        JController
-	 * @since      1.6
+	 * @since      1.0
 	 */
 	public function __construct($config = array())
 	{
@@ -72,7 +72,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 *
 	 * @return void
 	 *
-	 * @since  1.6
+	 * @since  1.0
 	 */
 	protected function populateState()
 	{
@@ -232,7 +232,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 *
 	 * @return    JTable    A database object
 	 *
-	 * @since    1.6
+	 * @since    1.0
 	 */
 	public function getTable($type = 'Item', $prefix = 'TjucmTable', $config = array())
 	{
@@ -244,7 +244,7 @@ class TjucmModelItemForm extends JModelAdmin
 	/**
 	 * Get an array of data items
 	 *
-	 * @param   string  $client  client value
+	 * @param   string  $client  client
 	 *
 	 * @return mixed Array of data items on success, false on failure.
 	 */
@@ -261,7 +261,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 *
 	 * @return  JForm  A JForm object on success, false on failure
 	 *
-	 * @since    1.6
+	 * @since    1.0
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
@@ -466,7 +466,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 *
 	 * @return   mixed  The data for the form.
 	 *
-	 * @since    1.6
+	 * @since    1.0
 	 */
 	protected function loadFormData()
 	{
@@ -493,7 +493,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 *
 	 * @return  boolean  True on success.
 	 *
-	 * @since   1.6
+	 * @since   1.0
 	 */
 	public function save($data)
 	{
@@ -609,7 +609,9 @@ class TjucmModelItemForm extends JModelAdmin
 			$ownerShipFieldName = str_replace('.', '_', $fieldData['client']) . '_ownershipcreatedby';
 			$itemCategoryFieldName = str_replace('.', '_', $fieldData['client']) . '_itemcategory';
 
-			if (array_key_exists($clusterFieldName, $fieldData['fieldsvalue']) || array_key_exists($ownerShipFieldName, $fieldData['fieldsvalue']) || array_key_exists($itemCategoryFieldName, $fieldData['fieldsvalue']))
+			if (array_key_exists($clusterFieldName, $fieldData['fieldsvalue'])
+				|| array_key_exists($ownerShipFieldName, $fieldData['fieldsvalue'])
+				|| array_key_exists($itemCategoryFieldName, $fieldData['fieldsvalue']))
 			{
 				JLoader::import('components.com_tjucm.tables.item', JPATH_ADMINISTRATOR);
 				$ucmItemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', JFactory::getDbo()));
