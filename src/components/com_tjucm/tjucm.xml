@@ -36,6 +36,7 @@
 		<folder>layouts</folder>
 		<folder>controllers</folder>
 		<folder>helpers</folder>
+		<folder>includes</folder>
 	</files>
 	<media destination="com_tjucm" folder="media">
 		<folder>js</folder>
