@@ -18,7 +18,8 @@ $tjInstallerPath = JPATH_ROOT . '/administrator/manifests/packages/tjucm/tjinsta
 
 if (JFile::exists(__DIR__ . '/tjinstaller.php'))
 {
-	include_once __DIR__ . '/tjinstaller.php';
+	include_once __DIR__ . '/tjinstaller.php'; 
+
 }
 elseif (JFile::exists($tjInstallerPath))
 {
