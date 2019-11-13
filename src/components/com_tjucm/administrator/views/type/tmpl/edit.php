@@ -14,15 +14,8 @@ JHtml::_('behavior.tooltip');
 JHtml::_('behavior.formvalidation');
 JHtml::_('formbehavior.chosen', 'select');
 JHtml::_('behavior.keepalive');
-
-JHtml::script(JUri::root() . 'administrator/components/com_tjucm/assets/js/tjucm_type.js');
 ?>
 <script type="text/javascript">
-	js = jQuery.noConflict();
-	js(document).ready(function () {
-
-	});
-
 	Joomla.submitbutton = function (task) {
 		if (task == 'type.cancel')
 		{
