@@ -40,6 +40,7 @@
 	</files>
 	<media destination="com_tjucm" folder="media">
 		<folder>js</folder>
+		<folder>css</folder>
 	</media>
 	<languages folder="languages/site">
 		<language tag="en-GB">en-GB/en-GB.com_tjucm.ini</language>
@@ -54,7 +55,6 @@
 			<filename>tjucm.php</filename>
 			<folder>controllers</folder>
 			<folder>assets</folder>
-			<folder>classes</folder>
 			<folder>helpers</folder>
 			<folder>models</folder>
 			<folder>houseKeeping</folder>
