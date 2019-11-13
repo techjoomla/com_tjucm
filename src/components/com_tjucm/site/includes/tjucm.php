@@ -26,7 +26,7 @@ require_once JPATH_SITE . '/components/com_tjucm/includes/defines.php';
  *
  * @since  __DEPLOY_VERSION__
  */
-class Tjucm
+class TJUCM
 {
 	/**
 	 * Holds the record of the loaded Tjucm classes
@@ -164,11 +164,42 @@ class Tjucm
 	{
 		static $loaded = null;
 		$docType = Factory::getDocument()->getType();
+		$versionClass = self::Version();
 
 		if (! $loaded[$location] && ($docType == 'html'))
 		{
-			// HTMLHelper::script('administrator/components/com_tjucm/assets/js/tjucm_ajaxForm_save.js');
-			HTMLHelper::StyleSheet('media/jui/css/icomoon.css');
+			if (file_exists(JPATH_ROOT . '/media/techjoomla_strapper/tjstrapper.php'))
+			{
+				JLoader::register('TjStrapper', JPATH_ROOT . '/media/techjoomla_strapper/tjstrapper.php');
+				TjStrapper::loadTjAssets();
+			}
+
+			$version = '2.0';
+			$input   = Factory::getApplication()->input;
+			$view    = $input->get('view', '', 'STRING');
+
+			try
+			{
+				$version = $versionClass->getMediaVersion();
+			}
+			catch (Exception $e)
+			{
+				// Silence is peace :)
+			}
+
+			$options = array("version" => $version);
+
+			if ($view == 'itemform')
+			{
+				HTMLHelper::script('media/com_tjucm/js/com_tjucm.min.js', $options);
+				HTMLHelper::script('media/com_tjucm/js/core/class.min.js', $options);
+				HTMLHelper::script('media/com_tjucm/js/core/base.min.js', $options);
+				HTMLHelper::script('media/com_tjucm/js/services/item.min.js', $options);
+				HTMLHelper::script('media/com_tjucm/js/vendor/jquery/jquery.form.js', $options);
+				HTMLHelper::script('media/com_tjucm/js/ui/itemform.min.js', $options);
+
+				HTMLHelper::StyleSheet('media/com_tjucm/css/tjucm.css', $options);
+			}
 
 			$loaded[$location] = true;
 		}

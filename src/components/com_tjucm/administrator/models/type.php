@@ -48,9 +48,6 @@ class TjucmModelType extends JModelAdmin
 	 */
 	public function __construct($config = array())
 	{
-		JLoader::import('components.com_tjucm.classes.funlist', JPATH_ADMINISTRATOR);
-		$this->common  = new TjucmFunList;
-
 		parent::__construct($config);
 	}
 
@@ -313,11 +310,7 @@ class TjucmModelType extends JModelAdmin
 		if (!empty($data['id']))
 		{
 			$field_group = $this->getGroupCount($data['unique_identifier']);
-
-			// Not able to get count using getTotal method of category model
-			$field_category = $this->common->getDataValues('#__categories', 'count(*)', 'extension = "' . $data['unique_identifier'] . '"', 'loadResult');
-
-			// $field_category = $this->getCategoryCount($data['unique_identifier']);
+			$field_category = $this->getCategoryCount($data['unique_identifier']);
 
 			if ($field_group == 0 && $field_category == 0)
 			{
@@ -417,10 +410,10 @@ class TjucmModelType extends JModelAdmin
 	public function getCategoryCount($client)
 	{
 		JLoader::import('components.com_categories.models.categories', JPATH_ADMINISTRATOR);
-		$categories_model = JModelLegacy::getInstance('Categories', 'CategoriesModel');
-		$categories_model->setState('filter.extension', $client);
+		$categoryModel = JModelLegacy::getInstance('Categories', 'CategoriesModel', array('ignore_request' => true));
+		$categoryModel->setState('filter.extension', $client);
 
-		return $categories_model->getTotal();
+		return $categoryModel->getTotal();
 	}
 
 	/**

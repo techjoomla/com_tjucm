@@ -20,15 +20,6 @@ if (!JFactory::getUser()->authorise('core.manage', 'com_tjucm'))
 // Include dependancies
 jimport('joomla.application.component.controller');
 
-$path = JPATH_COMPONENT_ADMINISTRATOR . '/classes/' . 'funlist.php';
-
-if (!class_exists('TjucmFunList'))
-{
-	// Require_once $path;
-	JLoader::register('TjucmFunList', $path);
-	JLoader::load('TjucmFunList');
-}
-
 // Load backend helper
 $path = JPATH_ADMINISTRATOR . '/components/com_tjucm/helpers/tjucm.php';
 

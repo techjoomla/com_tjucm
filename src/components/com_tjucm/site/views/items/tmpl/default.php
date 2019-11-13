@@ -139,7 +139,7 @@ $fieldsData = array();
 				foreach ($this->items as $i => $item)
 				{
 					// Call the JLayout to render the fields in the details view
-					$layout = new JLayoutFile('list', JPATH_ROOT . '/components/com_tjucm/layouts/list');
+					$layout = new JLayoutFile('list.list', JPATH_ROOT . '/components/com_tjucm/');
 					echo $layout->render(array('itemsData' => $item, 'created_by' => $this->created_by, 'client' => $this->client, 'xmlFormObject' => $formXml, 'ucmTypeId' => $this->ucmTypeId, 'fieldsData' => $fieldsData, 'formObject' => $formObject));
 				}
 			}

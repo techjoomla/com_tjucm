@@ -201,7 +201,7 @@ class TjucmControllerItemForm extends JControllerForm
 			$fieldData['created_by'] = $table->created_by;
 
 			// If data is valid then save the data into DB
-			$response = $model->saveExtraFields($fieldData);
+			$response = $model->saveFieldsData($fieldData);
 
 			echo new JResponseJson($response);
 			$app->close();
@@ -281,7 +281,7 @@ class TjucmControllerItemForm extends JControllerForm
 			$formData['created_by'] = $table->created_by;
 
 			// If data is valid then save the data into DB
-			$response = $model->saveExtraFields($formData);
+			$response = $model->saveFieldsData($formData);
 			$msg = null;
 
 			if ($response && empty($section))
