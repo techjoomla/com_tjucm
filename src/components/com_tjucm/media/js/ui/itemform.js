@@ -504,6 +504,14 @@ var tjUcmItemForm = {
 
 		/* If there are errors in the response then show them on the screen*/
 		tjUcmItemForm.renderResponseMessages(response);
+
+		// To redirect on list view
+		if (response.data.success && jQuery.trim(response.data.redirectUrl) !='' && response.data.redirectUrl != undefined )
+		{
+			setTimeout(function(){
+				window.location.href =response.data.redirectUrl;
+			}, 2000);
+		}
 	},
 	renderResponseMessages: function (response)
 	{
@@ -577,18 +585,18 @@ var tjUcmItemForm = {
 
 		if (tjUcmFormSubmitCallingButtonId == 'tjUcmSectionFinalSave')
 		{
-			if(!confirm(Joomla.JText._("COM_TJUCM_ITEMFORM_SUBMIT_ALERT")))
-			{
-				jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
-
-				return false;
-			}
-
 			if (document.formvalidator.isValid(document.getElementById('item-form')))
 			{
+				if(!confirm(Joomla.JText._("COM_TJUCM_ITEMFORM_SUBMIT_ALERT")))
+				{
+					jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
+
+					return false;
+				}
+
 				/* Clear the error messages first if any before processing the data*/
 				jQuery("#system-message-container").html("");
-	
+
 				/* Disable the save button till the record is saved*/
 				jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
 			}
@@ -597,7 +605,7 @@ var tjUcmItemForm = {
 				tjUcmItemForm.setVisibilityOfNavigationButtons();
 				jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
 				jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
-	
+
 				return false;
 			}
 
@@ -779,7 +787,7 @@ var tjUcmItemForm = {
 			{
 				jQuery("#next_button").attr('disabled', true);
 			}
-	
+
 			if (jQuery(tjUcmCurrentFormTab).prev('li').length)
 			{
 				jQuery("#previous_button").attr('disabled', false);
@@ -809,18 +817,18 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 
 	if ('save' == status) {
 
-		if(confirm(Joomla.JText._("COM_TJUCM_ITEMFORM_SUBMIT_ALERT")))
+		if (document.formvalidator.isValid('#item-form'))
 		{
-			/* code to remove the class added by are-you-sure alert box */
-			jQuery('#item-form').removeClass('dirty');
-
-			if (!document.formvalidator.isValid('#item-form'))
+			if(!confirm(Joomla.JText._("COM_TJUCM_ITEMFORM_SUBMIT_ALERT")))
 			{
 				jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
 				jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
 
 				return false;
 			}
+
+			/* code to remove the class added by are-you-sure alert box */
+			jQuery('#item-form').removeClass('dirty');
 		}
 		else
 		{
