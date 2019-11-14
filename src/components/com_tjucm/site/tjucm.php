@@ -29,18 +29,13 @@ if (!class_exists('TjucmHelper'))
 	JLoader::load('TjucmHelper');
 }
 
-$path = JPATH_COMPONENT_ADMINISTRATOR . '/classes/' . 'funlist.php';
-
-if (!class_exists('TjucmFunList'))
-{
-	// Require_once $path;
-	JLoader::register('TjucmFunList', $path);
-	JLoader::load('TjucmFunList');
-}
-
 JLoader::register('TjucmHelpersTjucm', JPATH_SITE . '/components/com_tjucm/helpers/tjucm.php');
 JLoader::load('TjucmHelpersTjucm');
 TjucmHelpersTjucm::getLanguageConstantForJs();
+
+// Initialise UCM
+JLoader::register('TJUCM', JPATH_SITE . '/components/com_tjucm/includes/tjucm.php');
+TJUCM::init();
 
 // Execute the task.
 $controller = JControllerLegacy::getInstance('Tjucm');

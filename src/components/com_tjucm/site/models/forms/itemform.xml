@@ -1,26 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
-  <fieldset>
-    <field name="id" type="text" readonly="true" class="readonly" default="0" description="JGLOBAL_FIELD_ID_DESC"/>
-    <field name="client" type="text" readonly="true" class="readonly" default="" description="JGLOBAL_FIELD_ID_DESC"/>
-    <field name="ordering"/>
-    <field name="state" default="1" type="list" label="JSTATUS" description="JFIELD_PUBLISHED_DESC" class="inputbox" size="1">
-      <option value="1">JPUBLISHED</option>
-      <option value="0">JUNPUBLISHED</option>
-      <option value="2">JARCHIVED</option>
-      <option value="-2">JTRASHED</option>
-    </field>
-    <field name="type_id" type="foreignkey" label="COM_TJUCM_FORM_LBL_ITEM_TYPE_ID" description="COM_TJUCM_FORM_DESC_ITEM_TYPE_ID" class="inputbox" input_type="list" table="#__tj_ucm_types" key_field="id" value_field="id" default="0"/>
-    <field name="checked_out" type="hidden" filter="unset"/>
-    <field name="checked_out_time" default="0000-00-00 00:00:00" type="hidden" filter="unset"/>
-    <field name="created_by" type="createdby" default="0" label="COM_TJUCM_FORM_LBL_ITEM_CREATED_BY" description="COM_TJUCM_FORM_DESC_ITEM_CREATED_BY" hidden="true" hint="COM_TJUCM_FORM_LBL_ITEM_CREATED_BY"/>
-    <field name="created_date" type="timecreated" label="COM_TJUCM_FORM_LBL_ITEM_CREATED_DATE" description="COM_TJUCM_FORM_DESC_ITEM_CREATED_DATE" hidden="true" hint="COM_TJUCM_FORM_LBL_ITEM_CREATED_DATE"/>
-    <field name="modified_by" type="modifiedby" default="0" label="COM_TJUCM_FORM_LBL_ITEM_MODIFIED_BY" description="COM_TJUCM_FORM_DESC_ITEM_MODIFIED_BY" hidden="true" hint="COM_TJUCM_FORM_LBL_ITEM_MODIFIED_BY"/>
-    <field name="modified_date" type="timecreated" label="COM_TJUCM_FORM_LBL_ITEM_MODIFIED_DATE" description="COM_TJUCM_FORM_DESC_ITEM_MODIFIED_DATE" hidden="true" hint="COM_TJUCM_FORM_LBL_ITEM_MODIFIED_DATE"/>
-    <field name="version_note" type="text" label="JGLOBAL_FIELD_VERSION_NOTE_LABEL" description="JGLOBAL_FIELD_VERSION_NOTE_DESC" class="inputbox" size="45" labelclass="control-label"/>
-  </fieldset>
-  <fieldset name="accesscontrol">
-    <field name="asset_id" type="hidden" filter="unset"/>
-    <field name="rules" type="rules" label="JFIELD_RULES_LABEL" translate_label="false" filter="rules" validate="rules" class="inputbox" component="com_tjucm" section="item"/>
-  </fieldset>
+	<fieldset>
+		<field name="id" type="number" readonly="true" class="readonly" default="0"/>
+		<field name="client" type="text" readonly="true" class="readonly" default="" required="true"/>
+		<field name="parent_id" type="hidden" readonly="true" class="readonly" default="0" />
+		<field name="ordering"/>
+		<field name="state" default="1" type="list" label="JSTATUS" class="inputbox" size="1">
+			<option value="1">JPUBLISHED</option>
+			<option value="0">JUNPUBLISHED</option>
+			<option value="2">JARCHIVED</option>
+			<option value="-2">JTRASHED</option>
+		</field>
+		<field name="type_id" type="number" readonly="true" class="readonly"/>
+		<field name="draft" type="hidden"/>
+		<field name="category_id" type="number"/>
+		<field name="cluster_id" type="number"/>
+		<field name="checked_out" type="hidden" filter="unset"/>
+		<field name="checked_out_time" default="0000-00-00 00:00:00" type="hidden" filter="unset"/>
+		<field name="created_by" type="createdby" default="0" hidden="true"/>
+		<field name="created_date" type="timecreated" hidden="true"/>
+		<field name="modified_by" type="modifiedby" default="0" hidden="true"/>
+		<field name="modified_date" type="timecreated" hidden="true"/>
+		<field name="version_note" type="text" class="inputbox" size="45" labelclass="control-label"/>
+	</fieldset>
+	<fieldset name="accesscontrol">
+		<field name="asset_id" type="hidden" filter="unset"/>
+		<field name="rules" type="rules" label="JFIELD_RULES_LABEL" translate_label="false" filter="rules" validate="rules" class="inputbox" component="com_tjucm" section="item"/>
+	</fieldset>
 </form>

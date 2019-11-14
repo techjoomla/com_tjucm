@@ -24,7 +24,7 @@ if ($this->form_extra)
 	}
 
 	// Call the JLayout to render the fields in the details view
-	$layout = new JLayoutFile('fields', JPATH_ROOT . '/components/com_tjucm/layouts/detail');
+	$layout = new JLayoutFile('detail.fields', JPATH_ROOT . '/components/com_tjucm');
 	echo $layout->render(array('xmlFormObject' => $xmlFieldSets, 'formObject' => $this->form_extra, 'itemData' => $this->item));
 }
 else
