@@ -322,23 +322,13 @@ class TjucmModelType extends JModelAdmin
 			$data['unique_identifier'] = 'com_tjucm.' . $data['alias'];
 		}
 
-		$params = array();
-		$params['is_subform'] = $data['is_subform'];
-		$params['allow_draft_save'] = $data['allow_draft_save'];
-		$params['allow_auto_save'] = $data['allow_auto_save'];
-		$params['publish_items'] = $data['publish_items'];
-		$params['allowed_count'] = $data['allowed_count'];
-		$params['layout'] = $data['layout'];
-		$params['details_layout'] = $data['details_layout'];
-		$params['list_layout'] = $data['list_layout'];
-
 		// If UCM type is a subform then need to add content_id as hidden field in the form - For flat subform storage
 		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
 		$db = JFactory::getDbo();
 		$tjfieldsFieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
 		$tjfieldsFieldTable->load(array('name' => str_replace('.', '_', $data['unique_identifier']) . '_contentid'));
 
-		if ($params['is_subform'] == 1 && empty($tjfieldsFieldTable->id))
+		if ($data['params']['is_subform'] == 1 && empty($tjfieldsFieldTable->id))
 		{
 			JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
 			$fieldGroup = array("name" => "hidden", "title" => "hidden", "client" => $data['unique_identifier'], "state" => 1);
@@ -358,19 +348,17 @@ class TjucmModelType extends JModelAdmin
 			$input->post->set('client_type', '');
 		}
 
-		// If UCM type is a subform then it cant be saved as draft and auto save is also disabled
-		if ($params['is_subform'] == 1)
+		// Check the params 'Group' of fields & UCM type is a subform then it cant be saved as draft and auto save is also disabled
+		if ($data['params']['is_subform'] == 1)
 		{
-			$params['allow_draft_save'] = $params['allow_auto_save'] = $params['allowed_count'] = 0;
+			$data['params']['allow_draft_save']  = $data['params']['allow_auto_save'] = $data['params']['allowed_count'] = 0;
 		}
 
 		// If auto save is enabled then draft save is enabled by default
-		if ($params['allow_auto_save'] == 1)
+		if ($data['params']['allow_auto_save'] == 1)
 		{
-			$params['allow_draft_save'] = 1;
+			$data['params']['allow_draft_save'] = 1;
 		}
-
-		$data['params'] = json_encode($params);
 
 		if (parent::save($data))
 		{
@@ -536,7 +524,7 @@ class TjucmModelType extends JModelAdmin
 
 			// Delete UCM type
 			if (!parent::delete($pk))
-			{	
+			{
 				return false;
 			}
 		}
