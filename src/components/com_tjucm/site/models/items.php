@@ -171,6 +171,8 @@ class TjucmModelItems extends JModelList
 				'list.select', 'DISTINCT ' . $db->quoteName('a.id') . ', '
 				. $db->quoteName('a.state') . ', '
 				. $db->quoteName('a.cluster_id') . ', '
+				. $db->quoteName('a.draft') . ', '
+				. $db->quoteName('a.created_date') . ', '
 				. $db->quoteName('a.created_by')
 			)
 		);
@@ -337,8 +339,8 @@ class TjucmModelItems extends JModelList
 
 					if ($filterFieldsCount > 1)
 					{
-						$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' .
-						$db->qn('fv' . ($filterFieldsCount - 1) . '.content_id') . ' = ' . $db->qn('fv' . $filterFieldsCount . '.content_id') . ')');
+						$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' .
+						($filterFieldsCount - 1) . '.content_id') . ' = ' . $db->qn('fv' . $filterFieldsCount . '.content_id') . ')');
 					}
 
 					$search = trim(str_replace($field . ':', '', $search));
@@ -359,8 +361,8 @@ class TjucmModelItems extends JModelList
 
 			if ($filterFieldsCount > 1)
 			{
-				$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' .
-				$db->qn('fv' . ($filterFieldsCount - 1) . '.content_id') . ' = ' . $db->qn('fv' . $filterFieldsCount . '.content_id') . ')');
+				$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' .
+				($filterFieldsCount - 1) . '.content_id') . ' = ' . $db->qn('fv' . $filterFieldsCount . '.content_id') . ')');
 			}
 
 			$query->where($db->quoteName('fv' . $filterFieldsCount . '.value') . ' LIKE ' . $db->q('%' . $search . '%'));
@@ -384,8 +386,8 @@ class TjucmModelItems extends JModelList
 
 				if ($filterFieldsCount > 1)
 				{
-					$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' .
-					$db->qn('fv' . ($filterFieldsCount - 1) . '.content_id') . ' = ' . $db->qn('fv' . $filterFieldsCount . '.content_id') . ')');
+					$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' .
+					($filterFieldsCount - 1) . '.content_id') . ' = ' . $db->qn('fv' . $filterFieldsCount . '.content_id') . ')');
 				}
 
 				$query->where($db->qn('fv' . $filterFieldsCount . '.field_id') . ' = ' . $field->id);
