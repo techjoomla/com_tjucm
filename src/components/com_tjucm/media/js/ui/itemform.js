@@ -504,14 +504,6 @@ var tjUcmItemForm = {
 
 		/* If there are errors in the response then show them on the screen*/
 		tjUcmItemForm.renderResponseMessages(response);
-
-		// To redirect on list view
-		if (response.data.success && jQuery.trim(response.data.redirectUrl) !='' && response.data.redirectUrl != undefined )
-		{
-			setTimeout(function(){
-				window.location.href =response.data.redirectUrl;
-			}, 2000);
-		}
 	},
 	renderResponseMessages: function (response)
 	{
