@@ -218,11 +218,10 @@ class TjucmModelItems extends JModelList
 				JFormHelper::addFieldPath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models/fields/');
 				$cluster = JFormHelper::loadFieldType('cluster', false);
 				$clusterList = $cluster->getOptionsExternally();
+				$usersClusters = array();
 
 				if (!empty($clusterList))
 				{
-					$usersClusters = array();
-
 					foreach ($clusterList as $clusterList)
 					{
 						if (!empty($clusterList->value))
@@ -232,7 +231,13 @@ class TjucmModelItems extends JModelList
 					}
 				}
 
-				$query->where($db->quoteName('a.cluster_id') . " IN ('" . implode("','", $usersClusters) . "')");
+				// If cluster array empty then we set 0 in whereclause query
+				if (empty($usersClusters))
+				{
+					$usersClusters[] = 0;
+				}
+
+				$query->where($db->quoteName('a.cluster_id') . ' IN (' . implode(",", $usersClusters) . ')');
 			}
 		}
 
