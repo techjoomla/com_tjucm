@@ -34,7 +34,7 @@ class TjucmTableitem extends JTable
 	/**
 	 * Overloaded bind function to pre-process the params.
 	 *
-	 * @param   array  $array   Named array
+	 * @param   array  $data    Named array
 	 * @param   mixed  $ignore  Optional array or list of parameters to ignore
 	 *
 	 * @return  null|string  null is operation was satisfactory, otherwise returns an error
@@ -42,55 +42,20 @@ class TjucmTableitem extends JTable
 	 * @see     JTable:bind
 	 * @since   1.5
 	 */
-	public function bind($array, $ignore = '')
+	public function bind($data, $ignore = '')
 	{
-		if ($array['id'] == 0)
+		if (empty($data['id']))
 		{
-			$array['created_by'] = !empty($array['created_by']) ? $array['created_by'] : JFactory::getUser()->id;
-			$array['created_date'] = JFactory::getDate()->toSql();
+			$data['created_by'] = JFactory::getUser()->id;
+			$data['created_date'] = JFactory::getDate()->toSql();
+		}
+		else
+		{
+			$data['modified_by'] = JFactory::getUser()->id;
+			$data['modified_date'] = JFactory::getDate()->toSql();
 		}
 
-		$array['modified_by'] = JFactory::getUser()->id;
-		$array['modified_date'] = JFactory::getDate()->toSql();
-
-		if (isset($array['params']) && is_array($array['params']))
-		{
-			$registry = new JRegistry;
-			$registry->loadArray($array['params']);
-			$array['params'] = (string) $registry;
-		}
-
-		if (isset($array['metadata']) && is_array($array['metadata']))
-		{
-			$registry = new JRegistry;
-			$registry->loadArray($array['metadata']);
-			$array['metadata'] = (string) $registry;
-		}
-
-		if (!JFactory::getUser()->authorise('core.admin', 'com_tjucm.item.' . $array['id']))
-		{
-			$actions         = JAccess::getActionsFromFile(
-				JPATH_ADMINISTRATOR . '/components/com_tjucm/access.xml',
-				"/access/section[@name='item']/"
-			);
-			$default_actions = JAccess::getAssetRules('com_tjucm.item.' . $array['id'])->getData();
-			$array_jaccess   = array();
-
-			foreach ($actions as $action)
-			{
-				$array_jaccess[$action->name] = $default_actions[$action->name];
-			}
-
-			$array['rules'] = $this->JAccessRulestoArray($array_jaccess);
-		}
-
-		// Bind the rules for ACL where supported.
-		if (isset($array['rules']) && is_array($array['rules']))
-		{
-			$this->setRules($array['rules']);
-		}
-
-		return parent::bind($array, $ignore);
+		return parent::bind($data, $ignore);
 	}
 
 	/**

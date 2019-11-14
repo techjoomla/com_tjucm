@@ -394,7 +394,8 @@ class TjucmModelItems extends JModelList
 			}
 		}
 
-		$query->setLimit($this->getState('list.limit'));
+		$query->order('fv1.content_id DESC');
+		$query->group('fv1.content_id');
 
 		// If there is any filter applied then only execute the query
 		if ($filterApplied)
@@ -482,7 +483,22 @@ class TjucmModelItems extends JModelList
 			{
 				if ($item->id == $fieldValue->content_id)
 				{
-					$item->field_values[$fieldValue->field_id] = $fieldValue->value;
+					if (isset($item->field_values[$fieldValue->field_id]))
+					{
+						if (is_array($item->field_values[$fieldValue->field_id]))
+						{
+							$item->field_values[$fieldValue->field_id] = array_merge($item->field_values[$fieldValue->field_id], array($fieldValue->value));
+						}
+						else
+						{
+							$item->field_values[$fieldValue->field_id] = array_merge(array($item->field_values[$fieldValue->field_id]), array($fieldValue->value));
+						}
+					}
+					else
+					{
+						$item->field_values[$fieldValue->field_id] = $fieldValue->value;
+					}
+
 					unset($fieldValues[$key]);
 				}
 			}
@@ -538,86 +554,6 @@ class TjucmModelItems extends JModelList
 		$db->setQuery($query);
 
 		return $db->loadObjectList();
-	}
-
-	/**
-	 * Overrides the default function to check Date fields format, identified by
-	 * "_dateformat" suffix, and erases the field if it's not correct.
-	 *
-	 * @return void
-	 */
-	protected function loadFormData()
-	{
-		$app              = JFactory::getApplication();
-		$filters          = $app->getUserState($this->context . '.filter', array());
-		$error_dateformat = false;
-
-		foreach ($filters as $key => $value)
-		{
-			if (strpos($key, '_dateformat') && !empty($value) && $this->isValidDate($value) == null)
-			{
-				$filters[$key]    = '';
-				$error_dateformat = true;
-			}
-		}
-
-		if ($error_dateformat)
-		{
-			$app->enqueueMessage(JText::_("COM_TJUCM_SEARCH_FILTER_DATE_FORMAT"), "warning");
-			$app->setUserState($this->context . '.filter', $filters);
-		}
-
-		return parent::loadFormData();
-	}
-
-	/**
-	 * Checks if a given date is valid and in a specified format (YYYY-MM-DD)
-	 *
-	 * @param   string  $date  Date to be checked
-	 *
-	 * @return bool
-	 */
-	private function isValidDate($date)
-	{
-		$date = str_replace('/', '-', $date);
-
-		return (date_create($date)) ? JFactory::getDate($date)->format("Y-m-d") : null;
-	}
-
-	/**
-	 * Method to getAliasFieldNameByView
-	 *
-	 * @param   array  $view  An array of record primary keys.
-	 *
-	 * @return  boolean  True if successful, false if an error occurs.
-	 *
-	 * @since   12.2
-	 */
-	public function getAliasFieldNameByView($view)
-	{
-		switch ($view)
-		{
-			case 'items':
-				return 'alias';
-			break;
-		}
-	}
-
-	/**
-	 * Get an item by alias
-	 *
-	 * @param   string  $alias  Alias string
-	 *
-	 * @return int Element id
-	 */
-	public function getItemIdByAlias($alias)
-	{
-		$db = JFactory::getDbo();
-		$table = JTable::getInstance('type', 'TjucmTable', array('dbo', $db));
-
-		$table->load(array('alias' => $alias));
-
-		return $table->id;
 	}
 
 	/**
