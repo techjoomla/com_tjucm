@@ -794,7 +794,40 @@ class TjucmModelItemForm extends JModelAdmin
 			foreach ($ucmSubFormFieldValues as $ucmSubFormFieldValue)
 			{
 				$ucmSubFormFieldName = $ucmSubFormFieldValue->name;
-				$subFormData->$ucmSubFormFieldName = $ucmSubFormFieldValue->value;
+
+				$value = '';
+				$temp = array();
+
+				switch ($ucmSubFormFieldValue->type)
+				{
+					case 'tjlist':
+					case 'related':
+					case 'multi_select':
+
+						if (is_array($ucmSubFormFieldValue->value) || is_object($ucmSubFormFieldValue->value))
+						{
+							foreach ($ucmSubFormFieldValue->value as $option)
+							{
+								$temp[] = $option->value;
+							}
+
+							if (!empty($temp))
+							{
+								$value = $temp;
+							}
+						}
+						else
+						{
+							$value = $ucmSubFormFieldValue->value;
+						}
+
+						break;
+
+					default:
+						$value = $ucmSubFormFieldValue->value;
+				}
+
+				$subFormData->$ucmSubFormFieldName = $value;
 			}
 
 			$client = explode('.', $recordData['client']);
@@ -812,7 +845,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 * Function to updated related field options
 	 *
 	 * @param   INT  $client     client
-	 * 
+	 *
 	 * @param   INT  $contentId  Content id
 	 *
 	 * @return ARRAY
