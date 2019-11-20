@@ -314,12 +314,12 @@ class TjucmModelType extends JModelAdmin
 
 			if ($field_group == 0 && $field_category == 0)
 			{
-				$data['unique_identifier'] = 'com_tjucm.' . $data['alias'];
+				$data['unique_identifier'] = 'com_tjucm.' . preg_replace("/[^a-zA-Z0-9]/", "", $data['alias']);
 			}
 		}
 		else
 		{
-			$data['unique_identifier'] = 'com_tjucm.' . $data['alias'];
+			$data['unique_identifier'] = 'com_tjucm.' . preg_replace("/[^a-zA-Z0-9]/", "", $data['alias']);
 		}
 
 		$params = array();
