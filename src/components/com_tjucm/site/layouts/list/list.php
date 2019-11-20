@@ -1,7 +1,7 @@
 <?php
 /**
  * @package	TJ-UCM
- * 
+ *
  * @author	 TechJoomla <extensions@techjoomla.com>
  * @copyright  Copyright (c) 2009-2019 TechJoomla. All rights reserved.
  * @license	GNU General Public License version 2 or later; see LICENSE.txt
@@ -24,7 +24,7 @@ $user = JFactory::getUser();
 $fieldLayout = array();
 $fieldLayout['File'] = $fieldLayout['Image'] = "file";
 $fieldLayout['Checkbox'] = "checkbox";
-$fieldLayout['tjlist'] = $fieldLayout['Radio'] = $fieldLayout['List'] = $fieldLayout['Single_select'] = $fieldLayout['Multi_select'] = "list";
+$fieldLayout['Tjlist'] = $fieldLayout['Radio'] = $fieldLayout['List'] = $fieldLayout['Single_select'] = $fieldLayout['Multi_select'] = "list";
 $fieldLayout['Itemcategory'] = "itemcategory";
 $fieldLayout['Video'] = $fieldLayout['Audio'] = $fieldLayout['Url'] = "link";
 $fieldLayout['Calendar'] = "calendar";
