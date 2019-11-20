@@ -7,7 +7,7 @@
 	<authorEmail>extensions@techjoomla.com</authorEmail>
 	<authorUrl>https://techjoomla.com</authorUrl>
 	<creationDate>4th Nov 2019</creationDate>
-	<version>1.2.2</version>
+	<version>1.2.3</version>
 	<description><![CDATA[<h3>TJ-UCM - Universal Content Manager</h3>]]></description>
 	<scriptfile>script.php</scriptfile>
 	<install>
