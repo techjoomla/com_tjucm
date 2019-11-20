@@ -100,7 +100,10 @@ class TjucmModelItemForm extends JModelAdmin
 
 				if (!empty($ucm_type))
 				{
-					$ucmType     = 'com_tjucm.' . $ucm_type;
+					JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
+					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+					$ucmTypeTable->load(array('alias' => $this->ucm_type));
+					$ucmType = $ucmTypeTable->unique_identifier;
 				}
 			}
 		}
