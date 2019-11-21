@@ -14,6 +14,7 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\Registry\Registry;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\Filesystem\File;
 
 /**
  * Migration file for TJ-UCM
@@ -37,6 +38,7 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 	{
 		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
 		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
+		JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_ADMINISTRATOR);
 
 		$result = array();
 		$ucmSubFormFieldsConfig = array();
@@ -106,7 +108,6 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 									$tjfieldsFieldTable->store();
 
 									// Check if field name is unique
-									JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_ADMINISTRATOR);
 									$tjfieldsHelper = new TjfieldsHelper;
 									$isUnique = $tjfieldsHelper->checkIfUniqueName($tjfieldsFieldTable->name);
 
@@ -149,18 +150,19 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 						$db->setQuery($query);
 						$db->execute();
 
+						$oldClientParts = explode('.', $oldClientName);
+						$newClientParts = explode('.', $updatedUniqueIdentifier);
+						$oldFileName = $oldClientParts[1] . 'form_extra.xml';
+						$newFileName = $newClientParts[1] . 'form_extra.xml';
+						$oldFileNameAdmin = $oldClientParts[1] . '_extra.xml';
+
 						// If the UCM type is of subform type then update the link in the respective field
 						if ($ucmTypeParams->get('is_subform'))
 						{
-							$oldClientParts = explode('.', $oldClientName);
-							$newClientParts = explode('.', $updatedUniqueIdentifier);
-							$oldPath = 'components\/com_tjucm\/models\/forms\/' . $oldClientParts[1] . 'form_extra.xml';
-							$newPath = 'components\/com_tjucm\/models\/forms\/' . $newClientParts[1] . 'form_extra.xml';
-
 							$query = $db->getQuery(true);
 							$query->select('*');
 							$query->from($db->qn('#__tjfields_fields'));
-							$query->where($db->quoteName('params') . ' LIKE ' . $db->quote($oldPath));
+							$query->where($db->quoteName('params') . ' LIKE ' . $db->quote('%' . $oldFileName . '%'));
 							$db->setQuery($query);
 							$ucmSubFormFields = $db->loadObjectlist();
 
@@ -168,10 +170,24 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 							{
 								$tjfieldsFieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
 								$tjfieldsFieldTable->load($ucmSubFormField->id);
-								$tjfieldsFieldTable->params = str_replace($oldPath, $newPath, $tjfieldsFieldTable->params);
+								$tjfieldsFieldTable->params = str_replace($oldFileName, $newFileName, $tjfieldsFieldTable->params);
 								$tjfieldsFieldTable->store();
 							}
 						}
+
+						// Delete the old XML files for the UCM type
+						if (File::exists(JPATH_SITE . '/components/com_tjucm/models/forms/' . $oldFileName))
+						{
+							File::delete(JPATH_SITE . '/components/com_tjucm/models/forms/' . $oldFileName);
+						}
+
+						if (File::exists(JPATH_SITE . '/' . 'administrator/components/com_tjucm/models/forms/' . $oldFileNameAdmin))
+						{
+							File::delete(JPATH_SITE . '/' . 'administrator/components/com_tjucm/models/forms/' . $oldFileNameAdmin);
+						}
+
+						// Regenerate the XML files
+						$tjfieldsHelper->generateXml(array('client' => $updatedUniqueIdentifier, 'client_type' => $newClientParts[1]));
 					}
 				}
 			}
