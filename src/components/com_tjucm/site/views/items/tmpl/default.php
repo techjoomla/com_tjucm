@@ -61,6 +61,15 @@ $fieldsData = array();
 					<th width="2%">
 						<?php echo JHtml::_('grid.sort', 'COM_TJUCM_ITEMS_ID', 'a.id', $listDirn, $listOrder); ?>
 					</th>
+					<th width="2%">
+						<?php echo JText::_('COM_TJUCM_DATA_STATUS'); ?>
+					</th>
+					<th width="2%">
+						<?php echo JText::_('COM_TJUCM_TIME_LOGGED'); ?>
+					</th>
+					<th width="2%">
+						<?php echo JText::_('COM_TJUCM_LOGGED_BY'); ?>
+					</th>
 					<?php
 					if (!empty($this->listcolumn))
 					{
