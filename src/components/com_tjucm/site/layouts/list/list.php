@@ -50,6 +50,7 @@ $client        = $displayData['client'];
 $xmlFormObject = $displayData['xmlFormObject'];
 $formObject    = $displayData['formObject'];
 $ucmTypeId     = $displayData['ucmTypeId'];
+$allowDraftSave= $displayData['ucmTypeParams']->allow_draft_save;
 
 $appendUrl = '';
 $csrf = "&" . Session::getFormToken() . '=1';
@@ -89,6 +90,7 @@ if ($canDeleteOwn)
 {
 	$deleteOwn = (Factory::getUser()->id == $item->created_by ? true : false);
 }
+
 ?>
 <tr class="row<?php echo $item->id?>">
 	<?php
@@ -117,10 +119,12 @@ if ($canDeleteOwn)
 			<?php echo $this->escape($item->id); ?>
 		</a>
 	</td>
-	<td><?php echo ($item->draft) ? Text::_('COM_TJUCM_DATA_STATUS_DRAFT') : Text::_('COM_TJUCM_DATA_STATUS_SAVE'); ?></td>
-	<td><?php echo HTMLHelper::date($item->created_date, Text::_('COM_TJUCM_TIME_FORMAT')); ?></td>
-	<td><?php echo Factory::getUser($item->created_by)->name; ?></td>
 	<?php
+	if ($allowDraftSave)
+	{ ?>
+		<td><?php echo ($item->draft) ? Text::_('COM_TJUCM_DATA_STATUS_DRAFT') : Text::_('COM_TJUCM_DATA_STATUS_SAVE'); ?></td>
+	<?php
+	}
 	if (!empty($item->field_values))
 	{
 		foreach ($item->field_values as $key => $fieldValue)
