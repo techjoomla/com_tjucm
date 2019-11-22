@@ -90,7 +90,7 @@ $fieldsData = array();
 								$fieldsData[$fieldId] = $tjFieldsFieldTable;
 							}
 							?>
-							<th  style="word-break: break-word;" width="<?php echo 90/count($this->listcolumn).'%';?>">
+							<th  style="word-break: break-word;" width="<?php echo 88/count($this->listcolumn).'%';?>">
 								<?php echo htmlspecialchars($col_name, ENT_COMPAT, 'UTF-8'); ?>
 							</th>
 							<?php
