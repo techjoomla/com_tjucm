@@ -61,7 +61,17 @@ $fieldsData = array();
 					<th width="2%">
 						<?php echo JHtml::_('grid.sort', 'COM_TJUCM_ITEMS_ID', 'a.id', $listDirn, $listOrder); ?>
 					</th>
+
 					<?php
+					if (!empty($this->ucmTypeParams->allow_draft_save) && $this->ucmTypeParams->allow_draft_save == 1)
+					{
+					?>
+						<th width="2%">
+							<?php echo JText::_('COM_TJUCM_DATA_STATUS'); ?>
+						</th>
+					<?php
+					}
+
 					if (!empty($this->listcolumn))
 					{
 						JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
@@ -140,7 +150,7 @@ $fieldsData = array();
 				{
 					// Call the JLayout to render the fields in the details view
 					$layout = new JLayoutFile('list.list', JPATH_ROOT . '/components/com_tjucm/');
-					echo $layout->render(array('itemsData' => $item, 'created_by' => $this->created_by, 'client' => $this->client, 'xmlFormObject' => $formXml, 'ucmTypeId' => $this->ucmTypeId, 'fieldsData' => $fieldsData, 'formObject' => $formObject));
+					echo $layout->render(array('itemsData' => $item, 'created_by' => $this->created_by, 'client' => $this->client, 'xmlFormObject' => $formXml, 'ucmTypeId' => $this->ucmTypeId, 'ucmTypeParams' => $this->ucmTypeParams, 'fieldsData' => $fieldsData, 'formObject' => $formObject));
 				}
 			}
 			else

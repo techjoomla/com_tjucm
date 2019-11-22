@@ -298,7 +298,17 @@ class TjucmControllerItemForm extends JControllerForm
 
 				// Disable the draft mode of the item if full f)orm is submitted
 				$table->draft = $draft;
+				$table->modified_date = Factory::getDate()->toSql();
 				$table->store();
+
+				// Perform actions (redirection or trigger call) after final submit
+				if (!$draft)
+				{
+					// TJ-ucm plugin trigger after save
+					$dispatcher = JEventDispatcher::getInstance();
+					PluginHelper::importPlugin("content");
+					$dispatcher->trigger('onUcmItemAfterSave', array($table->getProperties(), $data, $isNew));
+				}
 			}
 
 			echo new JResponseJson($response, $msg);
