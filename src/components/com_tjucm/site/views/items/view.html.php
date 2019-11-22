@@ -56,6 +56,8 @@ class TjucmViewItems extends JViewLegacy
 
 	protected $created_by;
 
+	protected $ucmTypeParams;
+
 	/**
 	 * Display the view
 	 *
@@ -136,11 +138,11 @@ class TjucmViewItems extends JViewLegacy
 		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
 		$typeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
 		$typeTable->load(array('unique_identifier' => $this->client));
-		$typeParams = json_decode($typeTable->params);
+		$this->ucmTypeParams = json_decode($typeTable->params);
 
-		if (isset($typeParams->list_layout) && !empty($typeParams->list_layout))
+		if (isset($this->ucmTypeParams->list_layout) && !empty($this->ucmTypeParams->list_layout))
 		{
-			$this->setLayout($typeParams->list_layout);
+			$this->setLayout($this->ucmTypeParams->list_layout);
 		}
 
 		$allowedCount = (!empty($typeTable->allowed_count))?$typeTable->allowed_count:'0';
