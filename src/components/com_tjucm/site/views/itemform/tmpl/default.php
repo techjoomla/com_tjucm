@@ -22,13 +22,15 @@ HTMLHelper::_('jquery.token');
 * Script to show alert box if form changes are made and user is closing/refreshing/navigating the tab
 * without saving the content
 */
-HTMLHelper::script('media/com_tjucm/js/vendor/jquery/jquery.are-you-sure.js', $options);
+HTMLHelper::script('media/com_tjucm/js/vendor/jquery/jquery.are-you-sure.js');
 
 /*
 * Script to show alert box if form changes are made and user is closing/refreshing/navigating the tab
 * without saving the content on iphone|ipad|ipod|opera
 */
-HTMLHelper::script('media/com_tjucm/js/vendor/shim/ays-beforeunload-shim.js', $options);
+HTMLHelper::script('media/com_tjucm/js/vendor/shim/ays-beforeunload-shim.js');
+
+HTMLHelper::script('administrator/components/com_tjfields/assets/js/tjfields.js');
 
 // Load admin language file
 $lang = JFactory::getLanguage();
