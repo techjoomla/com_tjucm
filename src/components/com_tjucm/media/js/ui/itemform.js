@@ -37,12 +37,9 @@ jQuery(window).load(function()
 
 			/* To save calendar field value */
 			jQuery("#item-form .field-calendar input:text").blur(function(){
-				if (jQuery('#item-form').hasClass('dirty'))
+				if (tjUcmCurrentAutoSaveState)
 				{
-					if (tjUcmCurrentAutoSaveState)
-					{
-						tjUcmItemForm.onUcmFormChange(this);
-					}
+					tjUcmItemForm.onUcmFormChange(this);
 				}
 			});
 
@@ -434,6 +431,31 @@ var tjUcmItemForm = {
 				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), 0);
 			}
 		}
+		else if(jQuery(fieldObj).hasClass('tjfieldTjList'))
+		{
+			if (jQuery(fieldObj).val() !='' && jQuery(fieldObj).val() != undefined)
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
+			}
+
+			// Check other options multiple values exist and its not empty
+			if (jQuery('input#'+jQuery(fieldObj).attr('id')).val() !='' && jQuery('input#'+jQuery(fieldObj).attr('id')).val() != undefined)
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery('input#'+jQuery(fieldObj).attr('id')).val());
+			}
+		}
+		else if(jQuery('input#'+jQuery(fieldObj).attr('id')).data('role') == "tagsinput")
+		{
+			if (jQuery('#'+jQuery(fieldObj).attr('id')).val() !='' && jQuery('#'+jQuery(fieldObj).attr('id')).val() != undefined)
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery('#'+jQuery(fieldObj).attr('id')).val());
+			}
+
+			if (jQuery(fieldObj).val() !='' && jQuery(fieldObj).val() != undefined)
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
+			}
+		}
 		else if (jQuery(fieldObj).attr('type') != 'file')
 		{
 			tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
@@ -443,7 +465,11 @@ var tjUcmItemForm = {
 			tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj)[0].files[0]);
 		}
 
-		com_tjucm.Services.Item.saveFieldData(tjUcmItemFieldFormData, tjUcmItemForm.afterDataSave);
+		// Call function if field name exist in request data
+		if (jQuery(fieldObj).attr('name') !='' && jQuery(fieldObj).attr('name') != undefined)
+		{
+			com_tjucm.Services.Item.saveFieldData(tjUcmItemFieldFormData, tjUcmItemForm.afterDataSave);
+		}
 
 		return true;
 	},
