@@ -30,6 +30,7 @@ $user = Factory::getUser();
 $fieldLayout = array();
 $fieldLayout['File'] = $fieldLayout['Image'] = "file";
 $fieldLayout['Checkbox'] = "checkbox";
+$fieldLayout['Color'] = "color";
 $fieldLayout['Tjlist'] = $fieldLayout['Radio'] = $fieldLayout['List'] = $fieldLayout['Single_select'] = $fieldLayout['Multi_select'] = "list";
 $fieldLayout['Itemcategory'] = "itemcategory";
 $fieldLayout['Video'] = $fieldLayout['Audio'] = $fieldLayout['Url'] = "link";
