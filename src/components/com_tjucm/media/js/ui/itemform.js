@@ -433,12 +433,14 @@ var tjUcmItemForm = {
 		}
 		else if(jQuery(fieldObj).hasClass('tjfieldTjList'))
 		{
+			/* This condition used for tjlist option actial values updated  - This is used for single & multiple values*/
+
 			if (jQuery(fieldObj).val() !='' && jQuery(fieldObj).val() != undefined)
 			{
 				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
 			}
 
-			// Check other options multiple values exist and its not empty
+			/* Check other options multiple values exist and its not empty */
 			if (jQuery('input#'+jQuery(fieldObj).attr('id')).val() !='' && jQuery('input#'+jQuery(fieldObj).attr('id')).val() != undefined)
 			{
 				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery('input#'+jQuery(fieldObj).attr('id')).val());
@@ -446,11 +448,14 @@ var tjUcmItemForm = {
 		}
 		else if(jQuery('input#'+jQuery(fieldObj).attr('id')).data('role') == "tagsinput")
 		{
+			/* This condition used for tjlist Other option multiple values textbox */
+
 			if (jQuery('#'+jQuery(fieldObj).attr('id')).val() !='' && jQuery('#'+jQuery(fieldObj).attr('id')).val() != undefined)
 			{
 				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery('#'+jQuery(fieldObj).attr('id')).val());
 			}
 
+			/* Check other options multiple values exist and its not empty */
 			if (jQuery(fieldObj).val() !='' && jQuery(fieldObj).val() != undefined)
 			{
 				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
