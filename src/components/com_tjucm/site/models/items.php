@@ -217,6 +217,14 @@ class TjucmModelItems extends JModelList
 			$query->where($db->quoteName('a.created_by') . ' = ' . (INT) $createdBy);
 		}
 
+		// Filter for parent record
+		$parentId = $this->getState('parent_id');
+
+		if (is_numeric($parentId))
+		{
+			$query->where($db->quoteName('a.parent_id') . ' = ' . $parentId);
+		}
+
 		// Show records belonging to users cluster if com_cluster is installed and enabled - start
 		$clusterExist = ComponentHelper::getComponent('com_cluster', true)->enabled;
 
