@@ -70,7 +70,7 @@ class TjucmModelItem extends JModelAdmin
 				{
 					JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
 					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
-					$ucmTypeTable->load(array('alias' => $this->ucm_type));
+					$ucmTypeTable->load(array('alias' => $ucm_type));
 					$ucmType = $ucmTypeTable->unique_identifier;
 				}
 			}
