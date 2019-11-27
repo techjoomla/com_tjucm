@@ -79,9 +79,13 @@ jQuery(window).load(function()
 							if (tjUcmTinyMCEFieldIds[key] != tjUcmEditorFieldContent)
 							{
 								var tjUcmTempFieldObj = jQuery("#jform_"+key);
-								tjUcmTempFieldObj.val(tjUcmEditorFieldContent);
-								tjUcmTinyMCEFieldIds[key] = tjUcmEditorFieldContent;
-								tjUcmItemForm.onUcmFormChange(tjUcmTempFieldObj);
+
+								if (tjUcmTempFieldObj.length)
+								{
+									tjUcmTempFieldObj.val(tjUcmEditorFieldContent);
+									tjUcmTinyMCEFieldIds[key] = tjUcmEditorFieldContent;
+									tjUcmItemForm.onUcmFormChange(tjUcmTempFieldObj);
+								}
 							}
 						}
 					}
