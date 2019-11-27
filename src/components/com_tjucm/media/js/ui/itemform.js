@@ -364,11 +364,15 @@ var tjUcmItemForm = {
 
 						/* Save the ucm-subform field data*/
 						var afterAddFieldValueForUcmSubFormField = function (err, rsp){
-							var tjUcmIsMultiSelect = (jQuery(fieldObj).attr('name').slice(-2) == '[]') ? '[]' : '';
+							var fieldName = jQuery(fieldObj).attr('name');
+							var tjUcmIsMultiSelect = (fieldName.slice(-2) == '[]') ? '[]' : '';
 							var tjUcmUpdatedSubFormFieldName = 'jform['+jQuery(fieldObj).attr('id').split('__').pop()+']'+tjUcmIsMultiSelect;
+
 							jQuery(fieldObj).attr('name', tjUcmUpdatedSubFormFieldName);
 
 							tjUcmItemForm.saveUcmFormFieldData(tjucmClient, response.data.id, fieldObj);
+
+							jQuery(fieldObj).attr('name', fieldName);
 						}
 
 						/* Add entry for ucm-subform-field in field_value table for the parent record*/
@@ -391,11 +395,15 @@ var tjUcmItemForm = {
 			}
 			else if (jQuery.isNumeric(tjucmRecordId) && tjucmRecordId != 0)
 			{
-				var tjUcmIsMultiSelect = (jQuery(fieldObj).attr('name').slice(-2) == '[]') ? '[]' : '';
+				var fieldName = jQuery(fieldObj).attr('name');
+				var tjUcmIsMultiSelect = (fieldName.slice(-2) == '[]') ? '[]' : '';
 				var tjUcmUpdatedSubFormFieldName = 'jform['+jQuery(fieldObj).attr('id').split('__').pop()+']'+tjUcmIsMultiSelect;
+
 				jQuery(fieldObj).attr('name', tjUcmUpdatedSubFormFieldName);
 
 				tjUcmItemForm.saveUcmFormFieldData(tjucmClient, tjucmRecordId, fieldObj);
+
+				jQuery(fieldObj).attr('name', fieldName);
 
 				return true;
 			}
