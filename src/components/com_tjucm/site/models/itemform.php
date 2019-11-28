@@ -803,6 +803,19 @@ class TjucmModelItemForm extends JModelAdmin
 
 				switch ($ucmSubFormFieldValue->type)
 				{
+					case 'radio':
+						if (is_array($ucmSubFormFieldValue->value) || is_object($ucmSubFormFieldValue->value))
+						{
+							if (isset($ucmSubFormFieldValue->value[0]))
+							{
+								$value = $ucmSubFormFieldValue->value[0]->value;
+							}
+						}
+						else
+						{
+							$value = $ucmSubFormFieldValue->value;
+						}
+						break;
 					case 'tjlist':
 					case 'related':
 					case 'multi_select':
