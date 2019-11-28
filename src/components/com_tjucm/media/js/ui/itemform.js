@@ -372,6 +372,11 @@ var tjUcmItemForm = {
 							var tjUcmIsMultiSelect = (fieldName.slice(-2) == '[]') ? '[]' : '';
 							var tjUcmUpdatedSubFormFieldName = 'jform['+jQuery(fieldObj).attr('id').split('__').pop()+']'+tjUcmIsMultiSelect;
 
+							if (jQuery(fieldObj).attr('type') == 'radio')
+							{
+								var tjUcmUpdatedSubFormFieldName = 'jform['+jQuery(fieldObj).attr('name').split('][').pop();
+							}
+
 							jQuery(fieldObj).attr('name', tjUcmUpdatedSubFormFieldName);
 
 							tjUcmItemForm.saveUcmFormFieldData(tjucmClient, response.data.id, fieldObj);
@@ -402,6 +407,11 @@ var tjUcmItemForm = {
 				var fieldName = jQuery(fieldObj).attr('name');
 				var tjUcmIsMultiSelect = (fieldName.slice(-2) == '[]') ? '[]' : '';
 				var tjUcmUpdatedSubFormFieldName = 'jform['+jQuery(fieldObj).attr('id').split('__').pop()+']'+tjUcmIsMultiSelect;
+
+				if (jQuery(fieldObj).attr('type') == 'radio')
+				{
+					var tjUcmUpdatedSubFormFieldName = 'jform['+jQuery(fieldObj).attr('name').split('][').pop();
+				}
 
 				jQuery(fieldObj).attr('name', tjUcmUpdatedSubFormFieldName);
 
