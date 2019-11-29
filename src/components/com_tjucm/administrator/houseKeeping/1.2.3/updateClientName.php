@@ -36,6 +36,9 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 	 */
 	public function migrate()
 	{
+		// Increase the php execution time for migration
+		ini_set('max_execution_time', 0);
+
 		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
 		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
 		JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_ADMINISTRATOR);
