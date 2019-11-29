@@ -62,12 +62,6 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 					$updatedUniqueIdentifier = 'com_tjucm.' . preg_replace("/[^a-zA-Z0-9]/", "", str_replace('com_tjucm.', '', $ucmTypeTable->unique_identifier));
 					$ucmTypeParams = new Registry($ucmType->params);
 
-					// If the client of UCM type dont need any change then skip that UCM type
-					if ($updatedUniqueIdentifier == $ucmTypeTable->unique_identifier)
-					{
-						continue;
-					}
-
 					// Variable to store the old client of the UCM Type
 					$oldClientName = $ucmTypeTable->unique_identifier;
 					$ucmTypeTable->unique_identifier = $updatedUniqueIdentifier;
@@ -171,6 +165,32 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 								$tjfieldsFieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
 								$tjfieldsFieldTable->load($ucmSubFormField->id);
 								$tjfieldsFieldTable->params = str_replace($oldFileName, $newFileName, $tjfieldsFieldTable->params);
+								$tjfieldsFieldTable->store();
+							}
+						}
+
+						// If the UCM type is used as data source in related field the we need to update the UCM name in the field params
+						if ($ucmTypeParams->get('is_subform'))
+						{
+							$query = $db->getQuery(true);
+							$query->select('*');
+							$query->from($db->qn('#__tjfields_fields'));
+							$query->where($db->quoteName('params') . ' LIKE ' . $db->quote('%' . $oldClientName . '%'));
+							$db->setQuery($query);
+							$formFields = $db->loadObjectlist();
+
+							foreach ($formFields as $formField)
+							{
+								$tjfieldsFieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
+								$tjfieldsFieldTable->load($formField->id);
+								$fieldParams = new Registry($tjfieldsFieldTable->params);
+
+								if ($fieldParams->get('client') == $oldClientName)
+								{
+									$fieldParams->set('client', $updatedUniqueIdentifier);
+								}
+
+								$tjfieldsFieldTable->params = json_encode($fieldParams);
 								$tjfieldsFieldTable->store();
 							}
 						}
