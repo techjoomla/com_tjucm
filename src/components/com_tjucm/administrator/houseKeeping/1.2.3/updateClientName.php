@@ -98,7 +98,24 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 									$tjfieldsFieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
 									$tjfieldsFieldTable->load($field->id);
 									$tjfieldsFieldTable->client = $updatedUniqueIdentifier;
-									$tjfieldsFieldTable->name = str_replace('.', '_', $updatedUniqueIdentifier) . '_' . strtolower(preg_replace("/[^a-zA-Z0-9]/", "", $field->label));
+
+									if ($tjfieldsFieldTable->type == 'cluster')
+									{
+										$tjfieldsFieldTable->name = str_replace('.', '_', $updatedUniqueIdentifier) . '_clusterid';
+									}
+									elseif ($tjfieldsFieldTable->type == 'ownership')
+									{
+										$tjfieldsFieldTable->name = str_replace('.', '_', $updatedUniqueIdentifier) . '_createdby';
+									}
+									elseif ($tjfieldsFieldTable->type == 'itemcategory')
+									{
+										$tjfieldsFieldTable->name = str_replace('.', '_', $updatedUniqueIdentifier) . '_itemcategory';
+									}
+									else
+									{
+										$tjfieldsFieldTable->name = str_replace('.', '_', $updatedUniqueIdentifier) . '_' . strtolower(preg_replace("/[^a-zA-Z0-9]/", "", $field->label));
+									}
+
 									$tjfieldsFieldTable->store();
 
 									// Check if field name is unique
