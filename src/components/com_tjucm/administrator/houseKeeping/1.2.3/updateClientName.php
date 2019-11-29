@@ -101,15 +101,15 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 
 									if ($tjfieldsFieldTable->type == 'cluster')
 									{
-										$tjfieldsFieldTable->name = str_replace('.', '_', $updatedUniqueIdentifier) . '_clusterid';
+										$tjfieldsFieldTable->name = str_replace('.', '_', $updatedUniqueIdentifier) . '_clusterclusterid';
 									}
 									elseif ($tjfieldsFieldTable->type == 'ownership')
 									{
-										$tjfieldsFieldTable->name = str_replace('.', '_', $updatedUniqueIdentifier) . '_createdby';
+										$tjfieldsFieldTable->name = str_replace('.', '_', $updatedUniqueIdentifier) . '_ownershipcreatedby';
 									}
 									elseif ($tjfieldsFieldTable->type == 'itemcategory')
 									{
-										$tjfieldsFieldTable->name = str_replace('.', '_', $updatedUniqueIdentifier) . '_itemcategory';
+										$tjfieldsFieldTable->name = str_replace('.', '_', $updatedUniqueIdentifier) . '_itemcategoryitemcategory';
 									}
 									else
 									{
