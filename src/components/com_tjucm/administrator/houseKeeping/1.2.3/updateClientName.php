@@ -36,9 +36,6 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 	 */
 	public function migrate()
 	{
-		// Increase the php execution time for migration
-		ini_set('max_execution_time', 0);
-
 		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
 		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
 		JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_ADMINISTRATOR);
@@ -241,7 +238,7 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 					$updatedTypes[] = $ucmType->id;
 					$session->set('updatedTypes', $updatedTypes);
 
-					$result['status']   = false;
+					$result['status']   = '';
 					$result['message']  = "Migration in progress";
 
 					return $result;
