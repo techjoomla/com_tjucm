@@ -53,10 +53,18 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 			$db->setQuery($query);
 			$ucmTypes = $db->loadObjectlist();
 
+			$session = JFactory::getSession();
+			$updatedTypes = (empty($session->get('updatedTypes'))) ? array() : $session->get('updatedTypes');
+
 			if (!empty($ucmTypes))
 			{
 				foreach ($ucmTypes as $ucmType)
 				{
+					if (in_array($ucmType->id, $updatedTypes))
+					{
+						continue;
+					}
+
 					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', $db));
 					$ucmTypeTable->load($ucmType->id);
 					$updatedUniqueIdentifier = 'com_tjucm.' . preg_replace("/[^a-zA-Z0-9]/", "", str_replace('com_tjucm.', '', $ucmTypeTable->unique_identifier));
@@ -101,15 +109,15 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 
 									if ($tjfieldsFieldTable->type == 'cluster')
 									{
-										$tjfieldsFieldTable->name = str_replace('.', '_', $updatedUniqueIdentifier) . '_clusterid';
+										$tjfieldsFieldTable->name = str_replace('.', '_', $updatedUniqueIdentifier) . '_clusterclusterid';
 									}
 									elseif ($tjfieldsFieldTable->type == 'ownership')
 									{
-										$tjfieldsFieldTable->name = str_replace('.', '_', $updatedUniqueIdentifier) . '_createdby';
+										$tjfieldsFieldTable->name = str_replace('.', '_', $updatedUniqueIdentifier) . '_ownershipcreatedby';
 									}
 									elseif ($tjfieldsFieldTable->type == 'itemcategory')
 									{
-										$tjfieldsFieldTable->name = str_replace('.', '_', $updatedUniqueIdentifier) . '_itemcategory';
+										$tjfieldsFieldTable->name = str_replace('.', '_', $updatedUniqueIdentifier) . '_itemcategoryitemcategory';
 									}
 									else
 									{
@@ -226,8 +234,18 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 						// Regenerate the XML files
 						$tjfieldsHelper->generateXml(array('client' => $updatedUniqueIdentifier, 'client_type' => $newClientParts[1]));
 					}
+
+					$updatedTypes[] = $ucmType->id;
+					$session->set('updatedTypes', $updatedTypes);
+
+					$result['status']   = '';
+					$result['message']  = "Migration in progress";
+
+					return $result;
 				}
 			}
+
+			$session->set('updatedTypes', '');
 
 			$result['status']   = true;
 			$result['message']  = "Migration successful";
