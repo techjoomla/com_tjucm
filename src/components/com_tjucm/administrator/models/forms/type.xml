@@ -1,36 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <form>
 	<fieldset>
 		<field name="id" type="text" readonly="true" class="readonly" default="0" description="JGLOBAL_FIELD_ID_DESC" />
 		<field name="ordering" />
 		<field name="title" type="text" maxlength="255" filter="raw" required="true" label="COM_TJUCM_FORM_LBL_TYPE_TITLE" description="COM_TJUCM_FORM_DESC_TYPE_TITLE" hint="COM_TJUCM_FORM_LBL_TYPE_TITLE" />
 		<field name="alias" type="text" class="inputbox" generator="title" label="COM_TJUCM_FORM_LBL_TYPE_ALIAS" description="COM_TJUCM_FORM_DESC_TYPE_ALIAS" hint="COM_TJUCM_FORM_LBL_TYPE_ALIAS" />
-		<field name="is_subform" type="radio" class="btn-group" default="0" label="COM_TJUCM_FORM_LBL_TYPE_IS_SUBFORM" description="COM_TJUCM_FORM_DESC_TYPE_IS_SUBFORM" hint="COM_TJUCM_FORM_LBL_TYPE_IS_SUBFORM">
-			<option value="0">JNO</option>
-			<option value="1">JYES</option>
-		</field>
 		<field name="state" default="1" type="list" label="JSTATUS" description="JFIELD_PUBLISHED_DESC" class="inputbox" size="1">
 			<option value="1">JPUBLISHED</option>
 			<option value="0">JUNPUBLISHED</option>
 			<option value="2">JARCHIVED</option>
 			<option value="-2">JTRASHED</option>
 		</field>
-		<field name="allowed_count" type="number" label="COM_TJUCM_FORM_LBL_TYPE_ALLOWED_COUNT" description="COM_TJUCM_FORM_DESC_TYPE_ALLOWED_COUNT" hint="COM_TJUCM_FORM_LBL_TYPE_ALLOWED_COUNT" default="0" showon="is_subform:0"/>
-		<field name="allow_auto_save" type="radio" class="btn-group" default="1" label="COM_TJUCM_FORM_LBL_TYPE_ALLOW_AUTO_SAVE" description="COM_TJUCM_FORM_DESC_TYPE_ALLOW_AUTO_SAVE" hint="COM_TJUCM_FORM_LBL_TYPE_ALLOW_AUTO_SAVE" showon="is_subform:0">
-			<option value="0">JNO</option>
-			<option value="1">JYES</option>
-		</field>
-		<field name="allow_draft_save" type="radio" class="btn-group" default="1" label="COM_TJUCM_FORM_LBL_TYPE_ALLOW_DRAFT_SAVE" description="COM_TJUCM_FORM_DESC_TYPE_ALLOW_DRAFT_SAVE" hint="COM_TJUCM_FORM_LBL_TYPE_ALLOW_DRAFT_SAVE" showon="allow_auto_save:0[AND]is_subform:0">
-			<option value="0">JNO</option>
-			<option value="1">JYES</option>
-		</field>
-		<field name="publish_items" type="radio" class="btn-group" default="1" label="COM_TJUCM_FORM_LBL_TYPE_PUBLISH_ITEMS_BY_DEFAULT" description="COM_TJUCM_FORM_DESC_TYPE_PUBLISH_ITEMS_BY_DEFAULT" hint="COM_TJUCM_FORM_LBL_TYPE_PUBLISH_ITEMS_BY_DEFAULT">
-			<option value="0">JNO</option>
-			<option value="1">JYES</option>
-		</field>
 		<field name="type_description" type="textarea" cols="5" rows="5" label="COM_TJUCM_FORM_LBL_TYPE_TYPE_DESCRIPTION" description="COM_TJUCM_FORM_DESC_TYPE_TYPE_DESCRIPTION" hint="COM_TJUCM_FORM_LBL_TYPE_TYPE_DESCRIPTION" />
 		<field name="unique_identifier" type="text" readonly="true" class="readonly" label="COM_TJUCM_FORM_LBL_TYPE_UNIQUE_IDENTIFIER" description="COM_TJUCM_FORM_DESC_TYPE_UNIQUE_IDENTIFIER" hint="COM_TJUCM_FORM_LBL_TYPE_UNIQUE_IDENTIFIER" />
-		<field name="params" type="hidden" label="COM_TJUCM_FORM_LBL_TYPE_PARAMS" description="COM_TJUCM_FORM_DESC_TYPE_PARAMS" hint="COM_TJUCM_FORM_LBL_TYPE_PARAMS" />
 		<field name="checked_out" type="hidden" filter="unset" />
 		<field name="checked_out_time" default="0000-00-00 00:00:00" type="hidden" filter="unset" />
 		<field name="created_by" type="createdby" default="0" label="COM_TJUCM_FORM_LBL_TYPE_CREATED_BY" description="COM_TJUCM_FORM_DESC_TYPE_CREATED_BY" hidden="true" hint="COM_TJUCM_FORM_LBL_TYPE_CREATED_BY" />
@@ -38,9 +20,28 @@
 		<field name="modified_by" type="modifiedby" default="0" label="COM_TJUCM_FORM_LBL_TYPE_MODIFIED_BY" description="COM_TJUCM_FORM_DESC_TYPE_MODIFIED_BY" hidden="true" hint="COM_TJUCM_FORM_LBL_TYPE_MODIFIED_BY" />
 		<field name="modified_date" type="timecreated" label="COM_TJUCM_FORM_LBL_TYPE_MODIFIED_DATE" description="COM_TJUCM_FORM_DESC_TYPE_MODIFIED_DATE" hidden="true" hint="COM_TJUCM_FORM_LBL_TYPE_MODIFIED_DATE" />
 		<field name="version_note" type="text" label="JGLOBAL_FIELD_VERSION_NOTE_LABEL" description="JGLOBAL_FIELD_VERSION_NOTE_DESC" class="inputbox" size="45" labelclass="control-label" />
-		<field name="layout" type="componentlayout" label="COM_TJUCM_FORM_LBL_TYPE_LAYOUT" description="COM_TJUCM_FORM_DESC_TYPE_LAYOUT" useglobal="true" extension="com_tjucm" view="itemform"/>
-		<field name="details_layout" type="componentlayout" label="COM_TJUCM_DETAILS_LBL_TYPE_LAYOUT" description="COM_TJUCM_DETAILS_DESC_TYPE_LAYOUT" useglobal="true" extension="com_tjucm" view="item"/>
-		<field name="list_layout" type="componentlayout" label="COM_TJUCM_LIST_LBL_TYPE_LAYOUT" description="COM_TJUCM_LIST_DESC_TYPE_LAYOUT" useglobal="true" extension="com_tjucm" view="items"/>
+		<fields name="params" label="COM_TJUCM_FORM_LBL_TYPE_PARAMS" description="COM_TJUCM_FORM_DESC_TYPE_PARAMS" hint="COM_TJUCM_FORM_LBL_TYPE_PARAMS">
+			<field name="is_subform" type="radio" class="btn-group" default="0" label="COM_TJUCM_FORM_LBL_TYPE_IS_SUBFORM" description="COM_TJUCM_FORM_DESC_TYPE_IS_SUBFORM" hint="COM_TJUCM_FORM_LBL_TYPE_IS_SUBFORM">
+				<option value="0">JNO</option>
+				<option value="1">JYES</option>
+			</field>
+			<field name="allowed_count" type="number" label="COM_TJUCM_FORM_LBL_TYPE_ALLOWED_COUNT" description="COM_TJUCM_FORM_DESC_TYPE_ALLOWED_COUNT" hint="COM_TJUCM_FORM_LBL_TYPE_ALLOWED_COUNT" showon="is_subform:0" />
+			<field name="allow_auto_save" type="radio" class="btn-group" default="1" label="COM_TJUCM_FORM_LBL_TYPE_ALLOW_AUTO_SAVE" description="COM_TJUCM_FORM_DESC_TYPE_ALLOW_AUTO_SAVE" hint="COM_TJUCM_FORM_LBL_TYPE_ALLOW_AUTO_SAVE" showon="is_subform:0">
+				<option value="0">JNO</option>
+				<option value="1">JYES</option>
+			</field>
+			<field name="allow_draft_save" type="radio" class="btn-group" default="1" label="COM_TJUCM_FORM_LBL_TYPE_ALLOW_DRAFT_SAVE" description="COM_TJUCM_FORM_DESC_TYPE_ALLOW_DRAFT_SAVE" hint="COM_TJUCM_FORM_LBL_TYPE_ALLOW_DRAFT_SAVE" showon="allow_auto_save:0[AND]is_subform:0">
+				<option value="0">JNO</option>
+				<option value="1">JYES</option>
+			</field>
+			<field name="publish_items" type="radio" class="btn-group" default="1" label="COM_TJUCM_FORM_LBL_TYPE_PUBLISH_ITEMS_BY_DEFAULT" description="COM_TJUCM_FORM_DESC_TYPE_PUBLISH_ITEMS_BY_DEFAULT" hint="COM_TJUCM_FORM_LBL_TYPE_PUBLISH_ITEMS_BY_DEFAULT">
+				<option value="0">JNO</option>
+				<option value="1">JYES</option>
+			</field>
+			<field name="layout" type="componentlayout" label="COM_TJUCM_FORM_LBL_TYPE_LAYOUT" description="COM_TJUCM_FORM_DESC_TYPE_LAYOUT" useglobal="true" extension="com_tjucm" view="itemform" />
+			<field name="details_layout" type="componentlayout" label="COM_TJUCM_DETAILS_LBL_TYPE_LAYOUT" description="COM_TJUCM_DETAILS_DESC_TYPE_LAYOUT" useglobal="true" extension="com_tjucm" view="item" />
+			<field name="list_layout" type="componentlayout" label="COM_TJUCM_LIST_LBL_TYPE_LAYOUT" description="COM_TJUCM_LIST_DESC_TYPE_LAYOUT" useglobal="true" extension="com_tjucm" view="items" />
+		</fields>
 	</fieldset>
 	<fieldset name="accesscontrol">
 		<field name="asset_id" type="hidden" filter="unset" />

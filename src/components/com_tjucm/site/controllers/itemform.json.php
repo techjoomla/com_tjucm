@@ -16,6 +16,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Router\Route;
 use Joomla\Registry\Registry;
+use Joomla\CMS\Plugin\PluginHelper;
 
 jimport('joomla.filesystem.file');
 
@@ -61,52 +62,6 @@ class TjucmControllerItemForm extends JControllerForm
 		}
 
 		parent::__construct();
-	}
-
-	/**
-	 * Method to check if you can add a new record.
-	 *
-	 * Extended classes can override this if necessary.
-	 *
-	 * @param   array  $data  An array of input data.
-	 *
-	 * @return  boolean
-	 *
-	 * @since   12.2
-	 */
-	protected function allowAdd($data = array())
-	{
-		$user = Factory::getUser();
-
-		return $user->authorise('core.type.createitem', 'com_tjucm.type.' . $this->ucmTypeId);
-	}
-
-	/**
-	 * Method to check if you can edit an existing record.
-	 *
-	 * Extended classes can override this if necessary.
-	 *
-	 * @param   array   $data  An array of input data.
-	 * @param   string  $key   The name of the key for the primary key; default is id.
-	 *
-	 * @return  boolean
-	 *
-	 * @since   12.2
-	 */
-	protected function allowEdit($data = array(), $key = 'id')
-	{
-		$user = Factory::getUser();
-		$edit = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$editOwn = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $this->ucmTypeId);
-
-		if ($edit || $editOwn)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
 	}
 
 	/**
@@ -247,7 +202,7 @@ class TjucmControllerItemForm extends JControllerForm
 			$fieldData['created_by'] = $table->created_by;
 
 			// If data is valid then save the data into DB
-			$response = $model->saveExtraFields($fieldData);
+			$response = $model->saveFieldsData($fieldData);
 
 			echo new JResponseJson($response);
 			$app->close();
@@ -327,7 +282,7 @@ class TjucmControllerItemForm extends JControllerForm
 			$formData['created_by'] = $table->created_by;
 
 			// If data is valid then save the data into DB
-			$response = $model->saveExtraFields($formData);
+			$response = $model->saveFieldsData($formData);
 			$msg = null;
 
 			if ($response && empty($section))
@@ -343,7 +298,17 @@ class TjucmControllerItemForm extends JControllerForm
 
 				// Disable the draft mode of the item if full f)orm is submitted
 				$table->draft = $draft;
+				$table->modified_date = Factory::getDate()->toSql();
 				$table->store();
+
+				// Perform actions (redirection or trigger call) after final submit
+				if (!$draft)
+				{
+					// TJ-ucm plugin trigger after save
+					$dispatcher = JEventDispatcher::getInstance();
+					PluginHelper::importPlugin("content");
+					$dispatcher->trigger('onUcmItemAfterSave', array($table->getProperties(), $data));
+				}
 			}
 
 			echo new JResponseJson($response, $msg);
@@ -472,6 +437,13 @@ class TjucmControllerItemForm extends JControllerForm
 		}
 	}
 
+	/**
+	 * Method to get updated list of options for related field
+	 *
+	 * @return  void
+	 *
+	 * @since 1.2.1
+	 */
 	public function getRelatedFieldOptions()
 	{
 		JSession::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
