@@ -40,6 +40,9 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
 		JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_ADMINISTRATOR);
 
+		// TJ-Fields helper object
+		$tjfieldsHelper = new TjfieldsHelper;
+
 		$result = array();
 		$ucmSubFormFieldsConfig = array();
 
@@ -128,7 +131,6 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 									$tjfieldsFieldTable->store();
 
 									// Check if field name is unique
-									$tjfieldsHelper = new TjfieldsHelper;
 									$isUnique = $tjfieldsHelper->checkIfUniqueName($tjfieldsFieldTable->name);
 
 									// If the name of the field is not unique then update the name by appending count to it
