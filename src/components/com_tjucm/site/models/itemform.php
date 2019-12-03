@@ -49,19 +49,6 @@ class TjucmModelItemForm extends JModelAdmin
 	use TjfieldsFilterField;
 
 	/**
-	 * Constructor.
-	 *
-	 * @param   array  $config  An optional associative array of configuration settings.
-	 *
-	 * @see        JController
-	 * @since      1.0
-	 */
-	public function __construct($config = array())
-	{
-		parent::__construct($config);
-	}
-
-	/**
 	 * Method to auto-populate the model state.
 	 *
 	 * Note. Calling getState in this method will result in recursion.

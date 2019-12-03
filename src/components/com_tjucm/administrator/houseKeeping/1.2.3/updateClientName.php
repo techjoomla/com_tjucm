@@ -121,7 +121,8 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 									}
 									else
 									{
-										$tjfieldsFieldTable->name = str_replace('.', '_', $updatedUniqueIdentifier) . '_' . strtolower(preg_replace("/[^a-zA-Z0-9]/", "", $field->label));
+										$tjfieldsFieldTable->name = str_replace('.', '_', $updatedUniqueIdentifier) . '_' .
+										strtolower(preg_replace("/[^a-zA-Z0-9]/", "", $field->label));
 									}
 
 									$tjfieldsFieldTable->store();
