@@ -31,7 +31,11 @@ jQuery(window).load(function()
 			jQuery("#item-form").on("change select", ":input", function(){
 				if (tjUcmCurrentAutoSaveState)
 				{
-					tjUcmItemForm.onUcmFormChange(this);
+					// Call function if field name & value exist in request data
+					if (jQuery(this).attr('name') !='' && jQuery(this).attr('name') != undefined && jQuery(this).val() !='' && jQuery(this).val() != undefined)
+					{
+						tjUcmItemForm.onUcmFormChange(this);
+					}
 				}
 			});
 
@@ -39,7 +43,11 @@ jQuery(window).load(function()
 			jQuery("#item-form .field-calendar input:text").blur(function(){
 				if (tjUcmCurrentAutoSaveState)
 				{
-					tjUcmItemForm.onUcmFormChange(this);
+					// Call function if field name & value exist in request data
+					if (jQuery(this).attr('name') !='' && jQuery(this).attr('name') != undefined && jQuery(this).val() !='' && jQuery(this).val() != undefined)
+					{
+						tjUcmItemForm.onUcmFormChange(this);
+					}
 				}
 			});
 
