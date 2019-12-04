@@ -216,7 +216,7 @@ class TjucmControllerTypes extends JControllerAdmin
 		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
 		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
-		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models', 'TjfieldsModel');
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 
 		$app = Factory::getApplication();
