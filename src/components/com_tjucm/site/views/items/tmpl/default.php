@@ -133,11 +133,12 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 								<?php
 								if ($item->state == 1)
 								{
-									?><i class="icon-publish"></i><?php
+									?><span class="icon-checkmark-circle"></span>
+									<?php
 								}
 								else
 								{
-									?><i class="icon-unpublish"></i><?php
+									?><span class="icon-cancel-circle"></span><?php
 								}
 								?>
 								</a>
