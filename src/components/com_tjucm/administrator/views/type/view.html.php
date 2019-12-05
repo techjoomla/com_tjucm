@@ -76,7 +76,10 @@ class TjucmViewType extends JViewLegacy
 
 		$canDo = TjucmHelper::getActions();
 
-		JToolBarHelper::title(JText::_('COM_TJUCM_TITLE_TYPE'), 'type.png');
+		JToolbarHelper::title(
+			JText::_('COM_TYPE_PAGE_' . ($checkedOut ? 'VIEW_TYPE' : ($isNew ? 'ADD_TYPE' : 'EDIT_TYPE'))),
+			'pencil-2 article-add'
+		);
 
 		// If not checked out, can save the item.
 		if (!$checkedOut && ($canDo->get('core.edit') || ($canDo->get('core.create'))))
