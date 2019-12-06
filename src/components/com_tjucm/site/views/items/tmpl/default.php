@@ -40,6 +40,18 @@ $statusColumnWidth = 0;
 ?>
 <form action="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>" method="post" name="adminForm" id="adminForm">
 	<?php echo $this->loadTemplate('filters'); ?>
+	<div class="pull-right">
+		<?php
+		if ($this->allowedToAdd)
+		{
+			?>
+			<a target="_blank" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false); ?>" class="btn btn-success btn-small">
+				<i class="icon-plus"></i><?php echo JText::_('COM_TJUCM_ADD_ITEM'); ?>
+			</a>
+			<?php
+		}
+		?>
+	</div>
 	<div class="table-responsive">
 		<table class="table table-striped" id="itemList">
 			<?php
