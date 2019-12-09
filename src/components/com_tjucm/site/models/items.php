@@ -203,6 +203,14 @@ class TjucmModelItems extends JModelList
 			$query->where($db->quoteName('a.client') . ' = ' . $db->quote($db->escape($this->client)));
 		}
 
+		if(empty($title))
+		{
+			$query->select($db->quoteName('w.title'));
+			$query->join('LEFT',$db->quoteName('#__tj_ucm_types','w'). 'ON ' . $db->quoteName('w.id'). ' = '. $db->quoteName('a.type_id'));
+			$db->setQuery($query);
+			$result=$db->loadResult();
+		}
+
 		$ucmType = $this->getState('ucmType.id', '', 'INT');
 
 		if (!empty($ucmType))

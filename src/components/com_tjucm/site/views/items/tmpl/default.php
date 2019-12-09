@@ -39,7 +39,13 @@ $fieldsData = array();
 $statusColumnWidth = 0;
 ?>
 <form action="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>" method="post" name="adminForm" id="adminForm">
-	<?php echo $this->loadTemplate('filters'); ?>
+	<div class="page-header clearfix">
+		<h1 class="page-title">
+		<?php 
+			echo "<p style='color:blue 'size:100'>" . strtoupper($this->items['0']->title)."    LIST" . "</p>";
+		?><h1>
+	</div>
+		<?php echo $this->loadTemplate('filters'); ?>
 	<div class="pull-right">
 		<?php
 		if ($this->allowedToAdd)
