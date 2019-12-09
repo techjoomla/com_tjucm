@@ -116,17 +116,36 @@ JFactory::getDocument()->addScriptDeclaration('
 	</div>
 	<?php
 	if ($this->form_extra)
-	{
+	{	
+		if(isset($_GET['id']))
+		{
+			?>
+			<div class="page-header clearfix">
+			<h1 class="page-title">
+			<?php echo "<p style='color:blue 'size:100'>"." EDIT : ". strtoupper($this->params['ucm_type'])."    FORM" . "</p>";?>
+			<h1>
+			</div> 
+			<?php	
+		}
+		else
+		{
+			?>
+			<div class="page-header clearfix">
+			<h1 class="page-title">
+			<?php echo "<p style='color:blue 'size:100'>" . strtoupper($this->params['ucm_type'])."    FORM" . "</p>";?>
+			<h1>
+			</div>
+			<?php
+		}
 		?>
 		<div class="form-horizontal">
-		<?php
-		// Code to display the form
-		echo $this->loadTemplate('extrafields');
-		?>
+			<?php
+				// Code to display the form
+				echo $this->loadTemplate('extrafields');
+			?>
 		</div>
 		<?php
 	}
-
 	if ($editRecordId)
 	{
 	?>
