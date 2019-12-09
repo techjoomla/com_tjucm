@@ -93,8 +93,7 @@ $statusColumnWidth = 0;
 							}
 							?>
 
-							<th  style="word-break: break-word;" width="<?php echo (88 - $statusColumnWidth)/count($this->listcolumn).'%';?>">
-
+							<th  style="word-break: break-word;" width="<?php echo (85 - $statusColumnWidth)/count($this->listcolumn).'%';?>">
 								<?php echo htmlspecialchars($col_name, ENT_COMPAT, 'UTF-8'); ?>
 							</th>
 							<?php
@@ -104,7 +103,7 @@ $statusColumnWidth = 0;
 					if ($this->canEdit || $this->canDelete)
 					{
 						?>
-						<th class="center" width="7%">
+						<th class="center" width="10%">
 							<?php echo JText::_('COM_TJUCM_ITEMS_ACTIONS'); ?>
 						</th>
 					<?php
