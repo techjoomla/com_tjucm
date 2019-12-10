@@ -40,19 +40,15 @@ $statusColumnWidth = 0;
 ?>
 <form action="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>" method="post" name="adminForm" id="adminForm">
 	<?php 
-	if(isset($items))
-	{
-	?>
-	<div class="page-header clearfix">
-		<h1 class="page-title">
-			<?php 
-			echo "<p style='color:blue 'size:100'>" . strtoupper($this->items['0']->title)."    LIST" . "</p>";
+		if(isset($this->items))
+		{
 			?>
-		<h1>
-	</div>
-	<?php
-	}
-	?>
+			<div class="page-header">
+				<h1 class="page-title">
+				<?php echo  strtoupper($this->title)."    LIST" . "</p>"; ?>
+				<h1>
+			</div> <?php
+		}?>
 		<?php echo $this->loadTemplate('filters'); ?>
 	<div class="pull-right">
 		<?php

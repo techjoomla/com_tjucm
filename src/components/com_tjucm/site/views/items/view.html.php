@@ -123,6 +123,21 @@ class TjucmViewItems extends JViewLegacy
 			}
 		}
 
+		// To get title of list as per the ucm type
+		if (empty($this->title))
+			{
+			// Get the active item
+			$menuItem = $app->getMenu()->getActive();
+			
+			// Get the params
+			$this->menuparams = $menuItem->params;
+			
+			if (!empty($this->menuparams))
+				{
+					$this->title  = $this->menuparams->get('ucm_type');
+				}
+			}
+
 		// If there are no fields column to show in list view then dont allow to show data
 		$this->showList = $model->showListCheck($this->client);
 
