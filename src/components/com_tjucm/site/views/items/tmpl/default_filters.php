@@ -25,7 +25,7 @@ $firstListColumn = key($tmpListColumn);
 	</div>
 	<div class="pull-left">
 		<button class="btn btn-default" type="submit" title="<?php echo JText::_('JSEARCH_FILTER_SUBMIT'); ?>"><span class="icon-search"></span></button>
-		<button class="btn btn-default qtc-hasTooltip" id="clear-search-button" onclick="getElementById('filter_search').value='';this.form.submit();" type="button" title="<?php echo JText::_('JSEARCH_FILTER_CLEAR'); ?>"><span class="icon-remove"></span></button>
+		<button class="btn btn-default qtc-hasTooltip" id="clear-search-button" onclick="document.getElementById('filter_search').value='';this.form.submit();" type="button" title="<?php echo JText::_('JSEARCH_FILTER_CLEAR'); ?>"><span class="icon-remove"></span></button>
 	</div>
 	<div class="btn-group pull-right hidden-xs">
 		<?php echo $this->pagination->getLimitBox(); ?>

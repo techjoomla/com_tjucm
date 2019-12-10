@@ -1,7 +1,7 @@
 <?php
 /**
  * @package	TJ-UCM
- * 
+ *
  * @author	 TechJoomla <extensions@techjoomla.com>
  * @copyright  Copyright (c) 2009-2019 TechJoomla. All rights reserved.
  * @license	GNU General Public License version 2 or later; see LICENSE.txt
@@ -10,6 +10,12 @@
 // No direct access
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Session\Session;
+
 if (!key_exists('itemsData', $displayData))
 {
 	return;
@@ -17,14 +23,15 @@ if (!key_exists('itemsData', $displayData))
 
 $fieldsData = $displayData['fieldsData'];
 
-$app = JFactory::getApplication();
-$user = JFactory::getUser();
+$app = Factory::getApplication();
+$user = Factory::getUser();
 
 // Layout for field types
 $fieldLayout = array();
 $fieldLayout['File'] = $fieldLayout['Image'] = "file";
 $fieldLayout['Checkbox'] = "checkbox";
-$fieldLayout['tjlist'] = $fieldLayout['Radio'] = $fieldLayout['List'] = $fieldLayout['Single_select'] = $fieldLayout['Multi_select'] = "list";
+$fieldLayout['Color'] = "color";
+$fieldLayout['Tjlist'] = $fieldLayout['Radio'] = $fieldLayout['List'] = $fieldLayout['Single_select'] = $fieldLayout['Multi_select'] = "list";
 $fieldLayout['Itemcategory'] = "itemcategory";
 $fieldLayout['Video'] = $fieldLayout['Audio'] = $fieldLayout['Url'] = "link";
 $fieldLayout['Calendar'] = "calendar";
@@ -44,9 +51,10 @@ $client        = $displayData['client'];
 $xmlFormObject = $displayData['xmlFormObject'];
 $formObject    = $displayData['formObject'];
 $ucmTypeId     = $displayData['ucmTypeId'];
+$allowDraftSave= $displayData['ucmTypeParams']->allow_draft_save;
 
 $appendUrl = '';
-$csrf = "&" . JSession::getFormToken() . '=1';
+$csrf = "&" . Session::getFormToken() . '=1';
 
 $canEditOwn 		= $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $ucmTypeId);
 $canDeleteOwn       = $user->authorise('core.type.deleteownitem', 'com_tjucm.type.' . $ucmTypeId);
@@ -68,21 +76,22 @@ $link = 'index.php?option=com_tjucm&view=items' . $appendUrl;
 $tjUcmFrontendHelper = new TjucmHelpersTjucm;
 $itemId = $tjUcmFrontendHelper->getItemId($link);
 
-$link = JRoute::_('index.php?option=com_tjucm&view=item&id=' . $item->id . "&client=" . $client . '&Itemid=' . $itemId, false);
+$link = Route::_('index.php?option=com_tjucm&view=item&id=' . $item->id . "&client=" . $client . '&Itemid=' . $itemId, false);
 
 $editown = false;
 
 if ($canEditOwn)
 {
-	$editown = (JFactory::getUser()->id == $item->created_by ? true : false);
+	$editown = (Factory::getUser()->id == $item->created_by ? true : false);
 }
 
 $deleteOwn = false;
 
 if ($canDeleteOwn)
 {
-	$deleteOwn = (JFactory::getUser()->id == $item->created_by ? true : false);
+	$deleteOwn = (Factory::getUser()->id == $item->created_by ? true : false);
 }
+
 ?>
 <tr class="row<?php echo $item->id?>">
 	<?php
@@ -94,11 +103,11 @@ if ($canDeleteOwn)
 			<?php
 			if ($item->state == 1)
 			{
-				?><span class="icon-checkmark-circle" title="<?php echo JText::_('COM_TJUCM_UNPUBLISH_ITEM');?>"></span><?php
+				?><span class="icon-checkmark-circle" title="<?php echo Text::_('COM_TJUCM_UNPUBLISH_ITEM');?>"></span><?php
 			}
 			else
 			{
-				?><span class="icon-cancel-circle" title="<?php echo JText::_('COM_TJUCM_PUBLISH_ITEM');?>"></span><?php
+				?><span class="icon-cancel-circle" title="<?php echo Text::_('COM_TJUCM_PUBLISH_ITEM');?>"></span><?php
 			}
 			?>
 			</a>
@@ -107,11 +116,16 @@ if ($canDeleteOwn)
 	}
 	?>
 	<td>
-		<a href="<?php echo JRoute::_('index.php?option=com_tjucm&view=item&id=' . (int) $item->id . "&client=" . $client . '&Itemid=' . $itemId, false); ?>">
+		<a href="<?php echo Route::_('index.php?option=com_tjucm&view=item&id=' . (int) $item->id . "&client=" . $client . '&Itemid=' . $itemId, false); ?>">
 			<?php echo $this->escape($item->id); ?>
 		</a>
 	</td>
 	<?php
+	if ($allowDraftSave)
+	{ ?>
+		<td><?php echo ($item->draft) ? Text::_('COM_TJUCM_DATA_STATUS_DRAFT') : Text::_('COM_TJUCM_DATA_STATUS_SAVE'); ?></td>
+	<?php
+	}
 	if (!empty($item->field_values))
 	{
 		foreach ($item->field_values as $key => $fieldValue)
@@ -146,18 +160,18 @@ if ($canDeleteOwn)
 	{
 		?>
 		<td class="center">
-			<a target="_blank" href="<?php echo $link; ?>" class="btn btn-mini" type="button" title="<?php echo JText::_('COM_TJUCM_VIEW_RECORD');?>"><i class="icon-eye-open"></i></a>
+			<a target="_blank" href="<?php echo $link; ?>" type="button" title="<?php echo Text::_('COM_TJUCM_VIEW_RECORD');?>"><i class="icon-eye-open"></i></a>
 		<?php
 		if ($canEdit || $editown)
 		{
 			?>
-			<a target="_blank" href="<?php echo 'index.php?option=com_tjucm&task=itemform.edit&id=' . $item->id . $appendUrl; ?>" class="btn btn-mini" type="button" title="<?php echo JText::_('COM_TJUCM_EDIT_ITEM');?>"><i class="icon-apply" aria-hidden="true"></i></a>
+			<a target="_blank" href="<?php echo 'index.php?option=com_tjucm&task=itemform.edit&id=' . $item->id . $appendUrl; ?>" type="button" title="<?php echo Text::_('COM_TJUCM_EDIT_ITEM');?>"> | <i class="icon-apply" aria-hidden="true"></i></a>
 			<?php
 		}
 		if ($canDelete || $deleteOwn)
 		{
 			?>
-			<a href="<?php echo 'index.php?option=com_tjucm&task=itemform.remove' . '&id=' . $item->id . $appendUrl . $csrf; ?>" class="btn btn-mini delete-button" type="button" title="<?php echo JText::_('COM_TJUCM_DELETE_ITEM');?>"><i class="icon-delete" aria-hidden="true"></i></a>
+			<a href="<?php echo 'index.php?option=com_tjucm&task=itemform.remove' . '&id=' . $item->id . $appendUrl . $csrf; ?>" class="delete-button" type="button" title="<?php echo Text::_('COM_TJUCM_DELETE_ITEM');?>"> | <i class="icon-delete" aria-hidden="true"></i></a>
 			<?php
 		}
 		?>

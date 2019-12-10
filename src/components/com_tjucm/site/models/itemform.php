@@ -49,19 +49,6 @@ class TjucmModelItemForm extends JModelAdmin
 	use TjfieldsFilterField;
 
 	/**
-	 * Constructor.
-	 *
-	 * @param   array  $config  An optional associative array of configuration settings.
-	 *
-	 * @see        JController
-	 * @since      1.0
-	 */
-	public function __construct($config = array())
-	{
-		parent::__construct($config);
-	}
-
-	/**
 	 * Method to auto-populate the model state.
 	 *
 	 * Note. Calling getState in this method will result in recursion.
@@ -100,7 +87,10 @@ class TjucmModelItemForm extends JModelAdmin
 
 				if (!empty($ucm_type))
 				{
-					$ucmType     = 'com_tjucm.' . $ucm_type;
+					JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
+					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+					$ucmTypeTable->load(array('alias' => $ucm_type));
+					$ucmType = $ucmTypeTable->unique_identifier;
 				}
 			}
 		}
@@ -794,7 +784,53 @@ class TjucmModelItemForm extends JModelAdmin
 			foreach ($ucmSubFormFieldValues as $ucmSubFormFieldValue)
 			{
 				$ucmSubFormFieldName = $ucmSubFormFieldValue->name;
-				$subFormData->$ucmSubFormFieldName = $ucmSubFormFieldValue->value;
+
+				$value = '';
+				$temp = array();
+
+				switch ($ucmSubFormFieldValue->type)
+				{
+					case 'radio':
+						if (is_array($ucmSubFormFieldValue->value) || is_object($ucmSubFormFieldValue->value))
+						{
+							if (isset($ucmSubFormFieldValue->value[0]))
+							{
+								$value = $ucmSubFormFieldValue->value[0]->value;
+							}
+						}
+						else
+						{
+							$value = $ucmSubFormFieldValue->value;
+						}
+						break;
+					case 'tjlist':
+					case 'related':
+					case 'multi_select':
+
+						if (is_array($ucmSubFormFieldValue->value) || is_object($ucmSubFormFieldValue->value))
+						{
+							foreach ($ucmSubFormFieldValue->value as $option)
+							{
+								$temp[] = $option->value;
+							}
+
+							if (!empty($temp))
+							{
+								$value = $temp;
+							}
+						}
+						else
+						{
+							$value = $ucmSubFormFieldValue->value;
+						}
+
+						break;
+
+					default:
+						$value = $ucmSubFormFieldValue->value;
+				}
+
+				$subFormData->$ucmSubFormFieldName = $value;
 			}
 
 			$client = explode('.', $recordData['client']);
@@ -812,7 +848,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 * Function to updated related field options
 	 *
 	 * @param   INT  $client     client
-	 * 
+	 *
 	 * @param   INT  $contentId  Content id
 	 *
 	 * @return ARRAY

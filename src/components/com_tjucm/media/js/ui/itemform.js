@@ -37,12 +37,9 @@ jQuery(window).load(function()
 
 			/* To save calendar field value */
 			jQuery("#item-form .field-calendar input:text").blur(function(){
-				if (jQuery('#item-form').hasClass('dirty'))
+				if (tjUcmCurrentAutoSaveState)
 				{
-					if (tjUcmCurrentAutoSaveState)
-					{
-						tjUcmItemForm.onUcmFormChange(this);
-					}
+					tjUcmItemForm.onUcmFormChange(this);
 				}
 			});
 
@@ -82,9 +79,13 @@ jQuery(window).load(function()
 							if (tjUcmTinyMCEFieldIds[key] != tjUcmEditorFieldContent)
 							{
 								var tjUcmTempFieldObj = jQuery("#jform_"+key);
-								tjUcmTempFieldObj.val(tjUcmEditorFieldContent);
-								tjUcmTinyMCEFieldIds[key] = tjUcmEditorFieldContent;
-								tjUcmItemForm.onUcmFormChange(tjUcmTempFieldObj);
+
+								if (tjUcmTempFieldObj.length)
+								{
+									tjUcmTempFieldObj.val(tjUcmEditorFieldContent);
+									tjUcmTinyMCEFieldIds[key] = tjUcmEditorFieldContent;
+									tjUcmItemForm.onUcmFormChange(tjUcmTempFieldObj);
+								}
 							}
 						}
 					}
@@ -367,11 +368,20 @@ var tjUcmItemForm = {
 
 						/* Save the ucm-subform field data*/
 						var afterAddFieldValueForUcmSubFormField = function (err, rsp){
-							var tjUcmIsMultiSelect = (jQuery(fieldObj).attr('name').slice(-2) == '[]') ? '[]' : '';
+							var fieldName = jQuery(fieldObj).attr('name');
+							var tjUcmIsMultiSelect = (fieldName.slice(-2) == '[]') ? '[]' : '';
 							var tjUcmUpdatedSubFormFieldName = 'jform['+jQuery(fieldObj).attr('id').split('__').pop()+']'+tjUcmIsMultiSelect;
+
+							if (jQuery(fieldObj).attr('type') == 'radio')
+							{
+								var tjUcmUpdatedSubFormFieldName = 'jform['+jQuery(fieldObj).attr('name').split('][').pop();
+							}
+
 							jQuery(fieldObj).attr('name', tjUcmUpdatedSubFormFieldName);
 
 							tjUcmItemForm.saveUcmFormFieldData(tjucmClient, response.data.id, fieldObj);
+
+							jQuery(fieldObj).attr('name', fieldName);
 						}
 
 						/* Add entry for ucm-subform-field in field_value table for the parent record*/
@@ -394,11 +404,20 @@ var tjUcmItemForm = {
 			}
 			else if (jQuery.isNumeric(tjucmRecordId) && tjucmRecordId != 0)
 			{
-				var tjUcmIsMultiSelect = (jQuery(fieldObj).attr('name').slice(-2) == '[]') ? '[]' : '';
+				var fieldName = jQuery(fieldObj).attr('name');
+				var tjUcmIsMultiSelect = (fieldName.slice(-2) == '[]') ? '[]' : '';
 				var tjUcmUpdatedSubFormFieldName = 'jform['+jQuery(fieldObj).attr('id').split('__').pop()+']'+tjUcmIsMultiSelect;
+
+				if (jQuery(fieldObj).attr('type') == 'radio')
+				{
+					var tjUcmUpdatedSubFormFieldName = 'jform['+jQuery(fieldObj).attr('name').split('][').pop();
+				}
+
 				jQuery(fieldObj).attr('name', tjUcmUpdatedSubFormFieldName);
 
 				tjUcmItemForm.saveUcmFormFieldData(tjucmClient, tjucmRecordId, fieldObj);
+
+				jQuery(fieldObj).attr('name', fieldName);
 
 				return true;
 			}
@@ -434,6 +453,36 @@ var tjUcmItemForm = {
 				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), 0);
 			}
 		}
+		else if(jQuery(fieldObj).hasClass('tjfieldTjList'))
+		{
+			/* This condition used for tjlist option actial values updated  - This is used for single & multiple values*/
+
+			if (jQuery(fieldObj).val() !='' && jQuery(fieldObj).val() != undefined)
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
+			}
+
+			/* Check other options multiple values exist and its not empty */
+			if (jQuery('input#'+jQuery(fieldObj).attr('id')).val() !='' && jQuery('input#'+jQuery(fieldObj).attr('id')).val() != undefined)
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery('input#'+jQuery(fieldObj).attr('id')).val());
+			}
+		}
+		else if(jQuery('input#'+jQuery(fieldObj).attr('id')).data('role') == "tagsinput")
+		{
+			/* This condition used for tjlist Other option multiple values textbox */
+
+			if (jQuery('#'+jQuery(fieldObj).attr('id')).val() !='' && jQuery('#'+jQuery(fieldObj).attr('id')).val() != undefined)
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery('#'+jQuery(fieldObj).attr('id')).val());
+			}
+
+			/* Check other options multiple values exist and its not empty */
+			if (jQuery(fieldObj).val() !='' && jQuery(fieldObj).val() != undefined)
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
+			}
+		}
 		else if (jQuery(fieldObj).attr('type') != 'file')
 		{
 			tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
@@ -443,7 +492,11 @@ var tjUcmItemForm = {
 			tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj)[0].files[0]);
 		}
 
-		com_tjucm.Services.Item.saveFieldData(tjUcmItemFieldFormData, tjUcmItemForm.afterDataSave);
+		// Call function if field name exist in request data
+		if (jQuery(fieldObj).attr('name') !='' && jQuery(fieldObj).attr('name') != undefined)
+		{
+			com_tjucm.Services.Item.saveFieldData(tjUcmItemFieldFormData, tjUcmItemForm.afterDataSave);
+		}
 
 		return true;
 	},
@@ -577,18 +630,18 @@ var tjUcmItemForm = {
 
 		if (tjUcmFormSubmitCallingButtonId == 'tjUcmSectionFinalSave')
 		{
-			if(!confirm(Joomla.JText._("COM_TJUCM_ITEMFORM_SUBMIT_ALERT")))
-			{
-				jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
-
-				return false;
-			}
-
 			if (document.formvalidator.isValid(document.getElementById('item-form')))
 			{
+				if(!confirm(Joomla.JText._("COM_TJUCM_ITEMFORM_SUBMIT_ALERT")))
+				{
+					jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
+
+					return false;
+				}
+
 				/* Clear the error messages first if any before processing the data*/
 				jQuery("#system-message-container").html("");
-	
+
 				/* Disable the save button till the record is saved*/
 				jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
 			}
@@ -597,7 +650,7 @@ var tjUcmItemForm = {
 				tjUcmItemForm.setVisibilityOfNavigationButtons();
 				jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
 				jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
-	
+
 				return false;
 			}
 
@@ -779,7 +832,7 @@ var tjUcmItemForm = {
 			{
 				jQuery("#next_button").attr('disabled', true);
 			}
-	
+
 			if (jQuery(tjUcmCurrentFormTab).prev('li').length)
 			{
 				jQuery("#previous_button").attr('disabled', false);
@@ -809,18 +862,18 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 
 	if ('save' == status) {
 
-		if(confirm(Joomla.JText._("COM_TJUCM_ITEMFORM_SUBMIT_ALERT")))
+		if (document.formvalidator.isValid('#item-form'))
 		{
-			/* code to remove the class added by are-you-sure alert box */
-			jQuery('#item-form').removeClass('dirty');
-
-			if (!document.formvalidator.isValid('#item-form'))
+			if(!confirm(Joomla.JText._("COM_TJUCM_ITEMFORM_SUBMIT_ALERT")))
 			{
 				jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
 				jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
 
 				return false;
 			}
+
+			/* code to remove the class added by are-you-sure alert box */
+			jQuery('#item-form').removeClass('dirty');
 		}
 		else
 		{
