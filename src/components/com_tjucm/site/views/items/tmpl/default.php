@@ -39,13 +39,13 @@ $fieldsData = array();
 $statusColumnWidth = 0;
 ?>
 <form action="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>" method="post" name="adminForm" id="adminForm">
-	<?php 
+<?php 
 		if(isset($this->items))
 		{
 			?>
 			<div class="page-header">
 				<h1 class="page-title">
-				<?php echo  strtoupper($this->title)."    LIST" . "</p>"; ?>
+				<?php echo  strtoupper($this->title)." ".JText::_("COM_TJUCM_FORM_LIST"); ?>
 				<h1>
 			</div> <?php
 		}?>
