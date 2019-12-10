@@ -55,13 +55,15 @@ $statusColumnWidth = 0;
 		if ($this->allowedToAdd)
 		{
 			?>
-			<a target="_blank" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false); ?>" class="btn btn-success btn-small">
+			<a href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false); ?>" class="btn btn-success btn-small">
 				<i class="icon-plus"></i><?php echo JText::_('COM_TJUCM_ADD_ITEM'); ?>
 			</a>
 			<?php
 		}
 		?>
 	</div>
+	<div class="row">
+	<div class="col-xs-12">
 	<div class="table-responsive">
 		<table class="table table-striped" id="itemList">
 			<?php
@@ -195,6 +197,8 @@ $statusColumnWidth = 0;
 		?>
 		</tbody>
 	</table>
+</div>
+</div>
 </div>
 	<?php
 	if ($this->allowedToAdd)
