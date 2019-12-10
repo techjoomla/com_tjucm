@@ -46,19 +46,6 @@ class TjucmModelItem extends JModelAdmin
 	use TjfieldsFilterField;
 
 	/**
-	 * Constructor.
-	 *
-	 * @param   array  $config  An optional associative array of configuration settings.
-	 *
-	 * @see        JController
-	 * @since      1.6
-	 */
-	public function __construct($config = array())
-	{
-		parent::__construct($config);
-	}
-
-	/**
 	 * Get an array of data items
 	 *
 	 * @param   string  $client  client value
