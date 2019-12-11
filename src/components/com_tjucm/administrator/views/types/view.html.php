@@ -41,8 +41,10 @@ class TjucmViewTypes extends JViewLegacy
 		$this->state = $this->get('State');
 		$this->items = $this->get('Items');
 		$this->pagination = $this->get('Pagination');
+		$this->filterForm = $this->get('FilterForm');
+        $this->activeFilters = $this->get('ActiveFilters');
 
-		// Check for errors.
+		//Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{
 			throw new Exception(implode("\n", $errors));
@@ -139,19 +141,7 @@ class TjucmViewTypes extends JViewLegacy
 			JToolBarHelper::preferences('com_tjucm');
 		}
 
-		// Set sidebar action - New in 3.0
-		JHtmlSidebar::setAction('index.php?option=com_tjucm&view=types');
-
-		$this->extra_sidebar = '';
-		JHtmlSidebar::addFilter(
-
-			JText::_('JOPTION_SELECT_PUBLISHED'),
-
-			'filter_published',
-
-			JHtml::_('select.options', JHtml::_('jgrid.publishedOptions'), "value", "text", $this->state->get('filter.state'), true)
-
-		);
+	
 	}
 
 	/**
