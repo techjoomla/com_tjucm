@@ -69,34 +69,31 @@ class TjucmModelItems extends JModelList
 		$user = JFactory::getUser();
 		$db = JFactory::getDbo();
 
-		// Load the filter state.
-		$search = $app->getUserStateFromRequest($this->context . '.filter.search', 'filter_search', '', 'STRING');
-		$this->setState('filter.search', $search);
-
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
 
-		$typeId = $app->input->get('id', "", "INT");
+		$typeId  = $app->input->get('id', 0, "INT");
+		$ucmType = $app->input->get('client', '', "STRING");
 
-		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
-		$typeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', $db));
-		$typeTable->load(array('id' => $typeId));
-		$ucmType = $typeTable->unique_identifier;
-
-		// Set state for field filters
-		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
-		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
-		$fieldsModel->setState('filter.client', $this->client);
-		$fieldsModel->setState('filter.filterable', 1);
-		$fields = $fieldsModel->getItems();
-
-		foreach ($fields as $field)
+		if (empty($typeId) || empty($ucmType))
 		{
-			$filterValue = $app->getUserStateFromRequest($this->context . '.' . $field->name, $field->name, '', 'STRING');
-			$this->setState('filter.field.' . $field->name, $filterValue);
+			JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
+			$typeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', $db));
+
+			if ($typeId && empty($ucmType))
+			{
+				$typeTable->load(array('id' => $typeId));
+				$ucmType = $typeTable->unique_identifier;
+			}
+
+			if ($ucmType && empty($typeId))
+			{
+				$typeTable->load(array('unique_identifier' => $ucmType));
+				$typeId = $typeTable->id;
+			}
 		}
 
-		if (empty($ucmType))
+		if (empty($ucmType) && empty($typeId))
 		{
 			// Get the active item
 			$menuitem   = $app->getMenu()->getActive();
@@ -114,19 +111,26 @@ class TjucmModelItems extends JModelList
 					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
 					$ucmTypeTable->load(array('alias' => $this->ucm_type));
 					$ucmType = $ucmTypeTable->unique_identifier;
+					$typeId  = $ucmTypeTable->id;
 				}
 			}
 		}
 
-		if (empty($ucmType))
-		{
-			// Get UCM type id from uniquue identifier
-			$ucmType = $app->input->get('client', '', 'STRING');
-		}
+		// Load the filter state.
+		$search = $app->getUserStateFromRequest($this->context . '.filter.search', 'filter_search', '', 'STRING');
+		$this->setState('filter.search', $search);
 
-		if (empty($typeId))
+		// Set state for field filters
+		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
+		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+		$fieldsModel->setState('filter.client', $ucmType);
+		$fieldsModel->setState('filter.filterable', 1);
+		$fields = $fieldsModel->getItems();
+
+		foreach ($fields as $field)
 		{
-			$typeId = $tjUcmModelType->getTypeId($ucmType);
+			$filterValue = $app->getUserStateFromRequest($this->context . '.' . $field->name, $field->name, '', 'STRING');
+			$this->setState('filter.field.' . $field->name, $filterValue);
 		}
 
 		$clusterId = $app->getUserStateFromRequest($this->context . '.cluster', 'cluster');
