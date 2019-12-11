@@ -39,7 +39,31 @@ $fieldsData = array();
 $statusColumnWidth = 0;
 ?>
 <form action="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>" method="post" name="adminForm" id="adminForm">
-	<?php echo $this->loadTemplate('filters'); ?>
+<?php 
+		if(isset($this->items))
+		{
+			?>
+			<div class="page-header">
+				<h1 class="page-title">
+				<?php echo  strtoupper($this->title)." ".JText::_("COM_TJUCM_FORM_LIST"); ?>
+				<h1>
+			</div> <?php
+		}?>
+		<?php echo $this->loadTemplate('filters'); ?>
+	<div class="pull-right">
+		<?php
+		if ($this->allowedToAdd)
+		{
+			?>
+			<a href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false); ?>" class="btn btn-success btn-small">
+				<i class="icon-plus"></i><?php echo JText::_('COM_TJUCM_ADD_ITEM'); ?>
+			</a>
+			<?php
+		}
+		?>
+	</div>
+	<div class="row">
+	<div class="col-xs-12">
 	<div class="table-responsive">
 		<table class="table table-striped" id="itemList">
 			<?php
@@ -172,6 +196,8 @@ $statusColumnWidth = 0;
 		?>
 		</tbody>
 	</table>
+</div>
+</div>
 </div>
 	<?php
 	if ($this->allowedToAdd)
