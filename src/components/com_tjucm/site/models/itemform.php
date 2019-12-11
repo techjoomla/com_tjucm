@@ -49,19 +49,6 @@ class TjucmModelItemForm extends JModelAdmin
 	use TjfieldsFilterField;
 
 	/**
-	 * Constructor.
-	 *
-	 * @param   array  $config  An optional associative array of configuration settings.
-	 *
-	 * @see        JController
-	 * @since      1.0
-	 */
-	public function __construct($config = array())
-	{
-		parent::__construct($config);
-	}
-
-	/**
 	 * Method to auto-populate the model state.
 	 *
 	 * Note. Calling getState in this method will result in recursion.
@@ -623,7 +610,16 @@ class TjucmModelItemForm extends JModelAdmin
 
 				if (!empty($fieldData['fieldsvalue'][$ownerShipFieldName]))
 				{
-					$ucmItemTable->created_by = $fieldData['fieldsvalue'][$ownerShipFieldName];
+					JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
+					$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', JFactory::getDbo()));
+					$fieldTable->load(array('name' => $ownerShipFieldName));
+					$fieldParams = new Registry($fieldTable->params);
+
+					// If enabled then the selected user will be set as creator of the UCM type item
+					if ($fieldParams->get('ucmItemOwner'))
+					{
+						$ucmItemTable->created_by = $fieldData['fieldsvalue'][$ownerShipFieldName];
+					}
 				}
 
 				if (!empty($fieldData['fieldsvalue'][$itemCategoryFieldName]))
