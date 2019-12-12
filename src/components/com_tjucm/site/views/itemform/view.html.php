@@ -119,21 +119,25 @@ class TjucmViewItemform extends JViewLegacy
 			$clusterId = $this->item->cluster_id;
 		}
 
-		// Get com_subusers component status
-		$subUserExist = ComponentHelper::getComponent('com_subusers', true)->enabled;
-
-		// Check user have permission to edit record of assigned cluster
-		if ($subUserExist && !empty($clusterId) && !$user->authorise('core.manageall', 'com_cluster'))
+		// Get com_cluster component status
+		if (ComponentHelper::getComponent('com_cluster', true)->enabled)
 		{
-			JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
+			// Get com_subusers component status
+			$subUserExist = ComponentHelper::getComponent('com_subusers', true)->enabled;
 
-			// Check user has permission for mentioned cluster
-			if (!RBACL::authorise($user->id, 'com_cluster', 'core.manage', $clusterId))
+			// Check user have permission to edit record of assigned cluster
+			if ($subUserExist && !empty($clusterId) && !$user->authorise('core.manageall', 'com_cluster'))
 			{
-				$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
-				$app->setHeader('status', 403, true);
+				JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
 
-				return;
+				// Check user has permission for mentioned cluster
+				if (!RBACL::authorise($user->id, 'com_cluster', 'core.manage', $clusterId))
+				{
+					$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
+					$app->setHeader('status', 403, true);
+
+					return;
+				}
 			}
 		}
 

@@ -280,7 +280,6 @@ class TjucmControllerItemForm extends JControllerForm
 			$formData['fieldsvalue'] = $data;
 			$formData['client'] = $client;
 			$formData['created_by'] = $table->created_by;
-			$isNew = $table->draft;
 
 			// If data is valid then save the data into DB
 			$response = $model->saveFieldsData($formData);
@@ -310,7 +309,7 @@ class TjucmControllerItemForm extends JControllerForm
 					// TJ-ucm plugin trigger after save
 					$dispatcher = JEventDispatcher::getInstance();
 					PluginHelper::importPlugin("content");
-					$dispatcher->trigger('onUcmItemAfterSave', array($table->getProperties(), $data, $isNew));
+					$dispatcher->trigger('onUcmItemAfterSave', array($table->getProperties(), $data));
 				}
 			}
 
