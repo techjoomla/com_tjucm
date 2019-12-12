@@ -151,14 +151,14 @@ class TjucmModelItems extends JModelList
 
 		$this->setState("created_by", $createdBy);
 
-		if ($this->getUserStateFromRequest($this->context . '.filter.order', 'filter_order', '', 'string'))
+		if ($this->getUserStateFromRequest($this->context . $ucmType . '.filter.order', 'filter_order', '', 'string'))
 		{
-			$ordering = $this->getUserStateFromRequest($this->context . '.filter.order', 'filter_order', '', 'string');
+			$ordering = $this->getUserStateFromRequest($this->context . $ucmType . '.filter.order', 'filter_order', '', 'string');
 		}
 
-		if ($this->getUserStateFromRequest($this->context . '.filter.order_Dir', 'filter_order_Dir', '', 'string'))
+		if ($this->getUserStateFromRequest($this->context . $ucmType . '.filter.order_Dir', 'filter_order_Dir', '', 'string'))
 		{
-			$direction = $this->getUserStateFromRequest($this->context . '.filter.order_Dir', 'filter_order_Dir', '', 'string');
+			$direction = $this->getUserStateFromRequest($this->context . $ucmType . '.filter.order_Dir', 'filter_order_Dir', '', 'string');
 		}
 
 		// List state information.
