@@ -17,7 +17,6 @@ JHtml::_('formbehavior.chosen', 'select');
 
 use \Joomla\CMS\Layout\LayoutHelper;
 
-
 $user = JFactory::getUser();
 $listOrder = $this->state->get('list.ordering');
 $listDirn  = $this->state->get('list.direction');
@@ -114,17 +113,17 @@ $sortFields = $this->getSortFields();
 <form action="<?php echo JRoute::_('index.php?option=com_tjucm&view=types'); ?>" method="post" name="adminForm" id="adminForm">
 	<?php if (!empty($this->sidebar)): ?>
 		<div id="j-sidebar-container" class="span2"><?php echo $this->sidebar; ?></div>
-		<div id="j-main-container" class="span10">
+			<div id="j-main-container" class="span10">
 	<?php else : ?>
 		<div id="j-main-container">
 	<?php endif; ?>
 			<div class="tjBs3">
 				<div class="btn-group pull-left">
-				<?php echo LayoutHelper::render('joomla.searchtools.default', array('view' => $this)); ?>
+					<?php echo LayoutHelper::render('joomla.searchtools.default', array('view' => $this)); ?>
 				</div>
 				<div class="btn-group pull-right hidden-phone">
 					<label for="limit" class="element-invisible">
-						<?php echo JText::_('JFIELD_PLG_SEARCH_SEARCHLIMIT_DESC'); ?>
+						<?php echo JText::_('JFIELD_PLG_SEARCH_SEFARCHLIMIT_DESC'); ?>
 					</label>
 					<?php echo $this->pagination->getLimitBox(); ?>
 				</div>
@@ -143,11 +142,11 @@ $sortFields = $this->getSortFields();
 					</select>
 				</div>
 				<div class="btn-group pull-right">
-				<label for="sortTable" class="element-invisible"><?php echo JText::_('JGLOBAL_SORT_BY'); ?></label>
-					<select name="sortTable" id="sortTable" class="input-medium" onchange="Joomla.orderTable()">
-						<option value=""><?php echo JText::_('JGLOBAL_SORT_BY'); ?></option>
-						<?php echo JHtml::_('select.options', $sortFields, 'value', 'text', $listOrder); ?>
-					</select>
+					<label for="sortTable" class="element-invisible"><?php echo JText::_('JGLOBAL_SORT_BY'); ?></label>
+						<select name="sortTable" id="sortTable" class="input-medium" onchange="Joomla.orderTable()">
+							<option value=""><?php echo JText::_('JGLOBAL_SORT_BY'); ?></option>
+							<?php echo JHtml::_('select.options', $sortFields, 'value', 'text', $listOrder); ?>
+						</select>
 				</div>
 			</div>
 			<div class="clearfix"></div>
