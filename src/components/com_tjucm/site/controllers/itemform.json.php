@@ -283,6 +283,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 			// If data is valid then save the data into DB
 			$response = $model->saveFieldsData($formData);
+
 			$msg = null;
 
 			if ($response && empty($section))
@@ -296,7 +297,8 @@ class TjucmControllerItemForm extends JControllerForm
 					$msg = ($response) ? Text::_("COM_TJUCM_ITEM_SAVED_SUCCESSFULLY") : Text::_("COM_TJUCM_FORM_SAVE_FAILED");
 				}
 
-				// Disable the draft mode of the item if full f)orm is submitted
+				// Disable the draft mode of the item if full form is submitted
+				$table->load($recordId);
 				$table->draft = $draft;
 				$table->modified_date = Factory::getDate()->toSql();
 				$table->store();
