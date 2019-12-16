@@ -110,9 +110,9 @@ $sortFields = $this->getSortFields();
 </script>
 
 <form action="<?php echo JRoute::_('index.php?option=com_tjucm&view=types'); ?>" method="post" name="adminForm" id="adminForm">
-	<?php if (!empty($this->sidebar)): ?>
+	<?php if(!empty($this->sidebar)): ?>
 		<div id="j-sidebar-container" class="span2"><?php echo $this->sidebar; ?></div>
-			<div id="j-main-container" class="span10">
+		<div id="j-main-container" class="span10">
 	<?php else : ?>
 		<div id="j-main-container">
 	<?php endif; ?>
@@ -142,10 +142,10 @@ $sortFields = $this->getSortFields();
 				</div>
 				<div class="btn-group pull-right">
 					<label for="sortTable" class="element-invisible"><?php echo JText::_('JGLOBAL_SORT_BY'); ?></label>
-						<select name="sortTable" id="sortTable" class="input-medium" onchange="Joomla.orderTable()">
-							<option value=""><?php echo JText::_('JGLOBAL_SORT_BY'); ?></option>
+					<select name="sortTable" id="sortTable" class="input-medium" onchange="Joomla.orderTable()">
+						<option value=""><?php echo JText::_('JGLOBAL_SORT_BY'); ?></option>
 							<?php echo JHtml::_('select.options', $sortFields, 'value', 'text', $listOrder); ?>
-						</select>
+					</select>
 				</div>
 			</div>
 			<div class="clearfix"></div>

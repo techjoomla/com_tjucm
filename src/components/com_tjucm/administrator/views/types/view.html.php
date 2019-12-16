@@ -42,9 +42,9 @@ class TjucmViewTypes extends JViewLegacy
 		$this->items = $this->get('Items');
 		$this->pagination = $this->get('Pagination');
 		$this->filterForm = $this->get('FilterForm');
-        $this->activeFilters = $this->get('ActiveFilters');
+		$this->activeFilters = $this->get('ActiveFilters');
 
-		//Check for errors.
+		// Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{
 			throw new Exception(implode("\n", $errors));
@@ -140,8 +140,6 @@ class TjucmViewTypes extends JViewLegacy
 		{
 			JToolBarHelper::preferences('com_tjucm');
 		}
-
-	
 	}
 
 	/**
