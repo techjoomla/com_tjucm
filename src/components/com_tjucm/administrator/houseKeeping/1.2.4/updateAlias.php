@@ -17,7 +17,7 @@ use Joomla\CMS\Filesystem\File;
 /**
  * Migration file for TJ-UCM
  *
- * @since  1.0
+ * @since  1.2.4
  */
 class TjHouseKeepingUpdateAlias extends TjModelHouseKeeping
 {
@@ -30,12 +30,11 @@ class TjHouseKeepingUpdateAlias extends TjModelHouseKeeping
 	 *
 	 * @return  void
 	 *
-	 * @since   1.0
+	 * @since   1.2.4
 	 */
 	public function migrate()
 	{
 		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
-		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
 		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_menus/tables');
 
 		JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_ADMINISTRATOR);
@@ -56,35 +55,25 @@ class TjHouseKeepingUpdateAlias extends TjModelHouseKeeping
 			$db->setQuery($query);
 			$ucmTypes = $db->loadObjectlist();
 
-			$session = JFactory::getSession();
-			$updatedTypes = (empty($session->get('updatedTypes'))) ? array() : $session->get('updatedTypes');
-
 			if (!empty($ucmTypes))
 			{
 				foreach ($ucmTypes as $ucmType)
 				{
-					if (in_array($ucmType->id, $updatedTypes))
-					{
-						continue;
-					}
-
 					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', $db));
 					$ucmTypeTable->load($ucmType->id);
 
+					// Remove white spaces in alias of UCm types
 					$updatedAlias = JFilterOutput::stringURLSafe($ucmTypeTable->alias);
 					$oldAlias = $ucmTypeTable->alias;
 					$ucmTypeTable->alias = $updatedAlias;
 					$ucmTypeTable->store();
-
-					$updatedTypes[] = $ucmType->id;
-					$session->set('updatedTypes', $updatedTypes);
 
 					$result['status']   = '';
 					$result['message']  = "Migration in progress";
 				}
 			}
 
-			// Menus
+			// Get all the menus of UCM types
 			$query->from($db->quoteName('#__menu'));
 			$query->where("link" . "=" . "'index.php?option=com_tjucm&view=itemform'" . "||" . "link" . "=" . "'index.php?option=com_tjucm&view=items'");
 			$db->setQuery($query);
@@ -97,17 +86,16 @@ class TjHouseKeepingUpdateAlias extends TjModelHouseKeeping
 					$menuItemTable = JTable::getInstance('Menu', 'MenusTable', array('dbo', $db));
 					$menuItemTable->load($menuItem->id);
 					$oldparams = json_decode($menuItemTable->params);
+
+					// Remove white spaces in alias of menus
 					$oldparams->ucm_type  = JFilterOutput::stringURLSafe($oldparams->ucm_type);
 					$menuItemTable->params = json_encode($oldparams);
 					$menuItemTable->store();
-					$updatedTypes[] = $ucmType->id;
-					$session->set('updatedTypes', $updatedTypes);
 					$result['status']   = '';
 					$result['message']  = "Migration in progress";
 				}
 			}
 
-			$session->set('updatedTypes', '');
 			$result['status']   = true;
 			$result['message']  = "Migration successful";
 		}
