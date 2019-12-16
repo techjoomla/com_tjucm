@@ -67,8 +67,8 @@ class TjucmViewTypes extends JViewLegacy
 	{
 		$state = $this->get('State');
 		$canDo = TjucmHelper::getActions();
-
-		JToolBarHelper::title(JText::_('COM_TJUCM_TITLE_TYPES'), 'list');
+		$component_title = JText::_('COM_TJUCM_COMPONENT');
+		JToolBarHelper::title($component_title . " : " . JText::_('COM_TJUCM_TITLE_TYPES'), 'list');
 
 		// Check if the form exists before showing the add/edit buttons
 		$formPath = JPATH_COMPONENT_ADMINISTRATOR . '/views/type';
