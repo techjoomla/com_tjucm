@@ -139,8 +139,12 @@ class TjucmControllerItem extends JControllerLegacy
 			// Redirect to the list screen.
 			$this->setMessage(JText::_('COM_TJUCM_ITEM_SAVED_SUCCESSFULLY'));
 
+			//To get the client from TjucmModelItems
+			$items_model = $this->getModel('Items','TjucmModel');
+			$this->client = $items_model->getState('ucm.client');
+
 			// If there isn't any menu item active, redirect to list view
-			$itemId = $tjUcmFrontendHelper->getItemId('index.php?option=com_tjucm&view=items' . $this->appendUrl);
+			$itemId = $tjUcmFrontendHelper->getItemId('index.php?option=com_tjucm&view=items' . $this->client);
 			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl . '&Itemid=' . $itemId, false));
 		}
 		else
