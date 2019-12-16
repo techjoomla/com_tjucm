@@ -7,12 +7,9 @@
  * @copyright   Copyright (C) 2009 - 2019 Techjoomla. All rights reserved.
  * @license     http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
+
 // No direct access
 defined('_JEXEC') or die('Restricted access');
-use Joomla\Registry\Registry;
-use Joomla\CMS\Factory;
-use Joomla\CMS\MVC\Model\BaseDatabaseModel;
-use Joomla\CMS\Filesystem\File;
 
 /**
  * Migration file for TJ-UCM
@@ -37,13 +34,10 @@ class TjHouseKeepingUpdateAlias extends TjModelHouseKeeping
 		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
 		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_menus/tables');
 
-		JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_ADMINISTRATOR);
-
 		// TJ-Fields helper object
 		$tjfieldsHelper = new TjfieldsHelper;
 
 		$result = array();
-		$ucmSubFormFieldsConfig = array();
 
 		try
 		{
@@ -60,9 +54,8 @@ class TjHouseKeepingUpdateAlias extends TjModelHouseKeeping
 				foreach ($ucmTypes as $ucmType)
 				{
 					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', $db));
-					$ucmTypeTable->load($ucmType->id);
 
-					// Remove white spaces in alias of UCm types
+					// Remove white spaces in alias of UCM types
 					$updatedAlias = JFilterOutput::stringURLSafe($ucmTypeTable->alias);
 					$oldAlias = $ucmTypeTable->alias;
 					$ucmTypeTable->alias = $updatedAlias;
@@ -75,7 +68,10 @@ class TjHouseKeepingUpdateAlias extends TjModelHouseKeeping
 
 			// Get all the menus of UCM types
 			$query->from($db->quoteName('#__menu'));
-			$query->where("link" . "=" . "'index.php?option=com_tjucm&view=itemform'" . "||" . "link" . "=" . "'index.php?option=com_tjucm&view=items'");
+			$query->where(
+			$db->quoteName(link) . "=" . $db->quote('index.php?option=com_tjucm&view=itemform') .
+			"||" . $db->quoteName(link) . "=" . $db->quote('index.php?option=com_tjucm&view=items')
+			);
 			$db->setQuery($query);
 			$menuItems = $db->loadObjectlist();
 
@@ -84,7 +80,6 @@ class TjHouseKeepingUpdateAlias extends TjModelHouseKeeping
 				foreach ($menuItems as $menuItem)
 				{
 					$menuItemTable = JTable::getInstance('Menu', 'MenusTable', array('dbo', $db));
-					$menuItemTable->load($menuItem->id);
 					$oldparams = json_decode($menuItemTable->params);
 
 					// Remove white spaces in alias of menus
