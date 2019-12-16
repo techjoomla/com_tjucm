@@ -2,10 +2,10 @@
 <form>
     <fields name="filter">
         <field name="search"
-        type="text"
-        hint="COM_TJUCM_SEARCH_FILTER_SUBMIT"
-        label="COM_USERS_FILTER_SEARCH_DESC"
-        class="js-stools-search-string" />
+               type="text"
+               hint="COM_TJUCM_SEARCH_FILTER_SUBMIT"
+               label="COM_USERS_FILTER_SEARCH_DESC"
+               class="js-stools-search-string" />
         
         <field name="state"
                type="status"

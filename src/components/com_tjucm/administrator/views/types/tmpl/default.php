@@ -9,13 +9,12 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use \Joomla\CMS\Layout\LayoutHelper;
 
 JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/');
 JHtml::_('bootstrap.tooltip');
 JHtml::_('behavior.multiselect');
 JHtml::_('formbehavior.chosen', 'select');
-
-use \Joomla\CMS\Layout\LayoutHelper;
 
 $user = JFactory::getUser();
 $listOrder = $this->state->get('list.ordering');
