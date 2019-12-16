@@ -96,7 +96,7 @@ class TjucmViewItem extends JViewLegacy
 
 		$canDo = TjucmHelper::getActions();
 
-		JToolBarHelper::title(JText::_('COM_TJUCM_TITLE_ITEM'), 'item.png');
+		JToolBarHelper::title(JText::_('COM_TJUCM_TITLE_ITEM'), 'icon-pencil');
 
 		// If not checked out, can save the item.
 		if (!$checkedOut && ($canDo->get('core.edit') || ($canDo->get('core.create'))))
