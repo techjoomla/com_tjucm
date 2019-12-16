@@ -128,14 +128,11 @@ class TjHouseKeepingUcmSubformData extends TjModelHouseKeeping
 				// Save ucmSubForm records
 				if (!empty($ucmSubFormDataSet))
 				{
-					$itemFormModel = BaseDatabaseModel::getInstance('ItemForm', 'TjucmModel', array('ignore_request' => true));
-
 					// Set ucm type id to check permission in Item form model save() for logged-in user
 					$ucmTypeId = $tjUcmModelType->getTypeId($ucmSubFormClient);
-					$itemFormModel->setState('ucmType.id', $ucmTypeId);
 
 					// Call method to save ucmsubform data into new UCM data
-					$subFormContentIds = $itemFormModel->saveUcmSubFormRecords($validData, $ucmSubFormDataSet);
+					$subFormContentIds = $this->saveUcmSubFormRecords($validData, $ucmSubFormDataSet, $ucmTypeId);
 
 					// To update existing ucm subform field value from JSON to subform ucm type name
 					if ($subFormContentIds)
@@ -162,5 +159,105 @@ class TjHouseKeepingUcmSubformData extends TjModelHouseKeeping
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Function to save ucmSubForm records
+	 *
+	 * @param   ARRAY  &$validData         Parent record data
+	 * @param   ARRAY  $ucmSubFormDataSet  ucmSubForm records data
+	 * @param   ARRAY  $ucmTypeId          UCM Type Id
+	 *
+	 * @return ARRAY
+	 */
+	public function saveUcmSubFormRecords(&$validData, $ucmSubFormDataSet, $ucmTypeId)
+	{
+		$db = JFactory::getDbo();
+		$subFormContentIds = array();
+		$isNew = empty($validData['id']) ? 1 : 0;
+
+		// Delete removed subform details
+		if (!$isNew)
+		{
+			$query = $db->getQuery(true);
+			$query->select('id');
+			$query->from($db->quoteName('#__tj_ucm_data'));
+			$query->where($db->quoteName('parent_id') . '=' . $validData['id']);
+			$db->setQuery($query);
+			$oldSubFormContentIds = $db->loadColumn();
+		}
+
+		JLoader::import('components.com_tjfields.tables.fieldsvalue', JPATH_ADMINISTRATOR);
+		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		$itemFormModel  = BaseDatabaseModel::getInstance('ItemForm', 'TjucmModel', array('ignore_request' => true));
+		$itemFormModel->setState('ucmType.id', $ucmTypeId);
+
+		if (!empty($ucmSubFormDataSet))
+		{
+			foreach ($ucmSubFormDataSet as $client => $ucmSubFormTypeData)
+			{
+				$validData['client'] = $client;
+				$validData['type_id'] = $tjUcmModelType->getTypeId($client);
+				$clientDetail = explode('.', $client);
+
+				// This is an extra field which is used to render the reference of the ucmsubform field on the form (used in case of edit)
+				$ucmSubformContentIdFieldName = $clientDetail[0] . '_' . $clientDetail[1] . '_' . 'contentid';
+				$count = 0;
+
+				foreach ($ucmSubFormTypeData as $ucmSubFormData)
+				{
+					$validData['id'] = isset($ucmSubFormData[$ucmSubformContentIdFieldName]) ? (int) $ucmSubFormData[$ucmSubformContentIdFieldName] : 0;
+
+					// Unset extra data
+					$sfFieldName = $ucmSubFormData['ucmSubformFieldName'];
+					unset($ucmSubFormData['ucmSubformFieldName']);
+					$ucmSubformContentFieldElementId = 'jform[' . $sfFieldName . '][' . $sfFieldName . $count . '][' . $ucmSubformContentIdFieldName . ']';
+					$count++;
+
+					if ($insertedId = $itemFormModel->save($validData, $ucmSubFormData))
+					{
+						$validData['id'] = $insertedId;
+						$subFormContentIds[] = array('elementName' => $ucmSubformContentFieldElementId, 'content_id' => $insertedId);
+						$ucmSubFormData[$ucmSubformContentIdFieldName] = $insertedId;
+
+						// Get field id of contentid field
+						$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
+						$fieldTable->load(array('name' => $ucmSubformContentIdFieldName));
+
+						// Add-Update the value of content id field in the fields value table - start
+						$fieldsValueTable = JTable::getInstance('Fieldsvalue', 'TjfieldsTable', array('dbo', $db));
+						$fieldsValueTable->load(array('field_id' => $fieldTable->id, 'content_id' => $insertedId, 'client' => $validData['client']));
+
+						if (empty($fieldsValueTable->id))
+						{
+							$fieldsValueTable->field_id = $fieldTable->id;
+							$fieldsValueTable->value = $fieldsValueTable->content_id = $insertedId;
+							$fieldsValueTable->client = $validData['client'];
+						}
+
+						$fieldsValueTable->user_id = JFactory::getUser()->id;
+						$fieldsValueTable->store();
+
+						// Add-Update the value of content id field in the fields value table - end
+					}
+				}
+			}
+		}
+
+		// Delete removed ucmSubForm record from the form
+		if (!empty($oldSubFormContentIds))
+		{
+			foreach ($oldSubFormContentIds as $oldSubFormContentId)
+			{
+				if (array_search($oldSubFormContentId, array_column($subFormContentIds, 'content_id')) === false)
+				{
+					$itemFormModel->delete($oldSubFormContentId);
+				}
+			}
+		}
+
+		return $subFormContentIds;
 	}
 }

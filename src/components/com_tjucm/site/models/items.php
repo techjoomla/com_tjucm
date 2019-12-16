@@ -21,8 +21,6 @@ use Joomla\CMS\Component\ComponentHelper;
  */
 class TjucmModelItems extends JModelList
 {
-	private $client;
-
 	/**
 	 * Constructor.
 	 *
@@ -69,34 +67,31 @@ class TjucmModelItems extends JModelList
 		$user = JFactory::getUser();
 		$db = JFactory::getDbo();
 
-		// Load the filter state.
-		$search = $app->getUserStateFromRequest($this->context . '.filter.search', 'filter_search', '', 'STRING');
-		$this->setState('filter.search', $search);
-
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
 
-		$typeId = $app->input->get('id', "", "INT");
+		$typeId  = $app->input->get('id', 0, "INT");
+		$ucmType = $app->input->get('client', '', "STRING");
 
-		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
-		$typeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', $db));
-		$typeTable->load(array('id' => $typeId));
-		$ucmType = $typeTable->unique_identifier;
-
-		// Set state for field filters
-		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
-		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
-		$fieldsModel->setState('filter.client', $this->client);
-		$fieldsModel->setState('filter.filterable', 1);
-		$fields = $fieldsModel->getItems();
-
-		foreach ($fields as $field)
+		if (empty($typeId) || empty($ucmType))
 		{
-			$filterValue = $app->getUserStateFromRequest($this->context . '.' . $field->name, $field->name, '', 'STRING');
-			$this->setState('filter.field.' . $field->name, $filterValue);			
+			JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
+			$typeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', $db));
+
+			if ($typeId && empty($ucmType))
+			{
+				$typeTable->load(array('id' => $typeId));
+				$ucmType = $typeTable->unique_identifier;
+			}
+
+			if ($ucmType && empty($typeId))
+			{
+				$typeTable->load(array('unique_identifier' => $ucmType));
+				$typeId = $typeTable->id;
+			}
 		}
 
-		if (empty($ucmType))
+		if (empty($ucmType) && empty($typeId))
 		{
 			// Get the active item
 			$menuitem   = $app->getMenu()->getActive();
@@ -106,31 +101,41 @@ class TjucmModelItems extends JModelList
 
 			if (!empty($this->menuparams))
 			{
-				$this->ucm_type   = $this->menuparams->get('ucm_type');
+				$ucmTypeAlias = $this->menuparams->get('ucm_type');
 
-				if (!empty($this->ucm_type))
+				if (!empty($ucmTypeAlias))
 				{
-					$ucmType     = 'com_tjucm.' . $this->ucm_type;
+					JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
+					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+					$ucmTypeTable->load(array('alias' => $ucmTypeAlias));
+					$ucmType = $ucmTypeTable->unique_identifier;
+					$typeId  = $ucmTypeTable->id;
 				}
 			}
 		}
 
-		if (empty($ucmType))
+		// Load the filter state.
+		$search = $app->getUserStateFromRequest($this->context . '.' . $ucmType . '.filter.search', 'filter_search', '', 'STRING');
+		$this->setState($ucmType . '.filter.search', $search);
+
+		// Set state for field filters
+		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
+		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+		$fieldsModel->setState('filter.client', $ucmType);
+		$fieldsModel->setState('filter.filterable', 1);
+		$fields = $fieldsModel->getItems();
+
+		foreach ($fields as $field)
 		{
-			// Get UCM type id from uniquue identifier
-			$ucmType = $app->input->get('client', '', 'STRING');
+			$filterValue = $app->getUserStateFromRequest($this->context . '.' . $field->name, $field->name, '', 'STRING');
+			$this->setState('filter.field.' . $field->name, $filterValue);
 		}
 
-		if (empty($typeId))
-		{
-			$typeId = $tjUcmModelType->getTypeId($ucmType);
-		}
-
-		$clusterId = $app->getUserStateFromRequest($this->context . '.cluster', 'cluster');
+		$clusterId = $app->getUserStateFromRequest($this->context . '.' . $ucmType . '.cluster', 'cluster');
 
 		if ($clusterId)
 		{
-			$this->setState('filter.cluster_id', $clusterId);
+			$this->setState($ucmType . '.filter.cluster_id', $clusterId);
 		}
 
 		$this->setState('ucm.client', $ucmType);
@@ -145,6 +150,16 @@ class TjucmModelItems extends JModelList
 		}
 
 		$this->setState("created_by", $createdBy);
+
+		if ($this->getUserStateFromRequest($this->context . $ucmType . '.filter.order', 'filter_order', '', 'string'))
+		{
+			$ordering = $this->getUserStateFromRequest($this->context . $ucmType . '.filter.order', 'filter_order', '', 'string');
+		}
+
+		if ($this->getUserStateFromRequest($this->context . $ucmType . '.filter.order_Dir', 'filter_order_Dir', '', 'string'))
+		{
+			$direction = $this->getUserStateFromRequest($this->context . $ucmType . '.filter.order_Dir', 'filter_order_Dir', '', 'string');
+		}
 
 		// List state information.
 		parent::populateState($ordering, $direction);
@@ -171,6 +186,8 @@ class TjucmModelItems extends JModelList
 				'list.select', 'DISTINCT ' . $db->quoteName('a.id') . ', '
 				. $db->quoteName('a.state') . ', '
 				. $db->quoteName('a.cluster_id') . ', '
+				. $db->quoteName('a.draft') . ', '
+				. $db->quoteName('a.created_date') . ', '
 				. $db->quoteName('a.created_by')
 			)
 		);
@@ -181,18 +198,18 @@ class TjucmModelItems extends JModelList
 		$query->select($db->quoteName('uc.name', 'uEditor'));
 		$query->join("LEFT", $db->quoteName('#__users', 'uc') . ' ON (' . $db->quoteName('uc.id') . ' = ' . $db->quoteName('a.checked_out') . ')');
 
-		$this->client = $this->getState('ucm.client');
+		$client = $this->getState('ucm.client');
 
-		if (!empty($this->client))
+		if (!empty($client))
 		{
-			$query->where($db->quoteName('a.client') . ' = ' . $db->quote($db->escape($this->client)));
+			$query->where($db->quoteName('a.client') . ' = ' . $db->quote($db->escape($client)));
 		}
 
-		$ucmType = $this->getState('ucmType.id', '', 'INT');
+		$ucmTypeId = $this->getState('ucmType.id', '', 'INT');
 
-		if (!empty($ucmType))
+		if (!empty($ucmTypeId))
 		{
-			$query->where($db->quoteName('a.type_id') . ' = ' . (INT) $ucmType);
+			$query->where($db->quoteName('a.type_id') . ' = ' . (INT) $ucmTypeId);
 		}
 
 		$createdBy = $this->getState('created_by', '', 'INT');
@@ -202,6 +219,14 @@ class TjucmModelItems extends JModelList
 			$query->where($db->quoteName('a.created_by') . ' = ' . (INT) $createdBy);
 		}
 
+		// Filter for parent record
+		$parentId = $this->getState('parent_id');
+
+		if (is_numeric($parentId))
+		{
+			$query->where($db->quoteName('a.parent_id') . ' = ' . $parentId);
+		}
+
 		// Show records belonging to users cluster if com_cluster is installed and enabled - start
 		$clusterExist = ComponentHelper::getComponent('com_cluster', true)->enabled;
 
@@ -209,18 +234,17 @@ class TjucmModelItems extends JModelList
 		{
 			JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
 			$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
-			$fieldTable->load(array('client' => $this->client, 'type' => 'cluster'));
+			$fieldTable->load(array('client' => $client, 'type' => 'cluster'));
 
 			if ($fieldTable->id)
 			{
 				JFormHelper::addFieldPath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models/fields/');
 				$cluster = JFormHelper::loadFieldType('cluster', false);
 				$clusterList = $cluster->getOptionsExternally();
+				$usersClusters = array();
 
 				if (!empty($clusterList))
 				{
-					$usersClusters = array();
-
 					foreach ($clusterList as $clusterList)
 					{
 						if (!empty($clusterList->value))
@@ -228,6 +252,12 @@ class TjucmModelItems extends JModelList
 							$usersClusters[] = $clusterList->value;
 						}
 					}
+				}
+
+				// If cluster array empty then we set 0 in whereclause query
+				if (empty($usersClusters))
+				{
+					$usersClusters[] = 0;
 				}
 
 				$query->where($db->quoteName('a.cluster_id') . ' IN (' . implode(",", $usersClusters) . ')');
@@ -247,7 +277,7 @@ class TjucmModelItems extends JModelList
 		}
 
 		// Search by content id
-		$search = $this->getState('filter.search');
+		$search = $this->getState($client . '.filter.search');
 
 		if (!empty($search))
 		{
@@ -260,7 +290,7 @@ class TjucmModelItems extends JModelList
 		}
 
 		// Search on fields data
-		$filteredItemIds = $this->filterContent();
+		$filteredItemIds = $this->filterContent($client);
 
 		if (is_array($filteredItemIds))
 		{
@@ -272,12 +302,12 @@ class TjucmModelItems extends JModelList
 			else
 			{
 				// If no search results found then do not return any record
-				$query->where($db->quoteName('a.id') . '=0');	
+				$query->where($db->quoteName('a.id') . '=0');
 			}
 		}
 
 		// Filter by cluster
-		$clusterId = (int) $this->getState('filter.cluster_id');
+		$clusterId = (int) $this->getState($client . '.filter.cluster_id');
 
 		if ($clusterId)
 		{
@@ -303,7 +333,7 @@ class TjucmModelItems extends JModelList
 	 *
 	 * @since    1.2.1
 	 */
-	private function filterContent()
+	private function filterContent($client)
 	{
 		// Flag to mark if field specific search is done from the search box
 		$filterFieldFound = 0;
@@ -321,10 +351,10 @@ class TjucmModelItems extends JModelList
 		$query->from($db->quoteName('#__tjfields_fields_value', 'fv1'));
 		$query->join('INNER', $db->qn('#__tjfields_fields', 'f') . ' ON (' . $db->qn('fv1.field_id') . ' = ' . $db->qn('f.id') . ')');
 		$query->where($db->quoteName('f.state') . ' =1');
-		$query->where($db->quoteName('f.client') . ' = ' . $db->quote($this->client));
+		$query->where($db->quoteName('f.client') . ' = ' . $db->quote($client));
 
 		// Filter by field value
-		$search = $this->getState('filter.search');
+		$search = $this->getState($client . '.filter.search');
 
 		if (!empty($this->fields) && (stripos($search, 'id:') !== 0))
 		{
@@ -337,12 +367,13 @@ class TjucmModelItems extends JModelList
 
 					if ($filterFieldsCount > 1)
 					{
-						$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' . ($filterFieldsCount-1).'.content_id') . ' = ' . $db->qn('fv'.$filterFieldsCount.'.content_id') . ')');
+						$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' .
+						($filterFieldsCount - 1) . '.content_id') . ' = ' . $db->qn('fv' . $filterFieldsCount . '.content_id') . ')');
 					}
 
 					$search = trim(str_replace($field . ':', '', $search));
-					$query->where($db->qn('fv'.$filterFieldsCount.'.field_id') . ' = ' . $fieldId);
-					$query->where($db->qn('fv'.$filterFieldsCount.'.value') . ' LIKE ' . $db->q('%' . $search . '%'));
+					$query->where($db->qn('fv' . $filterFieldsCount . '.field_id') . ' = ' . $fieldId);
+					$query->where($db->qn('fv' . $filterFieldsCount . '.value') . ' LIKE ' . $db->q('%' . $search . '%'));
 					$filterFieldFound = 1;
 					$filterApplied = 1;
 
@@ -358,17 +389,18 @@ class TjucmModelItems extends JModelList
 
 			if ($filterFieldsCount > 1)
 			{
-				$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' . ($filterFieldsCount-1).'.content_id') . ' = ' . $db->qn('fv'.$filterFieldsCount.'.content_id') . ')');
+				$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' .
+				($filterFieldsCount - 1) . '.content_id') . ' = ' . $db->qn('fv' . $filterFieldsCount . '.content_id') . ')');
 			}
 
-			$query->where($db->quoteName('fv'.$filterFieldsCount.'.value') . ' LIKE ' . $db->q('%' . $search . '%'));
+			$query->where($db->quoteName('fv' . $filterFieldsCount . '.value') . ' LIKE ' . $db->q('%' . $search . '%'));
 			$filterApplied = 1;
-		}	
+		}
 
 		// For filterable fields
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
 		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
-		$fieldsModel->setState('filter.client', $this->client);
+		$fieldsModel->setState('filter.client', $client);
 		$fieldsModel->setState('filter.filterable', 1);
 		$fields = $fieldsModel->getItems();
 
@@ -382,16 +414,18 @@ class TjucmModelItems extends JModelList
 
 				if ($filterFieldsCount > 1)
 				{
-					$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' . ($filterFieldsCount-1).'.content_id') . ' = ' . $db->qn('fv'.$filterFieldsCount.'.content_id') . ')');
+					$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' .
+					($filterFieldsCount - 1) . '.content_id') . ' = ' . $db->qn('fv' . $filterFieldsCount . '.content_id') . ')');
 				}
 
-				$query->where($db->qn('fv'.$filterFieldsCount.'.field_id') . ' = ' . $field->id);
-				$query->where($db->qn('fv'.$filterFieldsCount.'.value') . ' = ' . $db->q($filterValue));
+				$query->where($db->qn('fv' . $filterFieldsCount . '.field_id') . ' = ' . $field->id);
+				$query->where($db->qn('fv' . $filterFieldsCount . '.value') . ' = ' . $db->q($filterValue));
 				$filterApplied = 1;
 			}
 		}
 
-		$query->setLimit($this->getState('list.limit'));
+		$query->order('fv1.content_id DESC');
+		$query->group('fv1.content_id');
 
 		// If there is any filter applied then only execute the query
 		if ($filterApplied)
@@ -418,11 +452,11 @@ class TjucmModelItems extends JModelList
 		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
 		$fieldsModel->setState('filter.showonlist', 1);
 		$fieldsModel->setState('filter.state', 1);
-		$this->client = $this->getState('ucm.client');
+		$client = $this->getState('ucm.client');
 
-		if (!empty($this->client))
+		if (!empty($client))
 		{
-			$fieldsModel->setState('filter.client', $this->client);
+			$fieldsModel->setState('filter.client', $client);
 		}
 
 		$items = $fieldsModel->getItems();
@@ -550,86 +584,6 @@ class TjucmModelItems extends JModelList
 		$db->setQuery($query);
 
 		return $db->loadObjectList();
-	}
-
-	/**
-	 * Overrides the default function to check Date fields format, identified by
-	 * "_dateformat" suffix, and erases the field if it's not correct.
-	 *
-	 * @return void
-	 */
-	protected function loadFormData()
-	{
-		$app              = JFactory::getApplication();
-		$filters          = $app->getUserState($this->context . '.filter', array());
-		$error_dateformat = false;
-
-		foreach ($filters as $key => $value)
-		{
-			if (strpos($key, '_dateformat') && !empty($value) && $this->isValidDate($value) == null)
-			{
-				$filters[$key]    = '';
-				$error_dateformat = true;
-			}
-		}
-
-		if ($error_dateformat)
-		{
-			$app->enqueueMessage(JText::_("COM_TJUCM_SEARCH_FILTER_DATE_FORMAT"), "warning");
-			$app->setUserState($this->context . '.filter', $filters);
-		}
-
-		return parent::loadFormData();
-	}
-
-	/**
-	 * Checks if a given date is valid and in a specified format (YYYY-MM-DD)
-	 *
-	 * @param   string  $date  Date to be checked
-	 *
-	 * @return bool
-	 */
-	private function isValidDate($date)
-	{
-		$date = str_replace('/', '-', $date);
-
-		return (date_create($date)) ? JFactory::getDate($date)->format("Y-m-d") : null;
-	}
-
-	/**
-	 * Method to getAliasFieldNameByView
-	 *
-	 * @param   array  $view  An array of record primary keys.
-	 *
-	 * @return  boolean  True if successful, false if an error occurs.
-	 *
-	 * @since   12.2
-	 */
-	public function getAliasFieldNameByView($view)
-	{
-		switch ($view)
-		{
-			case 'items':
-				return 'alias';
-			break;
-		}
-	}
-
-	/**
-	 * Get an item by alias
-	 *
-	 * @param   string  $alias  Alias string
-	 *
-	 * @return int Element id
-	 */
-	public function getItemIdByAlias($alias)
-	{
-		$db = JFactory::getDbo();
-		$table = JTable::getInstance('type', 'TjucmTable', array('dbo', $db));
-
-		$table->load(array('alias' => $alias));
-
-		return $table->id;
 	}
 
 	/**

@@ -18,8 +18,8 @@ JHtml::_('formbehavior.chosen', 'select');
 $user = JFactory::getUser();
 $userId = $user->get('id');
 $tjUcmFrontendHelper = new TjucmHelpersTjucm;
-$listOrder = $this->state->get('list.ordering');
-$listDirn = $this->state->get('list.direction');
+$listOrder  = $this->escape($this->state->get('list.ordering'));
+$listDirn   = $this->escape($this->state->get('list.direction'));
 $appendUrl = '';
 $csrf = "&" . JSession::getFormToken() . '=1';
 
@@ -33,16 +33,37 @@ if (!empty($this->client))
 	$appendUrl .= "&client=" . $this->client;
 }
 
-$tmpListColumn = $this->listcolumn;
-reset($tmpListColumn);
-$firstListColumn = key($tmpListColumn);
-
 $link = 'index.php?option=com_tjucm&view=items' . $appendUrl;
 $itemId = $tjUcmFrontendHelper->getItemId($link);
 $fieldsData = array();
+$statusColumnWidth = 0;
 ?>
 <form action="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>" method="post" name="adminForm" id="adminForm">
-	<?php echo $this->loadTemplate('filters'); ?>
+<?php 
+		if(isset($this->items))
+		{
+			?>
+			<div class="page-header">
+				<h1 class="page-title">
+				<?php echo  strtoupper($this->title)." ".JText::_("COM_TJUCM_FORM_LIST"); ?>
+				<h1>
+			</div> <?php
+		}?>
+		<?php echo $this->loadTemplate('filters'); ?>
+	<div class="pull-right">
+		<?php
+		if ($this->allowedToAdd)
+		{
+			?>
+			<a href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false); ?>" class="btn btn-success btn-small">
+				<i class="icon-plus"></i><?php echo JText::_('COM_TJUCM_ADD_ITEM'); ?>
+			</a>
+			<?php
+		}
+		?>
+	</div>
+	<div class="row">
+	<div class="col-xs-12">
 	<div class="table-responsive">
 		<table class="table table-striped" id="itemList">
 			<?php
@@ -65,7 +86,18 @@ $fieldsData = array();
 					<th width="2%">
 						<?php echo JHtml::_('grid.sort', 'COM_TJUCM_ITEMS_ID', 'a.id', $listDirn, $listOrder); ?>
 					</th>
+
 					<?php
+					if (!empty($this->ucmTypeParams->allow_draft_save) && $this->ucmTypeParams->allow_draft_save == 1)
+					{
+						$statusColumnWidth = 2;
+					?>
+						<th width="2%">
+							<?php echo JHtml::_('grid.sort', 'COM_TJUCM_DATA_STATUS', 'a.draft', $listDirn, $listOrder); ?>
+						</th>
+					<?php
+					}
+
 					if (!empty($this->listcolumn))
 					{
 						JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
@@ -84,7 +116,8 @@ $fieldsData = array();
 								$fieldsData[$fieldId] = $tjFieldsFieldTable;
 							}
 							?>
-							<th  style="word-break: break-word;" width="<?php echo 90/count($this->listcolumn).'%';?>">
+
+							<th  style="word-break: break-word;" width="<?php echo (85 - $statusColumnWidth)/count($this->listcolumn).'%';?>">
 								<?php echo htmlspecialchars($col_name, ENT_COMPAT, 'UTF-8'); ?>
 							</th>
 							<?php
@@ -94,7 +127,7 @@ $fieldsData = array();
 					if ($this->canEdit || $this->canDelete)
 					{
 						?>
-						<th class="center" width="5%">
+						<th class="center" width="10%">
 							<?php echo JText::_('COM_TJUCM_ITEMS_ACTIONS'); ?>
 						</th>
 					<?php
@@ -143,8 +176,8 @@ $fieldsData = array();
 				foreach ($this->items as $i => $item)
 				{
 					// Call the JLayout to render the fields in the details view
-					$layout = new JLayoutFile('list', JPATH_ROOT . '/components/com_tjucm/layouts/list');
-					echo $layout->render(array('itemsData' => $item, 'created_by' => $this->created_by, 'client' => $this->client, 'xmlFormObject' => $formXml, 'ucmTypeId' => $this->ucmTypeId, 'fieldsData' => $fieldsData, 'formObject' => $formObject));
+					$layout = new JLayoutFile('list.list', JPATH_ROOT . '/components/com_tjucm/');
+					echo $layout->render(array('itemsData' => $item, 'created_by' => $this->created_by, 'client' => $this->client, 'xmlFormObject' => $formXml, 'ucmTypeId' => $this->ucmTypeId, 'ucmTypeParams' => $this->ucmTypeParams, 'fieldsData' => $fieldsData, 'formObject' => $formObject));
 				}
 			}
 			else
@@ -164,11 +197,13 @@ $fieldsData = array();
 		</tbody>
 	</table>
 </div>
+</div>
+</div>
 	<?php
 	if ($this->allowedToAdd)
 	{
 		?>
-		<a target="_blank" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false, 2); ?>" class="btn btn-success btn-small">
+		<a target="_blank" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false); ?>" class="btn btn-success btn-small">
 			<i class="icon-plus"></i><?php echo JText::_('COM_TJUCM_ADD_ITEM'); ?>
 		</a>
 		<?php

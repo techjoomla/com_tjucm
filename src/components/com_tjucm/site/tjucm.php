@@ -29,32 +29,13 @@ if (!class_exists('TjucmHelper'))
 	JLoader::load('TjucmHelper');
 }
 
-// Load required JS files
-//JLoader::import('media.com_tjucm.js.load_js', JPATH_SITE);
-require_once JPATH_SITE . '/media/com_tjucm/js/load_js.php';
-
-$path = JPATH_COMPONENT_ADMINISTRATOR . '/classes/' . 'funlist.php';
-
-if (!class_exists('TjucmFunList'))
-{
-	// Require_once $path;
-	JLoader::register('TjucmFunList', $path);
-	JLoader::load('TjucmFunList');
-}
-
-// Load tjassets
-jimport('joomla.filesystem.file');
-$tjStrapperPath = JPATH_SITE . '/media/techjoomla_strapper/tjstrapper.php';
-
-if (JFile::exists($tjStrapperPath))
-{
-	require_once $tjStrapperPath;
-	TjStrapper::loadTjAssets();
-}
-
 JLoader::register('TjucmHelpersTjucm', JPATH_SITE . '/components/com_tjucm/helpers/tjucm.php');
 JLoader::load('TjucmHelpersTjucm');
 TjucmHelpersTjucm::getLanguageConstantForJs();
+
+// Initialise UCM
+JLoader::register('TJUCM', JPATH_SITE . '/components/com_tjucm/includes/tjucm.php');
+TJUCM::init();
 
 // Execute the task.
 $controller = JControllerLegacy::getInstance('Tjucm');

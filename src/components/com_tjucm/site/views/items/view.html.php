@@ -56,6 +56,10 @@ class TjucmViewItems extends JViewLegacy
 
 	protected $created_by;
 
+	protected $ucmTypeParams;
+
+	protected $title;
+
 	/**
 	 * Display the view
 	 *
@@ -111,10 +115,28 @@ class TjucmViewItems extends JViewLegacy
 
 				if (!empty($this->ucm_type))
 				{
-					$this->client     = 'com_tjucm.' . $this->ucm_type;
+					JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
+					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+					$ucmTypeTable->load(array('alias' => $this->ucm_type));
+					$this->client = $ucmTypeTable->unique_identifier;
 				}
 			}
 		}
+
+		// To get title of list as per the ucm type
+		if (empty($this->title))
+			{
+			// Get the active item
+			$menuItem = $app->getMenu()->getActive();
+			
+			// Get the params
+			$this->menuparams = $menuItem->params;
+			
+			if (!empty($this->menuparams))
+				{
+					$this->title  = $this->menuparams->get('ucm_type');
+				}
+			}
 
 		// If there are no fields column to show in list view then dont allow to show data
 		$this->showList = $model->showListCheck($this->client);
@@ -133,11 +155,11 @@ class TjucmViewItems extends JViewLegacy
 		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
 		$typeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
 		$typeTable->load(array('unique_identifier' => $this->client));
-		$typeParams = json_decode($typeTable->params);
+		$this->ucmTypeParams = json_decode($typeTable->params);
 
-		if (isset($typeParams->list_layout) && !empty($typeParams->list_layout))
+		if (isset($this->ucmTypeParams->list_layout) && !empty($this->ucmTypeParams->list_layout))
 		{
-			$this->setLayout($typeParams->list_layout);
+			$this->setLayout($this->ucmTypeParams->list_layout);
 		}
 
 		$allowedCount = (!empty($typeTable->allowed_count))?$typeTable->allowed_count:'0';

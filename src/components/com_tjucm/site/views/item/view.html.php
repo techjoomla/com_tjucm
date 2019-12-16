@@ -91,7 +91,10 @@ class TjucmViewItem extends JViewLegacy
 
 				if (!empty($this->ucm_type))
 				{
-					$this->client     = 'com_tjucm.' . $this->ucm_type;
+					JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
+					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+					$ucmTypeTable->load(array('alias' => $this->ucm_type));
+					$this->client = $ucmTypeTable->unique_identifier;
 				}
 			}
 		}

@@ -18,6 +18,7 @@ jimport('joomla.database.table');
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Component\ComponentHelper;
 
 /**
  * View to edit
@@ -115,6 +116,29 @@ class TjucmViewItemform extends JViewLegacy
 		if ($this->id && !$clusterId)
 		{
 			$input->set('cluster_id', $this->item->cluster_id);
+			$clusterId = $this->item->cluster_id;
+		}
+
+		// Get com_cluster component status
+		if (ComponentHelper::getComponent('com_cluster', true)->enabled)
+		{
+			// Get com_subusers component status
+			$subUserExist = ComponentHelper::getComponent('com_subusers', true)->enabled;
+
+			// Check user have permission to edit record of assigned cluster
+			if ($subUserExist && !empty($clusterId) && !$user->authorise('core.manageall', 'com_cluster'))
+			{
+				JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
+
+				// Check user has permission for mentioned cluster
+				if (!RBACL::authorise($user->id, 'com_cluster', 'core.manage', $clusterId))
+				{
+					$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
+					$app->setHeader('status', 403, true);
+
+					return;
+				}
+			}
 		}
 
 		// Get a copy record id
@@ -155,7 +179,10 @@ class TjucmViewItemform extends JViewLegacy
 
 				if (!empty($this->ucm_type))
 				{
-					$this->client     = 'com_tjucm.' . $this->ucm_type;
+					JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
+					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+					$ucmTypeTable->load(array('alias' => $this->ucm_type));
+					$this->client = $ucmTypeTable->unique_identifier;
 				}
 			}
 		}
