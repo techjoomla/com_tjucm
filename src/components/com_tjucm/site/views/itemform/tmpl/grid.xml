@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-	<layout title="COM_TJUCM_TITLE_FORM_VIEW_ITEMFORM" option="Grid(12X12)">
+	<layout title="COM_TJUCM_TITLE_FORM_VIEW_ITEMFORM" option="One line one input">
 		<message><![CDATA[COM_TJUCM_TITLE_FORM_VIEW_ITEM_DESC]]></message>
 	</layout>
 	<fields name="params">
