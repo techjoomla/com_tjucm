@@ -88,6 +88,7 @@ class TjucmControllerItems extends TjucmController
 			$app->redirect(Uri::root() . 'index.php?option=com_tjucm&view=items&layout=importitems&tmpl=component&client=' . $client);
 		}
 
+		// Get all fields in the given UCM type
 		$tjFieldsFieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
 		$tjFieldsFieldsModel->setState("filter.client", $client);
 		$tjFieldsFieldsModel->setState("filter.state", 1);
@@ -95,6 +96,7 @@ class TjucmControllerItems extends TjucmController
 		$tjFieldsFieldsModel->setState('list.direction', 'asc');
 		$fields = $tjFieldsFieldsModel->getItems();
 
+		// Map the field names as per field labels in the uploaded CSV file
 		$fieldsArray = array();
 		$requiredFieldsName = array();
 		$requiredFieldsLabel = array();
@@ -111,6 +113,7 @@ class TjucmControllerItems extends TjucmController
 				$requiredFieldsLabel[] = $field->label;
 			}
 
+			// Add options data the radio and list type fields
 			if (in_array($field->type, array('radio', 'single_select', 'multi_select', 'tjlist')))
 			{
 				$tjFieldsOptionsModel = BaseDatabaseModel::getInstance('Options', 'TjfieldsModel', array('ignore_request' => true));
@@ -121,11 +124,13 @@ class TjucmControllerItems extends TjucmController
 			$fieldsArray[$field->name] = $field;
 		}
 
+		// Read the CSV file
 		$file = fopen($uploadPath, 'r');
 		$headerRow = true;
 		$invalidRows = 0;
 		$validRows = 0;
 
+		// Loop through the uploaded file
 		while (($data = fgetcsv($file)) !== false)
 		{
 			if ($headerRow)
@@ -158,6 +163,7 @@ class TjucmControllerItems extends TjucmController
 						{
 							$fieldParams = new Registry($fieldsArray[$fieldName]->params);
 
+							// If there are multiple values for a field then we need to send those as array
 							if (strpos($value, '||') !== false && $fieldParams->get('multiple'))
 							{
 								$optionValue = array_map('trim', explode("||", $value));
@@ -202,6 +208,7 @@ class TjucmControllerItems extends TjucmController
 				}
 				else
 				{
+					// Save the record in UCM
 					$tjucmItemFormModel = BaseDatabaseModel::getInstance('ItemForm', 'TjucmModel');
 
 					if ($tjucmItemFormModel->save(array('client' => $client)))
@@ -222,6 +229,7 @@ class TjucmControllerItems extends TjucmController
 					}
 					else
 					{
+						// Return the error messages if any
 						if (!empty($tjucmItemFormModel->getErrors()))
 						{
 							foreach ($tjucmItemFormModel->getErrors() as $error)
