@@ -178,7 +178,12 @@ foreach ($fieldSets as $fieldset)
 
 							$layout = new JLayoutFile($layoutToUse, JPATH_ROOT . '/components/com_tjfields/layouts/fields');
 							$output = $layout->render(array('fieldXml' => $xmlField, 'field' => $field));
-							echo $output;
+							// To align text, textarea and textareacounter fields properly
+							if($field->type=='Textarea'|| $field->type=='Textareacounter'|| $field->type=='Text'){
+							?>
+								<p class="wordwrap-for-long-description"><?php echo $output; ?></p><?php 
+							}
+							//echo $output;
 							?>
 						</div>
 					</div>
