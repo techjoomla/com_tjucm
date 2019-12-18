@@ -192,6 +192,15 @@ class TjucmControllerItems extends TjucmController
 								}
 							}
 						}
+						elseif ($fieldsArray[$fieldName]->type == 'cluster')
+						{
+							if (JLoader::import('components.com_cluster.tables.clusters', JPATH_ADMINISTRATOR))
+							{
+								$clusterTable = Table::getInstance('Clusters', 'ClusterTable');
+								$clusterTable->load(array("name" => $value));
+								$itemData[$fieldName] = $clusterTable->id;
+							}
+						}
 						else
 						{
 							$itemData[$fieldName] = trim($value);
