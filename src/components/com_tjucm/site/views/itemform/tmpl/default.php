@@ -118,7 +118,7 @@ JFactory::getDocument()->addScriptDeclaration('
 	<?php
 		if ($this->form_extra)
 		{
-			if ( $this->id! = '0')
+			if ($this->id != '0')
 			{
 				?>
 				<div class="page-header">
