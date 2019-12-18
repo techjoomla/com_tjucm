@@ -141,11 +141,11 @@ JFactory::getDocument()->addScriptDeclaration('
 			// Code to display the form
 			if ($dynamicLayout == "default")
 			{
-			echo $this->loadTemplate('extrafields');
+				echo $this->loadTemplate('extrafields');
 			}
 			else
 			{
-			echo $this->loadTemplate('grid');
+				echo $this->loadTemplate('grid');
 			}
 			?>
 			</div>
