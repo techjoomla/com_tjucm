@@ -7,6 +7,6 @@ margin-left:5px !important;
 width:200px !important;
 }
 
-p.wordwrap-for-long-description{
+p.tj-wordwrap{
 word-break: break-word;
 }

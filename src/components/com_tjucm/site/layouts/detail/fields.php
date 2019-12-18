@@ -1,10 +1,10 @@
 <?php
 /**
- * @package	TJ-UCM
- * 
- * @author	 TechJoomla <extensions@techjoomla.com>
+ * @package    TJ-UCM
+ *
+ * @author     TechJoomla <extensions@techjoomla.com>
  * @copyright  Copyright (c) 2009-2019 TechJoomla. All rights reserved.
- * @license	GNU General Public License version 2 or later; see LICENSE.txt
+ * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 // No direct access
@@ -143,7 +143,12 @@ foreach ($fieldSets as $fieldset)
 
 									// Call the JLayout recursively to render fields of ucmsubform
 									$layout = new JLayoutFile('fields', JPATH_ROOT . '/components/com_tjucm/layouts/detail');
-									echo $layout->render(array('xmlFormObject' => $ucmSubFormXmlFieldSets, 'formObject' => $ucmSubformFormObject, 'itemData' => $ucmSubFormRecordData, 'isSubForm' => 1));
+
+									echo $layout->render(
+									array('xmlFormObject' => $ucmSubFormXmlFieldSets,
+									'formObject' => $ucmSubformFormObject,
+									'itemData' => $ucmSubFormRecordData, 'isSubForm' => 1)
+									);
 									echo "<hr>";
 								}
 							}
@@ -157,7 +162,9 @@ foreach ($fieldSets as $fieldset)
 					$layoutToUse = (array_key_exists($field->type, $fieldLayout)) ? $fieldLayout[$field->type] : 'field';
 					?>
 					<div class="<?php echo $controlGroupDivClass;?>">
-						<div class="<?php echo $labelDivClass;?>"><?php echo $field->label; ?>:</div>
+						<div class="<?php echo $labelDivClass;?>"> 
+							<?php echo $field->label; ?>:
+						</div>
 						<div class="<?php echo $controlDivClass;?>">
 							<?php
 							$valueFound = 0;
@@ -178,12 +185,19 @@ foreach ($fieldSets as $fieldset)
 
 							$layout = new JLayoutFile($layoutToUse, JPATH_ROOT . '/components/com_tjfields/layouts/fields');
 							$output = $layout->render(array('fieldXml' => $xmlField, 'field' => $field));
+
 							// To align text, textarea and textareacounter fields properly
-							if($field->type=='Textarea'|| $field->type=='Textareacounter'|| $field->type=='Text'){
-							?>
-								<p class="wordwrap-for-long-description"><?php echo $output; ?></p><?php 
+
+							if ($field->type == 'Textarea'|| $field->type == 'Textareacounter'|| $field->type == 'Text')
+							{
+								?>
+								<p class="tj-wordwrap">
+									<?php echo $output; ?>
+								</p>
+								<?php 
 							}
-							//echo $output;
+
+							echo $output;
 							?>
 						</div>
 					</div>
