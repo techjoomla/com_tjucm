@@ -13,7 +13,17 @@ defined('_JEXEC') or die;
 JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
 JHtml::_('bootstrap.tooltip');
 JHtml::_('behavior.multiselect');
+JHtml::_('behavior.modal');
 JHtml::_('formbehavior.chosen', 'select');
+
+$importItemsPopUpUrl = JUri::root() . '/index.php?option=com_tjucm&view=items&layout=importitems&tmpl=component&client=' . $this->client;
+JFactory::getDocument()->addScriptDeclaration('
+	jQuery(document).ready(function(){
+		jQuery("#adminForm #import-items").click(function() {
+			SqueezeBox.open("' . $importItemsPopUpUrl . '" ,{handler: "iframe", size: {x: window.innerWidth-250, y: window.innerHeight-150}});
+		});
+	});
+');
 
 $user = JFactory::getUser();
 $userId = $user->get('id');
@@ -39,13 +49,13 @@ $fieldsData = array();
 $statusColumnWidth = 0;
 ?>
 <form action="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>" method="post" name="adminForm" id="adminForm">
-<?php 
-		if(isset($this->items))
+<?php
+		if (isset($this->items))
 		{
 			?>
 			<div class="page-header">
 				<h1 class="page-title">
-				<?php echo  strtoupper($this->title)." ".JText::_("COM_TJUCM_FORM_LIST"); ?>
+				<?php echo strtoupper($this->title) . " " . JText::_("COM_TJUCM_FORM_LIST"); ?>
 				<h1>
 			</div> <?php
 		}?>
@@ -56,12 +66,22 @@ $statusColumnWidth = 0;
 		{
 			?>
 			<a href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false); ?>" class="btn btn-success btn-small">
-				<i class="icon-plus"></i><?php echo JText::_('COM_TJUCM_ADD_ITEM'); ?>
+				<i class="icon-plus"></i> <?php echo JText::_('COM_TJUCM_ADD_ITEM'); ?>
 			</a>
 			<?php
+			if ($this->canImport)
+			{
+				?>
+				<a href="#" id="import-items" class="btn btn-default btn-small">
+					<i class="fa fa-upload"></i> <?php echo JText::_('COM_TJUCM_IMPORT_ITEM'); ?>
+				</a>
+				<?php
+			}
 		}
 		?>
 	</div>
+	<div class="clearfix">&nbsp;</div>
+	<div class="clearfix">&nbsp;</div>
 	<div class="row">
 	<div class="col-xs-12">
 	<div class="table-responsive">
