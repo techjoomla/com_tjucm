@@ -48,19 +48,22 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 $fieldsData = array();
 $statusColumnWidth = 0;
 ?>
+<div class="tjucm-wrapper">
 <form action="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>" method="post" name="adminForm" id="adminForm">
 <?php
-		if (isset($this->items))
-		{
-			?>
-			<div class="page-header">
-				<h1 class="page-title">
-				<?php echo strtoupper($this->title) . " " . JText::_("COM_TJUCM_FORM_LIST"); ?>
-				<h1>
-			</div> <?php
-		}?>
-		<?php echo $this->loadTemplate('filters'); ?>
-	<div class="pull-right">
+	if (isset($this->items))
+	{
+	?>
+		<div class="page-header">
+			<h1 class="page-title">
+			<?php echo  strtoupper($this->title) . " " . JText::_("COM_TJUCM_FORM_LIST"); ?>
+			</h1>
+		</div> <?php
+	}
+
+	echo $this->loadTemplate('filters');
+	?>
+		<div class="pull-right">
 		<?php
 		if ($this->allowedToAdd)
 		{
@@ -90,38 +93,34 @@ $statusColumnWidth = 0;
 			if (!empty($this->showList))
 			{
 				if (!empty($this->items))
-				{?>
-			<thead>
-				<tr>
-					<?php
-					if (isset($this->items[0]->state))
-					{
-						?>
-						<th class="center" width="3%">
-							<?php echo JHtml::_('grid.sort', 'JPUBLISHED', 'a.state', $listDirn, $listOrder); ?>
-						</th>
+				{
+					?>
+					<thead>
+					<tr>
 						<?php
-					}
-					?>
-					<th width="2%">
-						<?php echo JHtml::_('grid.sort', 'COM_TJUCM_ITEMS_ID', 'a.id', $listDirn, $listOrder); ?>
-					</th>
-
-					<?php
-					if (!empty($this->ucmTypeParams->allow_draft_save) && $this->ucmTypeParams->allow_draft_save == 1)
-					{
-						$statusColumnWidth = 2;
-					?>
+						if (isset($this->items[0]->state))
+						{
+						?>
+							<th class="center" width="3%">
+							<?php echo JHtml::_('grid.sort', 'JPUBLISHED', 'a.state', $listDirn, $listOrder); ?>
+							</th>
+						<?php
+						}
+						?>
 						<th width="2%">
 							<?php echo JHtml::_('grid.sort', 'COM_TJUCM_DATA_STATUS', 'a.draft', $listDirn, $listOrder); ?>
 						</th>
 					<?php
-					}
 
-					if (!empty($this->listcolumn))
-					{
-						JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
-						$tjFieldsFieldTable = JTable::getInstance('field', 'TjfieldsTable');
+						if (!empty($this->ucmTypeParams->allow_draft_save) && $this->ucmTypeParams->allow_draft_save == 1)
+						{
+							$statusColumnWidth = 2;
+						?>
+							<th width="2%">
+								<?php echo JHtml::_('grid.sort', 'COM_TJUCM_DATA_STATUS', 'a.draft', $listDirn, $listOrder); ?>
+							</th>
+						<?php
+						}
 
 						foreach ($this->listcolumn as $fieldId => $col_name)
 						{
@@ -137,12 +136,11 @@ $statusColumnWidth = 0;
 							}
 							?>
 
-							<th  style="word-break: break-word;" width="<?php echo (85 - $statusColumnWidth)/count($this->listcolumn).'%';?>">
+							<th  style="word-break: break-word;" width="<?php echo (85 - $statusColumnWidth) / count($this->listcolumn) . '%';?>">
 								<?php echo htmlspecialchars($col_name, ENT_COMPAT, 'UTF-8'); ?>
 							</th>
 							<?php
 						}
-					}
 
 					if ($this->canEdit || $this->canDelete)
 					{
@@ -153,18 +151,18 @@ $statusColumnWidth = 0;
 					<?php
 					}
 					?>
-			</tr>
-		</thead>
-		<?php
-			}
-		}?>
+				</tr>
+			</thead>
+			<?php
+				}
+			}?>
 		<?php
 		if (!empty($this->items))
 		{
 		?>
 		<tfoot>
 			<tr>
-				<td colspan="<?php echo isset($this->items[0]) ? count($this->items[0]->field_values)+3 : 10; ?>">
+				<td colspan="<?php echo isset($this->items[0]) ? count($this->items[0]->field_values) + 3 : 10; ?>">
 					<?php echo $this->pagination->getListFooter(); ?>
 				</td>
 			</tr>
@@ -197,7 +195,18 @@ $statusColumnWidth = 0;
 				{
 					// Call the JLayout to render the fields in the details view
 					$layout = new JLayoutFile('list.list', JPATH_ROOT . '/components/com_tjucm/');
-					echo $layout->render(array('itemsData' => $item, 'created_by' => $this->created_by, 'client' => $this->client, 'xmlFormObject' => $formXml, 'ucmTypeId' => $this->ucmTypeId, 'ucmTypeParams' => $this->ucmTypeParams, 'fieldsData' => $fieldsData, 'formObject' => $formObject));
+					echo $layout->render(
+						array(
+							'itemsData' => $item,
+							'created_by' => $this->created_by,
+							'client' => $this->client,
+							'xmlFormObject' => $formXml,
+							'ucmTypeId' => $this->ucmTypeId,
+							'ucmTypeParams' => $this->ucmTypeParams,
+							'fieldsData' => $fieldsData,
+							'formObject' => $formObject
+						)
+					);
 				}
 			}
 			else
@@ -223,8 +232,11 @@ $statusColumnWidth = 0;
 	if ($this->allowedToAdd)
 	{
 		?>
-		<a target="_blank" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false); ?>" class="btn btn-success btn-small">
-			<i class="icon-plus"></i><?php echo JText::_('COM_TJUCM_ADD_ITEM'); ?>
+		<a target="_blank"
+		href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false); ?>"
+		class="btn btn-success btn-small">
+			<i class="icon-plus"></i>
+			<?php echo JText::_('COM_TJUCM_ADD_ITEM'); ?>
 		</a>
 		<?php
 	}
@@ -235,6 +247,7 @@ $statusColumnWidth = 0;
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>"/>
 	<?php echo JHtml::_('form.token'); ?>
 </form>
+</div>
 <?php
 if ($this->canDelete)
 {
