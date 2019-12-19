@@ -216,5 +216,7 @@ JFactory::getDocument()->addScriptDeclaration('
 	<input type="hidden" name="task" value="itemform.save"/>
 	<input type="hidden" name="form_status" id="form_status" value=""/>
 	<input type="hidden" name="tjucm-autosave" id="tjucm-autosave" value="<?php echo $this->allow_auto_save;?>"/>
+	<input type="hidden" name="tjucm-bitrate" id="tjucm-bitrate" value="<?php echo $this->allow_bit_rate;?>"/>
+	<input type="hidden" name="tjucm-bitrate_seconds" id="tjucm-bitrate_seconds" value="<?php echo $this->allow_bit_rate_seconds;?>"/>	
 	<?php echo HTMLHelper::_('form.token'); ?>
 </form>

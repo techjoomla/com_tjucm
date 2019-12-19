@@ -17,6 +17,12 @@ jQuery(window).load(function()
 	/*Code to get item state*/
 	var tjUcmCurrentDraftSaveState = Number(jQuery('#itemState').val());
 
+	/*value of bitrate on button*/
+	var tjUcmAllowBitrate = jQuery('#item-form #tjucm-bitrate').val();
+
+	/*value of bitrate seconds on button*/
+	var tjUcmBitrateSeconds = jQuery('#item-form #tjucm-bitrate_seconds').val();	
+
 	/* If record is submitted and no longet in the draft state then dont allow autosave to work*/
 	if (tjUcmCurrentDraftSaveState === 1)
 	{
@@ -242,6 +248,14 @@ jQuery(window).load(function()
 			jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
 		}
 	});
+
+	/* Handel saving if data as per the seconds of bitrate*/
+	var tjUcmFormSubmitCallingButtonId = event.target.id;
+	if(tjUcmAllowAutoSave == 1 && tjUcmAllowBitrate == 1 && tjUcmFormSubmitCallingButtonId != 'tjUcmSectionFinalSave') 
+	{
+		var milliseconds = tjUcmBitrateSeconds*1000;
+		setTimeout(function(){ tjUcmItemForm.saveUcmFormData(); }, milliseconds );
+	}	
 });
 
 var tjUcmItemForm = {

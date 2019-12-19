@@ -194,6 +194,19 @@ class TjucmViewItemform extends JViewLegacy
 
 			return;
 		}
+		if (empty($this->title))
+		{
+			// Get the active item
+			$menuItem = $app->getMenu()->getActive();
+	
+				// Get the params
+				$this->menuparams = $menuItem->params;
+	
+				if (!empty($this->menuparams))
+				{
+					$this->title  = $this->menuparams->get('ucm_type');
+				}
+		}	
 
 		// Check the view access to the itemform (the model has already computed the values).
 		if ($this->item->params->get('access-view') == false)
@@ -262,7 +275,9 @@ class TjucmViewItemform extends JViewLegacy
 
 		$this->allow_auto_save = (isset($typeParams->allow_auto_save) && empty($typeParams->allow_auto_save)) ? 0 : 1;
 		$this->allow_draft_save = (isset($typeParams->allow_draft_save) && !empty($typeParams->allow_draft_save)) ? 1 : 0;
-
+		$this->allow_bit_rate=(isset($typeParams->bitrate_on) && !empty($typeParams->bitrate_on)) ? 1 : 0;
+		$this->allow_bit_rate_seconds=$typeParams->bitrate_seconds;
+		
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{
