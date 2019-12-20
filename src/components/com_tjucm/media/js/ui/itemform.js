@@ -254,7 +254,10 @@ jQuery(window).load(function()
 	if(tjUcmAllowAutoSave == 1 && tjUcmAllowBitrate == 1 && tjUcmFormSubmitCallingButtonId != 'tjUcmSectionFinalSave') 
 	{
 		var milliseconds = tjUcmBitrateSeconds*1000;
-		setTimeout(function(){ tjUcmItemForm.saveUcmFormData(); }, milliseconds );
+		for(var i=0;i<=milliseconds;i++)
+		{
+			tjUcmItemForm.saveUcmFormData();
+		}
 	}	
 });
 
