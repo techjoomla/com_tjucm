@@ -68,7 +68,7 @@ class TjucmControllerItems extends TjucmController
 		}
 
 		// Check if the file is a CSV file
-		if ($importFile['type'] != "text/csv")
+		if (!in_array($importFile['type'], array('application/vnd.ms-excel', 'text/plain', 'text/csv', 'text/tsv')))
 		{
 			$app->enqueueMessage(Text::_('COM_TJUCM_ITEMS_INVALID_CSV_FILE'), 'error');
 			$app->redirect(Uri::root() . 'index.php?option=com_tjucm&view=items&layout=importitems&tmpl=component&client=' . $client);
