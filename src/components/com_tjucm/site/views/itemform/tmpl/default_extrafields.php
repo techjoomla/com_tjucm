@@ -60,6 +60,22 @@ if ($this->form_extra)
 								<?php echo $field->input; ?>
 							</div>
 							<?php
+							if ($field->type == 'Calendar')
+							{
+							?>
+								<script type="text/javascript">
+									jQuery(document).ready(function ()
+									{
+										document.formvalidator.setHandler('calendar', function(value) {
+											regex=/^\d{4}-\d{2}-\d{2}$/;
+
+											return regex.test(value);
+										});
+									}
+								</script>
+							<?php
+							}
+
 							// TODO :- Check and remove
 							if ($field->type == 'File')
 							{
