@@ -35,7 +35,7 @@ Factory::getDocument()->addScriptDeclaration('
 
 				if (tjUcmUploadFileExtension === "csv")
 				{
-					jQuery("#uploadForm #records-import-msg").removeClass("hidden");
+					jQuery("#uploadForm #records-import-msg").show();
 					jQuery("#uploadForm #upload-submit").attr("disabled", "disabled");
 					jQuery("#uploadForm #csv-file-upload").css("border-color", "");
 					document.getElementById("uploadForm").submit();
@@ -74,7 +74,7 @@ Factory::getDocument()->addScriptDeclaration('
 		</div>
 		<div class="clearfix">&nbsp;</div>
 		<div class="col-sm-12">
-			<div id="records-import-msg" class="alert alert-info hidden"><?php echo Text::_("COM_TJUCM_ITEMS_IMPORTING_MSG")?></div>
+			<div id="records-import-msg" style="display:none;" class="alert alert-info"><?php echo Text::_("COM_TJUCM_ITEMS_IMPORTING_MSG")?></div>
 		</div>
 		<div class="col-sm-12">
 			<hr class="hr hr-condensed">
