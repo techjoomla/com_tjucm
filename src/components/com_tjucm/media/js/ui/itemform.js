@@ -31,7 +31,18 @@ jQuery(window).load(function()
 			jQuery("#item-form").on("change select", ":input", function(){
 				if (tjUcmCurrentAutoSaveState)
 				{
-					tjUcmItemForm.onUcmFormChange(this);
+					// Call function if field name & value exist in request data
+					if (jQuery(this).attr('name') !='' && jQuery(this).attr('name') != undefined)
+					{
+						// If field is required and user tried to remove value then no need to call function
+						if ((jQuery(this).attr('required') == 'required' || jQuery(this).attr('required') == true) && jQuery.trim(jQuery(this).val()) =='')
+						{
+
+							return false;
+						}
+
+						tjUcmItemForm.onUcmFormChange(this);
+					}
 				}
 			});
 
@@ -39,7 +50,18 @@ jQuery(window).load(function()
 			jQuery("#item-form .field-calendar input:text").blur(function(){
 				if (tjUcmCurrentAutoSaveState)
 				{
-					tjUcmItemForm.onUcmFormChange(this);
+					// Call function if field name & value exist in request data
+					if (jQuery(this).attr('name') !='' && jQuery(this).attr('name') != undefined)
+					{
+						// If field is required and user tried to remove value then no need to call function
+						if ((jQuery(this).attr('required') == 'required' || jQuery(this).attr('required') == true) && jQuery.trim(jQuery(this).val()) =='')
+						{
+
+							return false;
+						}
+
+						tjUcmItemForm.onUcmFormChange(this);
+					}
 				}
 			});
 
