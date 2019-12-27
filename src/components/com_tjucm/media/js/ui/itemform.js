@@ -21,10 +21,13 @@ jQuery(window).load(function()
 	if (tjUcmCurrentDraftSaveState === 1)
 	{
 		var tjUcmAllowAutoSave = jQuery('#item-form #tjucm-autosave').val();
+
+		/*value of bitrate button*/
 		var tjUcmAllowBitrate = jQuery('#item-form #tjucm-bitrate').val();
 
 		/*value of bitrate seconds on button*/
 		var tjUcmBitrateSeconds = jQuery('#item-form #tjucm-bitrate_seconds').val();
+
 		/*Check if auto save is enabled for UCM type*/
 		if (tjUcmAllowAutoSave == 1)
 		{
@@ -76,6 +79,7 @@ jQuery(window).load(function()
 					});
 
 					/* Check after some time if the content of editor is changed and if so then save it in DB*/
+					var milliseconds = tjUcmBitrateSeconds*1000;					
 					setInterval(function () {
 						for (var key in tjUcmTinyMCEFieldIds) {
 							if (tjUcmTinyMCEFieldIds.hasOwnProperty(key)) {
@@ -94,7 +98,7 @@ jQuery(window).load(function()
 								}
 							}
 						}
-					},7000);
+					},milliseconds);
 				}
 			}
 			/*to save data of editor field if editor=jce*/			
