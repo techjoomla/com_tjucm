@@ -42,57 +42,73 @@ jQuery(window).load(function()
 					tjUcmItemForm.onUcmFormChange(this);
 				}
 			});
-
-			var tjUcmTinyMCE = Joomla.getOptions("plg_editor_tinymce");
-
-			/* Get the value of editor fields*/
-			if (tjUcmTinyMCE != undefined)
+			/*to save data of editor field if editor=tinymce*/
+			if(jQuery(".js-editor-tinymce").length > 0)
 			{
-				jQuery.each(tjUcmTinyMCE.tinyMCE, function(index, value){
-					if (jQuery("#item-form #jform_"+index).length)
-					{
-						var tjUcmEditorFieldContent = jQuery("#jform_"+index+"_ifr").contents().find('body').html();
-						tjUcmTinyMCEFieldIds[index] = tjUcmEditorFieldContent;
-					}
-					else if ((jQuery("#item-form #jform_"+index).length == 0) && (index != 'default'))
-					{
-						var tjUcmSubFormEditorFields = jQuery("textarea[id$='__"+index+"']");
+				var tjUcmTinyMCE = Joomla.getOptions("plg_editor_tinymce");
 
-						if (tjUcmSubFormEditorFields.length)
+				/* Get the value of editor fields*/
+				if (tjUcmTinyMCE != undefined)
+				{
+					jQuery.each(tjUcmTinyMCE.tinyMCE, function(index, value){
+						if (jQuery("#item-form #jform_"+index).length)
 						{
-							jQuery.each(tjUcmSubFormEditorFields, function(findex, fvalue){
-								var tjUcmEditorFieldContentId = jQuery(fvalue).attr('id');
-								var tjUcmEditorFieldContent = jQuery("#"+tjUcmEditorFieldContentId+"_ifr").contents().find('body').html();
-								var tjucmTempIndex = tjUcmEditorFieldContentId.replace("jform_", "");
-								tjUcmTinyMCEFieldIds[tjucmTempIndex] = tjUcmEditorFieldContent;
-							});
+							var tjUcmEditorFieldContent = jQuery("#jform_"+index+"_ifr").contents().find('body').html();
+							tjUcmTinyMCEFieldIds[index] = tjUcmEditorFieldContent;
 						}
-					}
-				});
+						else if ((jQuery("#item-form #jform_"+index).length == 0) && (index != 'default'))
+						{
+							var tjUcmSubFormEditorFields = jQuery("textarea[id$='__"+index+"']");
 
-				/* Check after some time if the content of editor is changed and if so then save it in DB*/
-				setInterval(function () {
-					for (var key in tjUcmTinyMCEFieldIds) {
-						if (tjUcmTinyMCEFieldIds.hasOwnProperty(key)) {
-							var tjUcmEditorFieldContent = jQuery("#jform_"+key+"_ifr").contents().find('body').html();
-
-							if (tjUcmTinyMCEFieldIds[key] != tjUcmEditorFieldContent)
+							if (tjUcmSubFormEditorFields.length)
 							{
-								var tjUcmTempFieldObj = jQuery("#jform_"+key);
+								jQuery.each(tjUcmSubFormEditorFields, function(findex, fvalue){
+									var tjUcmEditorFieldContentId = jQuery(fvalue).attr('id');
+									var tjUcmEditorFieldContent = jQuery("#"+tjUcmEditorFieldContentId+"_ifr").contents().find('body').html();
+									var tjucmTempIndex = tjUcmEditorFieldContentId.replace("jform_", "");
+									tjUcmTinyMCEFieldIds[tjucmTempIndex] = tjUcmEditorFieldContent;
+								});
+							}
+						}
+					});
 
-								if (tjUcmTempFieldObj.length)
+					/* Check after some time if the content of editor is changed and if so then save it in DB*/
+					setInterval(function () {
+						for (var key in tjUcmTinyMCEFieldIds) {
+							if (tjUcmTinyMCEFieldIds.hasOwnProperty(key)) {
+								var tjUcmEditorFieldContent = jQuery("#jform_"+key+"_ifr").contents().find('body').html();
+
+								if (tjUcmTinyMCEFieldIds[key] != tjUcmEditorFieldContent)
 								{
-									tjUcmTempFieldObj.val(tjUcmEditorFieldContent);
-									tjUcmTinyMCEFieldIds[key] = tjUcmEditorFieldContent;
-									tjUcmItemForm.onUcmFormChange(tjUcmTempFieldObj);
+									var tjUcmTempFieldObj = jQuery("#jform_"+key);
+
+									if (tjUcmTempFieldObj.length)
+									{
+										tjUcmTempFieldObj.val(tjUcmEditorFieldContent);
+										tjUcmTinyMCEFieldIds[key] = tjUcmEditorFieldContent;
+										tjUcmItemForm.onUcmFormChange(tjUcmTempFieldObj);
+									}
 								}
 							}
 						}
-					}
-				},7000);
+					},7000);
+				}
+			}
+			/*to save data of editor field if editor=jce*/			
+			if(jQuery(".wf-editor-container").length > 0)
+			{
+				var milliseconds = tjUcmBitrateSeconds*1000;
+				setInterval(function(){ 
+					var jceContent = document.getElementById('jform_com_tjucm_text_fef_ifr');
+					var innerDoc = jceContent.contentDocument || jceContent.contentWindow.document;
+					var currentJceText = innerDoc.body.innerHTML;
+					var tjUcmTempFieldJceObj = jQuery("#jform_com_tjucm_text_fef");
+					tjUcmTempFieldJceObj.val(currentJceText);
+					tjUcmItemForm.onUcmFormChange(tjUcmTempFieldJceObj);
+			 	}, milliseconds );
 			}
 		}
-	}
+	}	
 	else
 	{
 		jQuery("#tjucm-auto-save-disabled-msg").show();
