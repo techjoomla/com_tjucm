@@ -21,7 +21,10 @@ jQuery(window).load(function()
 	if (tjUcmCurrentDraftSaveState === 1)
 	{
 		var tjUcmAllowAutoSave = jQuery('#item-form #tjucm-autosave').val();
+		var tjUcmAllowBitrate = jQuery('#item-form #tjucm-bitrate').val();
 
+		/*value of bitrate seconds on button*/
+		var tjUcmBitrateSeconds = jQuery('#item-form #tjucm-bitrate_seconds').val();
 		/*Check if auto save is enabled for UCM type*/
 		if (tjUcmAllowAutoSave == 1)
 		{
@@ -43,7 +46,7 @@ jQuery(window).load(function()
 				}
 			});
 			/*to save data of editor field if editor=tinymce*/
-			if(jQuery(".js-editor-tinymce").length > 0)
+			if(jQuery("#item-form .js-editor-tinymce").length > 0)
 			{
 				var tjUcmTinyMCE = Joomla.getOptions("plg_editor_tinymce");
 
@@ -95,7 +98,7 @@ jQuery(window).load(function()
 				}
 			}
 			/*to save data of editor field if editor=jce*/			
-			if(jQuery(".wf-editor-container").length > 0)
+			if(jQuery("#item-form .wf-editor-container").length > 0)
 			{
 				var milliseconds = tjUcmBitrateSeconds*1000;
 				setInterval(function(){ 
@@ -258,6 +261,13 @@ jQuery(window).load(function()
 			jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
 		}
 	});
+		/* Handel saving if data as per the seconds of bitrate*/
+		var tjUcmFormSubmitCallingButtonId = event.target.id;
+		if(tjUcmAllowAutoSave == 1 && tjUcmAllowBitrate == 1 && tjUcmFormSubmitCallingButtonId != 'tjUcmSectionFinalSave') 
+		{
+			var milliseconds = tjUcmBitrateSeconds*1000;
+			setInterval(function(){ tjUcmItemForm.saveUcmFormData(); }, milliseconds );
+		}	
 });
 
 var tjUcmItemForm = {
@@ -673,8 +683,13 @@ var tjUcmItemForm = {
 			tjUcmSaveRecordAsDraft = 0;
 		}
 
-		/* For AJAX save need to assign values to the editor field containers*/
+		/* For AJAX save need to assign values to the editor field containers of editor="TinyMce"*/
 		jQuery("#item-form .toggle-editor a").each(function(index) {
+			this.click();
+		});
+
+		/* For AJAX save need to assign values to the editor field containers of editor="jce editor"*/
+		jQuery("#item-form .wf-editor-toggle").each(function(index) {
 			this.click();
 		});
 
@@ -717,10 +732,15 @@ var tjUcmItemForm = {
 			com_tjucm.Services.Item.saveFormData(tjUcmItemFormData, tjUcmItemForm.afterDataSave);
 		});
 
-		/* Once data is assigned to the textarea toggle the editors*/
+		/* Once data is assigned to the textarea toggle the TinyMce editors*/
 		jQuery("#item-form .toggle-editor a").each(function(index) {
 			this.click();
 		});
+
+		/* Once data is assigned to the textarea toggle the Jce editors*/
+		jQuery("#item-form .wf-editor-toggle").each(function(index) {
+			this.click();
+		});		
 	},
 	saveSectionData: function (tabId){
 		/* Disable the action buttons before performing the action*/

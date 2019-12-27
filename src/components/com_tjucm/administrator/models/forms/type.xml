@@ -38,6 +38,11 @@
 				<option value="0">JNO</option>
 				<option value="1">JYES</option>
 			</field>
+			<field name="bitrate_on" type="radio" class="btn-group" default="0" label="COM_TJUCM_FORM_LBL_TYPE_ALLOW_BITRATE_ON" description="COM_TJUCM_FORM_DESC_LBL_TYPE_ALLOW_BITRATE_ON" hint="COM_TJUCM_FORM_LBL_TYPE_ALLOW_BITRATE_ON" showon="allow_auto_save:1[AND]is_subform:0">
+				<option value="0">JNO</option>
+				<option value="1">JYES</option>
+			</field>
+			<field name="bitrate_seconds" type="number" filter="raw" label="COM_TJUCM_FORM_LBL_TYPE_BITRATE_SECONDS" description="COM_TJUCM_FORM_DESC_LBL_TYPE_BITRATE_SECONDS" hint="COM_TJUCM_FORM_LBL_TYPE_BITRATE_SECONDS" showon="bitrate_on:1"/>			
 			<field name="layout" type="componentlayout" label="COM_TJUCM_FORM_LBL_TYPE_LAYOUT" description="COM_TJUCM_FORM_DESC_TYPE_LAYOUT" useglobal="true" extension="com_tjucm" view="itemform" />
 			<field name="details_layout" type="componentlayout" label="COM_TJUCM_DETAILS_LBL_TYPE_LAYOUT" description="COM_TJUCM_DETAILS_DESC_TYPE_LAYOUT" useglobal="true" extension="com_tjucm" view="item" />
 			<field name="list_layout" type="componentlayout" label="COM_TJUCM_LIST_LBL_TYPE_LAYOUT" description="COM_TJUCM_LIST_DESC_TYPE_LAYOUT" useglobal="true" extension="com_tjucm" view="items" />
