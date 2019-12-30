@@ -59,55 +59,6 @@ jQuery(window).load(function()
 					}, tjUcmBitrateSeconds*1000);
 				}
 			}
-
-			var tjUcmTinyMCE = Joomla.getOptions("plg_editor_tinymce");
-
-			/* Get the value of editor fields*/
-			if (tjUcmTinyMCE != undefined)
-			{
-				jQuery.each(tjUcmTinyMCE.tinyMCE, function(index, value){
-					if (jQuery("#item-form #jform_"+index).length)
-					{
-						var tjUcmEditorFieldContent = jQuery("#jform_"+index+"_ifr").contents().find('body').html();
-						tjUcmTinyMCEFieldIds[index] = tjUcmEditorFieldContent;
-					}
-					else if ((jQuery("#item-form #jform_"+index).length == 0) && (index != 'default'))
-					{
-						var tjUcmSubFormEditorFields = jQuery("textarea[id$='__"+index+"']");
-
-						if (tjUcmSubFormEditorFields.length)
-						{
-							jQuery.each(tjUcmSubFormEditorFields, function(findex, fvalue){
-								var tjUcmEditorFieldContentId = jQuery(fvalue).attr('id');
-								var tjUcmEditorFieldContent = jQuery("#"+tjUcmEditorFieldContentId+"_ifr").contents().find('body').html();
-								var tjucmTempIndex = tjUcmEditorFieldContentId.replace("jform_", "");
-								tjUcmTinyMCEFieldIds[tjucmTempIndex] = tjUcmEditorFieldContent;
-							});
-						}
-					}
-				});
-
-				/* Check after some time if the content of editor is changed and if so then save it in DB*/
-				setInterval(function () {
-					for (var key in tjUcmTinyMCEFieldIds) {
-						if (tjUcmTinyMCEFieldIds.hasOwnProperty(key)) {
-							var tjUcmEditorFieldContent = jQuery("#jform_"+key+"_ifr").contents().find('body').html();
-
-							if (tjUcmTinyMCEFieldIds[key] != tjUcmEditorFieldContent)
-							{
-								var tjUcmTempFieldObj = jQuery("#jform_"+key);
-
-								if (tjUcmTempFieldObj.length)
-								{
-									tjUcmTempFieldObj.val(tjUcmEditorFieldContent);
-									tjUcmTinyMCEFieldIds[key] = tjUcmEditorFieldContent;
-									tjUcmItemForm.onUcmFormChange(tjUcmTempFieldObj);
-								}
-							}
-						}
-					}
-				}, tjUcmBitrateSeconds*1000);
-			}
 		}
 	}
 	else
