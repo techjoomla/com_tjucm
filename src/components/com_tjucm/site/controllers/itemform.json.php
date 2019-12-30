@@ -234,6 +234,7 @@ class TjucmControllerItemForm extends JControllerForm
 		$formData  = array_merge_recursive($formData, $filesData);
 		$section   = $post->get('tjUcmFormSection', '', 'STRING');
 		$draft     = $post->get('draft', 0, 'INT');
+		$state     = $formData['state'];
 
 		if (empty($formData) || empty($client))
 		{
@@ -300,6 +301,14 @@ class TjucmControllerItemForm extends JControllerForm
 				// Disable the draft mode of the item if full form is submitted
 				$table->load($recordId);
 				$table->draft = $draft;
+
+				if ($state == null)
+				{
+					// For the first time saving get the record from table which already stored
+					$state = $table->state;
+				}
+
+				$table->state = $state;
 				$table->modified_date = Factory::getDate()->toSql();
 				$table->store();
 
