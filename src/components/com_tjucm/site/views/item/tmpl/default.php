@@ -59,9 +59,28 @@ else
 		{
 			$redirectURL = JRoute::_('index.php?option=com_tjucm&task=itemform.remove&id=' . $this->item->id . '&client=' . $this->client . "&" . JSession::getFormToken() . '=1', false);
 			?>
-			<a class="btn btn-default" href="<?php echo $redirectURL; ?>"><?php echo JText::_("COM_TJUCM_DELETE_ITEM"); ?></a>
+			<a class="btn btn-default delete-button" href="<?php echo $redirectURL; ?>"><?php echo JText::_("COM_TJUCM_DELETE_ITEM"); ?></a>
 			<?php
 		}
 		?>
 	</div>
 </div>
+<?php
+if ($deleteOwn)
+{
+	?>
+	<script type="text/javascript">
+	jQuery(document).ready(function () {
+		jQuery('.delete-button').click(deleteItem);
+	});
+
+	function deleteItem()
+	{
+		if (!confirm("<?php echo JText::_('COM_TJUCM_DELETE_MESSAGE'); ?>"))
+		{
+			return false;
+		}
+	}
+	</script>
+<?php
+}
