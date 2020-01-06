@@ -292,9 +292,9 @@ class TjucmModelItems extends JModelList
 		// Search on fields data
 		$filteredItemIds = $this->filterContent($client);
 
-		if (is_array($filteredItemIds))
+		if ($filteredItemIds)
 		{
-			if (!empty($filteredItemIds))
+			if (!empty($filteredItemIds) && is_array($filteredItemIds))
 			{
 				$filteredItemIds = implode(',', $filteredItemIds);
 				$query->where($db->quoteName('a.id') . ' IN (' . $filteredItemIds . ')');
@@ -328,6 +328,8 @@ class TjucmModelItems extends JModelList
 
 	/**
 	 * Function to filter content as per field values
+	 *
+	 * @param   string  $client  Client
 	 *
 	 * @return   Array  Content Ids
 	 *
@@ -407,8 +409,9 @@ class TjucmModelItems extends JModelList
 		foreach ($fields as $field)
 		{
 			$filterValue = $this->getState('filter.field.' . $field->name);
+			$filteroptionId = $this->getState('filter.field.' . $field->name . '.optionId');
 
-			if ($filterValue != '')
+			if ($filterValue != '' || $filteroptionId)
 			{
 				$filterFieldsCount++;
 
@@ -419,7 +422,25 @@ class TjucmModelItems extends JModelList
 				}
 
 				$query->where($db->qn('fv' . $filterFieldsCount . '.field_id') . ' = ' . $field->id);
-				$query->where($db->qn('fv' . $filterFieldsCount . '.value') . ' = ' . $db->q($filterValue));
+
+				if ($filteroptionId)
+				{
+					// Check option id blank or null
+					if ($filteroptionId == 'other')
+					{
+						$query->where('(' . $db->qn('fv' . $filterFieldsCount . '.option_id') .
+						' is null OR ' . $db->qn('fv' . $filterFieldsCount . '.option_id') . ' = 0 )');
+					}
+					else
+					{
+						$query->where($db->qn('fv' . $filterFieldsCount . '.option_id') . ' = ' . $db->q($filteroptionId));
+					}
+				}
+				else
+				{
+					$query->where($db->qn('fv' . $filterFieldsCount . '.value') . ' = ' . $db->q($filterValue));
+				}
+
 				$filterApplied = 1;
 			}
 		}
@@ -432,7 +453,9 @@ class TjucmModelItems extends JModelList
 		{
 			$db->setQuery($query);
 
-			return $db->loadColumn();
+			$filteredRecord = $db->loadColumn();
+
+			return empty($filteredRecord)? true : $filteredRecord;
 		}
 		else
 		{
