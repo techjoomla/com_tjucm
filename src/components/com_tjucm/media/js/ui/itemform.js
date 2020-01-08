@@ -10,6 +10,8 @@ var tjUcmClickedOnPrev = 0;
 var tjUcmCurrentAutoSaveState = 0;
 /*Variable to store if form is submited for final save*/
 var tjUcmFormFinalSave = 0;
+/*Variable to store the data of JCE editor field*/
+var tjUcmJCEFieldIds = new Array();
 
 /* This function executes for autosave form */
 jQuery(window).load(function()
@@ -21,7 +23,7 @@ jQuery(window).load(function()
 	var tjUcmAllowBitrate = jQuery('#item-form #tjucm-bitrate').val();
 
 	/*value of bitrate seconds on button*/
-	var tjUcmBitrateSeconds = jQuery('#item-form #tjucm-bitrate_seconds').val();	
+	var tjUcmBitrateSeconds = jQuery('#item-form #tjucm-bitrate_seconds').val();
 
 	/* If record is submitted and no longet in the draft state then dont allow autosave to work*/
 	if (tjUcmCurrentDraftSaveState === 1)
@@ -97,8 +99,58 @@ jQuery(window).load(function()
 					}
 				},7000);
 			}
+			/*to save data of editor field if editor=jce*/
+			if(jQuery("#item-form .wf-editor-container").length > 0)
+			{
+				/*function to get iframe id of JCE editor*/
+				setTimeout(function(){
+					 jQuery("#item-form .mceIframeContainer iframe").each(function (){
+
+					var iframeId=jQuery(this).attr('id');
+					var tjucmIframeIndex = iframeId.replace("jform_", "");
+					var tjucmJceIframeIndex = tjucmIframeIndex.replace("_ifr", "");
+					var iframeContent=jQuery("#"+iframeId).contents().find('body').html();
+
+					tjUcmJCEFieldIds[tjucmJceIframeIndex]=iframeContent;console.log(tjUcmJCEFieldIds)});},2000);
+
+				/*Function to save data as per bitrate*/
+				setInterval(function(){
+					for (var key in tjUcmJCEFieldIds)
+					{
+						if (tjUcmJCEFieldIds.hasOwnProperty(key))
+						 {
+					 		var iframeContent = jQuery("#jform_"+key+"_ifr").contents().find('body').html();
+
+							if (tjUcmJCEFieldIds[key] != iframeContent)
+							{
+								var tjUcmTempJceFieldObj = jQuery("#jform_"+key);
+
+								if (tjUcmTempJceFieldObj.length)
+								{
+									tjUcmTempJceFieldObj.val(iframeContent);
+									tjUcmJCEFieldIds[key] = iframeContent;
+									tjUcmItemForm.onUcmFormChange(tjUcmTempJceFieldObj);
+								}
+							}
+						}
+					}
+				}, tjUcmBitrateSeconds*1000 );
+			}
+
+			// /* Auto save form as per configured bit rate*/
+			if (tjUcmAllowAutoSave == 1 && tjUcmAllowBitrate == 1 && tjUcmBitrateSeconds !== undefined)
+			{
+				if (jQuery("#item-form #tjUcmSectionDraftSave").length >= 1)
+				{
+					setInterval(function(){
+						if(jQuery('#item-form').hasClass('dirty'))
+						{
+							jQuery("#tjUcmSectionDraftSave").click();
+						}, tjUcmBitrateSeconds*1000);
+					}
+				}
+			}
 		}
-	}
 	else
 	{
 		jQuery("#tjucm-auto-save-disabled-msg").show();
@@ -248,15 +300,6 @@ jQuery(window).load(function()
 			jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
 		}
 	});
-
-	/* Handel saving if data as per the seconds of bitrate*/
-	var tjUcmFormSubmitCallingButtonId = event.target.id;
-	if(tjUcmAllowAutoSave == 1 && tjUcmAllowBitrate == 1 && tjUcmFormSubmitCallingButtonId != 'tjUcmSectionFinalSave') 
-	{
-		var milliseconds = tjUcmBitrateSeconds*1000;
-		setInterval(function(){ tjUcmItemForm.saveUcmFormData(); }, milliseconds );
-	}	
-});
 
 var tjUcmItemForm = {
 	getUcmParentRecordId: function (draft, callback){
