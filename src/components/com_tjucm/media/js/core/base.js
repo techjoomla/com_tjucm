@@ -44,7 +44,7 @@ com_tjucm.Services.Base = Class.extend({
 
         config.contentType = typeof config.contentType != "undefined" ? config.contentType : 'application/x-www-form-urlencoded; charset=UTF-8';
         config.processData = typeof config.processData != "undefined" ? config.processData : true;
-        config.async = typeof config.async != "undefined" ? config.async : false;
+        config.async = typeof config.async != "undefined" ? config.async : true;
 
         return jQuery.ajax({
             type: "POST",
