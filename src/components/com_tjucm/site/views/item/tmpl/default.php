@@ -9,6 +9,9 @@
 // No direct access
 defined('_JEXEC') or die;
 
+/*To load language constant of js file*/
+JText::script('COM_TJUCM_DELETE_MESSAGE');
+
 $user = JFactory::getUser();
 
 if ($this->form_extra)
@@ -64,22 +67,3 @@ else
 		?>
 	</div>
 </div>
-<?php
-if ($deleteOwn)
-{
-	?>
-	<script type="text/javascript">
-	jQuery(document).ready(function () {
-		jQuery('.delete-button').click(deleteItem);
-	});
-
-	function deleteItem()
-	{
-		if (!confirm("<?php echo JText::_('COM_TJUCM_DELETE_MESSAGE'); ?>"))
-		{
-			return false;
-		}
-	}
-	</script>
-<?php
-}

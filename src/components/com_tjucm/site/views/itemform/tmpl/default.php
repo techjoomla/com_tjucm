@@ -18,9 +18,6 @@ HTMLHelper::_('behavior.formvalidation');
 HTMLHelper::_('formbehavior.chosen', 'select');
 HTMLHelper::_('jquery.token');
 
-/*To load language constant of js file*/
-JText::script('COM_TJUCM_DELETE_MESSAGE');
-
 /*
 * Script to show alert box if form changes are made and user is closing/refreshing/navigating the tab
 * without saving the content
