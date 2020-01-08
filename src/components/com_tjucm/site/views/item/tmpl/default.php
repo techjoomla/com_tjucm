@@ -1,10 +1,9 @@
 <?php
 /**
- * @package	TJ-UCM
- * 
- * @author	 TechJoomla <extensions@techjoomla.com>
+ * @package	   TJ-UCM
+ * @author	   TechJoomla <extensions@techjoomla.com>
  * @copyright  Copyright (c) 2009-2019 TechJoomla. All rights reserved.
- * @license	GNU General Public License version 2 or later; see LICENSE.txt
+ * @license	   GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 // No direct access
