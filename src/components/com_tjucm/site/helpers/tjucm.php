@@ -77,6 +77,8 @@ class TjucmHelpersTjucm
 		Text::script('COM_TJUCM_FIELDS_VALIDATION_ERROR_NUMBER', true);
 		Text::script('COM_TJUCM_MSG_ON_SAVED_FORM', true);
 		Text::script('COM_TJUCM_ITEMS_INVALID_CSV_FILE', true);
+		Text::script('COM_TJUCM_ITEMS_CLUSTER_ERROR', true);
+		Text::script('COM_TJUCM_ITEMS_UPLOAD_CSV_FILE', true);
 	}
 
 	/**
