@@ -41,6 +41,7 @@ $editRecordId              = $jinput->input->get("id", '', 'INT');
 $baseUrl                   = $jinput->input->server->get('REQUEST_URI', '', 'STRING');
 $calledFrom                = (strpos($baseUrl, 'administrator')) ? 'backend' : 'frontend';
 $layout                    = ($calledFrom == 'frontend') ? 'default' : 'edit';
+$dynamicLayout             = $this->setLayout($typeParams->layout);
 $fieldsets_counter_deafult = 0;
 $setnavigation             = false;
 
@@ -138,7 +139,14 @@ JFactory::getDocument()->addScriptDeclaration('
 			<div class="form-horizontal">
 			<?php
 			// Code to display the form
-			echo $this->loadTemplate('extrafields');
+			if ($dynamicLayout == "default")
+			{
+				echo $this->loadTemplate('extrafields');
+			}
+			else
+			{
+				echo $this->loadTemplate('grid');
+			}
 			?>
 			</div>
 			<?php
