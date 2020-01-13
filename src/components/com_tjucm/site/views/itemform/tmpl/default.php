@@ -116,15 +116,15 @@ JFactory::getDocument()->addScriptDeclaration('
 	</div>
 	<?php
 		if ($this->form_extra)
-		{	
-			if($this->id!='0')
+		{
+			if ($this->id != '0')
 			{
 				?>
 				<div class="page-header">
 					<h1 class="page-title">
-					<?php echo JText::_("COM_TJUCM_EDIT_FORM") .": ". strtoupper($this->title); ?>
+					<?php echo JText::_("COM_TJUCM_EDIT_FORM") . ": " . strtoupper($this->title); ?>
 					<h1>
-				</div><?php	
+				</div><?php
 			}
 			else
 			{
@@ -133,7 +133,7 @@ JFactory::getDocument()->addScriptDeclaration('
 				<h1 class="page-title">
 					<?php echo strtoupper($this->title); ?>
 				<h1>
-				</div><?php	
+				</div><?php
 			}?>
 			<div class="form-horizontal">
 			<?php
