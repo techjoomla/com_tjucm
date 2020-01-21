@@ -201,6 +201,11 @@ class TJUCM
 				HTMLHelper::StyleSheet('media/com_tjucm/css/tjucm.css', $options);
 			}
 
+			if ($view == 'item')
+			{
+				HTMLHelper::script('media/com_tjucm/js/ui/item.js');
+			}
+
 			$loaded[$location] = true;
 		}
 	}
