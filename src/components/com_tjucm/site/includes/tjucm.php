@@ -197,7 +197,7 @@ class TJUCM
 				HTMLHelper::script('media/com_tjucm/js/services/item.min.js', $options);
 				HTMLHelper::script('media/com_tjucm/js/vendor/jquery/jquery.form.js', $options);
 				HTMLHelper::script('media/com_tjucm/js/ui/itemform.min.js', $options);
-				HTMLHelper::script('media/com_tjucm/js/services/items.js', $options);
+				HTMLHelper::script('media/com_tjucm/js/services/items.min.js', $options);
 
 				HTMLHelper::StyleSheet('media/com_tjucm/css/tjucm.css', $options);
 			}
