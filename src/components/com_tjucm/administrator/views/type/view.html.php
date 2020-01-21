@@ -64,8 +64,6 @@ class TjucmViewType extends JViewLegacy
 
 		$user  = JFactory::getUser();
 		$isNew = ($this->item->id == 0);
-		$input           = JFactory::getApplication()->input;
-		$client          = $input->get('client', '', 'STRING');
 
 		if (isset($this->item->checked_out))
 		{
@@ -78,11 +76,11 @@ class TjucmViewType extends JViewLegacy
 
 		$canDo = TjucmHelper::getActions();
 
-		$component_title =  JText::_('COM_TJUCM_COMPONENT');
-
-	
-		JToolbarHelper::title($component_title.": ".
-			JText::_('COM_TJUCM_PAGE_'  . ($checkedOut ? 'VIEW_TYPE' : ($isNew ? 'ADD_TYPE' : 'EDIT_TYPE'))),
+		$component_title = JText::_('COM_TJUCM_COMPONENT');
+		JToolbarHelper::title(
+			$component_title . ":" . JText::_(
+				'COM_TJUCM_PAGE_' . ($checkedOut ? 'VIEW_TYPE' : ($isNew ? 'ADD_TYPE' : 'EDIT_TYPE'))
+		),
 			'pencil-2 article-add'
 		);
 
