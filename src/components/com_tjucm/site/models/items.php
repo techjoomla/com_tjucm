@@ -110,7 +110,10 @@ class TjucmModelItems extends JModelList
 
 				if (!empty($this->ucm_type))
 				{
-					$ucmType     = 'com_tjucm.' . $this->ucm_type;
+					JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
+					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+					$ucmTypeTable->load(array('alias' => $this->ucm_type));
+					$ucmType = $ucmTypeTable->unique_identifier;
 				}
 			}
 		}
@@ -146,6 +149,16 @@ class TjucmModelItems extends JModelList
 
 		$this->setState("created_by", $createdBy);
 
+		if ($this->getUserStateFromRequest($this->context . '.filter.order', 'filter_order', '', 'string'))
+		{
+			$ordering = $this->getUserStateFromRequest($this->context . '.filter.order', 'filter_order', '', 'string');
+		}
+
+		if ($this->getUserStateFromRequest($this->context . '.filter.order_Dir', 'filter_order_Dir', '', 'string'))
+		{
+			$direction = $this->getUserStateFromRequest($this->context . '.filter.order_Dir', 'filter_order_Dir', '', 'string');
+		}
+
 		// List state information.
 		parent::populateState($ordering, $direction);
 	}
@@ -171,6 +184,8 @@ class TjucmModelItems extends JModelList
 				'list.select', 'DISTINCT ' . $db->quoteName('a.id') . ', '
 				. $db->quoteName('a.state') . ', '
 				. $db->quoteName('a.cluster_id') . ', '
+				. $db->quoteName('a.draft') . ', '
+				. $db->quoteName('a.created_date') . ', '
 				. $db->quoteName('a.created_by')
 			)
 		);
@@ -202,6 +217,14 @@ class TjucmModelItems extends JModelList
 			$query->where($db->quoteName('a.created_by') . ' = ' . (INT) $createdBy);
 		}
 
+		// Filter for parent record
+		$parentId = $this->getState('parent_id');
+
+		if (is_numeric($parentId))
+		{
+			$query->where($db->quoteName('a.parent_id') . ' = ' . $parentId);
+		}
+
 		// Show records belonging to users cluster if com_cluster is installed and enabled - start
 		$clusterExist = ComponentHelper::getComponent('com_cluster', true)->enabled;
 
@@ -216,11 +239,10 @@ class TjucmModelItems extends JModelList
 				JFormHelper::addFieldPath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models/fields/');
 				$cluster = JFormHelper::loadFieldType('cluster', false);
 				$clusterList = $cluster->getOptionsExternally();
+				$usersClusters = array();
 
 				if (!empty($clusterList))
 				{
-					$usersClusters = array();
-
 					foreach ($clusterList as $clusterList)
 					{
 						if (!empty($clusterList->value))
@@ -228,6 +250,12 @@ class TjucmModelItems extends JModelList
 							$usersClusters[] = $clusterList->value;
 						}
 					}
+				}
+
+				// If cluster array empty then we set 0 in whereclause query
+				if (empty($usersClusters))
+				{
+					$usersClusters[] = 0;
 				}
 
 				$query->where($db->quoteName('a.cluster_id') . ' IN (' . implode(",", $usersClusters) . ')');
@@ -337,7 +365,8 @@ class TjucmModelItems extends JModelList
 
 					if ($filterFieldsCount > 1)
 					{
-						$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' . ($filterFieldsCount-1).'.content_id') . ' = ' . $db->qn('fv'.$filterFieldsCount.'.content_id') . ')');
+						$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' .
+						($filterFieldsCount - 1) . '.content_id') . ' = ' . $db->qn('fv' . $filterFieldsCount . '.content_id') . ')');
 					}
 
 					$search = trim(str_replace($field . ':', '', $search));
@@ -358,7 +387,8 @@ class TjucmModelItems extends JModelList
 
 			if ($filterFieldsCount > 1)
 			{
-				$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' . ($filterFieldsCount-1).'.content_id') . ' = ' . $db->qn('fv'.$filterFieldsCount.'.content_id') . ')');
+				$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' .
+				($filterFieldsCount - 1) . '.content_id') . ' = ' . $db->qn('fv' . $filterFieldsCount . '.content_id') . ')');
 			}
 
 			$query->where($db->quoteName('fv' . $filterFieldsCount . '.value') . ' LIKE ' . $db->q('%' . $search . '%'));
@@ -382,7 +412,8 @@ class TjucmModelItems extends JModelList
 
 				if ($filterFieldsCount > 1)
 				{
-					$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' . ($filterFieldsCount-1).'.content_id') . ' = ' . $db->qn('fv'.$filterFieldsCount.'.content_id') . ')');
+					$query->join('LEFT', $db->qn('#__tjfields_fields_value', 'fv' . $filterFieldsCount) . ' ON (' . $db->qn('fv' .
+					($filterFieldsCount - 1) . '.content_id') . ' = ' . $db->qn('fv' . $filterFieldsCount . '.content_id') . ')');
 				}
 
 				$query->where($db->qn('fv' . $filterFieldsCount . '.field_id') . ' = ' . $field->id);

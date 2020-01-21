@@ -17,6 +17,7 @@ use Joomla\CMS\Session\Session;
 use Joomla\CMS\Router\Route;
 use Joomla\Registry\Registry;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\Plugin\PluginHelper;
 
 jimport('joomla.filesystem.file');
 
@@ -202,7 +203,7 @@ class TjucmControllerItemForm extends JControllerForm
 			$fieldData['created_by'] = $table->created_by;
 
 			// If data is valid then save the data into DB
-			$response = $model->saveExtraFields($fieldData);
+			$response = $model->saveFieldsData($fieldData);
 
 			echo new JResponseJson($response);
 			$app->close();
@@ -282,7 +283,7 @@ class TjucmControllerItemForm extends JControllerForm
 			$formData['created_by'] = $table->created_by;
 
 			// If data is valid then save the data into DB
-			$response = $model->saveExtraFields($formData);
+			$response = $model->saveFieldsData($formData);
 			$msg = null;
 
 			if ($response && empty($section))
@@ -298,7 +299,17 @@ class TjucmControllerItemForm extends JControllerForm
 
 				// Disable the draft mode of the item if full f)orm is submitted
 				$table->draft = $draft;
+				$table->modified_date = Factory::getDate()->toSql();
 				$table->store();
+
+				// Perform actions (redirection or trigger call) after final submit
+				if (!$draft)
+				{
+					// TJ-ucm plugin trigger after save
+					$dispatcher = JEventDispatcher::getInstance();
+					PluginHelper::importPlugin("content");
+					$dispatcher->trigger('onUcmItemAfterSave', array($table->getProperties(), $data));
+				}
 			}
 
 			echo new JResponseJson($response, $msg);
@@ -501,6 +512,7 @@ class TjucmControllerItemForm extends JControllerForm
 					$ucmOldData['content_id'] = $cid;
 					$ucmOldData['layout'] = 'edit';
 					$ucmOldData['client']     = $sourceClient;
+					$fielFieldArray = array();
 
 					// Get the field values
 					$extraFieldsData = $model->loadFormDataExtra($ucmOldData);
@@ -513,22 +525,36 @@ class TjucmControllerItemForm extends JControllerForm
 						$prefixTargetClient = str_replace(".", "_", $targetClient);
 						$targetFieldName = $prefixTargetClient . '_' . $fieldName[1];
 						$tjFieldsTable = $tjFieldsHelper->getFieldData($targetFieldName);
+						$fieldId = $tjFieldsTable->id;
+						$fieldType = $tjFieldsTable->type;
+						$fielParams = json_decode($tjFieldsTable->params);
+						$sourceTjFieldsTable = $tjFieldsHelper->getFieldData($fieldKey);
+						$sourceFieldParams = json_decode($sourceTjFieldsTable->params);
+						$subFormData = array();
 
-						if ($tjFieldsTable->type == 'ucmsubform')
+						if ($tjFieldsTable->type == 'ucmsubform' || $tjFieldsTable->type == 'subform')
 						{
 							$params = json_decode($tjFieldsTable->params)->formsource;
 							$subFormClient = explode('components/com_tjucm/models/forms/', $params);
 							$subFormClient = explode('form_extra.xml', $subFormClient[1]);
 							$subFormClient = 'com_tjucm.' . $subFormClient[0];
 
-							$tjFieldsTable = $tjFieldsHelper->getFieldData($fieldKey);
-							$params = json_decode($tjFieldsTable->params)->formsource;
+							$params = $sourceFieldParams->formsource;
 							$subFormSourceClient = explode('components/com_tjucm/models/forms/', $params);
 							$subFormSourceClient = explode('form_extra.xml', $subFormSourceClient[1]);
 							$subFormSourceClient = 'com_tjucm.' . $subFormSourceClient[0];
+
+							$subFormData = (array) json_decode($fieldValue);
 						}
 
-						$subFormData = (array) json_decode($fieldValue);
+						if ($fieldType == 'file')
+						{
+							$fielData['field_id'] = $fieldId;
+							$fielData['value'] = $fieldValue;
+							$fielData['params'] = $fielParams;
+							$fielData['sourceparams'] = $sourceFieldParams;
+							$fielFieldArray[] = $fielData;
+						}
 
 						if ($subFormData)
 						{
@@ -558,6 +584,7 @@ class TjucmControllerItemForm extends JControllerForm
 									}
 
 									$temp = array();
+									unset($data[$key]);
 
 									if (is_array($d))
 									{
@@ -591,22 +618,20 @@ class TjucmControllerItemForm extends JControllerForm
 									{
 										$data[$subFieldName] = $d;
 									}
-
-									unset($data[$key]);
 								}
 
-								$subFormData[$subTargetFieldName] = $data;
 								unset($subFormData[$keyData]);
+								$subFormData[$subTargetFieldName] = $data;
 							}
 
+							unset($extraFieldsData[$fieldKey]);
 							$extraFieldsData[$targetFieldName] = $subFormData;
 						}
 						else
 						{
+							unset($extraFieldsData[$fieldKey]);
 							$extraFieldsData[$targetFieldName] = $fieldValue;
 						}
-
-						unset($extraFieldsData[$fieldKey]);
 					}
 
 					$ucmData = array();
@@ -622,6 +647,23 @@ class TjucmControllerItemForm extends JControllerForm
 
 					if ($recordId)
 					{
+						foreach ($fielFieldArray as $fielField)
+						{
+							$fileFieldValue = round(microtime(true)) . "_" . JUserHelper::genRandomPassword(5) . "_" . $fielField['value'];
+
+							if (copy($fielField['sourceparams']->uploadpath . $fielField['value'], $fielField['params']->uploadpath . $fileFieldValue))
+							{
+								JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/tables');
+								$fielValuedTable = JTable::getInstance('fieldsvalue', 'TjfieldsTable');
+								$fielValuedTable->field_id = $fielField['field_id'];
+								$fielValuedTable->content_id = $recordId;
+								$fielValuedTable->value = $fileFieldValue;
+								$fielValuedTable->user_id = Factory::getUser()->id;
+								$fielValuedTable->client = $targetClient;
+								$fielValuedTable->store();
+							}
+						}
+
 						$formData = array();
 						$formData['content_id'] = $recordId;
 						$formData['fieldsvalue'] = $extraFieldsData;
@@ -633,7 +675,7 @@ class TjucmControllerItemForm extends JControllerForm
 						$msg = ($response) ? Text::_("COM_TJUCM_ITEM_COPY_SUCCESSFULLY") : Text::_("COM_TJUCM_FORM_SAVE_FAILED");
 					}
 				}
-				
+
 				echo new JResponseJson($response, $msg);
 				$app->close();
 			}

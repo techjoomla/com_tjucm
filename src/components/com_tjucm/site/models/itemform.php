@@ -15,7 +15,6 @@ jimport('joomla.application.component.modelform');
 jimport('joomla.event.dispatcher');
 
 require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
-require_once JPATH_ADMINISTRATOR . '/components/com_tjucm/classes/funlist.php';
 
 use Joomla\CMS\Table\Table;
 use Joomla\Utilities\ArrayHelper;
@@ -26,7 +25,7 @@ use Joomla\Registry\Registry;
 /**
  * Tjucm model.
  *
- * @since  1.6
+ * @since  1.0
  */
 class TjucmModelItemForm extends JModelAdmin
 {
@@ -34,7 +33,7 @@ class TjucmModelItemForm extends JModelAdmin
 
 	/**
 	 * @var      string    The prefix to use with controller messages.
-	 * @since    1.6
+	 * @since    1.0
 	 */
 	protected $text_prefix = 'COM_TJUCM';
 
@@ -55,13 +54,10 @@ class TjucmModelItemForm extends JModelAdmin
 	 * @param   array  $config  An optional associative array of configuration settings.
 	 *
 	 * @see        JController
-	 * @since      1.6
+	 * @since      1.0
 	 */
 	public function __construct($config = array())
 	{
-		JLoader::import('components.com_tjucm.classes.funlist', JPATH_ADMINISTRATOR);
-		$this->common  = new TjucmFunList;
-
 		parent::__construct($config);
 	}
 
@@ -72,7 +68,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 *
 	 * @return void
 	 *
-	 * @since  1.6
+	 * @since  1.0
 	 */
 	protected function populateState()
 	{
@@ -104,7 +100,10 @@ class TjucmModelItemForm extends JModelAdmin
 
 				if (!empty($ucm_type))
 				{
-					$ucmType     = 'com_tjucm.' . $ucm_type;
+					JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
+					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+					$ucmTypeTable->load(array('alias' => $ucm_type));
+					$ucmType = $ucmTypeTable->unique_identifier;
 				}
 			}
 		}
@@ -232,7 +231,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 *
 	 * @return    JTable    A database object
 	 *
-	 * @since    1.6
+	 * @since    1.0
 	 */
 	public function getTable($type = 'Item', $prefix = 'TjucmTable', $config = array())
 	{
@@ -244,7 +243,7 @@ class TjucmModelItemForm extends JModelAdmin
 	/**
 	 * Get an array of data items
 	 *
-	 * @param   string  $client  client value
+	 * @param   string  $client  client
 	 *
 	 * @return mixed Array of data items on success, false on failure.
 	 */
@@ -261,7 +260,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 *
 	 * @return  JForm  A JForm object on success, false on failure
 	 *
-	 * @since    1.6
+	 * @since    1.0
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
@@ -466,7 +465,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 *
 	 * @return   mixed  The data for the form.
 	 *
-	 * @since    1.6
+	 * @since    1.0
 	 */
 	protected function loadFormData()
 	{
@@ -493,7 +492,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 *
 	 * @return  boolean  True on success.
 	 *
-	 * @since   1.6
+	 * @since   1.0
 	 */
 	public function save($data)
 	{
@@ -600,7 +599,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 *
 	 * @since   1.2.1
 	 */
-	public function saveExtraFields($fieldData)
+	public function saveFieldsData($fieldData)
 	{
 		// If the data contain data related to cluster field or ownership field then update the ucm_data table accordingly
 		if (!empty($fieldData['fieldsvalue']) && !empty($fieldData['content_id']))
@@ -609,7 +608,9 @@ class TjucmModelItemForm extends JModelAdmin
 			$ownerShipFieldName = str_replace('.', '_', $fieldData['client']) . '_ownershipcreatedby';
 			$itemCategoryFieldName = str_replace('.', '_', $fieldData['client']) . '_itemcategory';
 
-			if (array_key_exists($clusterFieldName, $fieldData['fieldsvalue']) || array_key_exists($ownerShipFieldName, $fieldData['fieldsvalue']) || array_key_exists($itemCategoryFieldName, $fieldData['fieldsvalue']))
+			if (array_key_exists($clusterFieldName, $fieldData['fieldsvalue'])
+				|| array_key_exists($ownerShipFieldName, $fieldData['fieldsvalue'])
+				|| array_key_exists($itemCategoryFieldName, $fieldData['fieldsvalue']))
 			{
 				JLoader::import('components.com_tjucm.tables.item', JPATH_ADMINISTRATOR);
 				$ucmItemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', JFactory::getDbo()));
@@ -634,7 +635,7 @@ class TjucmModelItemForm extends JModelAdmin
 			}
 		}
 
-		return TjfieldsFilterField::saveExtraFields($fieldData);
+		return $this->saveExtraFields($fieldData);
 	}
 
 	/**
@@ -763,108 +764,6 @@ class TjucmModelItemForm extends JModelAdmin
 	/**
 	 * Function to save ucmSubForm records
 	 *
-	 * @param   ARRAY  &$validData         Parent record data
-	 * @param   ARRAY  $ucmSubFormDataSet  ucmSubForm records data
-	 *
-	 * @return ARRAY
-	 */
-	public function saveUcmSubFormRecords(&$validData, $ucmSubFormDataSet)
-	{
-		$db = JFactory::getDbo();
-		$subFormContentIds = array();
-
-		$isNew = empty($validData['id']) ? 1 : 0;
-
-		// Delete removed subform details
-		if (!$isNew)
-		{
-			$query = $db->getQuery(true);
-			$query->select('id');
-			$query->from($db->quoteName('#__tj_ucm_data'));
-			$query->where($db->quoteName('parent_id') . '=' . $validData['id']);
-			$db->setQuery($query);
-			$oldSubFormContentIds = $db->loadColumn();
-		}
-
-		JLoader::import('components.com_tjfields.tables.fieldsvalue', JPATH_ADMINISTRATOR);
-		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
-		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
-		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
-
-		if (!empty($ucmSubFormDataSet))
-		{
-			foreach ($ucmSubFormDataSet as $client => $ucmSubFormTypeData)
-			{
-				$validData['client'] = $client;
-				$validData['type_id'] = $tjUcmModelType->getTypeId($client);
-
-				$clientDetail = explode('.', $client);
-
-				// This is an extra field which is used to render the reference of the ucmsubform field on the form (used in case of edit)
-				$ucmSubformContentIdFieldName = $clientDetail[0] . '_' . $clientDetail[1] . '_' . 'contentid';
-
-				$count = 0;
-
-				foreach ($ucmSubFormTypeData as $ucmSubFormData)
-				{
-					$validData['id'] = isset($ucmSubFormData[$ucmSubformContentIdFieldName]) ? (int) $ucmSubFormData[$ucmSubformContentIdFieldName] : 0;
-
-					// Unset extra data
-					$sfFieldName = $ucmSubFormData['ucmSubformFieldName'];
-					unset($ucmSubFormData['ucmSubformFieldName']);
-
-					$ucmSubformContentFieldElementId = 'jform[' . $sfFieldName . '][' . $sfFieldName . $count . '][' . $ucmSubformContentIdFieldName . ']';
-					$count++;
-
-					if ($insertedId = $this->save($validData, $ucmSubFormData))
-					{
-						$validData['id'] = $insertedId;
-						$subFormContentIds[] = array('elementName' => $ucmSubformContentFieldElementId, 'content_id' => $insertedId);
-
-						$ucmSubFormData[$ucmSubformContentIdFieldName] = $insertedId;
-
-						// Get field id of contentid field
-						$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
-						$fieldTable->load(array('name' => $ucmSubformContentIdFieldName));
-
-						// Add-Update the value of content id field in the fields value table - start
-						$fieldsValueTable = JTable::getInstance('Fieldsvalue', 'TjfieldsTable', array('dbo', $db));
-						$fieldsValueTable->load(array('field_id' => $fieldTable->id, 'content_id' => $insertedId, 'client' => $validData['client']));
-
-						if (empty($fieldsValueTable->id))
-						{
-							$fieldsValueTable->field_id = $fieldTable->id;
-							$fieldsValueTable->value = $fieldsValueTable->content_id = $insertedId;
-							$fieldsValueTable->client = $validData['client'];
-						}
-
-						$fieldsValueTable->user_id = JFactory::getUser()->id;
-						$fieldsValueTable->store();
-
-						// Add-Update the value of content id field in the fields value table - end
-					}
-				}
-			}
-		}
-
-		// Delete removed ucmSubForm record from the form
-		if (!empty($oldSubFormContentIds))
-		{
-			foreach ($oldSubFormContentIds as $oldSubFormContentId)
-			{
-				if (array_search($oldSubFormContentId, array_column($subFormContentIds, 'content_id')) === false)
-				{
-					$this->delete($oldSubFormContentId);
-				}
-			}
-		}
-
-		return $subFormContentIds;
-	}
-
-	/**
-	 * Function to save ucmSubForm records
-	 *
 	 * @param   INT     $parentRecordId  parent content id
 	 * @param   OBJECT  $efd             Field object
 	 *
@@ -898,7 +797,53 @@ class TjucmModelItemForm extends JModelAdmin
 			foreach ($ucmSubFormFieldValues as $ucmSubFormFieldValue)
 			{
 				$ucmSubFormFieldName = $ucmSubFormFieldValue->name;
-				$subFormData->$ucmSubFormFieldName = $ucmSubFormFieldValue->value;
+
+				$value = '';
+				$temp = array();
+
+				switch ($ucmSubFormFieldValue->type)
+				{
+					case 'radio':
+						if (is_array($ucmSubFormFieldValue->value) || is_object($ucmSubFormFieldValue->value))
+						{
+							if (isset($ucmSubFormFieldValue->value[0]))
+							{
+								$value = $ucmSubFormFieldValue->value[0]->value;
+							}
+						}
+						else
+						{
+							$value = $ucmSubFormFieldValue->value;
+						}
+						break;
+					case 'tjlist':
+					case 'related':
+					case 'multi_select':
+
+						if (is_array($ucmSubFormFieldValue->value) || is_object($ucmSubFormFieldValue->value))
+						{
+							foreach ($ucmSubFormFieldValue->value as $option)
+							{
+								$temp[] = $option->value;
+							}
+
+							if (!empty($temp))
+							{
+								$value = $temp;
+							}
+						}
+						else
+						{
+							$value = $ucmSubFormFieldValue->value;
+						}
+
+						break;
+
+					default:
+						$value = $ucmSubFormFieldValue->value;
+				}
+
+				$subFormData->$ucmSubFormFieldName = $value;
 			}
 
 			$client = explode('.', $recordData['client']);
@@ -916,7 +861,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 * Function to updated related field options
 	 *
 	 * @param   INT  $client     client
-	 * 
+	 *
 	 * @param   INT  $contentId  Content id
 	 *
 	 * @return ARRAY

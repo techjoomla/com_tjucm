@@ -21,8 +21,8 @@ JHtml::_('jquery.token');
 $user = JFactory::getUser();
 $userId = $user->get('id');
 $tjUcmFrontendHelper = new TjucmHelpersTjucm;
-$listOrder = $this->state->get('list.ordering');
-$listDirn = $this->state->get('list.direction');
+$listOrder  = $this->escape($this->state->get('list.ordering'));
+$listDirn   = $this->escape($this->state->get('list.direction'));
 $appendUrl = '';
 $csrf = "&" . JSession::getFormToken() . '=1';
 
@@ -39,6 +39,7 @@ if (!empty($this->client))
 $link = 'index.php?option=com_tjucm&view=items' . $appendUrl;
 $itemId = $tjUcmFrontendHelper->getItemId($link);
 $fieldsData = array();
+
 JFactory::getDocument()->addScriptDeclaration("
 	jQuery(window).load(function()
 	{
@@ -85,6 +86,9 @@ JFactory::getDocument()->addScriptDeclaration("
 		com_tjucm.Services.Items.copyItem(copyItemData, afterCopyItem);
 	}	
 ");
+
+$statusColumnWidth = 0;
+
 ?>
 <form action="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>" enctype="multipart/form-data" method="post" name="adminForm" id="adminForm" class="form-validate">
 	<?php echo $this->loadTemplate('filters'); ?>
@@ -113,7 +117,18 @@ JFactory::getDocument()->addScriptDeclaration("
 					<th width="2%">
 						<?php echo JHtml::_('grid.sort', 'COM_TJUCM_ITEMS_ID', 'a.id', $listDirn, $listOrder); ?>
 					</th>
+
 					<?php
+					if (!empty($this->ucmTypeParams->allow_draft_save) && $this->ucmTypeParams->allow_draft_save == 1)
+					{
+						$statusColumnWidth = 2;
+					?>
+						<th width="2%">
+							<?php echo JHtml::_('grid.sort', 'COM_TJUCM_DATA_STATUS', 'a.draft', $listDirn, $listOrder); ?>
+						</th>
+					<?php
+					}
+
 					if (!empty($this->listcolumn))
 					{
 						JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
@@ -132,7 +147,7 @@ JFactory::getDocument()->addScriptDeclaration("
 								$fieldsData[$fieldId] = $tjFieldsFieldTable;
 							}
 							?>
-							<th  style="word-break: break-word;" width="<?php echo 90/count($this->listcolumn).'%';?>">
+							<th  style="word-break: break-word;" width="<?php echo (88 - $statusColumnWidth)/count($this->listcolumn).'%';?>">
 								<?php echo htmlspecialchars($col_name, ENT_COMPAT, 'UTF-8'); ?>
 							</th>
 							<?php
@@ -142,7 +157,7 @@ JFactory::getDocument()->addScriptDeclaration("
 					if ($this->canEdit || $this->canDelete)
 					{
 						?>
-						<th class="center" width="5%">
+						<th class="center" width="7%">
 							<?php echo JText::_('COM_TJUCM_ITEMS_ACTIONS'); ?>
 						</th>
 					<?php
@@ -191,8 +206,8 @@ JFactory::getDocument()->addScriptDeclaration("
 				foreach ($this->items as $i => $item)
 				{
 					// Call the JLayout to render the fields in the details view
-					$layout = new JLayoutFile('list', JPATH_ROOT . '/components/com_tjucm/layouts/list');
-					echo $layout->render(array('itemsData' => $item, 'created_by' => $this->created_by, 'client' => $this->client, 'xmlFormObject' => $formXml, 'ucmTypeId' => $this->ucmTypeId, 'fieldsData' => $fieldsData, 'formObject' => $formObject));
+					$layout = new JLayoutFile('list.list', JPATH_ROOT . '/components/com_tjucm/');
+					echo $layout->render(array('itemsData' => $item, 'created_by' => $this->created_by, 'client' => $this->client, 'xmlFormObject' => $formXml, 'ucmTypeId' => $this->ucmTypeId, 'ucmTypeParams' => $this->ucmTypeParams, 'fieldsData' => $fieldsData, 'formObject' => $formObject));
 				}
 			}
 			else
