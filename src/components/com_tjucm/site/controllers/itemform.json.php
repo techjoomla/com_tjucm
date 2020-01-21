@@ -225,15 +225,16 @@ class TjucmControllerItemForm extends JControllerForm
 	{
 		JSession::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
-		$app       = Factory::getApplication();
-		$post      = $app->input->post;
-		$recordId  = $post->get('recordid', 0, 'INT');
-		$client    = $post->get('client', '', 'STRING');
-		$formData  = $post->get('jform', array(), 'ARRAY');
-		$filesData = $app->input->files->get('jform', array(), 'ARRAY');
-		$formData  = array_merge_recursive($formData, $filesData);
-		$section   = $post->get('tjUcmFormSection', '', 'STRING');
-		$draft     = $post->get('draft', 0, 'INT');
+		$app          = Factory::getApplication();
+		$post         = $app->input->post;
+		$recordId     = $post->get('recordid', 0, 'INT');
+		$client       = $post->get('client', '', 'STRING');
+		$formData     = $post->get('jform', array(), 'ARRAY');
+		$filesData    = $app->input->files->get('jform', array(), 'ARRAY');
+		$formData     = array_merge_recursive($formData, $filesData);
+		$section      = $post->get('tjUcmFormSection', '', 'STRING');
+		$showDraftMsg = $post->get('showDraftMessage', 1, 'INT');
+		$draft        = $post->get('draft', 0, 'INT');
 
 		if (empty($formData) || empty($client))
 		{
@@ -290,7 +291,10 @@ class TjucmControllerItemForm extends JControllerForm
 			{
 				if ($draft)
 				{
-					$msg = ($response) ? Text::_("COM_TJUCM_ITEM_DRAFT_SAVED_SUCCESSFULLY") : Text::_("COM_TJUCM_FORM_SAVE_FAILED");
+					if ($showDraftMsg)
+					{
+						$msg = ($response) ? Text::_("COM_TJUCM_ITEM_DRAFT_SAVED_SUCCESSFULLY") : Text::_("COM_TJUCM_FORM_SAVE_FAILED");
+					}
 				}
 				else
 				{

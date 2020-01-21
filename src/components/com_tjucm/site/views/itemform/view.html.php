@@ -81,6 +81,15 @@ class TjucmViewItemform extends JViewLegacy
 	protected $copyRecId;
 
 	/**
+	 * The Title of view
+	 *
+	 * @var  String
+	 *
+	 * @since 1.2.4
+	 */
+	protected $title;
+
+	/**
 	 * Display the view
 	 *
 	 * @param   string  $tpl  Template name
@@ -194,6 +203,19 @@ class TjucmViewItemform extends JViewLegacy
 
 			return;
 		}
+		if (empty($this->title))
+		{
+			// Get the active item
+			$menuItem = $app->getMenu()->getActive();
+	
+				// Get the params
+				$this->menuparams = $menuItem->params;
+	
+				if (!empty($this->menuparams))
+				{
+					$this->title  = $this->menuparams->get('ucm_type');
+				}
+		}			
 
 		// Check the view access to the itemform (the model has already computed the values).
 		if ($this->item->params->get('access-view') == false)
@@ -262,7 +284,9 @@ class TjucmViewItemform extends JViewLegacy
 
 		$this->allow_auto_save = (isset($typeParams->allow_auto_save) && empty($typeParams->allow_auto_save)) ? 0 : 1;
 		$this->allow_draft_save = (isset($typeParams->allow_draft_save) && !empty($typeParams->allow_draft_save)) ? 1 : 0;
-
+		$this->allow_bit_rate=(isset($typeParams->bitrate_on) && !empty($typeParams->bitrate_on)) ? 1 : 0;
+		$this->allow_bit_rate_seconds=$typeParams->bitrate_seconds;
+		
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{
@@ -292,7 +316,7 @@ class TjucmViewItemform extends JViewLegacy
 	{
 		$app   = Factory::getApplication();
 		$menus = $app->getMenu();
-		$title = null;
+		$this->title = null;
 
 		// Because the application sets a default page title,
 		// we need to get it from the menu item itself
@@ -307,22 +331,22 @@ class TjucmViewItemform extends JViewLegacy
 			$this->params->def('page_heading', Text::_('COM_TJUCM_DEFAULT_PAGE_TITLE'));
 		}
 
-		$title = $this->params->get('page_title', '');
+		$this->title = $this->params->get('page_title', '');
 
-		if (empty($title))
+		if (empty($this->title))
 		{
-			$title = $app->get('sitename');
+			$this->title = $app->get('sitename');
 		}
 		elseif ($app->get('sitename_pagetitles', 0) == 1)
 		{
-			$title = Text::sprintf('JPAGETITLE', $app->get('sitename'), $title);
+			$this->title = Text::sprintf('JPAGETITLE', $app->get('sitename'), $this->title);
 		}
 		elseif ($app->get('sitename_pagetitles', 0) == 2)
 		{
-			$title = Text::sprintf('JPAGETITLE', $title, $app->get('sitename'));
+			$this->title = Text::sprintf('JPAGETITLE', $this->title, $app->get('sitename'));
 		}
 
-		$this->document->setTitle($title);
+		$this->document->setTitle($this->title);
 
 		if ($this->params->get('menu-meta_description'))
 		{
