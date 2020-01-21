@@ -130,7 +130,7 @@ jQuery(window).load(function()
 							}
 						}
 						//For saving data of tinyMce editor
-						if(jQuery(".js-editor-tinymce").length > 0)
+						if(jQuery("#item-form .js-editor-tinymce").length > 0)
 						{
 							for (var key in tjUcmTinyMCEFieldIds)
 							{
