@@ -555,11 +555,12 @@ class TjucmControllerItemForm extends JControllerForm
 
 						if ($fieldType == 'file')
 						{
-							$fielData['field_id'] = $fieldId;
-							$fielData['value'] = $fieldValue;
-							$fielData['params'] = $fielParams;
-							$fielData['sourceparams'] = $sourceFieldParams;
-							$fielFieldArray[] = $fielData;
+							$fileData = array();
+							$fileData['field_id'] = $fieldId;
+							$fileData['value'] = $fieldValue;
+							$fileData['params'] = $fielParams;
+							$fileData['sourceparams'] = $sourceFieldParams;
+							$fielFieldArray[] = $fileData;
 						}
 
 						if ($subFormData)
