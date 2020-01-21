@@ -518,7 +518,7 @@ class TjucmControllerItemForm extends JControllerForm
 					$ucmOldData['content_id'] = $cid;
 					$ucmOldData['layout'] = 'edit';
 					$ucmOldData['client']     = $sourceClient;
-					$fielFieldArray = array();
+					$fileFieldArray = array();
 
 					// Get the field values
 					$extraFieldsData = $model->loadFormDataExtra($ucmOldData);
@@ -560,7 +560,7 @@ class TjucmControllerItemForm extends JControllerForm
 							$fileData['value'] = $fieldValue;
 							$fileData['params'] = $fielParams;
 							$fileData['sourceparams'] = $sourceFieldParams;
-							$fielFieldArray[] = $fileData;
+							$fileFieldArray[] = $fileData;
 						}
 
 						if ($subFormData)
@@ -654,15 +654,15 @@ class TjucmControllerItemForm extends JControllerForm
 
 					if ($recordId)
 					{
-						foreach ($fielFieldArray as $fielField)
+						foreach ($fileFieldArray as $fileField)
 						{
-							$fileFieldValue = round(microtime(true)) . "_" . JUserHelper::genRandomPassword(5) . "_" . $fielField['value'];
+							$fileFieldValue = round(microtime(true)) . "_" . JUserHelper::genRandomPassword(5) . "_" . $fileField['value'];
 
-							if (copy($fielField['sourceparams']->uploadpath . $fielField['value'], $fielField['params']->uploadpath . $fileFieldValue))
+							if (copy($fileField['sourceparams']->uploadpath . $fileField['value'], $fileField['params']->uploadpath . $fileFieldValue))
 							{
 								JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/tables');
 								$fielValuedTable = JTable::getInstance('fieldsvalue', 'TjfieldsTable');
-								$fielValuedTable->field_id = $fielField['field_id'];
+								$fielValuedTable->field_id = $fileField['field_id'];
 								$fielValuedTable->content_id = $recordId;
 								$fielValuedTable->value = $fileFieldValue;
 								$fielValuedTable->user_id = Factory::getUser()->id;
