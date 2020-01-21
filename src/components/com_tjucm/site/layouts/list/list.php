@@ -93,6 +93,7 @@ if ($canDeleteOwn)
 }
 
 ?>
+<div class="tjucm-wrapper">
 <tr class="row<?php echo $item->id?>">
 	<?php
 	if (isset($item->state))
@@ -197,3 +198,4 @@ if ($canDeleteOwn)
 	}
 	?>
 </tr>
+</div>
