@@ -200,8 +200,8 @@ class TJUCM
 
 				HTMLHelper::StyleSheet('media/com_tjucm/css/tjucm.css', $options);
 			}
-			
-			//Load css file on every page
+
+			// Load css file on every page
 			HTMLHelper::StyleSheet('media/com_tjucm/css/tjucm.css', $options);
 			$loaded[$location] = true;
 		}

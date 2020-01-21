@@ -162,7 +162,7 @@ foreach ($fieldSets as $fieldset)
 					$layoutToUse = (array_key_exists($field->type, $fieldLayout)) ? $fieldLayout[$field->type] : 'field';
 					?>
 					<div class="<?php echo $controlGroupDivClass;?>">
-						<div class="<?php echo $labelDivClass;?>"> 
+						<div class="<?php echo $labelDivClass;?>">
 							<?php echo $field->label; ?>:
 						</div>
 						<div class="<?php echo $controlDivClass;?>">
@@ -194,7 +194,7 @@ foreach ($fieldSets as $fieldset)
 								<p class="tj-wordwrap">
 									<?php echo $output; ?>
 								</p>
-								<?php 
+								<?php
 							}
 
 							echo $output;
