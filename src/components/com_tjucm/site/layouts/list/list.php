@@ -149,7 +149,7 @@ if ($canDeleteOwn)
 
 			$fieldXml = $formObject->getFieldXml($tjFieldsFieldTable->name);
 			?>
-			<td style="word-break: break-word;">
+			<td style="word-break: break-word;"  width="<?php echo (85 - $statusColumnWidth) / count($this->listcolumn) . '%';?>">
 				<?php
 					if ($canView || ($item->created_by == $user->id))
 					{
@@ -173,20 +173,12 @@ if ($canDeleteOwn)
 	{
 		?>
 		<td class="center">
-			<a target="_blank" href="<?php echo $link; ?>"
-				type="button" title="<?php echo Text::_('COM_TJUCM_VIEW_RECORD');?>">
-				<i class="icon-eye-open"></i>
-			</a>
+			<a href="<?php echo $link; ?>" type="button" title="<?php echo Text::_('COM_TJUCM_VIEW_RECORD');?>"><i class="icon-eye-open"></i></a>
 		<?php
 		if ($canEdit || $editown)
 		{
 			?>
-			<a target="_blank"
-				href="<?php echo 'index.php?option=com_tjucm&task=itemform.edit&id=' . $item->id . $appendUrl; ?>"
-				type="button"
-				title="<?php echo Text::_('COM_TJUCM_EDIT_ITEM');?>"> |
-					<i class="icon-apply" aria-hidden="true"></i>
-			</a>
+			<a href="<?php echo 'index.php?option=com_tjucm&task=itemform.edit&id=' . $item->id . $appendUrl; ?>" type="button" title="<?php echo Text::_('COM_TJUCM_EDIT_ITEM');?>"> | <i class="icon-apply" aria-hidden="true"></i></a>
 			<?php
 		}
 

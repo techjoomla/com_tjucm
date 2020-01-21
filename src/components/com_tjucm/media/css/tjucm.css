@@ -6,3 +6,10 @@ margin-left:5px !important;
 #item-form .chzn-container{
 width:200px !important;
 }
+
+#item-form .field-calendar input{
+    display: inline !important;
+}
+ #item-form textarea{
+    height: inherit !important;
+}

@@ -21,6 +21,7 @@ com_tjucm.Services.Item = new (com_tjucm.Services.Base.extend({
     create: function (ucmTypeData, callback){
         this.config.processData = false;
         this.config.contentType = false;
+        this.config.async = false;
         this.post(this.createNewRecordUrl, ucmTypeData, this.config, callback);
     },
     saveFieldData: function (ucmFormData, callback) {

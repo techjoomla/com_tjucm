@@ -68,7 +68,7 @@ class TjucmControllerItems extends TjucmController
 		}
 
 		// Check if the file is a CSV file
-		if ($importFile['type'] != "text/csv")
+		if (!in_array($importFile['type'], array('application/vnd.ms-excel', 'text/plain', 'text/csv', 'text/tsv')))
 		{
 			$app->enqueueMessage(Text::_('COM_TJUCM_ITEMS_INVALID_CSV_FILE'), 'error');
 			$app->redirect(Uri::root() . 'index.php?option=com_tjucm&view=items&layout=importitems&tmpl=component&client=' . $client);
@@ -129,6 +129,7 @@ class TjucmControllerItems extends TjucmController
 		$headerRow = true;
 		$invalidRows = 0;
 		$validRows = 0;
+		$errors = array();
 
 		// Loop through the uploaded file
 		while (($data = fgetcsv($file)) !== false)
@@ -217,42 +218,47 @@ class TjucmControllerItems extends TjucmController
 				}
 				else
 				{
-					// Save the record in UCM
 					$tjucmItemFormModel = BaseDatabaseModel::getInstance('ItemForm', 'TjucmModel');
 
-					if ($tjucmItemFormModel->save(array('client' => $client)))
+					$fieldsData = array();
+					$fieldsData['client'] = $client;
+
+					$form = $tjucmItemFormModel->getTypeForm($fieldsData);
+					$data = $tjucmItemFormModel->validate($form, $itemData);
+
+					if ($data !== false)
 					{
-						$contentId = (int) $tjucmItemFormModel->getState($tjucmItemFormModel->getName() . '.id');
-
-						$fieldsData = array();
-						$fieldsData['client']      = $client;
-						$fieldsData['content_id']  = $contentId;
-						$fieldsData['fieldsvalue'] = $itemData;
-
-						if ($tjucmItemFormModel->saveFieldsData($fieldsData))
+						// Save the record in UCM
+						if ($tjucmItemFormModel->save(array('client' => $client)))
 						{
-							$validRows++;
+							$contentId = (int) $tjucmItemFormModel->getState($tjucmItemFormModel->getName() . '.id');
 
-							continue;
-						}
-					}
-					else
-					{
-						// Return the error messages if any
-						if (!empty($tjucmItemFormModel->getErrors()))
-						{
-							foreach ($tjucmItemFormModel->getErrors() as $error)
+							$fieldsData['content_id']  = $contentId;
+							$fieldsData['fieldsvalue'] = $data;
+
+							if ($tjucmItemFormModel->saveFieldsData($fieldsData))
 							{
-								$app->enqueueMessage($error, 'error');
+								$validRows++;
+
+								continue;
 							}
 						}
 					}
+
+					$invalidRows++;
+
+					$errors = array_merge($errors, $tjucmItemFormModel->getErrors());
 				}
 			}
 			else
 			{
 				$invalidRows++;
 			}
+		}
+
+		if (!empty($errors))
+		{
+			$this->processErrors($errors);
 		}
 
 		if ($validRows)
@@ -321,5 +327,41 @@ class TjucmControllerItems extends TjucmController
 		readfile($csvFileTmpPath);
 
 		jexit();
+	}
+
+	/**
+	 * Method to procees errors
+	 *
+	 * @param   ARRAY  $errors  ERRORS
+	 *
+	 * @return  void
+	 *
+	 * @since 1.0
+	 */
+	private function processErrors($errors)
+	{
+		$app = Factory::getApplication();
+
+		if (!empty($errors))
+		{
+			$code = 500;
+			$msg  = array();
+
+			// Push up to three validation messages out to the user.
+			for ($i = 0, $n = count($errors); $i < $n && $i < 3; $i++)
+			{
+				if ($errors[$i] instanceof Exception)
+				{
+					$code  = $errors[$i]->getCode();
+					$msg[] = $errors[$i]->getMessage();
+				}
+				else
+				{
+					$msg[] = $errors[$i];
+				}
+			}
+
+			$app->enqueueMessage(implode("<br>", $msg), 'error');
+		}
 	}
 }
