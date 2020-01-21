@@ -58,6 +58,8 @@ class TjucmViewItems extends JViewLegacy
 
 	protected $ucmTypeParams;
 
+	protected $title;
+
 	/**
 	 * Display the view
 	 *
@@ -91,6 +93,7 @@ class TjucmViewItems extends JViewLegacy
 		$this->ucmTypeId    = $id = $model->getState('ucmType.id');
 		$this->client       = $model->getState('ucm.client');
 		$this->canCreate    = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$this->canImport    = $user->authorise('core.type.importitem', 'com_tjucm.type.' . $this->ucmTypeId);
 		$this->canView      = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $this->ucmTypeId);
 		$this->canEdit      = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId);
 		$this->canChange    = $user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $this->ucmTypeId);
@@ -118,6 +121,21 @@ class TjucmViewItems extends JViewLegacy
 					$ucmTypeTable->load(array('alias' => $this->ucm_type));
 					$this->client = $ucmTypeTable->unique_identifier;
 				}
+			}
+		}
+
+		// To get title of list as per the ucm type
+		if (empty($this->title))
+		{
+			// Get the active item
+			$menuItem = $app->getMenu()->getActive();
+
+			// Get the params
+			$this->menuparams = $menuItem->params;
+
+			if (!empty($this->menuparams))
+			{
+				$this->title  = $this->menuparams->get('ucm_type');
 			}
 		}
 

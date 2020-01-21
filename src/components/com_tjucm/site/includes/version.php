@@ -62,6 +62,7 @@ class TjUcmVersion
 	{
 		return self::MAJOR_VERSION . '.' . self::MINOR_VERSION . '.' . self::PATCH_VERSION;
 	}
+
 	/**
 	 * Gets a version string for the current TJVendors with all release information.
 	 *
@@ -73,6 +74,7 @@ class TjUcmVersion
 	{
 		return self::PRODUCT . ' ' . $this->getShortVersion() . ' ' . self::RELDATE;
 	}
+
 	/**
 	 * Generate a media version string for assets
 	 * Public to allow third party developers to use it
@@ -85,6 +87,7 @@ class TjUcmVersion
 	{
 		return md5($this->getLongVersion() . Factory::getConfig()->get('secret'));
 	}
+
 	/**
 	 * Gets a media version which is used to append to TJVendors core media files.
 	 *

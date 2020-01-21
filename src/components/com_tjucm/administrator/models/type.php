@@ -41,19 +41,6 @@ class TjucmModelType extends JModelAdmin
 	protected $item = null;
 
 	/**
-	 * Constructor.
-	 *
-	 * @param   array  $config  An optional associative array of configuration settings.
-	 *
-	 * @see        JController
-	 * @since      1.6
-	 */
-	public function __construct($config = array())
-	{
-		parent::__construct($config);
-	}
-
-	/**
 	 * Returns a reference to the a Table object, always creating it.
 	 *
 	 * @param   string  $type    The table type to instantiate
@@ -307,8 +294,8 @@ class TjucmModelType extends JModelAdmin
 		}
 
 		// Remove white spaces from alias if any
-		$data['alias'] = str_replace(" ", "_", trim($data['alias']));
-
+		//$data['alias'] = str_replace(" ", "_", trim($data['alias']));
+		$data['alias'] =JFilterOutput::stringURLSafe($data['alias']);
 		if (!empty($data['id']))
 		{
 			$field_group = $this->getGroupCount($data['unique_identifier']);
