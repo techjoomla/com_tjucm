@@ -69,8 +69,8 @@ class TjHouseKeepingUpdateAlias extends TjModelHouseKeeping
 			// Get all the menus of UCM types
 			$query->from($db->quoteName('#__menu'));
 			$query->where(
-			$db->quoteName(link) . "=" . $db->quote('index.php?option=com_tjucm&view=itemform') .
-			"||" . $db->quoteName(link) . "=" . $db->quote('index.php?option=com_tjucm&view=items')
+			$db->quoteName(link) . "=" . $db->quote('index.php?option=com_tjucm&view=itemform')
+			. "||" . $db->quoteName(link) . "=" . $db->quote('index.php?option=com_tjucm&view=items')
 			);
 			$db->setQuery($query);
 			$menuItems = $db->loadObjectlist();
