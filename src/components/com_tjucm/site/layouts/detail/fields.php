@@ -63,6 +63,7 @@ foreach ($fieldSets as $fieldset)
 	$count++;
 	$fieldCount = 0;
 	?>
+	<div class="tjucm-wrapper">
 	<div class="row">
 		<?php
 		foreach ($formObject->getFieldset($fieldset->name) as $field)
@@ -207,5 +208,6 @@ foreach ($fieldSets as $fieldset)
 		}
 	?>
 	</div>
+</div>
 	<?php
 }

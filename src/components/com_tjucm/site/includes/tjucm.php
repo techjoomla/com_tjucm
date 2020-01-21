@@ -189,7 +189,7 @@ class TJUCM
 
 			$options = array("version" => $version);
 
-			if ($view == 'itemform')
+			if ($view == 'itemform' || $view == 'items')
 			{
 				HTMLHelper::script('media/com_tjucm/js/com_tjucm.min.js', $options);
 				HTMLHelper::script('media/com_tjucm/js/core/class.min.js', $options);
@@ -197,12 +197,19 @@ class TJUCM
 				HTMLHelper::script('media/com_tjucm/js/services/item.min.js', $options);
 				HTMLHelper::script('media/com_tjucm/js/vendor/jquery/jquery.form.js', $options);
 				HTMLHelper::script('media/com_tjucm/js/ui/itemform.min.js', $options);
+				HTMLHelper::script('media/com_tjucm/js/services/items.min.js', $options);
 
 				HTMLHelper::StyleSheet('media/com_tjucm/css/tjucm.css', $options);
 			}
 
 			// Load css file on every page
 			HTMLHelper::StyleSheet('media/com_tjucm/css/tjucm.css', $options);
+
+			if ($view == 'item')
+			{
+				HTMLHelper::script('media/com_tjucm/js/ui/item.js');
+			}
+
 			$loaded[$location] = true;
 		}
 	}

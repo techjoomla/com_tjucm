@@ -1,14 +1,16 @@
 <?php
 /**
- * @package	TJ-UCM
- * 
- * @author	 TechJoomla <extensions@techjoomla.com>
+ * @package	   TJ-UCM
+ * @author	   TechJoomla <extensions@techjoomla.com>
  * @copyright  Copyright (c) 2009-2019 TechJoomla. All rights reserved.
- * @license	GNU General Public License version 2 or later; see LICENSE.txt
+ * @license	   GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 // No direct access
 defined('_JEXEC') or die;
+
+/*To load language constant of js file*/
+JText::script('COM_TJUCM_DELETE_MESSAGE');
 
 $user = JFactory::getUser();
 
@@ -59,7 +61,7 @@ else
 		{
 			$redirectURL = JRoute::_('index.php?option=com_tjucm&task=itemform.remove&id=' . $this->item->id . '&client=' . $this->client . "&" . JSession::getFormToken() . '=1', false);
 			?>
-			<a class="btn btn-default" href="<?php echo $redirectURL; ?>"><?php echo JText::_("COM_TJUCM_DELETE_ITEM"); ?></a>
+			<a class="btn btn-default delete-button" href="<?php echo $redirectURL; ?>"><?php echo JText::_("COM_TJUCM_DELETE_ITEM"); ?></a>
 			<?php
 		}
 		?>
