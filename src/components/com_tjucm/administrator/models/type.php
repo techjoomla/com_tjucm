@@ -294,8 +294,10 @@ class TjucmModelType extends JModelAdmin
 		}
 
 		// Remove white spaces from alias if any
-		//$data['alias'] = str_replace(" ", "_", trim($data['alias']));
-		$data['alias'] =JFilterOutput::stringURLSafe($data['alias']);
+		// $data['alias'] = str_replace(" ", "_", trim($data['alias']));
+
+		$data['alias'] = JFilterOutput::stringURLSafe($data['alias']);
+
 		if (!empty($data['id']))
 		{
 			$field_group = $this->getGroupCount($data['unique_identifier']);

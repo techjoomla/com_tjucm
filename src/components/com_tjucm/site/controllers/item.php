@@ -69,6 +69,7 @@ class TjucmControllerItem extends JControllerLegacy
 				}
 			}
 		}
+
 		parent::__construct();
 	}
 
@@ -92,7 +93,6 @@ class TjucmControllerItem extends JControllerLegacy
 
 		// Get the model.
 		$model = $this->getModel('Item', 'TjucmModel');
-	
 
 		// Check out the item
 		if ($editId)
@@ -135,7 +135,6 @@ class TjucmControllerItem extends JControllerLegacy
 		$user = JFactory::getUser();
 		$canEdit    = $user->authorise('core.type.edititem', 'com_tjucm.type.edititem' . $this->ucmTypeId);
 		$canChange  = $user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $this->ucmTypeId);
-
 
 		if ($canEdit || $canChange)
 		{
