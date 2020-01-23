@@ -10,20 +10,12 @@ var tjUcmClickedOnPrev = 0;
 var tjUcmCurrentAutoSaveState = 0;
 /*Variable to store if form is submited for final save*/
 var tjUcmFormFinalSave = 0;
-/*Variable to store the data of JCE editor field*/
-var tjUcmJCEFieldIds = new Array();
 
 /* This function executes for autosave form */
 jQuery(window).load(function()
 {
 	/*Code to get item state*/
 	var tjUcmCurrentDraftSaveState = Number(jQuery('#itemState').val());
-
-	/*value of bitrate on button*/
-	var tjUcmAllowBitrate = jQuery('#item-form #tjucm-bitrate').val();
-
-	/*value of bitrate seconds on button*/
-	var tjUcmBitrateSeconds = jQuery('#item-form #tjucm-bitrate_seconds').val();
 
 	/* If record is submitted and no longet in the draft state then dont allow autosave to work*/
 	if (tjUcmCurrentDraftSaveState === 1)
@@ -57,108 +49,14 @@ jQuery(window).load(function()
 				}
 			});
 
-			/*function to get iframe id of JCE editor*/
-			if(jQuery("#item-form .js-editor-tinymce").length > 0)
-			{
-				var tjUcmTinyMCE = Joomla.getOptions("plg_editor_tinymce");
-				if (tjUcmTinyMCE != undefined)
-				{
-					jQuery.each(tjUcmTinyMCE.tinyMCE, function(index, value)
-					{
-						if (jQuery("#item-form #jform_"+index).length)
-						{
-							var tjUcmEditorFieldContent = jQuery("#jform_"+index+"_ifr").contents().find('body').html();
-							tjUcmTinyMCEFieldIds[index] = tjUcmEditorFieldContent;
-						}
-						else if ((jQuery("#item-form #jform_"+index).length == 0) && (index != 'default'))
-						{
-							var tjUcmSubFormEditorFields = jQuery("textarea[id$='__"+index+"']");
-
-							if (tjUcmSubFormEditorFields.length)
-							{
-								jQuery.each(tjUcmSubFormEditorFields, function(findex, fvalue)
-								{
-									var tjUcmEditorFieldContentId = jQuery(fvalue).attr('id');
-									var tjUcmEditorFieldContent = jQuery("#"+tjUcmEditorFieldContentId+"_ifr").contents().find('body').html();
-									var tjucmTempIndex = tjUcmEditorFieldContentId.replace("jform_", "");
-									tjUcmTinyMCEFieldIds[tjucmTempIndex] = tjUcmEditorFieldContent;
-								});
-							}
-						}
-					});
-				}
-			}
-			/*to save data of editor field if editor=jce*/
-			if(jQuery("#item-form .wf-editor-container").length > 0)
-			{
-				/*function to get iframe id of JCE editor*/
-				setTimeout(function(){
-					jQuery("#item-form .mceIframeContainer iframe").each(function (){
-
-					var iframeId=jQuery(this).attr('id');
-					var tjucmIframeIndex = iframeId.replace("jform_", "");
-					var tjucmJceIframeIndex = tjucmIframeIndex.replace("_ifr", "");
-					var iframeContent=jQuery("#"+iframeId).contents().find('body').html();
-
-					tjUcmJCEFieldIds[tjucmJceIframeIndex]=iframeContent;});},2000);
-			}
-
-			// /* Auto save form as per configured bit rate*/
+			/* Auto save form as per configured bit rate*/
 			if (tjUcmAllowAutoSave == 1 && tjUcmAllowBitrate == 1 && tjUcmBitrateSeconds !== undefined)
 			{
 				if (jQuery("#item-form #tjUcmSectionDraftSave").length >= 1)
 				{
 					setInterval(function(){
-						if(jQuery('#item-form').hasClass('dirty'))
-						{
-							jQuery("#tjUcmSectionDraftSave").click();
-						}
-						//For saving data of Jce editor.
-						if("#item-form .wf-editor-container")
-						{
-							for (var key in tjUcmJCEFieldIds)
-							{
-								if (tjUcmJCEFieldIds.hasOwnProperty(key))
-							 	{
-									var iframeContent = jQuery("#jform_"+key+"_ifr").contents().find('body').html();
-									if (tjUcmJCEFieldIds[key] != iframeContent)
-									{
-										var tjUcmTempFieldObj1 = jQuery("#jform_"+key);
-
-										if (tjUcmTempFieldObj1.length)
-											{
-												tjUcmTempFieldObj1.val(iframeContent);
-												tjUcmJCEFieldIds[key] = iframeContent;
-												tjUcmItemForm.onUcmFormChange(tjUcmTempFieldObj1);
-											}
-									}
-								}
-							}
-						}
-						//For saving data of tinyMce editor
-						if(jQuery("#item-form .js-editor-tinymce").length > 0)
-						{
-							for (var key in tjUcmTinyMCEFieldIds)
-							{
-								if (tjUcmTinyMCEFieldIds.hasOwnProperty(key))
-								{
-									var tjUcmEditorFieldContent = jQuery("#jform_"+key+"_ifr").contents().find('body').html();
-
-									if (tjUcmTinyMCEFieldIds[key] != tjUcmEditorFieldContent)
-									{
-										var tjUcmTempFieldObj = jQuery("#jform_"+key);
-
-										if (tjUcmTempFieldObj.length)
-										{
-											tjUcmTempFieldObj.val(tjUcmEditorFieldContent);
-											tjUcmTinyMCEFieldIds[key] = tjUcmEditorFieldContent;
-											tjUcmItemForm.onUcmFormChange(tjUcmTempFieldObj);
-										}
-									}
-								}
-							}
-
-						} }, tjUcmBitrateSeconds*1000);
+						jQuery("#tjUcmSectionDraftSave").click();
+					}, tjUcmBitrateSeconds*1000);
 				}
 			}
 		}
@@ -312,6 +210,7 @@ jQuery(window).load(function()
 			jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
 		}
 	});
+});
 
 var tjUcmItemForm = {
 	getUcmParentRecordId: function (draft, callback){

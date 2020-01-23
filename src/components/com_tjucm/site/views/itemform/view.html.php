@@ -215,7 +215,7 @@ class TjucmViewItemform extends JViewLegacy
 				{
 					$this->title  = $this->menuparams->get('ucm_type');
 				}
-		}
+		}			
 
 		// Check the view access to the itemform (the model has already computed the values).
 		if ($this->item->params->get('access-view') == false)
