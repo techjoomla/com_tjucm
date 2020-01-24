@@ -319,7 +319,7 @@ class TjucmControllerItemForm extends JControllerForm
 			}
 			else
 			{
-				$msg = ($response) ? Text::_("COM_TJUCM_ITEM_SAVED_SUCCESSFULLY") : Text::_("COM_TJUCM_FORM_SAVE_FAILED_AUTHORIZATION_ERROR");
+				$msg = Text::_("COM_TJUCM_FORM_SAVE_FAILED_AUTHORIZATION_ERROR");
 			}
 
 			echo new JResponseJson($response, $msg);
