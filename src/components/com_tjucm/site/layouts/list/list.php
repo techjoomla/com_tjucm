@@ -22,7 +22,6 @@ if (!key_exists('itemsData', $displayData))
 }
 
 $fieldsData = $displayData['fieldsData'];
-
 $app = Factory::getApplication();
 $user = Factory::getUser();
 
@@ -152,7 +151,7 @@ if ($canDeleteOwn)
 
 			$fieldXml = $formObject->getFieldXml($tjFieldsFieldTable->name);
 			?>
-			<td style="word-break: break-word;"  width="<?php echo (85 - $statusColumnWidth) / count($this->listcolumn) . '%';?>">
+			<td style="word-break: break-word;"  width="<?php echo (85 - $displayData['statusColumnWidth']) / count($displayData['listcolumn']) . '%';?>">
 				<?php
 					if ($canView || ($item->created_by == $user->id))
 					{
