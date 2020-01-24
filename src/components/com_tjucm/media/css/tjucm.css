@@ -13,3 +13,8 @@ width:200px !important;
  #item-form textarea{
     height: inherit !important;
 }
+
+#item-form .minicolors-theme-bootstrap .hex {
+    width: 100px !important;
+    height: auto;
+}
