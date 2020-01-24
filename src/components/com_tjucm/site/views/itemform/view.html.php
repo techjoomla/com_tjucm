@@ -242,7 +242,7 @@ class TjucmViewItemform extends JViewLegacy
 		}
 
 		// Set Layout to type view
-		$layout = isset($typeParams->layout) ? $typeParams->layout : '';
+		$this->layout = isset($typeParams->layout) ? $typeParams->layout : '';
 
 		if (isset($typeParams->layout) && !empty($typeParams->layout))
 		{
@@ -284,9 +284,9 @@ class TjucmViewItemform extends JViewLegacy
 
 		$this->allow_auto_save = (isset($typeParams->allow_auto_save) && empty($typeParams->allow_auto_save)) ? 0 : 1;
 		$this->allow_draft_save = (isset($typeParams->allow_draft_save) && !empty($typeParams->allow_draft_save)) ? 1 : 0;
-		$this->allow_bit_rate=(isset($typeParams->bitrate_on) && !empty($typeParams->bitrate_on)) ? 1 : 0;
-		$this->allow_bit_rate_seconds=$typeParams->bitrate_seconds;
-		
+		$this->allow_bit_rate = (isset($typeParams->bitrate_on) && !empty($typeParams->bitrate_on)) ? 1 : 0;
+		$this->allow_bit_rate_seconds = $typeParams->bitrate_seconds;
+
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{

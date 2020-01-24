@@ -41,7 +41,7 @@ $editRecordId              = $jinput->input->get("id", '', 'INT');
 $baseUrl                   = $jinput->input->server->get('REQUEST_URI', '', 'STRING');
 $calledFrom                = (strpos($baseUrl, 'administrator')) ? 'backend' : 'frontend';
 $layout                    = ($calledFrom == 'frontend') ? 'default' : 'edit';
-$dynamicLayout             = $this->setLayout($typeParams->layout);
+$dynamicLayout             = $this->setLayout($this->layout);
 $fieldsets_counter_deafult = 0;
 $setnavigation             = false;
 

@@ -258,7 +258,9 @@ $statusColumnWidth = 0;
 							'ucmTypeId' => $this->ucmTypeId,
 							'ucmTypeParams' => $this->ucmTypeParams,
 							'fieldsData' => $fieldsData,
-							'formObject' => $formObject
+							'formObject' => $formObject,
+							'statusColumnWidth' => $statusColumnWidth,
+							'listcolumn' => $this->listcolumn
 						)
 					);
 				}

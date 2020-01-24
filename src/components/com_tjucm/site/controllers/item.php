@@ -30,18 +30,6 @@ class TjucmControllerItem extends JControllerLegacy
 		$this->client  = JFactory::getApplication()->input->get('client');
 		$this->created_by  = JFactory::getApplication()->input->get('created_by');
 
-		$this->appendUrl = "";
-
-		if (!empty($this->created_by))
-		{
-			$this->appendUrl .= "&created_by=" . $this->created_by;
-		}
-
-		if (!empty($this->client))
-		{
-			$this->appendUrl .= "&client=" . $this->client;
-		}
-
 		// Get UCM type id from uniquue identifier
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
@@ -69,6 +57,19 @@ class TjucmControllerItem extends JControllerLegacy
 				}
 			}
 		}
+
+		$this->appendUrl = "";
+
+		if (!empty($this->created_by))
+		{
+			$this->appendUrl .= "&created_by=" . $this->created_by;
+		}
+
+		if (!empty($this->client))
+		{
+			$this->appendUrl .= "&client=" . $this->client;
+		}
+
 		parent::__construct();
 	}
 
