@@ -182,7 +182,7 @@ foreach ($fieldSets as $fieldset)
 
 							// To align text, textarea, textareacounter and editor fields properly
 
-							if ($field->type == 'Textarea'|| $field->type == 'Textareacounter'|| $field->type == 'Text' || $field->type == 'Editor')
+							if ($field->type == 'Textarea'|| $field->type == 'Textareacounter'|| $field->type == 'Text' || $field->type == 'Editor' || $field->type == 'tjlist')
 							{
 								?>
 								<div class="tj-wordwrap">

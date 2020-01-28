@@ -189,7 +189,7 @@ class TJUCM
 
 			$options = array("version" => $version);
 
-			if ($view == 'itemform' || $view == 'items')
+			if ($view == 'itemform')
 			{
 				HTMLHelper::script('media/com_tjucm/js/com_tjucm.min.js', $options);
 				HTMLHelper::script('media/com_tjucm/js/core/class.min.js', $options);
@@ -207,6 +207,8 @@ class TJUCM
 				HTMLHelper::script('media/com_tjucm/js/ui/item.js');
 			}
 
+			// Load css file on every page
+			HTMLHelper::StyleSheet('media/com_tjucm/css/tjucm.css', $options);
 			$loaded[$location] = true;
 		}
 	}
