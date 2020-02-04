@@ -184,6 +184,7 @@ $statusColumnWidth = 0;
 							}
 							else
 							{
+								JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
 								$tjFieldsFieldTable = JTable::getInstance('field', 'TjfieldsTable');
 								$tjFieldsFieldTable->load($fieldId);
 								$fieldsData[$fieldId] = $tjFieldsFieldTable;
