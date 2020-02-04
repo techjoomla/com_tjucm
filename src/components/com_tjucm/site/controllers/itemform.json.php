@@ -317,6 +317,10 @@ class TjucmControllerItemForm extends JControllerForm
 					$dispatcher->trigger('onUcmItemAfterSave', array($table->getProperties(), $data));
 				}
 			}
+			else
+			{
+				$msg = Text::_("COM_TJUCM_FORM_SAVE_FAILED_AUTHORIZATION_ERROR");
+			}
 
 			echo new JResponseJson($response, $msg);
 			$app->close();
