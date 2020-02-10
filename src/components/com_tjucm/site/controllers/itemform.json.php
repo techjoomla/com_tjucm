@@ -249,7 +249,6 @@ class TjucmControllerItemForm extends JControllerForm
 			// Create JForm object for the field
 			$model = $this->getModel('itemform');
 			$formData['client'] = $client;
-			$form  = $model->getTypeForm($formData);
 
 			if (!empty($section))
 			{
@@ -265,7 +264,35 @@ class TjucmControllerItemForm extends JControllerForm
 			// Validate field data
 			$data = $model->validate($form, $formData);
 
-			if ($data == false)
+			// Validate UCM subform data - start
+			$fieldSets = $form->getFieldsets();
+
+			foreach ($fieldSets as $fieldset)
+			{
+				foreach ($form->getFieldset($fieldset->name) as $field)
+				{
+					if ($field->type == 'Ucmsubform')
+					{
+						$subForm = $field->loadSubForm();
+						$subFormFieldName = str_replace('jform[', '', $field->name);
+						$subFormFieldName = str_replace(']', '', $subFormFieldName);
+
+						foreach ($formData[$subFormFieldName] as $ucmSubFormData)
+						{
+							$ucmSubFormData = $model->validate($subForm, $ucmSubFormData);
+
+							if ($ucmSubFormData === false)
+							{
+								$data = false;
+							}
+						}
+					}
+				}
+			}
+
+			// Validate UCM subform data - end
+
+			if ($data === false)
 			{
 				$errors = $model->getErrors();
 				$this->processErrors($errors);
@@ -431,7 +458,7 @@ class TjucmControllerItemForm extends JControllerForm
 			$msg  = array();
 
 			// Push up to three validation messages out to the user.
-			for ($i = 0, $n = count($errors); $i < $n && $i < 3; $i++)
+			for ($i = 0; $i < count($errors); $i++)
 			{
 				if ($errors[$i] instanceof Exception)
 				{
@@ -444,7 +471,7 @@ class TjucmControllerItemForm extends JControllerForm
 				}
 			}
 
-			$app->enqueueMessage(implode("\n", $msg), 'error');
+			$app->enqueueMessage(implode("<br>", $msg), 'error');
 		}
 	}
 

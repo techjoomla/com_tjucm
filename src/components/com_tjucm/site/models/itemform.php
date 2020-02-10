@@ -358,6 +358,21 @@ class TjucmModelItemForm extends JModelAdmin
 			{
 				foreach ($form->getFieldset($fieldset->name) as $field)
 				{
+					// Remove required attribute from the subform fields in case of draft save
+					if ($field->type == 'Subform' || $field->type == 'Ucmsubform')
+					{
+						$subForm = $field->loadSubForm();
+						$subFormFieldSets = $subForm->getFieldsets();
+
+						foreach ($subFormFieldSets as $subFormFieldSet)
+						{
+							foreach ($subForm->getFieldset($subFormFieldSet->name) as $subFormField)
+							{
+								$subForm->setFieldAttribute($subFormField->fieldname, 'required', false);
+							}
+						}
+					}
+
 					$form->setFieldAttribute($field->fieldname, 'required', false);
 				}
 			}
