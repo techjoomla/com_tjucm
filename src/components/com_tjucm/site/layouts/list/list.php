@@ -94,14 +94,14 @@ if ($canDeleteOwn)
 ?>
 <div class="tjucm-wrapper">
 <tr class="row<?php echo $item->id?>">
-	<td class="center hidden-phone">
+	<td width="1%" class="center hidden-phone">
 		<?php echo JHtml::_('grid.id', '', $item->id); ?>
 	</td>
 	<?php
 	if (isset($item->state))
 	{
 		$class = ($canChange) ? 'active' : 'disabled'; ?>
-		<td class="center">
+		<td class="center" width="1%">
 			<a class="<?php echo $class; ?>"
 				href="<?php echo ($canChange) ? 'index.php?option=com_tjucm&task=item.publish&id=' .
 				$item->id . '&state=' . (($item->state + 1) % 2) . $appendUrl . $csrf : '#'; ?>">
@@ -120,7 +120,7 @@ if ($canDeleteOwn)
 	<?php
 	}
 	?>
-	<td>
+	<td width="1%">
 		<a href="<?php echo Route::_(
 		'index.php?option=com_tjucm&view=item&id=' .
 		(int) $item->id . "&client=" . $client . '&Itemid=' . $itemId, false
@@ -132,7 +132,7 @@ if ($canDeleteOwn)
 	if ($allowDraftSave)
 	{
 		?>
-		<td><?php echo ($item->draft) ? Text::_('COM_TJUCM_DATA_STATUS_DRAFT') : Text::_('COM_TJUCM_DATA_STATUS_SAVE'); ?></td>
+		<td width="2%"><?php echo ($item->draft) ? Text::_('COM_TJUCM_DATA_STATUS_DRAFT') : Text::_('COM_TJUCM_DATA_STATUS_SAVE'); ?></td>
 	<?php
 	}
 
@@ -151,7 +151,7 @@ if ($canDeleteOwn)
 
 			$fieldXml = $formObject->getFieldXml($tjFieldsFieldTable->name);
 			?>
-			<td style="word-break: break-word;"  width="<?php echo (85 - $displayData['statusColumnWidth']) / count($displayData['listcolumn']) . '%';?>">
+			<td width="85%">
 				<?php
 					if ($canView || ($item->created_by == $user->id))
 					{
@@ -174,7 +174,7 @@ if ($canDeleteOwn)
 	if ($canEdit || $canDelete || $editown || $deleteOwn)
 	{
 		?>
-		<td class="center">
+		<td  class="actions" width="10%">
 			<a href="<?php echo $link; ?>" type="button" title="<?php echo Text::_('COM_TJUCM_VIEW_RECORD');?>"><i class="icon-eye-open"></i></a>
 		<?php
 		if ($canEdit || $editown)
