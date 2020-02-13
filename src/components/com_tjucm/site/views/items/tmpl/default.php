@@ -267,19 +267,6 @@ $statusColumnWidth = 0;
 		}
 		?>
 		</tbody>
-		<?php
-		if (!empty($this->items))
-		{
-		?>
-		<tfoot>
-			<tr>
-				<td colspan="<?php echo isset($this->items[0]) ? count($this->items[0]->field_values) + 3 : 10; ?>">
-				</td>
-			</tr>
-		</tfoot>
-		<?php
-		}
-		?>
 		</table>
 	</div>
 		<?php echo $this->pagination->getListFooter(); ?>
