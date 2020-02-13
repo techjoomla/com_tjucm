@@ -18,3 +18,8 @@ width:200px !important;
     width: 100px !important;
     height: auto;
 }
+
+ .calendar-container{
+   min-width: 260px;
+}
+
