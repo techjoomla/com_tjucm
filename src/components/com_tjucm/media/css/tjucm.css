@@ -10,7 +10,8 @@ width:200px !important;
 #item-form .field-calendar input{
     display: inline !important;
 }
- #item-form textarea{
+
+#item-form textarea{
     height: inherit !important;
 }
 
@@ -18,3 +19,9 @@ width:200px !important;
     width: 100px !important;
     height: auto;
 }
+
+#itemList .actions{
+	display: inline-flex;
+	width: 78px;
+}
+

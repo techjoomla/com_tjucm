@@ -155,13 +155,13 @@ $statusColumnWidth = 0;
 					if (isset($this->items[0]->state))
 					{
 						?>
-							<th class="center" width="3%">
+							<th class="center" width="1%">
 							<?php echo JHtml::_('grid.sort', 'JPUBLISHED', 'a.state', $listDirn, $listOrder); ?>
 							</th>
 						<?php
 						}
 						?>
-						<th width="2%">
+						<th width="1%">
 							<?php echo JHtml::_('grid.sort', 'COM_TJUCM_DATA_STATUS', 'a.draft', $listDirn, $listOrder); ?>
 						</th>
 					<?php
@@ -191,7 +191,7 @@ $statusColumnWidth = 0;
 							}
 							?>
 
-							<th  style="word-break: break-word;" width="<?php echo (85 - $statusColumnWidth) / count($this->listcolumn) . '%';?>">
+							<th  class="center" width="85%">
 								<?php echo htmlspecialchars($col_name, ENT_COMPAT, 'UTF-8'); ?>
 							</th>
 							<?php
@@ -211,20 +211,6 @@ $statusColumnWidth = 0;
 			<?php
 				}
 			}?>
-		<?php
-		if (!empty($this->items))
-		{
-		?>
-		<tfoot>
-			<tr>
-				<td colspan="<?php echo isset($this->items[0]) ? count($this->items[0]->field_values) + 3 : 10; ?>">
-					<?php echo $this->pagination->getListFooter(); ?>
-				</td>
-			</tr>
-		</tfoot>
-		<?php
-		}
-		?>
 		<tbody>
 		<?php
 		if (!empty($this->showList))
@@ -281,8 +267,9 @@ $statusColumnWidth = 0;
 		}
 		?>
 		</tbody>
-	</table>
-</div>
+		</table>
+	</div>
+		<?php echo $this->pagination->getListFooter(); ?>
 </div>
 </div>
 	<?php
