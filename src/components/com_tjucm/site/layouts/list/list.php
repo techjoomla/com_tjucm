@@ -174,7 +174,7 @@ if ($canDeleteOwn)
 	if ($canEdit || $canDelete || $editown || $deleteOwn)
 	{
 		?>
-		<td  class="actions" width="10%">
+		<td  class="center" width="10%">
 			<a href="<?php echo $link; ?>" type="button" title="<?php echo Text::_('COM_TJUCM_VIEW_RECORD');?>"><i class="icon-eye-open"></i></a>
 		<?php
 		if ($canEdit || $editown)
