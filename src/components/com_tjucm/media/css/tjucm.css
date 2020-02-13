@@ -18,3 +18,14 @@ width:200px !important;
     width: 100px !important;
     height: auto;
 }
+
+.form-horizontal .control-group .control-label{
+	width: 0px;
+	padding-top: 20px;
+}
+
+.form-horizontal .control-group .controls{
+	margin-left: 90px;
+	margin-top: 20px;
+    text-align: left;
+}
