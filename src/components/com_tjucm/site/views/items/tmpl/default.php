@@ -274,7 +274,6 @@ $statusColumnWidth = 0;
 		<tfoot>
 			<tr>
 				<td colspan="<?php echo isset($this->items[0]) ? count($this->items[0]->field_values) + 3 : 10; ?>">
-
 				</td>
 			</tr>
 		</tfoot>
