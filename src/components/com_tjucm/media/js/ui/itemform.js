@@ -14,6 +14,10 @@ var tjUcmFormFinalSave = 0;
 var tjUcmJCEFieldIds = new Array();
 /*Variable to store if form is saved once using bit rate config*/
 var tjUcmFormSavedByBitRateConfig = 0;
+/*Variable to store if save call is from bitrate*/
+var tjUcmSaveFormInDraftWithNoMsg = undefined;
+/*Variable to store id of button from which the save is initiated*/
+var tjUcmFormSubmitCallingButtonId = '';
 
 /* This function executes for autosave form */
 jQuery(window).load(function()
@@ -512,6 +516,13 @@ var tjUcmItemForm = {
 
 				return true;
 			}
+			else if (tjucmRecordId == undefined)
+			{
+				/* In case of subform onchange save the entire form*/
+				tjUcmSaveFormInDraftWithNoMsg = 1;
+				tjUcmFormSubmitCallingButtonId = 'tjUcmSectionDraftSave';
+				jQuery("#tjUcmSectionDraftSave").click();
+			}
 
 			return false;
 		}
@@ -717,14 +728,22 @@ var tjUcmItemForm = {
 		/* Disable the action buttons before performing the action*/
 		jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
 
+		/* In case of save through bitrate setting event will be undefined*/
 		if (event === undefined)
 		{
-			var tjUcmFormSubmitCallingButtonId = 'tjUcmSectionDraftSave';
-			var tjUcmBitrateAutoSaveCall = 1;
+			tjUcmFormSubmitCallingButtonId = 'tjUcmSectionDraftSave';
+			tjUcmSaveFormInDraftWithNoMsg = 1;
 		}
 		else
 		{
-			var tjUcmFormSubmitCallingButtonId = event.target.id;
+			if (event.target.id == 'tjUcmSectionDraftSave' || event.target.id == 'tjUcmSectionFinalSave')
+			{
+				tjUcmFormSubmitCallingButtonId = event.target.id;
+			}
+			else
+			{
+				tjUcmFormSubmitCallingButtonId = 'tjUcmSectionDraftSave';
+			}
 		}
 
 		var tjUcmSaveRecordAsDraft = 1;
@@ -793,6 +812,9 @@ var tjUcmItemForm = {
 				tjUcmFormFinalSave = 1;
 			}
 
+			/* Reset the variable*/
+			tjUcmFormSubmitCallingButtonId = '';
+
 			jQuery('input[type="checkbox"]').each(function (){
 				if (jQuery(this).prop('checked') == true)
 				{
@@ -805,8 +827,9 @@ var tjUcmItemForm = {
 			});
 
 			/* Do not show draft save msg if the save is triggered as per bitrate config*/
-			if (tjUcmBitrateAutoSaveCall !== undefined)
+			if (tjUcmSaveFormInDraftWithNoMsg !== undefined)
 			{
+				tjUcmSaveFormInDraftWithNoMsg = undefined;
 				tjUcmItemFormData.append('showDraftMessage', 0);
 			}
 
