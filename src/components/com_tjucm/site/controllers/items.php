@@ -11,6 +11,7 @@
 // No direct access.
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Filesystem\File;
@@ -104,8 +105,23 @@ class TjucmControllerItems extends TjucmController
 		$fieldsLabel = array_column($fields, 'label');
 		$fieldHeaders = array_combine($fieldsName, $fieldsLabel);
 
+		// Get UCM Type data
+		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
+		$ucmTypeTable = Table::getInstance('Type', 'TjucmTable');
+		$ucmTypeTable->load(array("unique_identifier" => $client));
+
+		// Get decoded data object
+		$typeParams = new Registry($ucmTypeTable->params);
+
 		foreach ($fields as $field)
 		{
+			// Check com_cluster component is installed and configuration set Yes in UCM type form
+			if (ComponentHelper::getComponent('com_cluster', true)->enabled && $field->type == 'cluster' && $typeParams->get('import_items'))
+			{
+				$requiredFieldsName[$field->name] = $field->name;
+				continue;
+			}
+
 			// Get the required fields for the UCM type
 			if ($field->required == 1)
 			{
@@ -209,6 +225,14 @@ class TjucmControllerItems extends TjucmController
 					}
 				}
 
+				// Check com_cluster component is installed and configuration set Yes in UCM type form
+				if (ComponentHelper::getComponent('com_cluster', true)->enabled && $typeParams->get('import_items'))
+				{
+					$clusterId = $app->input->getInt("cluster", 0);
+					$clusterFieldName = str_replace('.', '_', $client) . '_clusterclusterid';
+					$itemData[$clusterFieldName] = $clusterId;
+				}
+
 				// Check if all the required values are present in the row
 				$isValid = (count(array_intersect_key($itemData, $requiredFieldsName)) == count($requiredFieldsName));
 
@@ -304,6 +328,9 @@ class TjucmControllerItems extends TjucmController
 		$ucmTypeTable = Table::getInstance('Type', 'TjucmTable');
 		$ucmTypeTable->load(array("unique_identifier" => $client));
 
+		// Get decoded data object
+		$typeParams = new Registry($ucmTypeTable->params);
+
 		// Get fields in the given UCM type
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
 		$tjFieldsFieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
@@ -312,10 +339,24 @@ class TjucmControllerItems extends TjucmController
 		$tjFieldsFieldsModel->setState('list.ordering', 'a.ordering');
 		$tjFieldsFieldsModel->setState('list.direction', 'asc');
 		$fields = $tjFieldsFieldsModel->getItems();
-		$fieldsLabel = array_column($fields, 'label');
+		$fieldsLabel = array_column($fields, 'label', 'id');
+
+		// Check if com_cluster component is installed
+		if (ComponentHelper::getComponent('com_cluster', true)->enabled && $typeParams->get('import_items'))
+		{
+			$fieldsType = array_column($fields, 'id', 'type');
+
+			foreach ($fieldsType as $key => $value)
+			{
+				if ($key == 'cluster')
+				{
+					unset($fieldsLabel[$value]);
+				}
+			}
+		}
 
 		// Generate schema CSV file with CSV headers as label of the fields for given UCM type and save it in temp folder
-		$fileName = preg_replace('/[^A-Za-z0-9\-]/', '', $ucmTypeTable->title) . '.csv';
+		$fileName = preg_replace('/[^A-Za-z0-9\-]/', '', $ucmTypeTable->title) . '_' . round(microtime(true)) . '.csv';
 		$csvFileTmpPath = Factory::getConfig()->get('tmp_path') . '/' . $fileName;
 		$output = fopen($csvFileTmpPath, 'w');
 		fputcsv($output, $fieldsLabel);

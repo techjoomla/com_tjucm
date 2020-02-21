@@ -8,6 +8,7 @@
  */
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\Component\ComponentHelper;
 
 JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
 JHtml::_('behavior.tooltip');
@@ -51,9 +52,18 @@ JHtml::_('behavior.keepalive');
 							<?php echo $this->form->renderField('state'); ?>
 							<?php echo $this->form->renderField('type_description'); ?>
 
-							<?php foreach ($this->form->getGroup('params') as $field) : ?>
-								<?php echo $field->renderField(); ?>
-							<?php endforeach; ?>
+							<?php foreach ($this->form->getGroup('params') as $field) :
+
+								if (strpos($field->name, 'import_items') == false)
+								{
+									echo $field->renderField();
+								}
+								elseif (ComponentHelper::getComponent('com_cluster', true)->enabled)
+								{
+									echo $field->renderField();
+								}
+
+							endforeach; ?>
 
 							<input type="hidden" name="jform[checked_out]" value="<?php echo $this->item->checked_out; ?>" />
 							<input type="hidden" name="jform[checked_out_time]" value="<?php echo $this->item->checked_out_time; ?>" />
