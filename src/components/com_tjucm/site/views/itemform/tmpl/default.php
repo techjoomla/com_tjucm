@@ -41,6 +41,7 @@ $editRecordId              = $jinput->input->get("id", '', 'INT');
 $baseUrl                   = $jinput->input->server->get('REQUEST_URI', '', 'STRING');
 $calledFrom                = (strpos($baseUrl, 'administrator')) ? 'backend' : 'frontend';
 $layout                    = ($calledFrom == 'frontend') ? 'default' : 'edit';
+$dynamicLayout             = $this->setLayout($this->layout);
 $fieldsets_counter_deafult = 0;
 $setnavigation             = false;
 
@@ -116,15 +117,15 @@ JFactory::getDocument()->addScriptDeclaration('
 	</div>
 	<?php
 		if ($this->form_extra)
-		{	
-			if($this->id!='0')
+		{
+			if ($this->id != '0')
 			{
 				?>
 				<div class="page-header">
 					<h1 class="page-title">
-					<?php echo JText::_("COM_TJUCM_EDIT_FORM") .": ". strtoupper($this->title); ?>
+					<?php echo JText::_("COM_TJUCM_EDIT_FORM") . ": " . strtoupper($this->title); ?>
 					<h1>
-				</div><?php	
+				</div><?php
 			}
 			else
 			{
@@ -133,12 +134,19 @@ JFactory::getDocument()->addScriptDeclaration('
 				<h1 class="page-title">
 					<?php echo strtoupper($this->title); ?>
 				<h1>
-				</div><?php	
+				</div><?php
 			}?>
 			<div class="form-horizontal">
 			<?php
 			// Code to display the form
-			echo $this->loadTemplate('extrafields');
+			if ($dynamicLayout == "default")
+			{
+				echo $this->loadTemplate('extrafields');
+			}
+			else
+			{
+				echo $this->loadTemplate('grid');
+			}
 			?>
 			</div>
 			<?php
@@ -216,5 +224,7 @@ JFactory::getDocument()->addScriptDeclaration('
 	<input type="hidden" name="task" value="itemform.save"/>
 	<input type="hidden" name="form_status" id="form_status" value=""/>
 	<input type="hidden" name="tjucm-autosave" id="tjucm-autosave" value="<?php echo $this->allow_auto_save;?>"/>
+	<input type="hidden" name="tjucm-bitrate" id="tjucm-bitrate" value="<?php echo $this->allow_bit_rate;?>"/>
+	<input type="hidden" name="tjucm-bitrate_seconds" id="tjucm-bitrate_seconds" value="<?php echo $this->allow_bit_rate_seconds;?>"/>	
 	<?php echo HTMLHelper::_('form.token'); ?>
 </form>

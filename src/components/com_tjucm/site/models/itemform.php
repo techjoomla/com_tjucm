@@ -358,6 +358,21 @@ class TjucmModelItemForm extends JModelAdmin
 			{
 				foreach ($form->getFieldset($fieldset->name) as $field)
 				{
+					// Remove required attribute from the subform fields in case of draft save
+					if ($field->type == 'Subform' || $field->type == 'Ucmsubform')
+					{
+						$subForm = $field->loadSubForm();
+						$subFormFieldSets = $subForm->getFieldsets();
+
+						foreach ($subFormFieldSets as $subFormFieldSet)
+						{
+							foreach ($subForm->getFieldset($subFormFieldSet->name) as $subFormField)
+							{
+								$subForm->setFieldAttribute($subFormField->fieldname, 'required', false);
+							}
+						}
+					}
+
 					$form->setFieldAttribute($field->fieldname, 'required', false);
 				}
 			}
@@ -610,7 +625,16 @@ class TjucmModelItemForm extends JModelAdmin
 
 				if (!empty($fieldData['fieldsvalue'][$ownerShipFieldName]))
 				{
-					$ucmItemTable->created_by = $fieldData['fieldsvalue'][$ownerShipFieldName];
+					JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
+					$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', JFactory::getDbo()));
+					$fieldTable->load(array('name' => $ownerShipFieldName));
+					$fieldParams = new Registry($fieldTable->params);
+
+					// If enabled then the selected user will be set as creator of the UCM type item
+					if ($fieldParams->get('ucmItemOwner'))
+					{
+						$ucmItemTable->created_by = $fieldData['fieldsvalue'][$ownerShipFieldName];
+					}
 				}
 
 				if (!empty($fieldData['fieldsvalue'][$itemCategoryFieldName]))

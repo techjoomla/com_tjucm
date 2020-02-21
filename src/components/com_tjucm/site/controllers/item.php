@@ -30,6 +30,34 @@ class TjucmControllerItem extends JControllerLegacy
 		$this->client  = JFactory::getApplication()->input->get('client');
 		$this->created_by  = JFactory::getApplication()->input->get('created_by');
 
+		// Get UCM type id from uniquue identifier
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		$this->ucmTypeId = $tjUcmModelType->getTypeId($this->client);
+
+		// If client is empty then get client from menu params
+		if (empty($this->client))
+		{
+			// Get the active item
+			$menuitem   = $app->getMenu()->getActive();
+
+			// Get the params
+			$this->menuparams = $menuitem->params;
+
+			if (!empty($this->menuparams))
+			{
+				$this->ucm_type   = $this->menuparams->get('ucm_type');
+
+				if (!empty($this->ucm_type))
+				{
+					JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
+					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+					$ucmTypeTable->load(array('alias' => $this->ucm_type));
+					$this->client = $ucmTypeTable->unique_identifier;
+				}
+			}
+		}
+
 		$this->appendUrl = "";
 
 		if (!empty($this->created_by))
@@ -41,11 +69,6 @@ class TjucmControllerItem extends JControllerLegacy
 		{
 			$this->appendUrl .= "&client=" . $this->client;
 		}
-
-		// Get UCM type id from uniquue identifier
-		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
-		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
-		$this->ucmTypeId = $tjUcmModelType->getTypeId($this->client);
 
 		parent::__construct();
 	}
@@ -70,6 +93,7 @@ class TjucmControllerItem extends JControllerLegacy
 
 		// Get the model.
 		$model = $this->getModel('Item', 'TjucmModel');
+	
 
 		// Check out the item
 		if ($editId)
@@ -113,6 +137,7 @@ class TjucmControllerItem extends JControllerLegacy
 		$canEdit    = $user->authorise('core.type.edititem', 'com_tjucm.type.edititem' . $this->ucmTypeId);
 		$canChange  = $user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $this->ucmTypeId);
 
+
 		if ($canEdit || $canChange)
 		{
 			$model = $this->getModel('Item', 'TjucmModel');
@@ -140,7 +165,7 @@ class TjucmControllerItem extends JControllerLegacy
 			$this->setMessage(JText::_('COM_TJUCM_ITEM_SAVED_SUCCESSFULLY'));
 
 			// If there isn't any menu item active, redirect to list view
-			$itemId = $tjUcmFrontendHelper->getItemId('index.php?option=com_tjucm&view=items' . $this->appendUrl);
+			$itemId = $tjUcmFrontendHelper->getItemId('index.php?option=com_tjucm&view=items' . $this->client);
 			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl . '&Itemid=' . $itemId, false));
 		}
 		else
