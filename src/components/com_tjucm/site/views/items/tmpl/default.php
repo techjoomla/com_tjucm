@@ -162,7 +162,7 @@ $statusColumnWidth = 0;
 						}
 						?>
 						<th width="2%">
-							<?php echo JHtml::_('grid.sort', 'COM_TJUCM_DATA_STATUS', 'a.draft', $listDirn, $listOrder); ?>
+							<?php echo JHtml::_('grid.sort', 'COM_TJUCM_ITEMS_ID', 'a.id', $listDirn, $listOrder); ?>
 						</th>
 					<?php
 
