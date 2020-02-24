@@ -138,6 +138,13 @@ class TjucmModelItems extends JModelList
 			$this->setState($ucmType . '.filter.cluster_id', $clusterId);
 		}
 
+		$draft = $app->getUserStateFromRequest($this->context . '.draft', 'draft');
+
+		if ($draft)
+		{
+			$this->setState('filter.draft', $draft);
+		}
+
 		$this->setState('ucm.client', $ucmType);
 		$this->setState("ucmType.id", $typeId);
 
