@@ -140,9 +140,9 @@ class TjucmModelItems extends JModelList
 
 		$draft = $app->getUserStateFromRequest($this->context . '.draft', 'draft');
 
-		if ($draft)
+		if ($draft != '-' )
 		{
-			$this->setState('filter.draft', $draft);
+			$this->setState('filter.draft', (int) $draft);
 		}
 
 		$this->setState('ucm.client', $ucmType);
@@ -283,6 +283,13 @@ class TjucmModelItems extends JModelList
 			$query->where(($db->quoteName('(a.state) ') . ' IN (0, 1)'));
 		}
 
+		// Filter by draft status
+		$draft = $this->getState('filter.draft');
+
+		if ($draft !== null)
+		{
+			$query->where($db->quoteName('a.draft') . ' = ' . (int) $draft);
+		}
 		// Search by content id
 		$search = $this->getState($client . '.filter.search');
 
@@ -335,6 +342,8 @@ class TjucmModelItems extends JModelList
 
 	/**
 	 * Function to filter content as per field values
+	 *
+	 * @param   string  $client  Client
 	 *
 	 * @return   Array  Content Ids
 	 *
