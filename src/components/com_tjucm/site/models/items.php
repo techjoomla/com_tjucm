@@ -282,7 +282,7 @@ class TjucmModelItems extends JModelList
 		// Filter by draft status
 		$draft = $this->getState('filter.draft');
 
-		if ($draft != '')
+		if (in_array($draft, array('0', '1')))
 		{
 			$query->where($db->quoteName('a.draft') . ' = ' . $draft);
 		}
