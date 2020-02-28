@@ -277,13 +277,16 @@ class TjucmControllerItemForm extends JControllerForm
 						$subFormFieldName = str_replace('jform[', '', $field->name);
 						$subFormFieldName = str_replace(']', '', $subFormFieldName);
 
-						foreach ($formData[$subFormFieldName] as $ucmSubFormData)
+						if (!empty($formData[$subFormFieldName]))
 						{
-							$ucmSubFormData = $model->validate($subForm, $ucmSubFormData);
-
-							if ($ucmSubFormData === false)
+							foreach ($formData[$subFormFieldName] as $ucmSubFormData)
 							{
-								$data = false;
+								$ucmSubFormData = $model->validate($subForm, $ucmSubFormData);
+
+								if ($ucmSubFormData === false)
+								{
+									$data = false;
+								}
 							}
 						}
 					}
