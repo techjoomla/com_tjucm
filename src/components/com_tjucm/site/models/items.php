@@ -138,6 +138,9 @@ class TjucmModelItems extends JModelList
 			$this->setState($ucmType . '.filter.cluster_id', $clusterId);
 		}
 
+		$draft = $app->getUserStateFromRequest($this->context . '.draft', 'draft');
+		$this->setState('filter.draft', $draft);
+
 		$this->setState('ucm.client', $ucmType);
 		$this->setState("ucmType.id", $typeId);
 
@@ -276,6 +279,13 @@ class TjucmModelItems extends JModelList
 			$query->where(($db->quoteName('(a.state) ') . ' IN (0, 1)'));
 		}
 
+		// Filter by draft status
+		$draft = $this->getState('filter.draft');
+
+		if (in_array($draft, array('0', '1')))
+		{
+			$query->where($db->quoteName('a.draft') . ' = ' . $draft);
+		}
 		// Search by content id
 		$search = $this->getState($client . '.filter.search');
 
