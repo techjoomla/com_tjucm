@@ -33,6 +33,7 @@ class TjHouseKeepingUpdateAlias extends TjModelHouseKeeping
 	{
 		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
 		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_menus/tables');
+		JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_ADMINISTRATOR);
 
 		// TJ-Fields helper object
 		$tjfieldsHelper = new TjfieldsHelper;
