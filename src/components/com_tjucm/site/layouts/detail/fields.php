@@ -180,9 +180,9 @@ foreach ($fieldSets as $fieldset)
 							$layout = new JLayoutFile($layoutToUse, JPATH_ROOT . '/components/com_tjfields/layouts/fields');
 							$output = $layout->render(array('fieldXml' => $xmlField, 'field' => $field));
 
-							// To align text, textarea, textareacounter and editor fields properly
+							// To align text, textarea, textareacounter, editor and tjlist fields properly
 
-							if ($field->type == 'Textarea'|| $field->type == 'Textareacounter'|| $field->type == 'Text' || $field->type == 'Editor')
+							if ($field->type == 'Textarea'|| $field->type == 'Textareacounter'|| $field->type == 'Text' || $field->type == 'Editor' || $field->type == 'tjlist')
 							{
 								?>
 								<div class="tj-wordwrap">

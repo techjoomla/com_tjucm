@@ -162,10 +162,9 @@ $statusColumnWidth = 0;
 						}
 						?>
 						<th width="2%">
-							<?php echo JHtml::_('grid.sort', 'COM_TJUCM_DATA_STATUS', 'a.draft', $listDirn, $listOrder); ?>
+							<?php echo JHtml::_('grid.sort', 'COM_TJUCM_ITEMS_ID', 'a.id', $listDirn, $listOrder); ?>
 						</th>
-					<?php
-
+						<?php
 						if (!empty($this->ucmTypeParams->allow_draft_save) && $this->ucmTypeParams->allow_draft_save == 1)
 						{
 							$statusColumnWidth = 2;
@@ -211,20 +210,6 @@ $statusColumnWidth = 0;
 			<?php
 				}
 			}?>
-		<?php
-		if (!empty($this->items))
-		{
-		?>
-		<tfoot>
-			<tr>
-				<td colspan="<?php echo isset($this->items[0]) ? count($this->items[0]->field_values) + 3 : 10; ?>">
-					<?php echo $this->pagination->getListFooter(); ?>
-				</td>
-			</tr>
-		</tfoot>
-		<?php
-		}
-		?>
 		<tbody>
 		<?php
 		if (!empty($this->showList))
@@ -281,6 +266,20 @@ $statusColumnWidth = 0;
 		}
 		?>
 		</tbody>
+		<?php
+		if (!empty($this->items))
+		{
+		?>
+		<tfoot>
+			<tr>
+				<td colspan="<?php echo isset($this->items[0]) ? count($this->items[0]->field_values) + 3 : 10; ?>">
+					<?php echo $this->pagination->getListFooter(); ?>
+				</td>
+			</tr>
+		</tfoot>
+		<?php
+		}
+		?>
 	</table>
 </div>
 </div>
