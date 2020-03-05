@@ -22,3 +22,7 @@ width:200px !important;
 .tjucm-wrapper .tj-wordwrap{
 word-break: break-word;
 }
+
+#copyModal .chzn-container{
+	min-width: 150px;
+}
