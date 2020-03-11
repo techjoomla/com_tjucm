@@ -190,21 +190,15 @@ $statusColumnWidth = 0;
 							}
 							?>
 
-							<th  style="word-break: break-word;" width="<?php echo (85 - $statusColumnWidth) / count($this->listcolumn) . '%';?>">
+							<th style="word-break: break-word;" width="<?php echo (85 - $statusColumnWidth) / count($this->listcolumn) . '%';?>">
 								<?php echo htmlspecialchars($col_name, ENT_COMPAT, 'UTF-8'); ?>
 							</th>
 							<?php
 						}
-
-					if ($this->canEdit || $this->canDelete)
-					{
 						?>
 						<th class="center" width="10%">
 							<?php echo JText::_('COM_TJUCM_ITEMS_ACTIONS'); ?>
 						</th>
-					<?php
-					}
-					?>
 				</tr>
 			</thead>
 			<?php
@@ -269,10 +263,10 @@ $statusColumnWidth = 0;
 	</table>
 </div>
 <?php
-		if (!empty($this->items))
-		{
-			 echo $this->pagination->getListFooter();
-		}
+	if (!empty($this->items))
+	{
+		echo $this->pagination->getListFooter();
+	}
 ?>
 </div>
 </div>
@@ -327,22 +321,16 @@ $statusColumnWidth = 0;
 	<?php echo JHtml::_('form.token'); ?>
 </form>
 </div>
-<?php
-if ($this->canDelete)
-{
-	?>
-	<script type="text/javascript">
-	jQuery(document).ready(function () {
-		jQuery('.delete-button').click(deleteItem);
-	});
+<script type="text/javascript">
+jQuery(document).ready(function () {
+	jQuery('.delete-button').click(deleteItem);
+});
 
-	function deleteItem()
+function deleteItem()
+{
+	if (!confirm("<?php echo JText::_('COM_TJUCM_DELETE_MESSAGE'); ?>"))
 	{
-		if (!confirm("<?php echo JText::_('COM_TJUCM_DELETE_MESSAGE'); ?>"))
-		{
-			return false;
-		}
+		return false;
 	}
-	</script>
-<?php
 }
+</script>

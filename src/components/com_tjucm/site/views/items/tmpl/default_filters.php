@@ -46,7 +46,6 @@ $firstListColumn = key($tmpListColumn);
 	$db = JFactory::getDbo();
 
 	// Check if com_cluster component is installed
-
 	if (ComponentHelper::getComponent('com_cluster', true)->enabled)
 	{
 		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
@@ -55,9 +54,34 @@ $firstListColumn = key($tmpListColumn);
 
 		if ($fieldTable->id)
 		{
-			JFormHelper::addFieldPath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models/fields/');
-			$cluster           = JFormHelper::loadFieldType('cluster', false);
-			$this->clusterList = $cluster->getOptionsExternally();
+			JLoader::import("/components/com_cluster/includes/cluster", JPATH_ADMINISTRATOR);
+			$clustersModel = ClusterFactory::model('Clusters', array('ignore_request' => true));
+			$clusters = $clustersModel->getItems();
+			$usersClusters = array();
+
+			$clusterObj = new stdclass;
+			$clusterObj->text = JText::_("COM_TJFIELDS_OWNERSHIP_CLUSTER");
+			$clusterObj->value = "";
+
+			$usersClusters[] = $clusterObj;
+
+			if (!empty($clusters))
+			{
+				foreach ($clusters as $clusterList)
+				{
+					if (TjucmAccess::canView($this->ucmTypeId, $clusterList->id))
+					{
+						if (!empty($clusterList->id))
+						{
+							$clusterObj = new stdclass;
+							$clusterObj->text = $clusterList->name;
+							$clusterObj->value = $clusterList->id;
+
+							$usersClusters[] = $clusterObj;
+						}
+					}
+				}
+			}
 			?>
 			<div class="btn-group pull-right hidden-xs">
 				<?php

@@ -128,28 +128,6 @@ class TjucmViewItemform extends JViewLegacy
 			$clusterId = $this->item->cluster_id;
 		}
 
-		// Get com_cluster component status
-		if (ComponentHelper::getComponent('com_cluster', true)->enabled)
-		{
-			// Get com_subusers component status
-			$subUserExist = ComponentHelper::getComponent('com_subusers', true)->enabled;
-
-			// Check user have permission to edit record of assigned cluster
-			if ($subUserExist && !empty($clusterId) && !$user->authorise('core.manageall', 'com_cluster'))
-			{
-				JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
-
-				// Check user has permission for mentioned cluster
-				if (!RBACL::authorise($user->id, 'com_cluster', 'core.manage', $clusterId))
-				{
-					$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
-					$app->setHeader('status', 403, true);
-
-					return;
-				}
-			}
-		}
-
 		// Get a copy record id
 		$this->copyRecId = (int) $app->getUserState('com_tjucm.edit.itemform.data.copy_id', 0);
 
@@ -231,6 +209,14 @@ class TjucmViewItemform extends JViewLegacy
 		$typeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
 		$typeTable->load(array('unique_identifier' => $this->client));
 		$typeParams = json_decode($typeTable->params);
+
+		if (!TjucmAccess::canEdit($typeTable->id, $this->item->id))
+		{
+			$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
+			$app->setHeader('status', 403, true);
+
+			return;
+		}
 
 		// Check if the UCM type is unpublished
 		if ($typeTable->state == "0")

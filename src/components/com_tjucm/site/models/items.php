@@ -145,13 +145,6 @@ class TjucmModelItems extends JModelList
 		$this->setState("ucmType.id", $typeId);
 
 		$createdBy = $app->input->get('created_by', "", "INT");
-		$canView = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $typeId);
-
-		if (!$canView)
-		{
-			$createdBy = $user->id;
-		}
-
 		$this->setState("created_by", $createdBy);
 
 		if ($this->getUserStateFromRequest($this->context . $ucmType . '.filter.order', 'filter_order', '', 'string'))
@@ -241,18 +234,21 @@ class TjucmModelItems extends JModelList
 
 			if ($fieldTable->id)
 			{
-				JFormHelper::addFieldPath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models/fields/');
-				$cluster = JFormHelper::loadFieldType('cluster', false);
-				$clusterList = $cluster->getOptionsExternally();
+				JLoader::import("/components/com_cluster/includes/cluster", JPATH_ADMINISTRATOR);
+				$clustersModel = ClusterFactory::model('Clusters', array('ignore_request' => true));
+				$clusters = $clustersModel->getItems();
 				$usersClusters = array();
 
-				if (!empty($clusterList))
+				if (!empty($clusters))
 				{
-					foreach ($clusterList as $clusterList)
+					foreach ($clusters as $clusterList)
 					{
-						if (!empty($clusterList->value))
+						if (!empty($clusterList->id))
 						{
-							$usersClusters[] = $clusterList->value;
+							if (TjucmAccess::canView($ucmTypeId, $clusterList->id))
+							{
+								$usersClusters[] = $clusterList->id;
+							}
 						}
 					}
 				}
@@ -286,6 +282,7 @@ class TjucmModelItems extends JModelList
 		{
 			$query->where($db->quoteName('a.draft') . ' = ' . $draft);
 		}
+
 		// Search by content id
 		$search = $this->getState($client . '.filter.search');
 
@@ -511,28 +508,6 @@ class TjucmModelItems extends JModelList
 	 */
 	public function getItems()
 	{
-		$typeId = $this->getState('ucmType.id');
-		$createdBy = $this->getState('created_by', '');
-
-		JLoader::import('components.com_tjucm.models.item', JPATH_SITE);
-		$itemModel = new TjucmModelItem;
-		$canView = $itemModel->canView($typeId);
-		$user = JFactory::getUser();
-
-		// If user is not allowed to view the records and if the created_by is not the logged in user then do not show the records
-		if (!$canView)
-		{
-			if (!empty($createdBy) && $createdBy == $user->id)
-			{
-				$canView = true;
-			}
-		}
-
-		if (!$canView)
-		{
-			return false;
-		}
-
 		$items = parent::getItems();
 		$itemsArray = (array) $items;
 		$contentIds = array_column($itemsArray, 'id');

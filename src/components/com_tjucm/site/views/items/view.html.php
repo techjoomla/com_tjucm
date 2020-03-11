@@ -38,15 +38,9 @@ class TjucmViewItems extends JViewLegacy
 
 	protected $canCreate;
 
+	protected $canImport;
+
 	protected $canView;
-
-	protected $canEdit;
-
-	protected $canChange;
-
-	protected $canEditOwn;
-
-	protected $canDelete;
 
 	protected $menuparams;
 
@@ -94,17 +88,11 @@ class TjucmViewItems extends JViewLegacy
 		$model              = $this->getModel("Items");
 		$this->ucmTypeId    = $id = $model->getState('ucmType.id');
 		$this->client       = $model->getState('ucm.client');
-		$this->canCreate    = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$this->canImport    = $user->authorise('core.type.importitem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$this->canView      = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$this->canEdit      = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$this->canChange    = $user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $this->ucmTypeId);
-		$this->canEditOwn   = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$this->canDelete    = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$this->canDeleteOwn = $user->authorise('core.type.deleteownitem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$this->canCreate    = TjucmAccess::canCreate($this->ucmTypeId);
+		$this->canImport    = TjucmAccess::canImport($this->ucmTypeId);
+		$this->canView      = TjucmAccess::canView($this->ucmTypeId);
 		$this->draft        = array("" => JText::_('COM_TJUCM_DATA_STATUS_SELECT_OPTION'),
 			"0" => JText::_("COM_TJUCM_DATA_STATUS_SAVE"), "1" => JText::_('COM_TJUCM_DATA_STATUS_DRAFT'));
-
 		// If did not get the client from url then get if from menu param
 		if (empty($this->client))
 		{

@@ -55,11 +55,11 @@ $allowDraftSave = $displayData['ucmTypeParams']->allow_draft_save;
 $appendUrl = '';
 $csrf = "&" . Session::getFormToken() . '=1';
 
-$canEditOwn 		= $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $ucmTypeId);
-$canDeleteOwn       = $user->authorise('core.type.deleteownitem', 'com_tjucm.type.' . $ucmTypeId);
-$canChange          = $user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $ucmTypeId);
-$canEdit 			= $user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmTypeId);
-$canDelete          = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $ucmTypeId);
+$canEditOwn   = TjucmAccess::canEditOwn($ucmTypeId, $item->id);
+$canDeleteOwn = TjucmAccess::canDeleteOwn($ucmTypeId, $item->id);
+$canEditState = TjucmAccess::canEditState($ucmTypeId, $item->id);
+$canEdit      = TjucmAccess::canEdit($ucmTypeId, $item->id);
+$canDelete    = TjucmAccess::canDelete($ucmTypeId, $item->id);
 
 if (!empty($created_by))
 {
@@ -100,10 +100,10 @@ if ($canDeleteOwn)
 	<?php
 	if (isset($item->state))
 	{
-		$class = ($canChange) ? 'active' : 'disabled'; ?>
+		$class = ($canEditState) ? 'active' : 'disabled'; ?>
 		<td class="center">
 			<a class="<?php echo $class; ?>"
-				href="<?php echo ($canChange) ? 'index.php?option=com_tjucm&task=item.publish&id=' .
+				href="<?php echo ($canEditState) ? 'index.php?option=com_tjucm&task=item.publish&id=' .
 				$item->id . '&state=' . (($item->state + 1) % 2) . $appendUrl . $csrf : '#'; ?>">
 			<?php
 			if ($item->state == 1)
@@ -170,34 +170,28 @@ if ($canDeleteOwn)
 			</td><?php
 		}
 	}
-
-	if ($canEdit || $canDelete || $editown || $deleteOwn)
+	?>
+	<td class="center">
+		<a href="<?php echo $link; ?>" type="button" title="<?php echo Text::_('COM_TJUCM_VIEW_RECORD');?>"><i class="icon-eye-open"></i></a>
+	<?php
+	if ($canEdit || $editown)
 	{
 		?>
-		<td class="center">
-			<a href="<?php echo $link; ?>" type="button" title="<?php echo Text::_('COM_TJUCM_VIEW_RECORD');?>"><i class="icon-eye-open"></i></a>
+		<a href="<?php echo 'index.php?option=com_tjucm&task=itemform.edit&id=' . $item->id . $appendUrl; ?>" type="button" title="<?php echo Text::_('COM_TJUCM_EDIT_ITEM');?>"> | <i class="icon-apply" aria-hidden="true"></i></a>
 		<?php
-		if ($canEdit || $editown)
-		{
-			?>
-			<a href="<?php echo 'index.php?option=com_tjucm&task=itemform.edit&id=' . $item->id . $appendUrl; ?>" type="button" title="<?php echo Text::_('COM_TJUCM_EDIT_ITEM');?>"> | <i class="icon-apply" aria-hidden="true"></i></a>
-			<?php
-		}
+	}
 
-		if ($canDelete || $deleteOwn)
-		{
-			?>
-			<a href="<?php echo 'index.php?option=com_tjucm&task=itemform.remove' . '&id=' . $item->id . $appendUrl . $csrf; ?>"
-				class="delete-button" type="button"
-				title="<?php echo Text::_('COM_TJUCM_DELETE_ITEM');?>"> |
-					<i class="icon-delete" aria-hidden="true"></i>
-			</a>
-			<?php
-		}
+	if ($canDelete || $deleteOwn)
+	{
 		?>
-		</td>
-	<?php
+		<a href="<?php echo 'index.php?option=com_tjucm&task=itemform.remove' . '&id=' . $item->id . $appendUrl . $csrf; ?>"
+			class="delete-button" type="button"
+			title="<?php echo Text::_('COM_TJUCM_DELETE_ITEM');?>"> |
+				<i class="icon-delete" aria-hidden="true"></i>
+		</a>
+		<?php
 	}
 	?>
+	</td>
 </tr>
 </div>
