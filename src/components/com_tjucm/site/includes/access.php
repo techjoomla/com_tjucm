@@ -109,6 +109,11 @@ class TjucmAccess
 	{
 		if (TjucmAccess::hasCluster($ucmTypeId))
 		{
+			if (RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.editallitem'))
+			{
+				return true;
+			}
+
 			// Get com_subusers component status
 			$subUserExist = ComponentHelper::getComponent('com_subusers', true)->enabled;
 
@@ -133,6 +138,11 @@ class TjucmAccess
 	{
 		if (TjucmAccess::hasCluster($ucmTypeId))
 		{
+			if (RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.editallitemstate'))
+			{
+				return true;
+			}
+
 			// Get com_subusers component status
 			$subUserExist = ComponentHelper::getComponent('com_subusers', true)->enabled;
 
@@ -181,6 +191,11 @@ class TjucmAccess
 	{
 		if (TjucmAccess::hasCluster($ucmTypeId))
 		{
+			if (RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.deleteallitem'))
+			{
+				return true;
+			}
+
 			// Get com_subusers component status
 			$subUserExist = ComponentHelper::getComponent('com_subusers', true)->enabled;
 
