@@ -109,6 +109,8 @@ class TjucmAccess
 	{
 		if (TjucmAccess::hasCluster($ucmTypeId))
 		{
+			JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
+
 			if (RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.editallitem'))
 			{
 				return true;
@@ -120,7 +122,6 @@ class TjucmAccess
 			// Check user have permission to edit record of assigned cluster
 			if ($subUserExist)
 			{
-				JLoader::import("components.com_subusers.includes.rbacl", JPATH_ADMINISTRATOR);
 				JLoader::import('components.com_tjucm.tables.item', JPATH_ADMINISTRATOR);
 				$itemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', JFactory::getDbo()));
 				$itemTable->load($contentId);
@@ -138,6 +139,8 @@ class TjucmAccess
 	{
 		if (TjucmAccess::hasCluster($ucmTypeId))
 		{
+			JLoader::import("components.com_subusers.includes.rbacl", JPATH_ADMINISTRATOR);
+
 			if (RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.editallitemstate'))
 			{
 				return true;
@@ -149,7 +152,6 @@ class TjucmAccess
 			// Check user have permission to edit record of assigned cluster
 			if ($subUserExist)
 			{
-				JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
 				JLoader::import('components.com_tjucm.tables.item', JPATH_ADMINISTRATOR);
 				$itemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', JFactory::getDbo()));
 				$itemTable->load($contentId);
@@ -191,6 +193,8 @@ class TjucmAccess
 	{
 		if (TjucmAccess::hasCluster($ucmTypeId))
 		{
+			JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
+
 			if (RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.deleteallitem'))
 			{
 				return true;
@@ -202,7 +206,6 @@ class TjucmAccess
 			// Check user have permission to edit record of assigned cluster
 			if ($subUserExist)
 			{
-				JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
 				JLoader::import('components.com_tjucm.tables.item', JPATH_ADMINISTRATOR);
 				$itemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', JFactory::getDbo()));
 				$itemTable->load($contentId);

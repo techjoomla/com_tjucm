@@ -54,6 +54,7 @@ $firstListColumn = key($tmpListColumn);
 
 		if ($fieldTable->id)
 		{
+			JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
 			JLoader::import("/components/com_cluster/includes/cluster", JPATH_ADMINISTRATOR);
 			$clustersModel = ClusterFactory::model('Clusters', array('ignore_request' => true));
 			$clusters = $clustersModel->getItems();
@@ -69,7 +70,7 @@ $firstListColumn = key($tmpListColumn);
 			{
 				foreach ($clusters as $clusterList)
 				{
-					if (TjucmAccess::canView($this->ucmTypeId, $clusterList->id))
+					if (RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.viewitem', $clusterList->id))
 					{
 						if (!empty($clusterList->id))
 						{
