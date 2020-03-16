@@ -240,7 +240,7 @@ class TjucmAccess
 		}
 	}
 
-	public static function hasCluster($ucmTypeId, $contentId)
+	public static function hasCluster($ucmTypeId)
 	{
 		if (ComponentHelper::getComponent('com_cluster', true)->enabled)
 		{
