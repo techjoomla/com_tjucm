@@ -40,8 +40,6 @@ class TjucmViewItems extends JViewLegacy
 
 	protected $canImport;
 
-	protected $canView;
-
 	protected $menuparams;
 
 	protected $ucm_type;
@@ -90,7 +88,6 @@ class TjucmViewItems extends JViewLegacy
 		$this->client       = $model->getState('ucm.client');
 		$this->canCreate    = TjucmAccess::canCreate($this->ucmTypeId);
 		$this->canImport    = TjucmAccess::canImport($this->ucmTypeId);
-		$this->canView      = TjucmAccess::canView($this->ucmTypeId);
 		$this->draft        = array("" => JText::_('COM_TJUCM_DATA_STATUS_SELECT_OPTION'),
 			"0" => JText::_("COM_TJUCM_DATA_STATUS_SAVE"), "1" => JText::_('COM_TJUCM_DATA_STATUS_DRAFT'));
 		// If did not get the client from url then get if from menu param
@@ -164,11 +161,6 @@ class TjucmViewItems extends JViewLegacy
 			{
 				$this->allowedToAdd = $itemFormModel->allowedToAddTypeData($userId, $this->client, $allowedCount);
 			}
-		}
-
-		if ($this->created_by == $userId)
-		{
-			$this->canView = true;
 		}
 
 		// Check for errors.
