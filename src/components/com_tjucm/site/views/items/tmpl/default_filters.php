@@ -57,6 +57,17 @@ $firstListColumn = key($tmpListColumn);
 			JLoader::import("/components/com_cluster/includes/cluster", JPATH_ADMINISTRATOR);
 			$clustersModel = ClusterFactory::model('Clusters', array('ignore_request' => true));
 			$clusters = $clustersModel->getItems();
+
+			// Get list of clusters with data in UCM type
+			$db = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select($db->quoteName('cluster_id'));
+			$query->from($db->quoteName('#__tj_ucm_data'));
+			$query->where($db->quoteName('client') . '=' . $db->quote($this->client));
+			$query->group($db->quoteName('cluster_id'));
+			$db->setQuery($query);
+			$clustersWithData = $db->loadColumn();
+
 			$usersClusters = array();
 
 			$clusterObj = new stdclass;
@@ -73,11 +84,14 @@ $firstListColumn = key($tmpListColumn);
 					{
 						if (!empty($clusterList->id))
 						{
-							$clusterObj = new stdclass;
-							$clusterObj->text = $clusterList->name;
-							$clusterObj->value = $clusterList->id;
+							if (in_array($clusterList->id, $clustersWithData))
+							{
+								$clusterObj = new stdclass;
+								$clusterObj->text = $clusterList->name;
+								$clusterObj->value = $clusterList->id;
 
-							$usersClusters[] = $clusterObj;
+								$usersClusters[] = $clusterObj;
+							}
 						}
 					}
 				}
