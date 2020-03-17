@@ -24,6 +24,9 @@ $firstListColumn = key($tmpListColumn);
 			value="<?php echo $this->escape($this->state->get($this->client . '.filter.search')); ?>"
 			placeholder="<?php echo JText::_('JSEARCH_FILTER'); ?>"/>
 	</div>
+	<div class="btn-group pull-right hidden-xs">
+		<?php echo $this->pagination->getLimitBox(); ?>
+	</div>
 	<div class="pull-left">
 		<button class="btn btn-default" type="submit" title="<?php echo JText::_('JSEARCH_FILTER_SUBMIT'); ?>"><span class="icon-search"></span></button>
 		<button class="btn btn-default qtc-hasTooltip" id="clear-search-button"
@@ -31,16 +34,12 @@ $firstListColumn = key($tmpListColumn);
 		type="button" title="<?php echo JText::_('JSEARCH_FILTER_CLEAR'); ?>"><span class="icon-remove"></span></button>
 		</div>
 		<div class="btn-group pull-right hidden-xs">
-				<?php
-
-					echo JHtml::_(
-						'select.genericlist', $this->draft, "draft", 'class="input-medium"
-						size="1" onchange="this.form.submit();"', "value", "text", $this->state->get('filter.draft')
-					);
-				?>
-	</div>
-	<div class="btn-group pull-right hidden-xs">
-		<?php echo $this->pagination->getLimitBox(); ?>
+		<?php
+			echo JHtml::_(
+				'select.genericlist', $this->draft, "draft", 'class="input-medium"
+				size="1" onchange="this.form.submit();"', "value", "text", $this->state->get('filter.draft')
+			);
+		?>
 	</div>
 	<?php
 	$db = JFactory::getDbo();
@@ -70,7 +69,7 @@ $firstListColumn = key($tmpListColumn);
 			{
 				foreach ($clusters as $clusterList)
 				{
-					if (RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.viewitem', $clusterList->id))
+					if (RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.viewitem', $clusterList->id) || RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.viewallitem'))
 					{
 						if (!empty($clusterList->id))
 						{
@@ -87,7 +86,7 @@ $firstListColumn = key($tmpListColumn);
 			<div class="btn-group pull-right hidden-xs">
 				<?php
 					echo JHtml::_(
-						'select.genericlist', $this->clusterList, "cluster", 'class="input-medium"
+						'select.genericlist', $usersClusters, "cluster", 'class="input-medium"
 						size="1" onchange="this.form.submit();"', "value", "text",
 						$this->state->get($this->client . '.filter.cluster_id', '', 'INT')
 					);
