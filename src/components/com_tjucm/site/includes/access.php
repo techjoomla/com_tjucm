@@ -61,7 +61,7 @@ class TjucmAccess
 			{
 				JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
 
-				return RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.importitem');
+				return RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.importitem') && RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.createtitem');
 			}
 		}
 		else
