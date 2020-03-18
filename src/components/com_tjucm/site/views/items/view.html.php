@@ -68,6 +68,16 @@ class TjucmViewItems extends JViewLegacy
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 
+		if (!$user->id)
+		{
+			$msg = JText::_('COM_TJUCM_LOGIN_MSG');
+
+			// Get current url.
+			$current = JUri::getInstance()->toString();
+			$url = base64_encode($current);
+			JFactory::getApplication()->redirect(JRoute::_('index.php?option=com_users&view=login&return=' . $url, false), $msg);
+		}
+
 		// Check the view access to the items.
 		if (!$user->id)
 		{

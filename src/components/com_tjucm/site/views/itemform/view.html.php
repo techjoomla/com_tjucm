@@ -103,6 +103,17 @@ class TjucmViewItemform extends JViewLegacy
 		$app  = Factory::getApplication();
 		$input = $app->input;
 		$user = Factory::getUser();
+
+		if (!$user->id)
+		{
+			$msg = JText::_('COM_TJUCM_LOGIN_MSG');
+
+			// Get current url.
+			$current = JUri::getInstance()->toString();
+			$url = base64_encode($current);
+			JFactory::getApplication()->redirect(JRoute::_('index.php?option=com_users&view=login&return=' . $url, false), $msg);
+		}
+
 		$this->state   = $this->get('State');
 		$this->id = $input->getInt('id', $input->getInt('content_id', 0));
 
