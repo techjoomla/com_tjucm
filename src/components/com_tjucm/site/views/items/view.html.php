@@ -109,23 +109,18 @@ class TjucmViewItems extends JViewLegacy
 					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
 					$ucmTypeTable->load(array('alias' => $this->ucm_type));
 					$this->client = $ucmTypeTable->unique_identifier;
+					$this->title = $ucmTypeTable->title;
 				}
 			}
 		}
 
 		// To get title of list as per the ucm type
-		if (empty($this->title))
+		if (!isset($this->title))
 		{
-			// Get the active item
-			$menuItem = $app->getMenu()->getActive();
-
-			// Get the params
-			$this->menuparams = $menuItem->params;
-
-			if (!empty($this->menuparams))
-			{
-				$this->title  = $this->menuparams->get('ucm_type');
-			}
+			JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
+			$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+			$ucmTypeTable->load(array('unique_identifier' => $this->client));
+			$this->title = $ucmTypeTable->title;
 		}
 
 		// If there are no fields column to show in list view then dont allow to show data

@@ -108,7 +108,7 @@ $statusColumnWidth = 0;
 	?>
 		<div class="page-header">
 			<h1 class="page-title">
-			<?php echo  strtoupper($this->title) . " " . JText::_("COM_TJUCM_FORM_LIST"); ?>
+			<?php echo strtoupper($this->title) . " " . JText::_("COM_TJUCM_FORM_LIST"); ?>
 			</h1>
 		</div> <?php
 	}
