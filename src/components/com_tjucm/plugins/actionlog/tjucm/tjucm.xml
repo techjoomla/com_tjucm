@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension version="3.9" type="plugin" group="actionlog" method="upgrade">
+	<name>PLG_ACTIONLOG_TJUCM</name>
+	<author>Techjoomla</author>
+	<creationDate>19th March 2020</creationDate>
+	<copyright>Copyright (C) 2009 - 2020 Techjoomla. All rights reserved.</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+	<authorEmail>extensions@techjoomla.com</authorEmail>
+	<authorUrl>https://techjoomla.com</authorUrl>
+	<version>1.2.4</version>
+	<description>PLG_ACTIONLOG_TJUCM_XML_DESCRIPTION</description>
+	<files>
+		<filename plugin="tjucm">tjucm.php</filename>
+		<filename>index.html</filename>
+	</files>
+	<languages folder="language">
+		<language tag="en-GB">en-GB/en-GB.plg_actionlog_tjucm.ini</language>
+		<language tag="en-GB">en-GB/en-GB.plg_actionlog_tjucm.sys.ini</language>
+	</languages>
+	<config>
+		<fields name="params">
+			<fieldset name="basic">
+				<field name="logActionForTypeSave" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_TYPE_SAVE" description="PLG_ACTIONLOG_TJUCM_LOG_ACTION_COMMON_DESC" default="1" class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="logActionForTypeUpdate" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_TYPE_UPDATE" description="PLG_ACTIONLOG_TJUCM_LOG_ACTION_COMMON_DESC" default="0" class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="logActionForTypeDelete" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_TYPE_DELETE" description="PLG_ACTIONLOG_TJUCM_LOG_ACTION_COMMON_DESC" default="1" class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="logActionForTypeStateChange" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_TYPE_STATE_CHANGE" description="PLG_ACTIONLOG_TJUCM_LOG_ACTION_COMMON_DESC" default="0" class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="logActionForTypeImport" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_TYPE_IMPORT" description="PLG_ACTIONLOG_TJUCM_LOG_ACTION_COMMON_DESC" default="0" class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="logActionForTypeExport" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_TYPE_EXPORT" description="PLG_ACTIONLOG_TJUCM_LOG_ACTION_COMMON_DESC" default="0" class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="tjucmOnAfterSaveItem" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_ITEM_SAVE" description="PLG_ACTIONLOG_TJUCM_LOG_ACTION_COMMON_DESC" default="0" class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="TjUcmOnAfterItemDelete" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_ITEM_DELETE" description="PLG_ACTIONLOG_TJUCM_LOG_ACTION_COMMON_DESC" default="0" class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+			</fieldset>
+		</fields>
+	</config>
+</extension>
