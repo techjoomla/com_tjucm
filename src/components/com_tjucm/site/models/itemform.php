@@ -102,9 +102,7 @@ class TjucmModelItemForm extends JModelAdmin
 		$this->setState('ucmType.id', $ucmId);
 
 		// Check published state
-		if ((!$user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmId))
-			&& (!$user->authorise('core.type.editownitem', 'com_tjucm.type.' . $ucmId))
-			&& (!$user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $ucmId)))
+		if ((!TjucmAccess::canEdit($ucmId, $id)) && (!TjucmAccess::canEditOwn($ucmId, $id)) && (!TjucmAccess::canEditState($ucmId, $id)))
 		{
 			$this->setState('filter.published', 1);
 			$this->setState('fileter.archived', 2);
@@ -144,9 +142,9 @@ class TjucmModelItemForm extends JModelAdmin
 
 		// Get UCM type id (Get if user is autorised to edit the items for this UCM type)
 		$ucmTypeId = $this->getState('ucmType.id');
-		$canEdit = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmTypeId);
-		$canEditOwn = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $ucmTypeId);
-		$canCreate = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $ucmTypeId);
+		$canEdit = TjucmAccess::canEdit($ucmTypeId, $id);
+		$canEditOwn = TjucmAccess::canEditOwn($ucmTypeId, $id);
+		$canCreate = TjucmAccess::canCreate($ucmTypeId);
 
 		// Get a level row instance.
 		$table = $this->getTable();
@@ -541,7 +539,7 @@ class TjucmModelItemForm extends JModelAdmin
 			$allowedCount = $ucmTypeParams->get('allowed_count', 0, 'INT');
 
 			// Check if the user is allowed to add record for given UCM type
-			$canAdd = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $data['type_id']);
+			$canAdd = TjucmAccess::canCreate($data['type_id']);
 
 			if (!$canAdd)
 			{
@@ -566,8 +564,8 @@ class TjucmModelItemForm extends JModelAdmin
 		else
 		{
 			// Check if the user can edit this record
-			$canEdit = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $data['type_id']);
-			$canEditOwn = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $data['type_id']);
+			$canEdit = TjucmAccess::canEdit($data['type_id'], $data['id']);
+			$canEditOwn = TjucmAccess::canEditOwn($data['type_id'], $data['id']);
 
 			$itemTable = $this->getTable();
 			$itemTable->load(array('id' => $data['id']));
@@ -664,8 +662,8 @@ class TjucmModelItemForm extends JModelAdmin
 		$user = JFactory::getUser();
 		$table = $this->getTable();
 		$table->load($contentId);
-		$canDelete = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $table->type_id);
-		$canDeleteown = $user->authorise('core.type.deleteownitem', 'com_tjucm.type.' . $table->type_id);
+		$canDelete = TjucmAccess::canDelete($table->type_id, $contentId);
+		$canDeleteown = TjucmAccess::canDeleteOwn($table->type_id, $contentId);
 
 		$deleteOwn = false;
 
@@ -702,7 +700,17 @@ class TjucmModelItemForm extends JModelAdmin
 
 					if ($table->delete($subFormContentId) === true)
 					{
+						// Plugin trigger on before item delete
+						JPluginHelper::importPlugin('actionlog');
+						$dispatcher = JDispatcher::getInstance();
+						$dispatcher->trigger('tjUcmOnBeforeDeleteItem', array($subFormContentId, $table->client));
+
 						$this->deleteExtraFieldsData($subFormContentId, $table->client);
+
+						// Plugin trigger on after item delete
+						JPluginHelper::importPlugin('actionlog');
+						$dispatcher = JDispatcher::getInstance();
+						$dispatcher->trigger('tjUcmOnAfterDeleteItem', array($subFormContentId, $table->client));
 					}
 				}
 			}
@@ -712,7 +720,17 @@ class TjucmModelItemForm extends JModelAdmin
 
 			if ($table->delete($id) === true)
 			{
+				// Plugin trigger on before item delete
+				JPluginHelper::importPlugin('actionlog');
+				$dispatcher = JDispatcher::getInstance();
+				$dispatcher->trigger('tjUcmOnBeforeDeleteItem', array($id, $table->client));
+
 				$this->deleteExtraFieldsData($id, $table->client);
+
+				// Plugin trigger on after item delete
+				JPluginHelper::importPlugin('actionlog');
+				$dispatcher = JDispatcher::getInstance();
+				$dispatcher->trigger('tjUcmOnAfterDeleteItem', array($id, $table->client));
 
 				return $id;
 			}

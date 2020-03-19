@@ -41,6 +41,22 @@ class TjucmModelType extends JModelAdmin
 	protected $item = null;
 
 	/**
+	 * Constructor.
+	 *
+	 * @param   array  $config  An optional associative array of configuration settings.
+	 *
+	 * @see        JController
+	 * @since      1.6
+	 */
+	public function __construct($config = array())
+	{
+		$config['event_after_delete'] = 'tjUcmOnAfterTypeDelete';
+		$config['event_change_state'] = 'tjUcmOnAfterTypeChangeState';
+
+		parent::__construct($config);
+	}
+
+	/**
 	 * Returns a reference to the a Table object, always creating it.
 	 *
 	 * @param   string  $type    The table type to instantiate
@@ -351,6 +367,13 @@ class TjucmModelType extends JModelAdmin
 
 		if (parent::save($data))
 		{
+			$id = (int) $this->getState($this->getName() . '.id');
+			$data['typeId'] = $id;
+			$dispatcher = JDispatcher::getInstance();
+			JPluginHelper::importPlugin('actionlog', 'tjucm');
+			$isNew = ($data['id'] != 0) ? false : true;
+			$dispatcher->trigger('tjUcmOnAfterTypeSave', array($data, $isNew));
+
 			return true;
 		}
 

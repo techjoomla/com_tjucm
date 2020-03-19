@@ -42,7 +42,7 @@ else
 <div>
 	<div class="form-group">
 		<?php
-		if (($user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId)) || ($user->authorise('core.type.editownitem', 'com_tjucm.type.' . $this->ucmTypeId) && JFactory::getUser()->id == $this->item->created_by))
+		if ((TjucmAccess::canEdit($this->ucmTypeId, $this->item->id)) || (TjucmAccess::canEditOwn($this->ucmTypeId, $this->item->id) && JFactory::getUser()->id == $this->item->created_by))
 		{
 			$redirectURL = JRoute::_('index.php?option=com_tjucm&task=item.edit&id=' . $this->item->id . '&client=' . $this->client, false);
 			?>
@@ -52,12 +52,12 @@ else
 
 		$deleteOwn = false;
 
-		if ($user->authorise('core.type.deleteownitem', 'com_tjucm.type.' . $this->ucmTypeId))
+		if (TjucmAccess::canDeleteOwn($this->ucmTypeId, $this->item->id))
 		{
 			$deleteOwn = (JFactory::getUser()->id == $this->item->created_by ? true : false);
 		}
 
-		if ($user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this->ucmTypeId) || $deleteOwn)
+		if (TjucmAccess::canDelete($this->ucmTypeId, $this->item->id) || $deleteOwn)
 		{
 			$redirectURL = JRoute::_('index.php?option=com_tjucm&task=itemform.remove&id=' . $this->item->id . '&client=' . $this->client . "&" . JSession::getFormToken() . '=1', false);
 			?>

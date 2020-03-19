@@ -108,7 +108,7 @@ $statusColumnWidth = 0;
 	?>
 		<div class="page-header">
 			<h1 class="page-title">
-			<?php echo  strtoupper($this->title) . " " . JText::_("COM_TJUCM_FORM_LIST"); ?>
+			<?php echo strtoupper($this->title) . " " . JText::_("COM_TJUCM_FORM_LIST"); ?>
 			</h1>
 		</div> <?php
 	}
@@ -190,21 +190,15 @@ $statusColumnWidth = 0;
 							}
 							?>
 
-							<th  style="word-break: break-word;" width="<?php echo (85 - $statusColumnWidth) / count($this->listcolumn) . '%';?>">
+							<th style="word-break: break-word;" width="<?php echo (85 - $statusColumnWidth) / count($this->listcolumn) . '%';?>">
 								<?php echo htmlspecialchars($col_name, ENT_COMPAT, 'UTF-8'); ?>
 							</th>
 							<?php
 						}
-
-					if ($this->canEdit || $this->canDelete)
-					{
 						?>
 						<th class="center" width="10%">
 							<?php echo JText::_('COM_TJUCM_ITEMS_ACTIONS'); ?>
 						</th>
-					<?php
-					}
-					?>
 				</tr>
 			</thead>
 			<?php
@@ -269,10 +263,10 @@ $statusColumnWidth = 0;
 	</table>
 </div>
 <?php
-		if (!empty($this->items))
-		{
-			 echo $this->pagination->getListFooter();
-		}
+	if (!empty($this->items))
+	{
+		echo $this->pagination->getListFooter();
+	}
 ?>
 </div>
 </div>
@@ -286,16 +280,20 @@ $statusColumnWidth = 0;
 			<i class="icon-plus"></i>
 			<?php echo JText::_('COM_TJUCM_ADD_ITEM'); ?>
 		</a>
-		<a target="_blank" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false, 2); ?>" class="btn btn-success btn-small">
-			<?php echo JText::_('COM_TJUCM_COPY_ITEM'); ?>
-		</a>
-		<a data-toggle="modal" onclick="if(document.adminForm.boxchecked.value==0){alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{jQuery( '#copyModal' ).modal('show'); return true;}" class="btn btn-success btn-small copyToOther hide">
-			<?php echo JText::_('COM_TJUCM_COPY_ITEM_TO_OTHER'); ?>
-		</a>
 		<?php
+		if ($this->canImport)
+		{
+			?>
+			<a target="_blank" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false, 2); ?>" class="btn btn-success btn-small">
+				<?php echo JText::_('COM_TJUCM_COPY_ITEM'); ?>
+			</a>
+			<a data-toggle="modal" onclick="if(document.adminForm.boxchecked.value==0){alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{jQuery( '#copyModal' ).modal('show'); return true;}" class="btn btn-success btn-small copyToOther hide">
+				<?php echo JText::_('COM_TJUCM_COPY_ITEM_TO_OTHER'); ?>
+			</a>
+			<?php
+		}
 	}
 	?>
-
 	<input type="hidden" name="boxchecked" value="0"/>
 	<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>"/>
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>"/>
@@ -327,22 +325,16 @@ $statusColumnWidth = 0;
 	<?php echo JHtml::_('form.token'); ?>
 </form>
 </div>
-<?php
-if ($this->canDelete)
-{
-	?>
-	<script type="text/javascript">
-	jQuery(document).ready(function () {
-		jQuery('.delete-button').click(deleteItem);
-	});
+<script type="text/javascript">
+jQuery(document).ready(function () {
+	jQuery('.delete-button').click(deleteItem);
+});
 
-	function deleteItem()
+function deleteItem()
+{
+	if (!confirm("<?php echo JText::_('COM_TJUCM_DELETE_MESSAGE'); ?>"))
 	{
-		if (!confirm("<?php echo JText::_('COM_TJUCM_DELETE_MESSAGE'); ?>"))
-		{
-			return false;
-		}
+		return false;
 	}
-	</script>
-<?php
 }
+</script>
