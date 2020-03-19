@@ -700,7 +700,17 @@ class TjucmModelItemForm extends JModelAdmin
 
 					if ($table->delete($subFormContentId) === true)
 					{
+						// Plugin trigger on before item delete
+						JPluginHelper::importPlugin('actionlog');
+						$dispatcher = JDispatcher::getInstance();
+						$dispatcher->trigger('tjUcmOnBeforeDeleteItem', array($subFormContentId, $table->client));
+
 						$this->deleteExtraFieldsData($subFormContentId, $table->client);
+
+						// Plugin trigger on after item delete
+						JPluginHelper::importPlugin('actionlog');
+						$dispatcher = JDispatcher::getInstance();
+						$dispatcher->trigger('tjUcmOnAfterDeleteItem', array($subFormContentId, $table->client));
 					}
 				}
 			}
@@ -710,7 +720,17 @@ class TjucmModelItemForm extends JModelAdmin
 
 			if ($table->delete($id) === true)
 			{
+				// Plugin trigger on before item delete
+				JPluginHelper::importPlugin('actionlog');
+				$dispatcher = JDispatcher::getInstance();
+				$dispatcher->trigger('tjUcmOnBeforeDeleteItem', array($id, $table->client));
+
 				$this->deleteExtraFieldsData($id, $table->client);
+
+				// Plugin trigger on after item delete
+				JPluginHelper::importPlugin('actionlog');
+				$dispatcher = JDispatcher::getInstance();
+				$dispatcher->trigger('tjUcmOnAfterDeleteItem', array($id, $table->client));
 
 				return $id;
 			}
