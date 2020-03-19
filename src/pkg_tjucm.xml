@@ -14,6 +14,6 @@
 	<files>
 		<file type="component" id="com_tjucm">components/com_tjucm.zip</file>
 		<file type="component" id="com_tjfields">components/com_tjfields.zip</file>
-		<file type="plugin" id="tjucm">plugins/actionlogs/tjucm.zip</file>
+		<file type="plugin" id="tjucm">plugins/actionlog/tjucm.zip</file>
 	</files>
 </extension>
