@@ -19,7 +19,7 @@ use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Table\Table;
 
 /**
- * JGive Actions Logging Plugin.
+ * UCM Actions Logging Plugin.
  *
  * @since  __DEPLOY__VERSION__
  */
@@ -180,6 +180,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 			return;
 		}
 
+		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
 		$tjucmTableType = Table::getInstance('type', 'TjucmTable', array());
 
 		$context  = Factory::getApplication()->input->get('option');
@@ -251,6 +252,10 @@ class PlgActionlogTjUcm extends CMSPlugin
 			return;
 		}
 
+		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
+		$tjucmTableType = Table::getInstance('type', 'TjucmTable', array());
+		$tjucmTableType->load(array('unique_identifier' => $item['client']));
+
 		$context  = Factory::getApplication()->input->get('option');
 		$user     = Factory::getUser();
 
@@ -258,6 +263,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 		$message = array(
 				'action'      => 'add',
 				'id'          => $item['id'],
+				'title'       => $tjucmTableType->title,
 				'userid'      => $user->id,
 				'username'    => $user->username,
 				'accountlink' => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
@@ -282,7 +288,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 	 *
 	 * @since    __DEPLOY__VERSION__
 	 */
-	public function tjucmOnAfterSaveItemData($recordId, $client, $data)
+	public function tjucmOnBeforeSaveItemData($recordId, $client, $data)
 	{
 		if (!$this->params->get('tjucmOnAfterSaveItemData', 1))
 		{
@@ -292,10 +298,20 @@ class PlgActionlogTjUcm extends CMSPlugin
 		$context  = Factory::getApplication()->input->get('option');
 		$user     = Factory::getUser();
 
-		$messageLanguageKey = 'PLG_ACTIONLOG_TJUCM_ITEM_DATA_ADDED';
+		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
+		$tjucmTableType = Table::getInstance('type', 'TjucmTable', array());
+		$tjucmTableType->load(array('unique_identifier' => $client));
+
+		JLoader::import('components.com_tjfields.tables.fieldsvalue', JPATH_ADMINISTRATOR);
+		$fieldValue = Table::getInstance('FieldsValue', 'TjfieldsTable', array());
+		$fieldValue->load(array('content_id' => $recordId, 'client' => $client));
+
+		$messageLanguageKey = ($fieldValue->id) ? 'PLG_ACTIONLOG_TJUCM_ITEM_DATA_EDIT' : 'PLG_ACTIONLOG_TJUCM_ITEM_DATA_ADDED';
+
 		$message = array(
 				'action'      => 'add',
-				'id'          => $item['id'],
+				'id'          => $recordId,
+				'title'       => $tjucmTableType->title,
 				'userid'      => $user->id,
 				'username'    => $user->username,
 				'accountlink' => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
@@ -324,6 +340,10 @@ class PlgActionlogTjUcm extends CMSPlugin
 			return;
 		}
 
+		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
+		$tjucmTableType = Table::getInstance('type', 'TjucmTable', array());
+		$tjucmTableType->load(array('unique_identifier' => $client));
+
 		$context = Factory::getApplication()->input->get('option');
 		$user    = Factory::getUser();
 
@@ -331,6 +351,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 		$message = array(
 				'action'      => 'delete',
 				'id'          => $item,
+				'title'       => $tjucmTableType->title,
 				'userid'      => $user->id,
 				'username'    => $user->username,
 				'accountlink' => 'index.php?option=com_users&task=user.edit&id=' . $user->id,

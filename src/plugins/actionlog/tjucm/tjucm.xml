@@ -20,35 +20,31 @@
 	<config>
 		<fields name="params">
 			<fieldset name="basic">
-				<field name="logActionForTypeSave" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_TYPE_SAVE" description="PLG_ACTIONLOG_TJUCM_LOG_ACTION_COMMON_DESC" default="1" class="btn-group btn-group-yesno">
+				<field name="logActionForTypeSave" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_TYPE_SAVE" default="1" class="btn-group btn-group-yesno">
 					<option value="1">JYES</option>
 					<option value="0">JNO</option>
 				</field>
-				<field name="logActionForTypeUpdate" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_TYPE_UPDATE" description="PLG_ACTIONLOG_TJUCM_LOG_ACTION_COMMON_DESC" default="0" class="btn-group btn-group-yesno">
+				<field name="logActionForTypeUpdate" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_TYPE_UPDATE" default="0" class="btn-group btn-group-yesno">
 					<option value="1">JYES</option>
 					<option value="0">JNO</option>
 				</field>
-				<field name="logActionForTypeDelete" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_TYPE_DELETE" description="PLG_ACTIONLOG_TJUCM_LOG_ACTION_COMMON_DESC" default="1" class="btn-group btn-group-yesno">
+				<field name="logActionForTypeDelete" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_TYPE_DELETE" default="1" class="btn-group btn-group-yesno">
 					<option value="1">JYES</option>
 					<option value="0">JNO</option>
 				</field>
-				<field name="logActionForTypeStateChange" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_TYPE_STATE_CHANGE" description="PLG_ACTIONLOG_TJUCM_LOG_ACTION_COMMON_DESC" default="0" class="btn-group btn-group-yesno">
+				<field name="logActionForTypeStateChange" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_TYPE_STATE_CHANGE" default="0" class="btn-group btn-group-yesno">
 					<option value="1">JYES</option>
 					<option value="0">JNO</option>
 				</field>
-				<field name="logActionForTypeImport" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_TYPE_IMPORT" description="PLG_ACTIONLOG_TJUCM_LOG_ACTION_COMMON_DESC" default="0" class="btn-group btn-group-yesno">
+				<field name="tjucmOnAfterSaveItem" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_ITEM_SAVE" default="0" class="btn-group btn-group-yesno">
 					<option value="1">JYES</option>
 					<option value="0">JNO</option>
 				</field>
-				<field name="logActionForTypeExport" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_TYPE_EXPORT" description="PLG_ACTIONLOG_TJUCM_LOG_ACTION_COMMON_DESC" default="0" class="btn-group btn-group-yesno">
+				<field name="tjucmOnAfterSaveItemData" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_ITEM_DATA_SAVE" default="0" class="btn-group btn-group-yesno">
 					<option value="1">JYES</option>
 					<option value="0">JNO</option>
 				</field>
-				<field name="tjucmOnAfterSaveItem" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_ITEM_SAVE" description="PLG_ACTIONLOG_TJUCM_LOG_ACTION_COMMON_DESC" default="0" class="btn-group btn-group-yesno">
-					<option value="1">JYES</option>
-					<option value="0">JNO</option>
-				</field>
-				<field name="TjUcmOnAfterItemDelete" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_ITEM_DELETE" description="PLG_ACTIONLOG_TJUCM_LOG_ACTION_COMMON_DESC" default="0" class="btn-group btn-group-yesno">
+				<field name="TjUcmOnAfterItemDelete" type="radio" label="PLG_ACTIONLOG_TJUCM_LOG_ACTION_ITEM_DELETE" default="0" class="btn-group btn-group-yesno">
 					<option value="1">JYES</option>
 					<option value="0">JNO</option>
 				</field>
