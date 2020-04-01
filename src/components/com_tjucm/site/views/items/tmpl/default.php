@@ -265,7 +265,7 @@ $statusColumnWidth = 0;
 <?php
 	if (!empty($this->items))
 	{
-		echo $this->pagination->getListFooter();
+		echo $this->pagination->getPagesLinks();
 	}
 ?>
 </div>
