@@ -13,6 +13,7 @@ defined('_JEXEC') or die();
 
 JLoader::register('ActionlogsHelper', JPATH_ADMINISTRATOR . '/components/com_actionlogs/helpers/actionlogs.php');
 
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
@@ -290,7 +291,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 	 */
 	public function tjucmOnBeforeSaveItemData($recordId, $client, $data)
 	{
-		if (!$this->params->get('tjucmOnAfterSaveItemData', 1))
+		if (!$this->params->get('tjucmOnAfterSaveItemData', 1) || empty($recordId))
 		{
 			return;
 		}
@@ -306,15 +307,45 @@ class PlgActionlogTjUcm extends CMSPlugin
 		$fieldValue = Table::getInstance('FieldsValue', 'TjfieldsTable', array());
 		$fieldValue->load(array('content_id' => $recordId, 'client' => $client));
 
-		$messageLanguageKey = ($fieldValue->id) ? 'PLG_ACTIONLOG_TJUCM_ITEM_DATA_EDIT' : 'PLG_ACTIONLOG_TJUCM_ITEM_DATA_ADDED';
+		$clusterId = "";
+		$clusterTitle = "";
+
+		if (ComponentHelper::getComponent('com_cluster', true)->enabled)
+		{
+			$clusterField = str_replace(".", "_", $client) . '_clusterclusterid';
+
+			if ($data[$clusterField])
+			{
+				JLoader::import('components.com_cluster.tables.clusters', JPATH_ADMINISTRATOR);
+				$clusterTable = Table::getInstance('Clusters', 'ClusterTable', array());
+				$clusterTable->load($data[$clusterField]);
+				$clusterId = $tjucmTableItem->cluster_id;
+				$clusterTitle = $clusterTable->name;
+			}
+
+			$messageLanguageKey = ($fieldValue->id) ? 'PLG_ACTIONLOG_TJUCM_CLUSTER_ITEM_DATA_EDIT' : 'PLG_ACTIONLOG_TJUCM_CLUSTER_ITEM_DATA_ADDED';
+		}
+		else
+		{
+			$messageLanguageKey = ($fieldValue->id) ? 'PLG_ACTIONLOG_TJUCM_ITEM_DATA_EDIT' : 'PLG_ACTIONLOG_TJUCM_ITEM_DATA_ADDED';
+		}
+
+		JLoader::import('components.com_tjucm.helpers.tjucm', JPATH_SITE);
+		$tjUcmFrontendHelper = new TjucmHelpersTjucm;
+		$link = 'index.php?option=com_tjucm&view=item&client=' . $client . '&id=' . $recordId;
+		$itemId = $tjUcmFrontendHelper->getItemId($link);
+		$link = JRoute::_($link . '&Itemid=' . $itemId, false);
 
 		$message = array(
-				'action'      => 'add',
-				'id'          => $recordId,
-				'title'       => $tjucmTableType->title,
-				'userid'      => $user->id,
-				'username'    => ucfirst($user->username),
-				'accountlink' => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
+				'action'        => 'add',
+				'id'            => $recordId,
+				'title'         => $tjucmTableType->title,
+				'cluster_id'    => $clusterId,
+				'cluster_title' => $clusterTitle,
+				'userid'        => $user->id,
+				'username'      => ucfirst($user->name),
+				'accountlink'   => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
+				'item_link'     => $link,
 			);
 
 		$this->addLog(array($message), $messageLanguageKey, $context, $user->id);
@@ -347,14 +378,40 @@ class PlgActionlogTjUcm extends CMSPlugin
 		$context = Factory::getApplication()->input->get('option');
 		$user    = Factory::getUser();
 
-		$messageLanguageKey = 'PLG_ACTIONLOG_TJUCM_ITEM_DELETED';
+		$clusterId = "";
+		$clusterTitle = "";
+
+		if (ComponentHelper::getComponent('com_cluster', true)->enabled)
+		{
+			JLoader::import('components.com_tjucm.tables.item', JPATH_ADMINISTRATOR);
+			$tjucmTableItem = Table::getInstance('Item', 'TjucmTable', array());
+			$tjucmTableItem->load($recordId);
+
+			if ($tjucmTableItem->cluster_id)
+			{
+				JLoader::import('components.com_cluster.tables.clusters', JPATH_ADMINISTRATOR);
+				$clusterTable = Table::getInstance('Clusters', 'ClusterTable', array());
+				$clusterTable->load($tjucmTableItem->cluster_id);
+				$clusterId = $tjucmTableItem->cluster_id;
+				$clusterTitle = $clusterTable->name;
+			}
+
+			$messageLanguageKey = 'PLG_ACTIONLOG_TJUCM_CLUSTER_ITEM_DELETED';
+		}
+		else
+		{
+			$messageLanguageKey = 'PLG_ACTIONLOG_TJUCM_ITEM_DELETED';
+		}
+
 		$message = array(
-				'action'      => 'delete',
-				'id'          => $item,
-				'title'       => $tjucmTableType->title,
-				'userid'      => $user->id,
-				'username'    => ucfirst($user->username),
-				'accountlink' => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
+				'action'        => 'delete',
+				'id'            => $item,
+				'title'         => $tjucmTableType->title,
+				'cluster_id'    => $clusterId,
+				'cluster_title' => $clusterTitle,
+				'userid'        => $user->id,
+				'username'      => ucfirst($user->name),
+				'accountlink'   => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
 			);
 
 		$this->addLog(array($message), $messageLanguageKey, $context, $user->id);
