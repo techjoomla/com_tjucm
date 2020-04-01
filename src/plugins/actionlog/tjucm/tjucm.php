@@ -115,7 +115,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 			'id'          => $type['typeId'],
 			'title'       => $type['title'],
 			'userid'      => $user->id,
-			'username'    => $user->username,
+			'username'    => ucfirst($user->username),
 			'accountlink' => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
 			'typelink'    => 'index.php?option=com_tjucm&view=type&layout=edit&id=' . $type['typeId'],
 		);
@@ -152,7 +152,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 				'title'       => $table->title,
 				'identifier'  => $table->unique_identifier,
 				'userid'      => $user->id,
-				'username'    => $user->username,
+				'username'    => ucfirst($user->username),
 				'accountlink' => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
 			);
 
@@ -186,7 +186,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 		$context  = Factory::getApplication()->input->get('option');
 		$jUser    = Factory::getUser();
 		$userId   = $jUser->id;
-		$userName = $jUser->username;
+		$userName = ucfirst($jUser->username);
 
 		switch ($value)
 		{
@@ -265,7 +265,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 				'id'          => $item['id'],
 				'title'       => $tjucmTableType->title,
 				'userid'      => $user->id,
-				'username'    => $user->username,
+				'username'    => ucfirst($user->username),
 				'accountlink' => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
 			);
 
@@ -313,7 +313,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 				'id'          => $recordId,
 				'title'       => $tjucmTableType->title,
 				'userid'      => $user->id,
-				'username'    => $user->username,
+				'username'    => ucfirst($user->username),
 				'accountlink' => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
 			);
 
@@ -333,7 +333,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 	 *
 	 * @since    __DEPLOY__VERSION__
 	 */
-	public function tjUcmOnAfterDeleteItem($item, $client)
+	public function tjUcmOnBeforeDeleteItem($item, $client)
 	{
 		if (!$this->params->get('TjUcmOnAfterItemDelete', 1))
 		{
@@ -353,7 +353,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 				'id'          => $item,
 				'title'       => $tjucmTableType->title,
 				'userid'      => $user->id,
-				'username'    => $user->username,
+				'username'    => ucfirst($user->username),
 				'accountlink' => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
 			);
 

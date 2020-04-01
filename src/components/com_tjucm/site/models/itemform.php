@@ -698,13 +698,13 @@ class TjucmModelItemForm extends JModelAdmin
 				{
 					$table->load($subFormContentId);
 
+					// Plugin trigger on before item delete
+					JPluginHelper::importPlugin('actionlog');
+					$dispatcher = JDispatcher::getInstance();
+					$dispatcher->trigger('tjUcmOnBeforeDeleteItem', array($subFormContentId, $table->client));
+
 					if ($table->delete($subFormContentId) === true)
 					{
-						// Plugin trigger on before item delete
-						JPluginHelper::importPlugin('actionlog');
-						$dispatcher = JDispatcher::getInstance();
-						$dispatcher->trigger('tjUcmOnBeforeDeleteItem', array($subFormContentId, $table->client));
-
 						$this->deleteExtraFieldsData($subFormContentId, $table->client);
 
 						// Plugin trigger on after item delete
@@ -718,13 +718,13 @@ class TjucmModelItemForm extends JModelAdmin
 			// Delete parent record
 			$table->load($id);
 
+			// Plugin trigger on before item delete
+			JPluginHelper::importPlugin('actionlog');
+			$dispatcher = JDispatcher::getInstance();
+			$dispatcher->trigger('tjUcmOnBeforeDeleteItem', array($id, $table->client));
+
 			if ($table->delete($id) === true)
 			{
-				// Plugin trigger on before item delete
-				JPluginHelper::importPlugin('actionlog');
-				$dispatcher = JDispatcher::getInstance();
-				$dispatcher->trigger('tjUcmOnBeforeDeleteItem', array($id, $table->client));
-
 				$this->deleteExtraFieldsData($id, $table->client);
 
 				// Plugin trigger on after item delete
