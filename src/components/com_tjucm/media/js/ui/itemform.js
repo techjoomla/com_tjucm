@@ -302,7 +302,7 @@ jQuery(window).load(function()
 					tjUcmClickedOnPrev = 0;
 				}
 
-				jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+				jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 			}
 		}
 		else
@@ -334,7 +334,7 @@ jQuery(window).load(function()
 				tjUcmClickedOnPrev = 0;
 			}
 
-			jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+			jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 		}
 	});
 });
@@ -603,6 +603,10 @@ var tjUcmItemForm = {
 		return true;
 	},
 	afterDataSave: function (error, response){
+
+		/* Hide loader when record is saved*/
+		jQuery("#item-form #tjucm_loader").hide();
+
 		response = JSON.parse(response);
 		/* Remove the dirty class fromt the form once the field data is saved*/
 		jQuery('#item-form').removeClass('dirty');
@@ -675,7 +679,7 @@ var tjUcmItemForm = {
 					Joomla.renderMessages({'error':[response.message]});
 				}
 
-				jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+				jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 			}
 
 			if (response.messages !== null)
@@ -686,7 +690,7 @@ var tjUcmItemForm = {
 						Joomla.renderMessages({'error':[value]});
 					});
 
-					jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+					jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 				}
 			}
 		}
@@ -727,6 +731,10 @@ var tjUcmItemForm = {
 	saveUcmFormData: function(){
 		/* Disable the action buttons before performing the action*/
 		jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
+
+		/* Show loader when record is saved*/
+		jQuery("#item-form #tjucm_loader").show();
+		jQuery("html, body").animate({scrollTop: jQuery("#item-form #tjucm_loader").position().top}, "slow");
 
 		/* In case of save through bitrate setting event will be undefined*/
 		if (event === undefined)
@@ -769,7 +777,7 @@ var tjUcmItemForm = {
 			{
 				tjUcmItemForm.setVisibilityOfNavigationButtons();
 				jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
-				jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+				jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 
 				return false;
 			}
@@ -917,7 +925,7 @@ var tjUcmItemForm = {
 		}
 		else
 		{
-			jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+			jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 
 			return false;
 		}
@@ -1007,7 +1015,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 			if(!confirm(Joomla.JText._("COM_TJUCM_ITEMFORM_SUBMIT_ALERT")))
 			{
 				jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
-				jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+				jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 
 				return false;
 			}
@@ -1018,7 +1026,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 		else
 		{
 			jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
-			jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+			jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 
 			return false;
 		}
@@ -1040,7 +1048,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 							Joomla.renderMessages({'error':[value]});
 						});
 
-						jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+						jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 					}
 				}
 
@@ -1048,7 +1056,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 				{
 					Joomla.renderMessages({'info':[returnedData.message]});
 
-					jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+					jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 				}
 
 				if (returnedData.data !== null)
