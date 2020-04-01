@@ -220,6 +220,9 @@ JFactory::getDocument()->addScriptDeclaration('
 		}
 		?>
 	</div>
+	<div id="tjucm_loader">
+		<img src='<?php echo JUri::root();?>media/com_tjucm/gif/loading.gif'>
+	</div>
 	<input type="hidden" name="layout" value="<?php echo $layout ?>"/>
 	<input type="hidden" name="task" value="itemform.save"/>
 	<input type="hidden" name="form_status" id="form_status" value=""/>
