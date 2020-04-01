@@ -22,3 +22,12 @@ width:200px !important;
 .tjucm-wrapper .tj-wordwrap{
 word-break: break-word;
 }
+
+#item-form #tjucm_loader{
+    height:auto;
+    position:absolute;
+    top:45%;
+    left:45%;
+    opacity: 0.5;
+    display:none;
+}
