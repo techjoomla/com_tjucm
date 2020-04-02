@@ -482,6 +482,8 @@ class TjucmModelItems extends JModelList
 		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
 		$fieldsModel->setState('filter.showonlist', 1);
 		$fieldsModel->setState('filter.state', 1);
+		$fieldsModel->setState('list.ordering', 'ordering');
+		$fieldsModel->setState('list.direction', 'ASC');
 		$client = $this->getState('ucm.client');
 
 		if (!empty($client))
