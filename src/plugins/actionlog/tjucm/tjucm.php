@@ -385,7 +385,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 		{
 			JLoader::import('components.com_tjucm.tables.item', JPATH_ADMINISTRATOR);
 			$tjucmTableItem = Table::getInstance('Item', 'TjucmTable', array());
-			$tjucmTableItem->load($recordId);
+			$tjucmTableItem->load($item);
 
 			if ($tjucmTableItem->cluster_id)
 			{
