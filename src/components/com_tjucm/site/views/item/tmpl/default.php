@@ -16,6 +16,17 @@ $user = JFactory::getUser();
 
 if ($this->form_extra)
 {
+	if (isset($this->title))
+	{
+		?>
+		<div class="page-header">
+			<h1 class="page-title">
+			<?php echo strtoupper($this->title); ?>
+			</h1>
+		</div> 
+		<?php
+	}
+
 	$count = 0;
 	$xmlFieldSets = array();
 

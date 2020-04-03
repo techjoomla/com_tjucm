@@ -309,21 +309,57 @@ class PlgActionlogTjUcm extends CMSPlugin
 
 		$clusterId = "";
 		$clusterTitle = "";
+		$ownerClusterId = "";
+		$ownerClusterTitle = "";
 
 		if (ComponentHelper::getComponent('com_cluster', true)->enabled)
 		{
 			$clusterField = str_replace(".", "_", $client) . '_clusterclusterid';
 
+			JLoader::import('components.com_cluster.models.clusteruser', JPATH_ADMINISTRATOR);
+			$clusterUserModel = JModelLegacy::getInstance('ClusterUser', 'ClusterModel');
+			$usersClusters = $clusterUserModel->getUsersClusters($user->id);
+
 			if ($data[$clusterField])
 			{
+				$editingRecordOfOtherCluster = true;
+
+				// Check if user belongs to the cluster who has created the record or not
+				foreach ($usersClusters as $usersCluster)
+				{
+					if ($usersCluster->cluster_id == $data[$clusterField])
+					{
+						// If user is not part of cluster who owns the record then he is editing record on behalf or other cluster
+						$editingRecordOfOtherCluster = false;
+
+						break;
+					}
+				}
+
 				JLoader::import('components.com_cluster.tables.clusters', JPATH_ADMINISTRATOR);
 				$clusterTable = Table::getInstance('Clusters', 'ClusterTable', array());
-				$clusterTable->load($data[$clusterField]);
-				$clusterId = $tjucmTableItem->cluster_id;
-				$clusterTitle = $clusterTable->name;
-			}
 
-			$messageLanguageKey = ($fieldValue->id) ? 'PLG_ACTIONLOG_TJUCM_CLUSTER_ITEM_DATA_EDIT' : 'PLG_ACTIONLOG_TJUCM_CLUSTER_ITEM_DATA_ADDED';
+				if ($editingRecordOfOtherCluster)
+				{
+					$clusterTable->load($usersClusters[0]->cluster_id);
+					$clusterId = $usersClusters[0]->cluster_id;
+					$clusterTitle = $clusterTable->name;
+
+					$clusterTable->load($data[$clusterField]);
+					$ownerClusterId = $data[$clusterField];
+					$ownerClusterTitle = $clusterTable->name;
+
+					$messageLanguageKey = ($fieldValue->id) ? 'PLG_ACTIONLOG_TJUCM_OTHER_CLUSTER_ITEM_DATA_EDIT' : 'PLG_ACTIONLOG_TJUCM_OTHER_CLUSTER_ITEM_DATA_ADDED';
+				}
+				else
+				{
+					$clusterTable->load($data[$clusterField]);
+					$clusterId = $tjucmTableItem->cluster_id;
+					$clusterTitle = $clusterTable->name;
+
+					$messageLanguageKey = ($fieldValue->id) ? 'PLG_ACTIONLOG_TJUCM_CLUSTER_ITEM_DATA_EDIT' : 'PLG_ACTIONLOG_TJUCM_CLUSTER_ITEM_DATA_ADDED';
+				}
+			}
 		}
 		else
 		{
@@ -337,15 +373,17 @@ class PlgActionlogTjUcm extends CMSPlugin
 		$link = JRoute::_($link . '&Itemid=' . $itemId, false);
 
 		$message = array(
-				'action'        => 'add',
-				'id'            => $recordId,
-				'title'         => $tjucmTableType->title,
-				'cluster_id'    => $clusterId,
-				'cluster_title' => $clusterTitle,
-				'userid'        => $user->id,
-				'username'      => ucfirst($user->name),
-				'accountlink'   => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
-				'item_link'     => $link,
+				'action'              => 'add',
+				'id'                  => $recordId,
+				'title'               => $tjucmTableType->title,
+				'cluster_id'          => $clusterId,
+				'cluster_title'       => $clusterTitle,
+				'owner_cluster_id'    => $ownerClusterId,
+				'owner_cluster_title' => $ownerClusterTitle,
+				'userid'              => $user->id,
+				'username'            => ucfirst($user->name),
+				'accountlink'         => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
+				'item_link'           => $link,
 			);
 
 		$this->addLog(array($message), $messageLanguageKey, $context, $user->id);
@@ -380,6 +418,8 @@ class PlgActionlogTjUcm extends CMSPlugin
 
 		$clusterId = "";
 		$clusterTitle = "";
+		$ownerClusterId = "";
+		$ownerClusterTitle = "";
 
 		if (ComponentHelper::getComponent('com_cluster', true)->enabled)
 		{
@@ -387,16 +427,50 @@ class PlgActionlogTjUcm extends CMSPlugin
 			$tjucmTableItem = Table::getInstance('Item', 'TjucmTable', array());
 			$tjucmTableItem->load($item);
 
+			JLoader::import('components.com_cluster.models.clusteruser', JPATH_ADMINISTRATOR);
+			$clusterUserModel = JModelLegacy::getInstance('ClusterUser', 'ClusterModel');
+			$usersClusters = $clusterUserModel->getUsersClusters($user->id);
+
+			$deletingRecordOfOtherCluster = true;
+
+			// Check if user belongs to the cluster who has created the record or not
+			foreach ($usersClusters as $usersCluster)
+			{
+				if ($usersCluster->cluster_id == $tjucmTableItem->cluster_id)
+				{
+					// If user is not part of cluster who owns the record then he is editing record on behalf or other cluster
+					$deletingRecordOfOtherCluster = false;
+
+					break;
+				}
+			}
+
 			if ($tjucmTableItem->cluster_id)
 			{
 				JLoader::import('components.com_cluster.tables.clusters', JPATH_ADMINISTRATOR);
 				$clusterTable = Table::getInstance('Clusters', 'ClusterTable', array());
-				$clusterTable->load($tjucmTableItem->cluster_id);
-				$clusterId = $tjucmTableItem->cluster_id;
-				$clusterTitle = $clusterTable->name;
-			}
 
-			$messageLanguageKey = 'PLG_ACTIONLOG_TJUCM_CLUSTER_ITEM_DELETED';
+				if ($deletingRecordOfOtherCluster)
+				{
+					$clusterTable->load($usersClusters[0]->cluster_id);
+					$clusterId = $usersClusters[0]->cluster_id;
+					$clusterTitle = $clusterTable->name;
+
+					$clusterTable->load($tjucmTableItem->cluster_id);
+					$ownerClusterId = $tjucmTableItem->cluster_id;
+					$ownerClusterTitle = $clusterTable->name;
+
+					$messageLanguageKey = 'PLG_ACTIONLOG_TJUCM_OTHER_CLUSTER_ITEM_DELETED';
+				}
+				else
+				{
+					$clusterTable->load($tjucmTableItem->cluster_id);
+					$clusterId = $tjucmTableItem->cluster_id;
+					$clusterTitle = $clusterTable->name;
+
+					$messageLanguageKey = 'PLG_ACTIONLOG_TJUCM_CLUSTER_ITEM_DELETED';
+				}
+			}
 		}
 		else
 		{
@@ -404,14 +478,16 @@ class PlgActionlogTjUcm extends CMSPlugin
 		}
 
 		$message = array(
-				'action'        => 'delete',
-				'id'            => $item,
-				'title'         => $tjucmTableType->title,
-				'cluster_id'    => $clusterId,
-				'cluster_title' => $clusterTitle,
-				'userid'        => $user->id,
-				'username'      => ucfirst($user->name),
-				'accountlink'   => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
+				'action'              => 'delete',
+				'id'                  => $item,
+				'title'               => $tjucmTableType->title,
+				'cluster_id'          => $clusterId,
+				'cluster_title'       => $clusterTitle,
+				'owner_cluster_id'    => $ownerClusterId,
+				'owner_cluster_title' => $ownerClusterTitle,
+				'userid'              => $user->id,
+				'username'            => ucfirst($user->name),
+				'accountlink'         => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
 			);
 
 		$this->addLog(array($message), $messageLanguageKey, $context, $user->id);

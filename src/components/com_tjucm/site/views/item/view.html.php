@@ -132,6 +132,7 @@ class TjucmViewItem extends JViewLegacy
 		$typeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
 		$typeTable->load(array('unique_identifier' => $this->client));
 		$typeParams = json_decode($typeTable->params);
+		$this->title = $typeTable->title;
 
 		if (isset($typeParams->details_layout) && !empty($typeParams->details_layout))
 		{
