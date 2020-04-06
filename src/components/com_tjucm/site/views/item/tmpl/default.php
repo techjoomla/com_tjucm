@@ -13,6 +13,7 @@ defined('_JEXEC') or die;
 JText::script('COM_TJUCM_DELETE_MESSAGE');
 
 $user = JFactory::getUser();
+$tjUcmFrontendHelper = new TjucmHelpersTjucm;
 
 if ($this->form_extra)
 {
@@ -75,6 +76,10 @@ else
 			<a class="btn btn-default delete-button" href="<?php echo $redirectURL; ?>"><?php echo JText::_("COM_TJUCM_DELETE_ITEM"); ?></a>
 			<?php
 		}
+
+		$link = 'index.php?option=com_tjucm&view=items&client=' . $this->client;
+		$itemId = $tjUcmFrontendHelper->getItemId($link);
 		?>
+		<a class="btn btn-default" href="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>"><?php echo JText::_("COM_TJUCM_CANCEL_BUTTON"); ?></a>
 	</div>
 </div>
