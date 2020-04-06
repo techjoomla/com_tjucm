@@ -823,7 +823,7 @@ var tjUcmItemForm = {
 			/* Reset the variable*/
 			tjUcmFormSubmitCallingButtonId = '';
 
-			jQuery('input[type="checkbox"]').each(function (){
+			jQuery('#item-form input[type="checkbox"]').each(function (){
 				if (jQuery(this).prop('checked') == true)
 				{
 					tjUcmItemFormData.append(jQuery(this).attr('name'), 1);
@@ -832,6 +832,10 @@ var tjUcmItemForm = {
 				{
 					tjUcmItemFormData.append(jQuery(this).attr('name'), 0);
 				}
+			});
+
+			jQuery('#item-form select').each(function (){
+				tjUcmItemFormData.append(jQuery(this).attr('name'), jQuery(this).val());
 			});
 
 			/* Do not show draft save msg if the save is triggered as per bitrate config*/
@@ -904,7 +908,6 @@ var tjUcmItemForm = {
 
 			/* Disable the save button till the record is saved*/
 			jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
-
 
 			tjUcmItemForm.getUcmParentRecordId(1, function (){
 				tjUcmSectionFormData.delete('task');
