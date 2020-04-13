@@ -157,6 +157,26 @@ class TjucmModelItems extends JModelList
 			$direction = $this->getUserStateFromRequest($this->context . $ucmType . '.filter.order_Dir', 'filter_order_Dir', '', 'string');
 		}
 
+		$fromDate = $this->getUserStateFromRequest($this->context . '.fromDate', 'fromDate', '', 'STRING');
+		$toDate = $this->getUserStateFromRequest($this->context . '.toDate', 'toDate', '', 'STRING');
+
+		if (!empty($fromDate) || !empty($toDate))
+		{
+			$fromDate = empty($fromDate) ? JFactory::getDate('now -1 month')->toSql() : JFactory::getDate($fromDate)->toSql();
+			$toDate = empty($toDate) ? JFactory::getDate('now')->toSql() : JFactory::getDate($toDate)->toSql();
+
+			// If from date is less than to date then swipe the dates
+			if ($fromDate > $toDate)
+			{
+				$tmpDate = $fromDate;
+				$fromDate = $toDate;
+				$toDate = $tmpDate;
+			}
+
+			$this->setState($ucmType . ".filter.fromDate", $fromDate);
+			$this->setState($ucmType . ".filter.toDate", $toDate);
+		}
+
 		// List state information.
 		parent::populateState($ordering, $direction);
 	}
@@ -294,6 +314,14 @@ class TjucmModelItems extends JModelList
 			{
 				$query->where($db->quoteName('a.id') . ' = ' . (int) str_replace('id:', '', $search));
 			}
+		}
+
+		$fromDate = $this->getState($client . '.filter.fromDate');
+		$toDate = $this->getState($client . '.filter.toDate');
+
+		if (!empty($fromDate) || !empty($toDate))
+		{
+			$query->where('DATE(' . $db->quoteName('a.created_date') . ') ' . ' BETWEEN ' . $db->quote($fromDate) . ' AND ' . $db->quote($toDate));
 		}
 
 		// Search on fields data
