@@ -284,7 +284,7 @@ class TjucmModelItems extends JModelList
 		}
 
 		// Filter by published state
-		$published = $this->getState('filter.state');
+		$published = $this->getState('filter.state', '');
 
 		if (is_numeric($published))
 		{
@@ -292,7 +292,7 @@ class TjucmModelItems extends JModelList
 		}
 		elseif ($published === '')
 		{
-			$query->where(($db->quoteName('(a.state) ') . ' IN (0, 1)'));
+			$query->where(($db->quoteName('a.state') . ' IN (0, 1)'));
 		}
 
 		// Filter by draft status

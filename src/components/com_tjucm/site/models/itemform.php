@@ -22,6 +22,8 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\Registry\Registry;
 
+JLoader::register('TjucmAccess', JPATH_SITE . '/components/com_tjucm/includes/access.php');
+
 /**
  * Tjucm model.
  *
