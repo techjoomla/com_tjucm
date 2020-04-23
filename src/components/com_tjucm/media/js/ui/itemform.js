@@ -732,10 +732,6 @@ var tjUcmItemForm = {
 		/* Disable the action buttons before performing the action*/
 		jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
 
-		/* Show loader when record is saved*/
-		jQuery("#item-form #tjucm_loader").show();
-		jQuery("html, body").animate({scrollTop: jQuery("#item-form #tjucm_loader").position().top}, "slow");
-
 		/* In case of save through bitrate setting event will be undefined*/
 		if (event === undefined)
 		{
@@ -794,6 +790,10 @@ var tjUcmItemForm = {
 		jQuery("#item-form .wf-editor-toggle").each(function(index) {
 			this.click();
 		});
+
+		/* Show loader when record is saved*/
+		jQuery("#item-form #tjucm_loader").show();
+		jQuery("html, body").animate({scrollTop: jQuery("#item-form #tjucm_loader").position().top}, "slow");
 
 		tjUcmItemForm.getUcmParentRecordId(tjUcmSaveRecordAsDraft, function (){
 			var tjUcmForm = document.getElementById('item-form');
