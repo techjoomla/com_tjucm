@@ -125,7 +125,8 @@ JFactory::getDocument()->addScriptDeclaration('
 					<h1 class="page-title">
 					<?php echo JText::_("COM_TJUCM_EDIT_FORM") . ": " . strtoupper($this->title); ?>
 					<h1>
-				</div><?php
+				</div>
+				<?php
 			}
 			else
 			{

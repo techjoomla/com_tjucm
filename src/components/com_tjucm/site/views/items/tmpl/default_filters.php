@@ -80,7 +80,7 @@ $firstListColumn = key($tmpListColumn);
 			{
 				foreach ($clusters as $clusterList)
 				{
-					if (RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.viewitem', $clusterList->id) || RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.viewallitem'))
+					if (RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.viewitem.' . $this->ucmTypeId, $clusterList->id) || RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.viewallitem.' . $this->ucmTypeId))
 					{
 						if (!empty($clusterList->id))
 						{
