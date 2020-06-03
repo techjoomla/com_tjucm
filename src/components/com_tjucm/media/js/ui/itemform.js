@@ -835,7 +835,14 @@ var tjUcmItemForm = {
 			});
 
 			jQuery('#item-form select').each(function (){
-				tjUcmItemFormData.append(jQuery(this).attr('name'), jQuery(this).val());
+				if (typeOf (jQuery(this).val()) == Array)
+				{
+					tjUcmItemFormData.append(jQuery(this).attr('name'), jQuery(this).val().join());
+				}
+				else if (jQuery(this).val())
+				{
+					tjUcmItemFormData.append(jQuery(this).attr('name'), jQuery(this).val());
+				}
 			});
 
 			/* Do not show draft save msg if the save is triggered as per bitrate config*/
