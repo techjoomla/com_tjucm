@@ -94,7 +94,8 @@ if ($canDeleteOwn)
 ?>
 <div class="tjucm-wrapper">
 <tr class="row<?php echo $item->id?>">
-	<td class="center hidden-phone">
+	<!-- TODO- copy and copy to other feature is not fully stable hence relate buttons are hidden-->
+	<td class="center hide">
 		<?php echo JHtml::_('grid.id', '', $item->id); ?>
 	</td>
 	<?php

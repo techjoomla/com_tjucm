@@ -585,13 +585,20 @@ var tjUcmItemForm = {
 				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
 			}
 		}
-		else if (jQuery(fieldObj).attr('type') != 'file')
+		else if (jQuery(fieldObj).attr('type') == 'file')
 		{
-			tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
+			tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj)[0].files[0]);
 		}
 		else
 		{
-			tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj)[0].files[0]);
+			if (jQuery(fieldObj).val() == null)
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), '');
+			}
+			else
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
+			}
 		}
 
 		// Call function if field name exist in request data
@@ -835,13 +842,9 @@ var tjUcmItemForm = {
 			});
 
 			jQuery('#item-form select').each(function (){
-				if (typeOf (jQuery(this).val()) == Array)
+				if (jQuery(this).val() == null)
 				{
-					tjUcmItemFormData.append(jQuery(this).attr('name'), jQuery(this).val().join());
-				}
-				else if (jQuery(this).val())
-				{
-					tjUcmItemFormData.append(jQuery(this).attr('name'), jQuery(this).val());
+					tjUcmItemFormData.append(jQuery(this).attr('name'), '');
 				}
 			});
 
