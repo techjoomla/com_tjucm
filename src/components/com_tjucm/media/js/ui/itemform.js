@@ -558,10 +558,13 @@ var tjUcmItemForm = {
 		else if(jQuery(fieldObj).hasClass('tjfieldTjList'))
 		{
 			/* This condition used for tjlist option actial values updated  - This is used for single & multiple values*/
-
 			if (jQuery(fieldObj).val() !='' && jQuery(fieldObj).val() != undefined)
 			{
 				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
+			}
+			else
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), '');
 			}
 
 			/* Check other options multiple values exist and its not empty */
