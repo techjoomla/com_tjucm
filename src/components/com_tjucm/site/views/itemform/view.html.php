@@ -221,12 +221,15 @@ class TjucmViewItemform extends JViewLegacy
 		$typeTable->load(array('unique_identifier' => $this->client));
 		$typeParams = json_decode($typeTable->params);
 
-		if (!TjucmAccess::canEdit($typeTable->id, $this->item->id))
+		if ($this->item->id)
 		{
-			$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
-			$app->setHeader('status', 403, true);
+			if (!TjucmAccess::canEdit($typeTable->id, $this->item->id))
+			{
+				$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
+				$app->setHeader('status', 403, true);
 
-			return;
+				return;
+			}
 		}
 
 		// Check if the UCM type is unpublished
