@@ -223,7 +223,7 @@ class TjucmViewItemform extends JViewLegacy
 
 		if ($this->item->id)
 		{
-			if (!TjucmAccess::canEdit($typeTable->id, $this->item->id))
+			if (!TjucmAccess::canEdit($typeTable->id, $this->item->id) && !TjucmAccess::canEditOwn($typeTable->id, $this->item->id))
 			{
 				$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
 				$app->setHeader('status', 403, true);
