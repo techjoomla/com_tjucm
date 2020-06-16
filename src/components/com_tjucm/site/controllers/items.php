@@ -233,18 +233,6 @@ class TjucmControllerItems extends TjucmController
 					$form = $tjucmItemFormModel->getTypeForm($fieldsData);
 					$data = $tjucmItemFormModel->validate($form, $itemData);
 
-					// Check if parent is Valid
-					if ($parentid)
-					{
-						$tableParentData = $tjucmItemFormModel->getTable();
-						$tableParentData->load(array('id' => $parentid));
-
-						if (!property_exists($tableParentData->id) && (!$tableParentData->id))
-						{
-							$data = false;
-						}
-					}
-
 					if ($data !== false)
 					{
 						// Save the record in UCM
@@ -323,6 +311,10 @@ class TjucmControllerItems extends TjucmController
 		$ucmTypeTable = Table::getInstance('Type', 'TjucmTable');
 		$ucmTypeTable->load(array("unique_identifier" => $client));
 
+		// Check if UCM type is subform
+		$ucmTypeParams = new Registry($ucmTypeTable->params);
+		$isSubform     = $ucmTypeParams->get('is_subform');
+
 		// Get fields in the given UCM type
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
 		$tjFieldsFieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
@@ -332,6 +324,12 @@ class TjucmControllerItems extends TjucmController
 		$tjFieldsFieldsModel->setState('list.direction', 'asc');
 		$fields = $tjFieldsFieldsModel->getItems();
 		$fieldsLabel = array_column($fields, 'label');
+
+		if ($isSubform)
+		{
+			// Add parentid in colunm
+			array_push($fieldsLabel, 'parentid');
+		}
 
 		// Generate schema CSV file with CSV headers as label of the fields for given UCM type and save it in temp folder
 		$fileName = preg_replace('/[^A-Za-z0-9\-]/', '', $ucmTypeTable->title) . '.csv';

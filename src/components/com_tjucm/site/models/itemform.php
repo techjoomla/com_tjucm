@@ -21,6 +21,7 @@ use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\Registry\Registry;
+use Joomla\CMS\Language\Text;
 
 /**
  * Tjucm model.
@@ -534,6 +535,31 @@ class TjucmModelItemForm extends JModelAdmin
 		}
 
 		$ucmTypeParams = new Registry($tjUcmTypeTable->params);
+		// Check if UCM type is subform
+		$isSubform     = $ucmTypeParams->get('is_subform');
+
+		if ($isSubform)
+		{
+			if ($data['parent_id'])
+			{
+				$tableParentData = $this->getTable();
+				$tableParentData->load(array('id' => $data['parent_id']));
+
+				if (!property_exists($tableParentData->id) && (!$tableParentData->id))
+				{
+					$this->setError(Text::_('COM_TJUCM_INVALID_PARENT_ID'));
+
+					return false;
+				}
+			}
+
+			if (!$data['parent_id'])
+			{
+				$this->setError(Text::_('COM_TJUCM_SUBFORM_NOT_ALLOWED_WITH_OUT_PARENT_ID'));
+
+				return false;
+			}
+		}
 
 		// Check if user is allowed to add/edit the record
 		if (empty($data['id']))
