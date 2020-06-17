@@ -156,7 +156,7 @@ class TjucmControllerItems extends TjucmController
 				// Prepare item data for item creation
 				foreach ($data as $key => $value)
 				{
-					if ($headers[$key] === 'parentid')
+					if ($headers[$key] === 'parent_id')
 					{
 						$parentId = $value;
 						continue;
@@ -328,7 +328,7 @@ class TjucmControllerItems extends TjucmController
 		if ($isSubform)
 		{
 			// Add parentid in colunm
-			array_push($fieldsLabel, 'parentid');
+			array_push($fieldsLabel, 'parent_id');
 		}
 
 		// Generate schema CSV file with CSV headers as label of the fields for given UCM type and save it in temp folder
