@@ -151,14 +151,14 @@ class TjucmControllerItems extends TjucmController
 			elseif (count($headers) == count($data))
 			{
 				$itemData = array();
-				$parentid = 0;
+				$parentId = 0;
 
 				// Prepare item data for item creation
 				foreach ($data as $key => $value)
 				{
 					if ($headers[$key] === 'parentid')
 					{
-						$parentid = $value;
+						$parentId = $value;
 						continue;
 					}
 
@@ -236,7 +236,7 @@ class TjucmControllerItems extends TjucmController
 					if ($data !== false)
 					{
 						// Save the record in UCM
-						if ($tjucmItemFormModel->save(array('client' => $client, 'parent_id' => $parentid)))
+						if ($tjucmItemFormModel->save(array('client' => $client, 'parent_id' => $parentId)))
 						{
 							$contentId = (int) $tjucmItemFormModel->getState($tjucmItemFormModel->getName() . '.id');
 
