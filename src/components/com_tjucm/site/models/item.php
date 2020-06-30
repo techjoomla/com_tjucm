@@ -256,10 +256,23 @@ class TjucmModelItem extends JModelAdmin
 	{
 		$table = $this->getTable();
 		$table->load($id);
-		$table->draft = $state == 1 ? 0 : 1;
 		$table->state = $state;
 
-		return $table->store();
+		if($table->store())
+		{
+			JLoader::import('components.com_tjucm.models.items', JPATH_SITE);
+			$itemsModel = BaseDatabaseModel::getInstance('Items', 'TjucmModel', array('ignore_request' => true));
+			$itemsModel->setState("parent_id", $id);
+			$children = $itemsModel->getItems();
+			
+			foreach ($children as $child)
+			{
+				$childTable = $this->getTable();
+				$childTable->load($child->id);
+				$childTable->state = $state;
+				$childTable->store();
+			}
+		}
 	}
 
 	/**
