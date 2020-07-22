@@ -54,11 +54,11 @@ JFactory::getDocument()->addScriptDeclaration("
 	jQuery(window).load(function()
 	{
 		var currentUcmType = new FormData();
-		currentUcmType.append('client', '"  . $this->client . "');
+		currentUcmType.append('client', '" . $this->client . "');
 		var afterCheckCompatibilityOfUcmType = function(error, response){
 			response = JSON.parse(response);
 
-			if (response.data !== null)
+			if (response.data.length > 0)
 			{
 				jQuery('.copyToOther').removeClass('hide');
 				jQuery.each(response.data, function(key, value) {
@@ -71,15 +71,15 @@ JFactory::getDocument()->addScriptDeclaration("
 		// Code to check ucm type compatibility to copy item
 		com_tjucm.Services.Items.chekCompatibility(currentUcmType, afterCheckCompatibilityOfUcmType);
 	});
-	
+
 	function copyItem()
 	{
 		var afterCopyItem = function(error, response){
 			response = JSON.parse(response);
-			
+
 			// Close pop up and display message
 			jQuery( '#copyModal' ).modal('hide');
-			
+
 			if(response.data !== null)
 			{
 				Joomla.renderMessages({'success':[response.message]});
@@ -89,12 +89,12 @@ JFactory::getDocument()->addScriptDeclaration("
 				Joomla.renderMessages({'error':[response.message]});
 			}
 		}
-	
+
 		var copyItemData =  jQuery('#adminForm').serialize();
-		
+
 		// Code to copy item to ucm type
 		com_tjucm.Services.Items.copyItem(copyItemData, afterCopyItem);
-	}	
+	}
 ");
 
 $statusColumnWidth = 0;
@@ -108,7 +108,7 @@ $statusColumnWidth = 0;
 	?>
 		<div class="page-header">
 			<h1 class="page-title">
-			<?php echo  strtoupper($this->title) . " " . JText::_("COM_TJUCM_FORM_LIST"); ?>
+			<?php echo strtoupper($this->title) . " " . JText::_("COM_TJUCM_FORM_LIST"); ?>
 			</h1>
 		</div> <?php
 	}
@@ -148,7 +148,8 @@ $statusColumnWidth = 0;
 				{?>
 			<thead>
 				<tr>
-					<th width="1%" class="">
+					<!-- TODO- copy and copy to other feature is not fully stable hence relate buttons are hidden-->
+					<th width="1%" class="hidden">
 						<input type="checkbox" name="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 					</th>
 					<?php
@@ -190,21 +191,15 @@ $statusColumnWidth = 0;
 							}
 							?>
 
-							<th  style="word-break: break-word;" width="<?php echo (85 - $statusColumnWidth) / count($this->listcolumn) . '%';?>">
+							<th style="word-break: break-word;" width="<?php echo (85 - $statusColumnWidth) / count($this->listcolumn) . '%';?>">
 								<?php echo htmlspecialchars($col_name, ENT_COMPAT, 'UTF-8'); ?>
 							</th>
 							<?php
 						}
-
-					if ($this->canEdit || $this->canDelete)
-					{
 						?>
 						<th class="center" width="10%">
 							<?php echo JText::_('COM_TJUCM_ITEMS_ACTIONS'); ?>
 						</th>
-					<?php
-					}
-					?>
 				</tr>
 			</thead>
 			<?php
@@ -269,10 +264,10 @@ $statusColumnWidth = 0;
 	</table>
 </div>
 <?php
-		if (!empty($this->items))
-		{
-			 echo $this->pagination->getListFooter();
-		}
+	if (!empty($this->items))
+	{
+		echo $this->pagination->getPagesLinks();
+	}
 ?>
 </div>
 </div>
@@ -286,16 +281,23 @@ $statusColumnWidth = 0;
 			<i class="icon-plus"></i>
 			<?php echo JText::_('COM_TJUCM_ADD_ITEM'); ?>
 		</a>
-		<a target="_blank" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false, 2); ?>" class="btn btn-success btn-small">
-			<?php echo JText::_('COM_TJUCM_COPY_ITEM'); ?>
-		</a>
-		<a data-toggle="modal" onclick="if(document.adminForm.boxchecked.value==0){alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{jQuery( '#copyModal' ).modal('show'); return true;}" class="btn btn-success btn-small copyToOther hide">
-			<?php echo JText::_('COM_TJUCM_COPY_ITEM_TO_OTHER'); ?>
-		</a>
 		<?php
+		if ($this->canImport)
+		{
+			?>
+			<!-- TODO- copy and copy to other feature is not fully stable hence relate buttons are hidden-->
+			<div class="hide">
+				<a target="_blank" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false, 2); ?>" class="btn btn-success btn-small">
+					<?php echo JText::_('COM_TJUCM_COPY_ITEM'); ?>
+				</a>
+				<a data-toggle="modal" onclick="if(document.adminForm.boxchecked.value==0){alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{jQuery( '#copyModal' ).modal('show'); return true;}" class="btn btn-success btn-small copyToOther hide">
+					<?php echo JText::_('COM_TJUCM_COPY_ITEM_TO_OTHER'); ?>
+				</a>
+			</div>
+			<?php
+		}
 	}
 	?>
-
 	<input type="hidden" name="boxchecked" value="0"/>
 	<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>"/>
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>"/>
@@ -309,16 +311,16 @@ $statusColumnWidth = 0;
 					<button type="button" class="close novalidate" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">×</span>
 					</button>
-					<h3>Select Ucm Type</h3>
+					<h3><?php echo JText::_("COM_TJUCM_SELECT_SOURCE_FORM");?></h3>
 				</div>
 				<div class="modal-body">
-						<?php echo JHTML::_('select.genericlist', '', 'filter[ucm_list]', 'class="ucm_list" onchange=""', 'text', 'value',$this->state->get('filter.ucm_list'), 'ucm_list' ); ?>
-						<input type="hidden" name="sourceClient" value="<?php echo $this->client;?>"/>
+					<?php echo JHTML::_('select.genericlist', '', 'filter[ucm_list]', 'class="ucm_list input-medium" onchange=""', 'text', 'value', $this->state->get('filter.ucm_list'), 'ucm_list'); ?>
+					<input type="hidden" name="sourceClient" value="<?php echo $this->client;?>"/>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn" onclick="document.getElementById('ucm_list').value='';" data-dismiss="modal">Cancel</button>
+					<button type="button" class="btn" onclick="document.getElementById('ucm_list').value='';" data-dismiss="modal"><?php echo JText::_("COM_TJUCM_CANCEL_COPY");?></button>
 					<a class="btn btn-success" onclick="copyItem()">
-						Process
+						<?php echo JText::_("COM_TJUCM_PROCESS_DATA");?>
 					</a>
 				</div>
 			</div>
@@ -327,22 +329,16 @@ $statusColumnWidth = 0;
 	<?php echo JHtml::_('form.token'); ?>
 </form>
 </div>
-<?php
-if ($this->canDelete)
-{
-	?>
-	<script type="text/javascript">
-	jQuery(document).ready(function () {
-		jQuery('.delete-button').click(deleteItem);
-	});
+<script type="text/javascript">
+jQuery(document).ready(function () {
+	jQuery('.delete-button').click(deleteItem);
+});
 
-	function deleteItem()
+function deleteItem()
+{
+	if (!confirm("<?php echo JText::_('COM_TJUCM_DELETE_MESSAGE'); ?>"))
 	{
-		if (!confirm("<?php echo JText::_('COM_TJUCM_DELETE_MESSAGE'); ?>"))
-		{
-			return false;
-		}
+		return false;
 	}
-	</script>
-<?php
 }
+</script>

@@ -123,9 +123,21 @@ class TjucmControllerItemForm extends JControllerForm
 				$app->close();
 			}
 
+			$isNew = (empty($data['id'])) ? 1 : 0;
+
+			// Plugin trigger on before item save
+			JPluginHelper::importPlugin('actionlog');
+			$dispatcher = JDispatcher::getInstance();
+			$dispatcher->trigger('tjUcmOnBeforeSaveItem', array($data, $isNew));
+
 			if ($model->save($data))
 			{
 				$result['id'] = $model->getState($model->getName() . '.id');
+
+				// Plugin trigger on after item save
+				JPluginHelper::importPlugin('actionlog');
+				$dispatcher = JDispatcher::getInstance();
+				$dispatcher->trigger('tjUcmOnafterSaveItem', array($data, $isNew));
 
 				echo new JResponseJson($result, Text::_('COM_TJUCM_ITEM_SAVED_SUCCESSFULLY'));
 				$app->close();
@@ -202,8 +214,18 @@ class TjucmControllerItemForm extends JControllerForm
 			$fieldData['client'] = $client;
 			$fieldData['created_by'] = $table->created_by;
 
+			// Plugin trigger on before item date save
+			JPluginHelper::importPlugin('actionlog');
+			$dispatcher = JDispatcher::getInstance();
+			$dispatcher->trigger('tjUcmOnBeforeSaveItemData', array($recordId, $client, $data));
+
 			// If data is valid then save the data into DB
 			$response = $model->saveFieldsData($fieldData);
+
+			// Plugin trigger on after item data save
+			JPluginHelper::importPlugin('actionlog');
+			$dispatcher = JDispatcher::getInstance();
+			$dispatcher->trigger('tjUcmOnAfterSaveItemData', array($recordId, $client, $data));
 
 			echo new JResponseJson($response);
 			$app->close();
@@ -313,8 +335,18 @@ class TjucmControllerItemForm extends JControllerForm
 			$formData['client'] = $client;
 			$formData['created_by'] = $table->created_by;
 
+			// Plugin trigger on before item date save
+			JPluginHelper::importPlugin('actionlog');
+			$dispatcher = JDispatcher::getInstance();
+			$dispatcher->trigger('tjUcmOnBeforeSaveItemData', array($recordId, $client, $data));
+
 			// If data is valid then save the data into DB
 			$response = $model->saveFieldsData($formData);
+
+			// Plugin trigger on before item date save
+			JPluginHelper::importPlugin('actionlog');
+			$dispatcher = JDispatcher::getInstance();
+			$dispatcher->trigger('tjUcmOnAfterSaveItemData', array($recordId, $client, $data));
 
 			$msg = null;
 
