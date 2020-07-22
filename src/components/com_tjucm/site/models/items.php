@@ -145,13 +145,6 @@ class TjucmModelItems extends JModelList
 		$this->setState("ucmType.id", $typeId);
 
 		$createdBy = $app->input->get('created_by', "", "INT");
-		$canView = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $typeId);
-
-		if (!$canView)
-		{
-			$createdBy = $user->id;
-		}
-
 		$this->setState("created_by", $createdBy);
 
 		if ($this->getUserStateFromRequest($this->context . $ucmType . '.filter.order', 'filter_order', '', 'string'))
@@ -162,6 +155,26 @@ class TjucmModelItems extends JModelList
 		if ($this->getUserStateFromRequest($this->context . $ucmType . '.filter.order_Dir', 'filter_order_Dir', '', 'string'))
 		{
 			$direction = $this->getUserStateFromRequest($this->context . $ucmType . '.filter.order_Dir', 'filter_order_Dir', '', 'string');
+		}
+
+		$fromDate = $this->getUserStateFromRequest($this->context . '.fromDate', 'fromDate', '', 'STRING');
+		$toDate = $this->getUserStateFromRequest($this->context . '.toDate', 'toDate', '', 'STRING');
+
+		if (!empty($fromDate) || !empty($toDate))
+		{
+			$fromDate = empty($fromDate) ? JFactory::getDate('now -1 month')->toSql() : JFactory::getDate($fromDate)->toSql();
+			$toDate = empty($toDate) ? JFactory::getDate('now')->toSql() : JFactory::getDate($toDate)->toSql();
+
+			// If from date is less than to date then swipe the dates
+			if ($fromDate > $toDate)
+			{
+				$tmpDate = $fromDate;
+				$fromDate = $toDate;
+				$toDate = $tmpDate;
+			}
+
+			$this->setState($ucmType . ".filter.fromDate", $fromDate);
+			$this->setState($ucmType . ".filter.toDate", $toDate);
 		}
 
 		// List state information.
@@ -241,18 +254,21 @@ class TjucmModelItems extends JModelList
 
 			if ($fieldTable->id)
 			{
-				JFormHelper::addFieldPath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models/fields/');
-				$cluster = JFormHelper::loadFieldType('cluster', false);
-				$clusterList = $cluster->getOptionsExternally();
+				JLoader::import("/components/com_cluster/includes/cluster", JPATH_ADMINISTRATOR);
+				$clustersModel = ClusterFactory::model('Clusters', array('ignore_request' => true));
+				$clusters = $clustersModel->getItems();
 				$usersClusters = array();
 
-				if (!empty($clusterList))
+				if (!empty($clusters))
 				{
-					foreach ($clusterList as $clusterList)
+					foreach ($clusters as $clusterList)
 					{
-						if (!empty($clusterList->value))
+						if (!empty($clusterList->id))
 						{
-							$usersClusters[] = $clusterList->value;
+							if (TjucmAccess::canView($ucmTypeId, $clusterList->id))
+							{
+								$usersClusters[] = $clusterList->id;
+							}
 						}
 					}
 				}
@@ -268,7 +284,7 @@ class TjucmModelItems extends JModelList
 		}
 
 		// Filter by published state
-		$published = $this->getState('filter.state');
+		$published = $this->getState('filter.state', '');
 
 		if (is_numeric($published))
 		{
@@ -276,7 +292,7 @@ class TjucmModelItems extends JModelList
 		}
 		elseif ($published === '')
 		{
-			$query->where(($db->quoteName('(a.state) ') . ' IN (0, 1)'));
+			$query->where(($db->quoteName('a.state') . ' IN (0, 1)'));
 		}
 
 		// Filter by draft status
@@ -286,6 +302,7 @@ class TjucmModelItems extends JModelList
 		{
 			$query->where($db->quoteName('a.draft') . ' = ' . $draft);
 		}
+
 		// Search by content id
 		$search = $this->getState($client . '.filter.search');
 
@@ -297,6 +314,14 @@ class TjucmModelItems extends JModelList
 			{
 				$query->where($db->quoteName('a.id') . ' = ' . (int) str_replace('id:', '', $search));
 			}
+		}
+
+		$fromDate = $this->getState($client . '.filter.fromDate');
+		$toDate = $this->getState($client . '.filter.toDate');
+
+		if (!empty($fromDate) || !empty($toDate))
+		{
+			$query->where('DATE(' . $db->quoteName('a.created_date') . ') ' . ' BETWEEN ' . $db->quote($fromDate) . ' AND ' . $db->quote($toDate));
 		}
 
 		// Search on fields data
@@ -485,6 +510,8 @@ class TjucmModelItems extends JModelList
 		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
 		$fieldsModel->setState('filter.showonlist', 1);
 		$fieldsModel->setState('filter.state', 1);
+		$fieldsModel->setState('list.ordering', 'ordering');
+		$fieldsModel->setState('list.direction', 'ASC');
 		$client = $this->getState('ucm.client');
 
 		if (!empty($client))
@@ -511,28 +538,6 @@ class TjucmModelItems extends JModelList
 	 */
 	public function getItems()
 	{
-		$typeId = $this->getState('ucmType.id');
-		$createdBy = $this->getState('created_by', '');
-
-		JLoader::import('components.com_tjucm.models.item', JPATH_SITE);
-		$itemModel = new TjucmModelItem;
-		$canView = $itemModel->canView($typeId);
-		$user = JFactory::getUser();
-
-		// If user is not allowed to view the records and if the created_by is not the logged in user then do not show the records
-		if (!$canView)
-		{
-			if (!empty($createdBy) && $createdBy == $user->id)
-			{
-				$canView = true;
-			}
-		}
-
-		if (!$canView)
-		{
-			return false;
-		}
-
 		$items = parent::getItems();
 		$itemsArray = (array) $items;
 		$contentIds = array_column($itemsArray, 'id');

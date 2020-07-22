@@ -64,17 +64,18 @@ class TjucmControllerType extends JControllerForm
 		$typeModel = BaseDatabaseModel::getInstance('Type', 'TjucmModel');
 
 		$validUcmType = array();
-		$validUcmType[0]['value'] = "";
-		$validUcmType[0]['text'] = Text::_('COM_TJUCM_SELECT_UCM_TYPE_DESC');
 
 		foreach ($ucmTypes as $key => $type)
 		{
-			$result = $typeModel->getCompatableUcmType($client, $type->unique_identifier);
-
-			if ($result)
+			if ($type->unique_identifier != $client)
 			{
-				$validUcmType[$key]['value'] = $type->unique_identifier;
-				$validUcmType[$key]['text']  = $type->title;
+				$result = $typeModel->getCompatableUcmType($client, $type->unique_identifier);
+
+				if ($result)
+				{
+					$validUcmType[$key]['value'] = $type->unique_identifier;
+					$validUcmType[$key]['text']  = $type->title;
+				}
 			}
 		}
 

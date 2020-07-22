@@ -125,7 +125,8 @@ JFactory::getDocument()->addScriptDeclaration('
 					<h1 class="page-title">
 					<?php echo JText::_("COM_TJUCM_EDIT_FORM") . ": " . strtoupper($this->title); ?>
 					<h1>
-				</div><?php
+				</div>
+				<?php
 			}
 			else
 			{
@@ -219,6 +220,9 @@ JFactory::getDocument()->addScriptDeclaration('
 			<?php
 		}
 		?>
+	</div>
+	<div id="tjucm_loader">
+		<img src='<?php echo JUri::root();?>media/com_tjucm/gif/loading.gif'>
 	</div>
 	<input type="hidden" name="layout" value="<?php echo $layout ?>"/>
 	<input type="hidden" name="task" value="itemform.save"/>

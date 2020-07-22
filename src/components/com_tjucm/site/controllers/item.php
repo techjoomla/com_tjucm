@@ -93,7 +93,6 @@ class TjucmControllerItem extends JControllerLegacy
 
 		// Get the model.
 		$model = $this->getModel('Item', 'TjucmModel');
-	
 
 		// Check out the item
 		if ($editId)
@@ -133,12 +132,10 @@ class TjucmControllerItem extends JControllerLegacy
 		$tjUcmFrontendHelper = new TjucmHelpersTjucm;
 
 		// Checking if the user can remove object
-		$user = JFactory::getUser();
-		$canEdit    = $user->authorise('core.type.edititem', 'com_tjucm.type.edititem' . $this->ucmTypeId);
-		$canChange  = $user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $this->ucmTypeId);
+		$canEdit       = $this->canEdit($this->ucmTypeId);
+		$canEditState  = $this->canEditState($this->ucmTypeId);
 
-
-		if ($canEdit || $canChange)
+		if ($canEdit || $canEditState)
 		{
 			$model = $this->getModel('Item', 'TjucmModel');
 
@@ -197,8 +194,7 @@ class TjucmControllerItem extends JControllerLegacy
 		$app = JFactory::getApplication();
 
 		// Checking if the user can remove object
-		$user = JFactory::getUser();
-		$canDelete  = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$canDelete = $this->canDelete($this->ucmTypeId);
 
 		if ($canDelete)
 		{
