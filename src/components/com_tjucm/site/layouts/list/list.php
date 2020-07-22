@@ -43,6 +43,10 @@ $fieldLayout['Editor'] = "editor";
 JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
 $TjfieldsHelper = new TjfieldsHelper;
 
+// Load itemForm model
+JLoader::import('components.com_tjucm.models.itemform', JPATH_SITE);
+$tjucmItemFormModel = JModelLegacy::getInstance('ItemForm', 'TjucmModel');
+
 // Get JLayout data
 $item          = $displayData['itemsData'];
 $created_by    = $displayData['created_by'];
@@ -158,14 +162,88 @@ if ($canDeleteOwn)
 					{
 						$field = $formObject->getField($tjFieldsFieldTable->name);
 						$field->setValue($fieldValue);
-						$layoutToUse = (
-							array_key_exists(
-								ucfirst($tjFieldsFieldTable->type), $fieldLayout
-							)
-						) ? $fieldLayout[ucfirst($tjFieldsFieldTable->type)] : 'field';
-						$layout = new JLayoutFile($layoutToUse, JPATH_ROOT . '/components/com_tjfields/layouts/fields');
-						$output = $layout->render(array('fieldXml' => $fieldXml, 'field' => $field));
-						echo $output;
+
+						if ($field->type == 'Ucmsubform' && $fieldValue)
+						{
+							$ucmSubFormData = json_decode($tjucmItemFormModel->getUcmSubFormFieldDataJson($item->id, $field));
+							$field->setValue($ucmSubFormData);
+							?>
+							<div>
+								<div class="col-xs-4"><?php echo $field->label; ?>:</div>
+								<div class="col-xs-8">
+									<?php
+									$count = 0;
+									$ucmSubFormXmlFieldSets = array();
+
+									// Call to extra fields
+									JLoader::import('components.com_tjucm.models.item', JPATH_SITE);
+									$tjucmItemModel = JModelLegacy::getInstance('Item', 'TjucmModel');
+
+									// Get Subform field data
+									$fieldData = $TjfieldsHelper->getFieldData($field->getAttribute('name'));
+
+									$ucmSubFormFieldParams = json_decode($fieldData->params);
+									$ucmSubFormFormSource = explode('/', $ucmSubFormFieldParams->formsource);
+									$ucmSubFormClient = $ucmSubFormFormSource[1] . '.' . str_replace('form_extra.xml', '', $ucmSubFormFormSource[4]);
+									$view = explode('.', $ucmSubFormClient);
+									$ucmSubFormData = (array) $ucmSubFormData;
+
+									if (!empty($ucmSubFormData))
+									{
+										$count = 0;
+
+										foreach ($ucmSubFormData as $subFormData)
+										{
+											$count++;
+											$contentIdFieldname = str_replace('.', '_', $ucmSubFormClient) . '_contentid';
+
+											$ucmSubformFormObject = $tjucmItemModel->getFormExtra(
+												array(
+													"clientComponent" => 'com_tjucm',
+													"client" => $ucmSubFormClient,
+													"view" => $view[1],
+													"layout" => 'default',
+													"content_id" => $subFormData->$contentIdFieldname)
+													);
+
+											$ucmSubFormFormXml = simplexml_load_file($field->formsource);
+
+											$ucmSubFormCount = 0;
+
+											foreach ($ucmSubFormFormXml as $ucmSubFormXmlFieldSet)
+											{
+												$ucmSubFormXmlFieldSets[$ucmSubFormCount] = $ucmSubFormXmlFieldSet;
+												$ucmSubFormCount++;
+											}
+
+											$ucmSubFormRecordData = $tjucmItemModel->getData($subFormData->$contentIdFieldname);
+
+											// Call the JLayout recursively to render fields of ucmsubform
+											$layout = new JLayoutFile('fields', JPATH_ROOT . '/components/com_tjucm/layouts/detail');
+											echo $layout->render(array('xmlFormObject' => $ucmSubFormXmlFieldSets, 'formObject' => $ucmSubformFormObject, 'itemData' => $ucmSubFormRecordData, 'isSubForm' => 1));
+
+											if (count($ucmSubFormData) > $count)
+											{
+												echo "<hr>";
+											}
+										}
+									}
+									?>
+								</div>
+							</div>
+							<?php
+						}
+						else
+						{
+							$layoutToUse = (
+								array_key_exists(
+									ucfirst($tjFieldsFieldTable->type), $fieldLayout
+								)
+							) ? $fieldLayout[ucfirst($tjFieldsFieldTable->type)] : 'field';
+							$layout = new JLayoutFile($layoutToUse, JPATH_ROOT . '/components/com_tjfields/layouts/fields');
+							$output = $layout->render(array('fieldXml' => $fieldXml, 'field' => $field));
+							echo $output;
+						}
 					}
 				?>
 			</td><?php

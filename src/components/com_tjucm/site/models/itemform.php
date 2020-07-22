@@ -535,6 +535,7 @@ class TjucmModelItemForm extends JModelAdmin
 		}
 
 		$ucmTypeParams = new Registry($tjUcmTypeTable->params);
+		
 		// Check if UCM type is subform
 		$isSubform     = $ucmTypeParams->get('is_subform');
 
@@ -908,6 +909,16 @@ class TjucmModelItemForm extends JModelAdmin
 			$subFormData->$ucmSubformContentIdFieldName = $contentId;
 
 			$concat = $efd->name . $key;
+
+			// Check if any field has value for the subform entry and if there is no value in subform then dont show it
+			$subFormDataArray = (array) $subFormData;
+			unset($subFormDataArray[$ucmSubformContentIdFieldName]);
+
+			if (empty($subFormDataArray))
+			{
+				continue;
+			}
+
 			$ucmSubFormFieldData->$concat = $subFormData;
 		}
 
