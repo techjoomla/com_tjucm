@@ -41,6 +41,16 @@ class TjucmViewItem extends JViewLegacy
 	{
 		$app  = JFactory::getApplication();
 
+		if (!JFactory::getUser()->id)
+		{
+			$msg = JText::_('COM_TJUCM_LOGIN_MSG');
+
+			// Get current url.
+			$current = JUri::getInstance()->toString();
+			$url = base64_encode($current);
+			JFactory::getApplication()->redirect(JRoute::_('index.php?option=com_users&view=login&return=' . $url, false), $msg);
+		}
+
 		// Load tj-fields language file
 		$lang = JFactory::getLanguage();
 		$lang->load('com_tjfields', JPATH_SITE);
@@ -122,6 +132,7 @@ class TjucmViewItem extends JViewLegacy
 		$typeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
 		$typeTable->load(array('unique_identifier' => $this->client));
 		$typeParams = json_decode($typeTable->params);
+		$this->title = $typeTable->title;
 
 		if (isset($typeParams->details_layout) && !empty($typeParams->details_layout))
 		{

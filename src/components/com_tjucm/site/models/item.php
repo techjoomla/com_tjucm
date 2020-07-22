@@ -44,7 +44,6 @@ class TjucmModelItem extends JModelAdmin
 	protected function populateState()
 	{
 		$app  = JFactory::getApplication('com_tjucm');
-		$user = JFactory::getUser();
 
 		// Load state from the request.
 		$id = $app->input->getInt('id');
@@ -83,9 +82,7 @@ class TjucmModelItem extends JModelAdmin
 		$this->setState('ucmType.id', $ucmId);
 
 		// Check published state
-		if ((!$user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmId))
-			&& (!$user->authorise('core.type.editownitem', 'com_tjucm.type.' . $ucmId))
-			&& (!$user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $ucmId)))
+		if ((!TjucmAccess::canEdit($ucmId, $id)) && (!TjucmAccess::canEditOwn($ucmId, $id)) && (!TjucmAccess::canEditState($ucmId, $id)))
 		{
 			$this->setState('filter.published', 1);
 			$this->setState('fileter.archived', 2);
@@ -173,8 +170,6 @@ class TjucmModelItem extends JModelAdmin
 	 */
 	public function &getData($id = null)
 	{
-		$user = JFactory::getUser();
-
 		$this->item = false;
 
 		if (empty($id))
@@ -184,7 +179,7 @@ class TjucmModelItem extends JModelAdmin
 
 		// Get UCM type id (Get if user is autorised to edit the items for this UCM type)
 		$ucmTypeId = $this->getState('ucmType.id');
-		$canView = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $ucmTypeId);
+		$canView = TjucmAccess::canView($ucmTypeId, $id);
 
 		// Get a level row instance.
 		$table = $this->getTable();
@@ -214,7 +209,7 @@ class TjucmModelItem extends JModelAdmin
 
 			if (!empty($this->item->id))
 			{
-				if ($canView || ($this->item->created_by == $user->id))
+				if ($canView || ($this->item->created_by == JFactory::getUser()->id))
 				{
 					$this->item->params->set('access-view', true);
 				}
@@ -300,8 +295,7 @@ class TjucmModelItem extends JModelAdmin
 		$app = JFactory::getApplication('com_tjucm');
 
 		$ucmTypeId = $this->getState('ucmType.id');
-		$user = JFactory::getUser();
-		$canDelete = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $ucmTypeId);
+		$canDelete = TjucmAccess::canDelete($ucmTypeId, $id);
 
 		if ($canDelete)
 		{
@@ -315,19 +309,5 @@ class TjucmModelItem extends JModelAdmin
 
 			return false;
 		}
-	}
-
-	/**
-	 * Method to check if a user has permissions to view ucm items of given type
-	 *
-	 * @param   int  $typeId  Type Id
-	 *
-	 * @return  boolean
-	 */
-	public function canView($typeId)
-	{
-		$user = JFactory::getUser();
-
-		return $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $typeId);
 	}
 }

@@ -170,32 +170,49 @@ class TjucmControllerItems extends TjucmController
 						if (isset($fieldsArray[$fieldName]->options) && !empty($fieldsArray[$fieldName]->options))
 						{
 							$fieldParams = new Registry($fieldsArray[$fieldName]->params);
+							$fieldOptions = array_column($fieldsArray[$fieldName]->options, 'options');
 
 							// If there are multiple values for a field then we need to send those as array
 							if (strpos($value, '||') !== false && $fieldParams->get('multiple'))
 							{
 								$optionValue = array_map('trim', explode("||", $value));
 								$multiSelectValues = array();
+								$otherOptionsValues = array();
 
-								foreach ($fieldsArray[$fieldName]->options as $option)
+								foreach ($optionValue as $option)
 								{
-									if (in_array($option->options, $optionValue))
+									if (in_array($option, $fieldOptions))
 									{
-										$multiSelectValues[] = $option->value;
+										$multiSelectValues[] = $option;
 									}
+									else
+									{
+										if ($fieldParams->get('other'))
+										{
+											$otherOptionsValues[] = $option;
+										}
+									}
+								}
+
+								if (!empty($otherOptionsValues))
+								{
+									$multiSelectValues[] = 'tjlistothervalue';
+									$multiSelectValues[] = implode(',', $otherOptionsValues);
 								}
 
 								$itemData[$fieldName] = $multiSelectValues;
 							}
 							else
 							{
-								foreach ($fieldsArray[$fieldName]->options as $option)
+								if (in_array($value, $fieldOptions))
 								{
-									if ($option->options == $value)
+									$itemData[$fieldName] = $value;
+								}
+								else
+								{
+									if ($fieldParams->get('other'))
 									{
-										$itemData[$fieldName] = $option->value;
-
-										break;
+										$itemData[$fieldName] = array('tjlistothervalue', $value);
 									}
 								}
 							}

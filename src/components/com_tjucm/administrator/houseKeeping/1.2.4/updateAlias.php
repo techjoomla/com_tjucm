@@ -55,23 +55,22 @@ class TjHouseKeepingUpdateAlias extends TjModelHouseKeeping
 				foreach ($ucmTypes as $ucmType)
 				{
 					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', $db));
+					$ucmTypeTable->load($ucmType->id);
 
 					// Remove white spaces in alias of UCM types
 					$updatedAlias = JFilterOutput::stringURLSafe($ucmTypeTable->alias);
-					$oldAlias = $ucmTypeTable->alias;
 					$ucmTypeTable->alias = $updatedAlias;
 					$ucmTypeTable->store();
-
-					$result['status']   = '';
-					$result['message']  = "Migration in progress";
 				}
 			}
 
 			// Get all the menus of UCM types
+			$query = $db->getQuery(true);
+			$query->select('*');
 			$query->from($db->quoteName('#__menu'));
 			$query->where(
-			$db->quoteName(link) . "=" . $db->quote('index.php?option=com_tjucm&view=itemform') .
-			"||" . $db->quoteName(link) . "=" . $db->quote('index.php?option=com_tjucm&view=items')
+			$db->quoteName('link') . "=" . $db->quote('index.php?option=com_tjucm&view=itemform') .
+			"||" . $db->quoteName('link') . "=" . $db->quote('index.php?option=com_tjucm&view=items')
 			);
 			$db->setQuery($query);
 			$menuItems = $db->loadObjectlist();
@@ -81,14 +80,17 @@ class TjHouseKeepingUpdateAlias extends TjModelHouseKeeping
 				foreach ($menuItems as $menuItem)
 				{
 					$menuItemTable = JTable::getInstance('Menu', 'MenusTable', array('dbo', $db));
+					$menuItemTable->load($menuItem->id);
 					$oldparams = json_decode($menuItemTable->params);
 
 					// Remove white spaces in alias of menus
-					$oldparams->ucm_type  = JFilterOutput::stringURLSafe($oldparams->ucm_type);
+					if (isset($oldparams->ucm_type))
+					{
+						$oldparams->ucm_type  = JFilterOutput::stringURLSafe($oldparams->ucm_type);
+					}
+
 					$menuItemTable->params = json_encode($oldparams);
 					$menuItemTable->store();
-					$result['status']   = '';
-					$result['message']  = "Migration in progress";
 				}
 			}
 
@@ -101,6 +103,7 @@ class TjHouseKeepingUpdateAlias extends TjModelHouseKeeping
 			$result['status']   = false;
 			$result['message']  = $e->getMessage();
 		}
+
 		return $result;
 	}
 }
