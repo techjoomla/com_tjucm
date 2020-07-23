@@ -167,7 +167,7 @@ class TjucmControllerItem extends JControllerLegacy
 			
 			// Call trigger on after publish the record
 			$dispatcher = JDispatcher::getInstance();
-			$dispatcher->trigger('onAfterPublishUCMRecord', array($id));
+			$dispatcher->trigger('tjUcmOnAfterStateChangeItem', array($id, $state));
 		}
 		else
 		{
