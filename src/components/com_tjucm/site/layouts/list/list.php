@@ -43,10 +43,6 @@ $fieldLayout['Editor'] = "editor";
 JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
 $TjfieldsHelper = new TjfieldsHelper;
 
-// Load itemForm model
-JLoader::import('components.com_tjucm.models.itemform', JPATH_SITE);
-$tjucmItemFormModel = JModelLegacy::getInstance('ItemForm', 'TjucmModel');
-
 // Get JLayout data
 $item          = $displayData['itemsData'];
 $created_by    = $displayData['created_by'];
@@ -141,100 +137,29 @@ if ($canDeleteOwn)
 	<?php
 	}
 
-	if (!empty($item->field_values))
+	if (!empty($item))
 	{
-		foreach ($item->field_values as $key => $fieldValue)
+		foreach ($item as $key => $fieldValue)
 		{
-			$tjFieldsFieldTable = $fieldsData[$key];
-
-			$canView = false;
-
-			if ($user->authorise('core.field.viewfieldvalue', 'com_tjfields.group.' . $tjFieldsFieldTable->group_id))
+			if (array_key_exists($key, $displayData['listcolumn']))
 			{
-				$canView = $user->authorise('core.field.viewfieldvalue', 'com_tjfields.field.' . $tjFieldsFieldTable->id);
-			}
+				$tjFieldsFieldTable = $fieldsData[$key];
 
-			$fieldXml = $formObject->getFieldXml($tjFieldsFieldTable->name);
-			?>
-			<td style="word-break: break-word;"  width="<?php echo (85 - $displayData['statusColumnWidth']) / count($displayData['listcolumn']) . '%';?>">
-				<?php
-					if ($canView || ($item->created_by == $user->id))
-					{
-						$field = $formObject->getField($tjFieldsFieldTable->name);
-						$field->setValue($fieldValue);
+				$canView = false;
 
-						if ($field->type == 'Ucmsubform' && $fieldValue)
+				if ($user->authorise('core.field.viewfieldvalue', 'com_tjfields.group.' . $tjFieldsFieldTable->group_id))
+				{
+					$canView = $user->authorise('core.field.viewfieldvalue', 'com_tjfields.field.' . $tjFieldsFieldTable->id);
+				}
+
+				$fieldXml = $formObject->getFieldXml($tjFieldsFieldTable->name);
+				?>
+				<td style="word-break: break-word;"  width="<?php echo (85 - $displayData['statusColumnWidth']) / count($displayData['listcolumn']) . '%';?>">
+					<?php
+						if ($canView || ($item->created_by == $user->id))
 						{
-							$ucmSubFormData = json_decode($tjucmItemFormModel->getUcmSubFormFieldDataJson($item->id, $field));
-							$field->setValue($ucmSubFormData);
-							?>
-							<div>
-								<div class="col-xs-4"><?php echo $field->label; ?>:</div>
-								<div class="col-xs-8">
-									<?php
-									$count = 0;
-									$ucmSubFormXmlFieldSets = array();
-
-									// Call to extra fields
-									JLoader::import('components.com_tjucm.models.item', JPATH_SITE);
-									$tjucmItemModel = JModelLegacy::getInstance('Item', 'TjucmModel');
-
-									// Get Subform field data
-									$fieldData = $TjfieldsHelper->getFieldData($field->getAttribute('name'));
-
-									$ucmSubFormFieldParams = json_decode($fieldData->params);
-									$ucmSubFormFormSource = explode('/', $ucmSubFormFieldParams->formsource);
-									$ucmSubFormClient = $ucmSubFormFormSource[1] . '.' . str_replace('form_extra.xml', '', $ucmSubFormFormSource[4]);
-									$view = explode('.', $ucmSubFormClient);
-									$ucmSubFormData = (array) $ucmSubFormData;
-
-									if (!empty($ucmSubFormData))
-									{
-										$count = 0;
-
-										foreach ($ucmSubFormData as $subFormData)
-										{
-											$count++;
-											$contentIdFieldname = str_replace('.', '_', $ucmSubFormClient) . '_contentid';
-
-											$ucmSubformFormObject = $tjucmItemModel->getFormExtra(
-												array(
-													"clientComponent" => 'com_tjucm',
-													"client" => $ucmSubFormClient,
-													"view" => $view[1],
-													"layout" => 'default',
-													"content_id" => $subFormData->$contentIdFieldname)
-													);
-
-											$ucmSubFormFormXml = simplexml_load_file($field->formsource);
-
-											$ucmSubFormCount = 0;
-
-											foreach ($ucmSubFormFormXml as $ucmSubFormXmlFieldSet)
-											{
-												$ucmSubFormXmlFieldSets[$ucmSubFormCount] = $ucmSubFormXmlFieldSet;
-												$ucmSubFormCount++;
-											}
-
-											$ucmSubFormRecordData = $tjucmItemModel->getData($subFormData->$contentIdFieldname);
-
-											// Call the JLayout recursively to render fields of ucmsubform
-											$layout = new JLayoutFile('fields', JPATH_ROOT . '/components/com_tjucm/layouts/detail');
-											echo $layout->render(array('xmlFormObject' => $ucmSubFormXmlFieldSets, 'formObject' => $ucmSubformFormObject, 'itemData' => $ucmSubFormRecordData, 'isSubForm' => 1));
-
-											if (count($ucmSubFormData) > $count)
-											{
-												echo "<hr>";
-											}
-										}
-									}
-									?>
-								</div>
-							</div>
-							<?php
-						}
-						else
-						{
+							$field = $formObject->getField($tjFieldsFieldTable->name);
+							$field->setValue($fieldValue);
 							$layoutToUse = (
 								array_key_exists(
 									ucfirst($tjFieldsFieldTable->type), $fieldLayout
@@ -244,9 +169,10 @@ if ($canDeleteOwn)
 							$output = $layout->render(array('fieldXml' => $fieldXml, 'field' => $field));
 							echo $output;
 						}
-					}
-				?>
-			</td><?php
+					?>
+				</td>
+				<?php
+			}
 		}
 	}
 	?>
