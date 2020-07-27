@@ -12,6 +12,10 @@
 defined('_JEXEC') or die;
 
 jimport('joomla.application.component.view');
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Router\Route;
 
 /**
  * View to edit
@@ -39,20 +43,11 @@ class TjucmViewItem extends JViewLegacy
 	 */
 	public function display($tpl = null)
 	{
-		$app  = JFactory::getApplication();
-
-		if (!JFactory::getUser()->id)
-		{
-			$msg = JText::_('COM_TJUCM_LOGIN_MSG');
-
-			// Get current url.
-			$current = JUri::getInstance()->toString();
-			$url = base64_encode($current);
-			JFactory::getApplication()->redirect(JRoute::_('index.php?option=com_users&view=login&return=' . $url, false), $msg);
-		}
+		$app  = Factory::getApplication();
+		$user = Factory::getUser();
 
 		// Load tj-fields language file
-		$lang = JFactory::getLanguage();
+		$lang = Factory::getLanguage();
 		$lang->load('com_tjfields', JPATH_SITE);
 
 		$this->state  = $this->get('State');
@@ -60,6 +55,21 @@ class TjucmViewItem extends JViewLegacy
 		$model        = $this->getModel("Item");
 		$this->model  = $this->getModel("Item");
 		$this->params = $app->getParams('com_tjucm');
+		$this->ucmTypeId = $model->getState('ucmType.id');
+
+		if (!$user->id)
+		{
+			// Check public user permission for view all items
+			if (empty($user->authorise('core.type.viewitem', 'com_tjucm.type.' . $this->ucmTypeId)))
+			{
+				$msg = Text::_('COM_TJUCM_LOGIN_MSG');
+
+				// Get current url.
+				$current = Uri::getInstance()->toString();
+				$url = base64_encode($current);
+				$app->redirect(Route::_('index.php?option=com_users&view=login&return=' . $url, false), $msg);
+			}
+		}
 
 		// Load tj-fields helper helper
 		$path = JPATH_SITE . '/components/com_tjfields/helpers/tjfields.php';
@@ -71,7 +81,6 @@ class TjucmViewItem extends JViewLegacy
 		}
 
 		$this->tjFieldsHelper = new TjfieldsHelper;
-		$this->ucmTypeId = $model->getState('ucmType.id');
 
 		// Check the view access to the article (the model has already computed the values).
 		if ($this->item->params->get('access-view') == false)
@@ -118,7 +127,7 @@ class TjucmViewItem extends JViewLegacy
 			"clientComponent" => 'com_tjucm',
 			"client" => $this->client,
 			"view" => $view[1],
-			"layout" => 'edit',
+			"layout" => 'default',
 			"content_id" => $this->id)
 			);
 

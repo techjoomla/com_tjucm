@@ -12,6 +12,9 @@
 defined('_JEXEC') or die;
 
 jimport('joomla.application.component.view');
+use Joomla\CMS\Factory;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Language\Text;
 
 /**
  * View class for a list of Tjucm.
@@ -65,27 +68,8 @@ class TjucmViewItems extends JViewLegacy
 	 */
 	public function display($tpl = null)
 	{
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
-
-		if (!$user->id)
-		{
-			$msg = JText::_('COM_TJUCM_LOGIN_MSG');
-
-			// Get current url.
-			$current = JUri::getInstance()->toString();
-			$url = base64_encode($current);
-			JFactory::getApplication()->redirect(JRoute::_('index.php?option=com_users&view=login&return=' . $url, false), $msg);
-		}
-
-		// Check the view access to the items.
-		if (!$user->id)
-		{
-			$app->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
-			$app->setHeader('status', 403, true);
-
-			return false;
-		}
+		$app  = Factory::getApplication();
+		$user = Factory::getUser();
 
 		$this->state        = $this->get('State');
 		$this->items        = $this->get('Items');
@@ -100,6 +84,34 @@ class TjucmViewItems extends JViewLegacy
 		$this->canImport    = TjucmAccess::canImport($this->ucmTypeId);
 		$this->draft        = array("" => JText::_('COM_TJUCM_DATA_STATUS_SELECT_OPTION'),
 			"0" => JText::_("COM_TJUCM_DATA_STATUS_SAVE"), "1" => JText::_('COM_TJUCM_DATA_STATUS_DRAFT'));
+
+		if (!$user->id)
+		{
+			// Check public user permission for view all items
+			if (empty($user->authorise('core.type.viewitem', 'com_tjucm.type.' . $this->ucmTypeId)))
+			{
+				$msg = Text::_('COM_TJUCM_LOGIN_MSG');
+
+				// Get current url.
+				$current = Uri::getInstance()->toString();
+				$url = base64_encode($current);
+				$app->redirect(JRoute::_('index.php?option=com_users&view=login&return=' . $url, false), $msg);
+			}
+		}
+
+		// Check the view access to the items.
+		if (!$user->id)
+		{
+			// Check public user permission for view all items
+			if (empty($user->authorise('core.type.viewitem', 'com_tjucm.type.' . $this->ucmTypeId)))
+			{
+				$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
+				$app->setHeader('status', 403, true);
+
+				return false;
+			}
+		}
+
 		// If did not get the client from url then get if from menu param
 		if (empty($this->client))
 		{
