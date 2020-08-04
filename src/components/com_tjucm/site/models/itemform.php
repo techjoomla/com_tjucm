@@ -535,7 +535,7 @@ class TjucmModelItemForm extends JModelAdmin
 		}
 
 		$ucmTypeParams = new Registry($tjUcmTypeTable->params);
-		
+
 		// Check if UCM type is subform
 		$isSubform     = $ucmTypeParams->get('is_subform');
 
