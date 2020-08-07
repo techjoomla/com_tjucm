@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results skipped="0" failed="0" ignored="6" total="12" passed="6">
+  <reporter-output>
+  </reporter-output>
+  <suite name="Suite" duration-ms="97073" started-at="2020-08-06T05:28:42Z" finished-at="2020-08-06T05:30:19Z">
+    <groups>
+    </groups>
+    <test name="Test" duration-ms="97073" started-at="2020-08-06T05:28:42Z" finished-at="2020-08-06T05:30:19Z">
+      <class name="com.ucm.testsuite.AdminDashboardTest">
+        <test-method status="PASS" signature="admindashboard()[pri:0, instance:com.ucm.testsuite.AdminDashboardTest@3551a94]" name="admindashboard" duration-ms="2672" started-at="2020-08-06T05:28:55Z" finished-at="2020-08-06T05:28:58Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- admindashboard -->
+        <test-method status="PASS" signature="evaluateStatus(org.testng.ITestResult)[pri:0, instance:com.ucm.testsuite.AdminDashboardTest@3551a94]" name="evaluateStatus" is-config="true" duration-ms="0" started-at="2020-08-06T05:28:58Z" finished-at="2020-08-06T05:28:58Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[[TestResult name=admindashboard status=SUCCESS method=AdminDashboardTest.admindashboard()[pri:0, instance:com.ucm.testsuite.AdminDashboardTest@3551a94] output={null}]]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- evaluateStatus -->
+      </class> <!-- com.ucm.testsuite.AdminDashboardTest -->
+      <class name="com.ucm.testsuite.AdminLoginTest">
+        <test-method status="PASS" signature="setup()[pri:0, instance:com.ucm.testsuite.AdminLoginTest@5a61f5df]" name="setup" is-config="true" duration-ms="23884" started-at="2020-08-06T05:28:18Z" finished-at="2020-08-06T05:28:42Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setup -->
+        <test-method status="PASS" signature="adminlogin(java.lang.String, java.lang.String, java.lang.String)[pri:0, instance:com.ucm.testsuite.AdminLoginTest@5a61f5df]" name="adminlogin" duration-ms="5431" started-at="2020-08-06T05:28:42Z" data-provider="adminlogin" finished-at="2020-08-06T05:28:48Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[negative]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[mun]]>
+              </value>
+            </param>
+            <param index="2">
+              <value>
+                <![CDATA[mun321]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- adminlogin -->
+        <test-method status="PASS" signature="evaluateStatus(org.testng.ITestResult)[pri:0, instance:com.ucm.testsuite.AdminLoginTest@5a61f5df]" name="evaluateStatus" is-config="true" duration-ms="1" started-at="2020-08-06T05:28:48Z" finished-at="2020-08-06T05:28:48Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[[TestResult name=adminlogin status=SUCCESS method=AdminLoginTest.adminlogin(java.lang.String, java.lang.String, java.lang.String)[pri:0, instance:com.ucm.testsuite.AdminLoginTest@5a61f5df] output={null}]]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- evaluateStatus -->
+        <test-method status="PASS" signature="adminlogin(java.lang.String, java.lang.String, java.lang.String)[pri:0, instance:com.ucm.testsuite.AdminLoginTest@5a61f5df]" name="adminlogin" duration-ms="1499" started-at="2020-08-06T05:28:48Z" data-provider="adminlogin" finished-at="2020-08-06T05:28:49Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[negative]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[2w2]]>
+              </value>
+            </param>
+            <param index="2">
+              <value>
+                <![CDATA[2w2`]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- adminlogin -->
+        <test-method status="PASS" signature="evaluateStatus(org.testng.ITestResult)[pri:0, instance:com.ucm.testsuite.AdminLoginTest@5a61f5df]" name="evaluateStatus" is-config="true" duration-ms="2" started-at="2020-08-06T05:28:49Z" finished-at="2020-08-06T05:28:49Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[[TestResult name=adminlogin status=SUCCESS method=AdminLoginTest.adminlogin(java.lang.String, java.lang.String, java.lang.String)[pri:0, instance:com.ucm.testsuite.AdminLoginTest@5a61f5df] output={null}]]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- evaluateStatus -->
+        <test-method status="PASS" signature="adminlogin(java.lang.String, java.lang.String, java.lang.String)[pri:0, instance:com.ucm.testsuite.AdminLoginTest@5a61f5df]" name="adminlogin" duration-ms="6323" started-at="2020-08-06T05:28:49Z" data-provider="adminlogin" finished-at="2020-08-06T05:28:55Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[positive]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[superuser]]>
+              </value>
+            </param>
+            <param index="2">
+              <value>
+                <![CDATA[superuser]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- adminlogin -->
+        <test-method status="PASS" signature="evaluateStatus(org.testng.ITestResult)[pri:0, instance:com.ucm.testsuite.AdminLoginTest@5a61f5df]" name="evaluateStatus" is-config="true" duration-ms="1" started-at="2020-08-06T05:28:55Z" finished-at="2020-08-06T05:28:55Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[[TestResult name=adminlogin status=SUCCESS method=AdminLoginTest.adminlogin(java.lang.String, java.lang.String, java.lang.String)[pri:0, instance:com.ucm.testsuite.AdminLoginTest@5a61f5df] output={null}]]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- evaluateStatus -->
+        <test-method status="PASS" signature="tearDown()[pri:0, instance:com.ucm.testsuite.AdminLoginTest@5a61f5df]" name="tearDown" is-config="true" duration-ms="333" started-at="2020-08-06T05:30:19Z" finished-at="2020-08-06T05:30:19Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- tearDown -->
+      </class> <!-- com.ucm.testsuite.AdminLoginTest -->
+      <class name="com.ucm.testsuite.AdminUcmformTest">
+        <test-method status="PASS" signature="adminsubformcreation(java.lang.String, java.lang.String)[pri:0, instance:com.ucm.testsuite.AdminUcmformTest@52af6cff]" name="adminsubformcreation" duration-ms="2888" started-at="2020-08-06T05:30:16Z" data-provider="ucmformcreation" finished-at="2020-08-06T05:30:19Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[validdata]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[POM form]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- adminsubformcreation -->
+        <test-method status="PASS" signature="evaluateStatus(org.testng.ITestResult)[pri:0, instance:com.ucm.testsuite.AdminUcmformTest@52af6cff]" name="evaluateStatus" is-config="true" duration-ms="2" started-at="2020-08-06T05:30:19Z" finished-at="2020-08-06T05:30:19Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[[TestResult name=adminsubformcreation status=SUCCESS method=AdminUcmformTest.adminsubformcreation(java.lang.String, java.lang.String)[pri:0, instance:com.ucm.testsuite.AdminUcmformTest@52af6cff] output={null}]]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- evaluateStatus -->
+      </class> <!-- com.ucm.testsuite.AdminUcmformTest -->
+      <class name="com.ucm.testsuite.AdminCreateSubFormTest">
+        <test-method status="PASS" signature="adminsubformcreation(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)[pri:0, instance:com.ucm.testsuite.AdminCreateSubFormTest@531be3c5]" name="adminsubformcreation" duration-ms="77619" started-at="2020-08-06T05:28:58Z" data-provider="subformcreation" finished-at="2020-08-06T05:30:16Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[positive]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[subform]]>
+              </value>
+            </param>
+            <param index="2">
+              <value>
+                <![CDATA[10]]>
+              </value>
+            </param>
+            <param index="3">
+              <value>
+                <![CDATA[sub group]]>
+              </value>
+            </param>
+            <param index="4">
+              <value>
+                <![CDATA[sub form label ]]>
+              </value>
+            </param>
+            <param index="5">
+              <value>
+                <![CDATA[Sub form field]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- adminsubformcreation -->
+        <test-method status="PASS" signature="evaluateStatus(org.testng.ITestResult)[pri:0, instance:com.ucm.testsuite.AdminCreateSubFormTest@531be3c5]" name="evaluateStatus" is-config="true" duration-ms="4" started-at="2020-08-06T05:30:16Z" finished-at="2020-08-06T05:30:16Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[[TestResult name=adminsubformcreation status=SUCCESS method=AdminCreateSubFormTest.adminsubformcreation(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)[pri:0, instance:com.ucm.testsuite.AdminCreateSubFormTest@531be3c5] output={null}]]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- evaluateStatus -->
+      </class> <!-- com.ucm.testsuite.AdminCreateSubFormTest -->
+    </test> <!-- Test -->
+  </suite> <!-- Suite -->
+</testng-results>
