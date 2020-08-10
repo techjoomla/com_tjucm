@@ -33,4 +33,11 @@ public class DataProviderClass {
 		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "ucmForm");
 
 	}
+	@DataProvider(name = "radiobuttoncreation")
+
+	public static Object[][] radiobuttoncreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "radiobutton");
+
+	}
 }
