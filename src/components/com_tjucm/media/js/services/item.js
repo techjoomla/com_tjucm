@@ -11,6 +11,7 @@ com_tjucm.Services.Item = new (com_tjucm.Services.Base.extend({
     saveFormDataUrl: window.tjSiteRoot + "index.php?option=com_tjucm&format=json&task=itemform.saveFormData",
     autoSaveFieldDataUrl: window.tjSiteRoot + "index.php?option=com_tjucm&format=json&task=itemform.saveFieldData",
     getRelatedFieldUpdatedOptionsUrl: window.tjSiteRoot + "index.php?option=com_tjucm&format=json&task=itemform.getRelatedFieldOptions",
+    getUpdatedRelatedFieldOptions: window.tjSiteRoot + "index.php?option=com_tjucm&format=json&task=itemform.getUpdatedRelatedFieldOptions",
     config: {
         headers: {}
     },
@@ -31,6 +32,12 @@ com_tjucm.Services.Item = new (com_tjucm.Services.Base.extend({
     },
     getUpdatedRelatedFieldsOptions: function (tjUcmItemFormData, callback){
         this.post(this.getRelatedFieldUpdatedOptionsUrl, tjUcmItemFormData, this.config, callback);
+    },
+    getRelatedFieldOptions: function (tjUcmItemFormData, callback){
+        this.config.processData = false;
+        this.config.contentType = false;
+        this.config.async = false;
+        this.post(this.getUpdatedRelatedFieldOptions, tjUcmItemFormData, this.config, callback);
     },
     saveFormData: function (ucmFormData, callback) {
         this.config.processData = false;
