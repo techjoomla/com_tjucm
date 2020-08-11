@@ -763,8 +763,8 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	public function getUpdatedRelatedFieldOptions()
 	{
-		$app        = Factory::getApplication();
-		$FieldsData['fieldId'] = $app->input->get('fieldId', '', 'STRING');
+		$app     = Factory::getApplication();
+		$fieldId = $app->input->get('fieldId', '', 'STRING');
 
 		// Check for request forgeries.
 		if (!Session::checkToken())
@@ -776,7 +776,7 @@ class TjucmControllerItemForm extends JControllerForm
 		// Get object of TJ-Fields field model
 		JLoader::import('components.com_tjfields.models.field', JPATH_ADMINISTRATOR);
 		$tjFieldsModelField = JModelLegacy::getInstance('Field', 'TjfieldsModel');
-		$options = $tjFieldsModelField->getRelatedFieldOptions($FieldsData['fieldId']);
+		$options = $tjFieldsModelField->getRelatedFieldOptions($fieldId);
 
 		$relatedFieldOptions = array();
 
