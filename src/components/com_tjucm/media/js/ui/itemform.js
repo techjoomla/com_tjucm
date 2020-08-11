@@ -1050,8 +1050,6 @@ var tjUcmItemForm = {
 		{
 			jQuery('#'+relatedFieldId+', .chzn-results').empty();
 			tjUcmItemFormData.append('fieldId', fieldId);
-			tjUcmItemFormData.append('fieldName', fieldName);
-			tjUcmItemFormData.append('FieldsData', FieldsData);
 			com_tjucm.Services.Item.getRelatedFieldOptions(tjUcmItemFormData, tjUcmUpdateRelatedFieldsOptions);
 		}
 	}
