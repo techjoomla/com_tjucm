@@ -1010,6 +1010,7 @@ var tjUcmItemForm = {
 	getRelatedFieldOptions: function (fieldName, fieldId) {
 		var tjUcmItemFormData = new FormData();
 		var FieldsData = {fieldName: fieldName , fieldId: fieldId};
+		var ajaxUrl    = Joomla.getOptions('system.paths').base + "/index.php?option=com_tjucm&task=itemform.getUpdatedRelatedFieldOptions&format=json";
 
 		var tjUcmUpdateRelatedFieldsOptions = function (error, response){
 			response = JSON.parse(response);
@@ -1027,7 +1028,7 @@ var tjUcmItemForm = {
 			for(var index = 0; index < data.length; ++index)
 			{
 				selectOption = '';
-				if(typeof FieldsData.SelectedValues !== 'undefined' && FieldsData.SelectedValues.length > 0)
+				if(FieldsData.SelectedValues !== null && typeof FieldsData.SelectedValues !== 'undefined' && FieldsData.SelectedValues.length > 0)
 				{
 					if (FieldsData.SelectedValues.includes(data[index].value))
 					{
@@ -1039,7 +1040,7 @@ var tjUcmItemForm = {
 				jQuery('#'+relatedFieldId).append(op);
 			}
 
-			// Update to chz-done selects
+			//~ /* IMP : to update to chz-done selects*/
 			jQuery('#'+relatedFieldId).trigger("liszt:updated");
 		};
 
@@ -1051,6 +1052,7 @@ var tjUcmItemForm = {
 			jQuery('#'+relatedFieldId+', .chzn-results').empty();
 			tjUcmItemFormData.append('fieldId', fieldId);
 			tjUcmItemFormData.append('fieldName', fieldName);
+			tjUcmItemFormData.append('FieldsData', FieldsData);
 			com_tjucm.Services.Item.getRelatedFieldOptions(tjUcmItemFormData, tjUcmUpdateRelatedFieldsOptions);
 		}
 	}

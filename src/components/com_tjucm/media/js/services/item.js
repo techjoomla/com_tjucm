@@ -36,7 +36,6 @@ com_tjucm.Services.Item = new (com_tjucm.Services.Base.extend({
     getRelatedFieldOptions: function (tjUcmItemFormData, callback){
         this.config.processData = false;
         this.config.contentType = false;
-        this.config.async = false;
         this.post(this.getUpdatedRelatedFieldOptions, tjUcmItemFormData, this.config, callback);
     },
     saveFormData: function (ucmFormData, callback) {
