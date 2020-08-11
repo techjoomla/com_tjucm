@@ -1010,7 +1010,6 @@ var tjUcmItemForm = {
 	getRelatedFieldOptions: function (fieldName, fieldId) {
 		var tjUcmItemFormData = new FormData();
 		var FieldsData = {fieldName: fieldName , fieldId: fieldId};
-		var ajaxUrl    = Joomla.getOptions('system.paths').base + "/index.php?option=com_tjucm&task=itemform.getUpdatedRelatedFieldOptions&format=json";
 
 		var tjUcmUpdateRelatedFieldsOptions = function (error, response){
 			response = JSON.parse(response);
