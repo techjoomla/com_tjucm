@@ -18,6 +18,8 @@ use Joomla\CMS\Router\Route;
 use Joomla\Registry\Registry;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Response\JsonResponse;
 
 jimport('joomla.filesystem.file');
 
