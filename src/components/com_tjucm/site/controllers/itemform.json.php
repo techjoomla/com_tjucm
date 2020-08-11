@@ -754,4 +754,38 @@ class TjucmControllerItemForm extends JControllerForm
 			}
 		}
 	}
+	/**
+	 * Method to get Related Field Options for the field.
+	 *
+	 * @return   null
+	 *
+	 * @since    1.0.0
+	 */
+	public function getUpdatedRelatedFieldOptions()
+	{
+		$app        = Factory::getApplication();
+		$FieldsData['fieldId'] = $app->input->get('fieldId', '', 'STRING');
+
+		// Check for request forgeries.
+		if (!Session::checkToken())
+		{
+			echo new JsonResponse(null, Text::_('JINVALID_TOKEN'), true);
+			$app->close();
+		}
+
+		// Get object of TJ-Fields field model
+		JLoader::import('components.com_tjfields.models.field', JPATH_ADMINISTRATOR);
+		$tjFieldsModelField = JModelLegacy::getInstance('Field', 'TjfieldsModel');
+		$options = $tjFieldsModelField->getRelatedFieldOptions($FieldsData['fieldId']);
+
+		$relatedFieldOptions = array();
+
+		foreach ($options as $option)
+		{
+			$relatedFieldOptions[] = HTMLHelper::_('select.option', trim($option['value']), trim($option['text']));
+		}
+
+		echo new JsonResponse($relatedFieldOptions);
+		$app->close();
+	}
 }
