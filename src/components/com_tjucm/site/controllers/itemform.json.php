@@ -18,6 +18,8 @@ use Joomla\CMS\Router\Route;
 use Joomla\Registry\Registry;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Response\JsonResponse;
 
 jimport('joomla.filesystem.file');
 
@@ -753,5 +755,39 @@ class TjucmControllerItemForm extends JControllerForm
 				$app->close();
 			}
 		}
+	}
+	/**
+	 * Method to get Related Field Options for the field.
+	 *
+	 * @return   null
+	 *
+	 * @since    1.0.0
+	 */
+	public function getUpdatedRelatedFieldOptions()
+	{
+		$app     = Factory::getApplication();
+		$fieldId = $app->input->get('fieldId', '', 'STRING');
+
+		// Check for request forgeries.
+		if (!Session::checkToken())
+		{
+			echo new JsonResponse(null, Text::_('JINVALID_TOKEN'), true);
+			$app->close();
+		}
+
+		// Get object of TJ-Fields field model
+		JLoader::import('components.com_tjfields.models.field', JPATH_ADMINISTRATOR);
+		$tjFieldsModelField = JModelLegacy::getInstance('Field', 'TjfieldsModel');
+		$options = $tjFieldsModelField->getRelatedFieldOptions($fieldId);
+
+		$relatedFieldOptions = array();
+
+		foreach ($options as $option)
+		{
+			$relatedFieldOptions[] = HTMLHelper::_('select.option', trim($option['value']), trim($option['text']));
+		}
+
+		echo new JsonResponse($relatedFieldOptions);
+		$app->close();
 	}
 }

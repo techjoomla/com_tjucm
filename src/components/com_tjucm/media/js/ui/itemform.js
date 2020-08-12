@@ -1006,6 +1006,52 @@ var tjUcmItemForm = {
 				jQuery("#previous_button").attr('disabled', true);
 			}
 		}
+	},
+	getRelatedFieldOptions: function (fieldName, fieldId) {
+		var tjUcmItemFormData = new FormData();
+		var FieldsData = {fieldName: fieldName , fieldId: fieldId};
+
+		var tjUcmUpdateRelatedFieldsOptions = function (error, response){
+			response = JSON.parse(response);
+			tjucmRelatedFieldUpdatedOptions = response.data;
+
+			if(tjucmRelatedFieldUpdatedOptions == '')
+			{
+				return false;
+			}
+
+			var selectOption = '';
+			var op = '';
+			var data = response.data;
+
+			for(var index = 0; index < data.length; ++index)
+			{
+				selectOption = '';
+				if(FieldsData.SelectedValues !== null && typeof FieldsData.SelectedValues !== 'undefined' && FieldsData.SelectedValues.length > 0)
+				{
+					if (FieldsData.SelectedValues.includes(data[index].value))
+					{
+						selectOption = ' selected="selected" ';
+					}
+				}
+
+				op="<option value='"+data[index].value+"' "+selectOption+" > " + data[index]['text'] + "</option>" ;
+				jQuery('#'+relatedFieldId).append(op);
+			}
+
+			//~ /* IMP : to update to chz-done selects*/
+			jQuery('#'+relatedFieldId).trigger("liszt:updated");
+		};
+
+		var relatedFieldId = 'jform_'+fieldName;
+		FieldsData.SelectedValues = jQuery('#jform_'+fieldName).val();
+
+		if (jQuery.trim(fieldId) != '' && fieldId != 'undefined')
+		{
+			jQuery('#'+relatedFieldId+', .chzn-results').empty();
+			tjUcmItemFormData.append('fieldId', fieldId);
+			com_tjucm.Services.Item.getRelatedFieldOptions(tjUcmItemFormData, tjUcmUpdateRelatedFieldsOptions);
+		}
 	}
 };
 
