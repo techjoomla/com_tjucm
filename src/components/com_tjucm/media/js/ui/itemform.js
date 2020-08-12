@@ -1007,9 +1007,9 @@ var tjUcmItemForm = {
 			}
 		}
 	},
-	getRelatedFieldOptions: function (fieldName, fieldId) {
+	getRelatedFieldOptions: function (relatedFieldId, fieldId) {
 		var tjUcmItemFormData = new FormData();
-		var FieldsData = {fieldName: fieldName , fieldId: fieldId};
+		var FieldsData = {fieldId: fieldId};
 
 		var tjUcmUpdateRelatedFieldsOptions = function (error, response){
 			response = JSON.parse(response);
@@ -1039,12 +1039,11 @@ var tjUcmItemForm = {
 				jQuery('#'+relatedFieldId).append(op);
 			}
 
-			//~ /* IMP : to update to chz-done selects*/
+			// Update to chz-done selects*/
 			jQuery('#'+relatedFieldId).trigger("liszt:updated");
 		};
 
-		var relatedFieldId = 'jform_'+fieldName;
-		FieldsData.SelectedValues = jQuery('#jform_'+fieldName).val();
+		FieldsData.SelectedValues = jQuery('#'+relatedFieldId).val();
 
 		if (jQuery.trim(fieldId) != '' && fieldId != 'undefined')
 		{
