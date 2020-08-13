@@ -756,6 +756,7 @@ class TjucmControllerItemForm extends JControllerForm
 			}
 		}
 	}
+
 	/**
 	 * Method to get Related Field Options for the field.
 	 *
@@ -765,8 +766,15 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	public function getUpdatedRelatedFieldOptions()
 	{
-		$app     = Factory::getApplication();
-		$fieldId = $app->input->get('fieldId', '', 'STRING');
+		$app       = Factory::getApplication();
+		$fieldId   = $app->input->get('fieldId', '', 'STRING');
+		$clusterId = $app->input->get('clusterId', 0, 'STRING');
+
+		// Set Cluster ID
+		if ($clusterId)
+		{
+			$app->input->set('cluster_id', $clusterId);
+		}
 
 		// Check for request forgeries.
 		if (!Session::checkToken())

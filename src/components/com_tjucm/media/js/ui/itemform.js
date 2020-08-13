@@ -1007,7 +1007,7 @@ var tjUcmItemForm = {
 			}
 		}
 	},
-	getRelatedFieldOptions: function (relatedFieldId, fieldId) {
+	getRelatedFieldOptions: function (relatedFieldId, fieldId, clusterId) {
 		var tjUcmItemFormData = new FormData();
 		var FieldsData = {fieldId: fieldId};
 
@@ -1049,6 +1049,7 @@ var tjUcmItemForm = {
 		{
 			jQuery('#'+relatedFieldId+', .chzn-results').empty();
 			tjUcmItemFormData.append('fieldId', fieldId);
+			tjUcmItemFormData.append('fieldId', clusterId);
 			com_tjucm.Services.Item.getRelatedFieldOptions(tjUcmItemFormData, tjUcmUpdateRelatedFieldsOptions);
 		}
 	}
