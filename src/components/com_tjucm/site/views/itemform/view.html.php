@@ -203,14 +203,15 @@ class TjucmViewItemform extends JViewLegacy
 
 			return;
 		}
+
 		if (empty($this->title))
 		{
 			// Get the active item
 			$menuItem = $app->getMenu()->getActive();
-	
+
 				// Get the params
 				$this->menuparams = $menuItem->params;
-	
+
 				if (!empty($this->menuparams))
 				{
 					$this->title  = $this->menuparams->get('ucm_type');
