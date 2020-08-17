@@ -51,7 +51,7 @@ $xmlFormObject = $displayData['xmlFormObject'];
 $formObject    = $displayData['formObject'];
 $ucmTypeId     = $displayData['ucmTypeId'];
 $allowDraftSave = $displayData['ucmTypeParams']->allow_draft_save;
-
+$i = $displayData['key'];
 $appendUrl = '';
 $csrf = "&" . Session::getFormToken() . '=1';
 
@@ -60,6 +60,7 @@ $canDeleteOwn       = $user->authorise('core.type.deleteownitem', 'com_tjucm.typ
 $canChange          = $user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $ucmTypeId);
 $canEdit 			= $user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmTypeId);
 $canDelete          = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $ucmTypeId);
+$canCopyItem        = $user->authorise('core.type.copyitem', 'com_tjucm.type.' . $ucmTypeId);
 
 if (!empty($created_by))
 {
@@ -94,9 +95,11 @@ if ($canDeleteOwn)
 ?>
 <div class="tjucm-wrapper">
 <tr class="row<?php echo $item->id?>">
+	<?php if ($canCopyItem) { ?>
 	<td class="center hidden-phone">
-		<?php echo JHtml::_('grid.id', '', $item->id); ?>
+		<?php echo JHtml::_('grid.id', $i, $item->id); ?>
 	</td>
+	<?php } ?>
 	<?php
 	if (isset($item->state))
 	{
