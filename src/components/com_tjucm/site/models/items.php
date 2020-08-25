@@ -13,7 +13,6 @@ defined('_JEXEC') or die;
 jimport('joomla.application.component.modellist');
 
 use Joomla\CMS\Component\ComponentHelper;
-use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 
 /**
  * Methods supporting a list of Tjucm records.
@@ -647,49 +646,5 @@ class TjucmModelItems extends JModelList
 		{
 			return false;
 		}
-	}
-	
-	/**
-	 * Method to check the compatibility between ucm types
-	 *
-	 * @return  mixed
-	 * 
-	 * @since    __DEPLOY_VERSION__
-	 */
-	public function canCopyToSameUcmType($client)
-	{
-		JLoader::import('components.com_tjucm.models.types', JPATH_ADMINISTRATOR);
-		$typesModel = BaseDatabaseModel::getInstance('Types', 'TjucmModel');
-		$typesModel->setState('filter.state', 1);
-		$ucmTypes 	= $typesModel->getItems();
-
-		JLoader::import('components.com_tjucm.models.type', JPATH_ADMINISTRATOR);
-		$typeModel = BaseDatabaseModel::getInstance('Type', 'TjucmModel');
-
-		$checkUcmCompatability = false;
-
-		foreach ($ucmTypes as $key => $type)
-		{
-			if ($client != $type->unique_identifier)
-			{
-				$result = $typeModel->getCompatableUcmType($client, $type->unique_identifier);
-				
-				if ($result)
-				{
-					$checkUcmCompatability = true;
-				}
-			}
-		}
-
-		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
-		$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
-		$fieldTable->load(array('client' => $client, 'type' => 'cluster'));
-
-		if (!$checkUcmCompatability && !$fieldTable->id)
-		{
-			return true;
-		}
-		
-		return false;
 	}
 }

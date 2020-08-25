@@ -524,34 +524,19 @@ class TjucmControllerItemForm extends JControllerForm
 		$app = Factory::getApplication();
 		$post = $app->input->post;
 
-		$sourceClient = $app->input->get('client', '', 'string');
+		$sourceClient = $app->input->get('sourceClient', '', 'string');
 		$filter = $app->input->get('filter', '', 'ARRAY');
 		$targetClient = $filter['ucm_list'];
-
-		if (!$targetClient)
-		{
-			$targetClient = $sourceClient;
-		}
-
-		$clusterId = $filter['cluster_list'];
 
 		JLoader::import('components.com_tjucm.models.type', JPATH_ADMINISTRATOR);
 		$typeModel = BaseDatabaseModel::getInstance('Type', 'TjucmModel');
 
-		if ($sourceClient != $targetClient)
-		{
-			// Server side Validation for source and UCM Type
-			$result = $typeModel->getCompatableUcmType($sourceClient, $targetClient);
-		}
-		else
-		{
-			$result = true;
-		}
+		// Server side Validation for source and UCM Type
+		$result = $typeModel->getCompatableUcmType($sourceClient, $targetClient);
 
 		if ($result)
 		{
 			$copyIds = $app->input->get('cid');
-			
 			JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
 			$tjFieldsHelper = new TjfieldsHelper;
 
@@ -696,11 +681,6 @@ class TjucmControllerItemForm extends JControllerForm
 					$ucmData['parent_id'] 	= 0;
 					$ucmData['state']		= 0;
 					$ucmData['draft']	 	= 1;
-					
-					if ($clusterId)
-					{
-						$ucmData['cluster_id']	 	= $clusterId;
-					}
 
 					// Save data into UCM data table
 					$result = $model->save($ucmData);
