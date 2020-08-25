@@ -67,7 +67,6 @@ JFactory::getDocument()->addScriptDeclaration("
 				});
 			}
 		};
-
 		// Code to check ucm type compatibility to copy item
 		com_tjucm.Services.Items.chekCompatibility(currentUcmType, afterCheckCompatibilityOfUcmType);
 	});

@@ -55,7 +55,6 @@ $xmlFormObject = $displayData['xmlFormObject'];
 $formObject    = $displayData['formObject'];
 $ucmTypeId     = $displayData['ucmTypeId'];
 $allowDraftSave = $displayData['ucmTypeParams']->allow_draft_save;
-
 $appendUrl = '';
 $csrf = "&" . Session::getFormToken() . '=1';
 

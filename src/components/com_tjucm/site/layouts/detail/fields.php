@@ -32,6 +32,7 @@ $fieldLayout['Related'] = $fieldLayout['SQL'] = "sql";
 $fieldLayout['Subform'] = "subform";
 $fieldLayout['Ownership'] = "ownership";
 $fieldLayout['Editor'] = "editor";
+$fieldLayout['rating'] = "rating";
 
 // Load the tj-fields helper
 JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
