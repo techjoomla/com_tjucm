@@ -18,6 +18,8 @@ use Joomla\CMS\Router\Route;
 use Joomla\Registry\Registry;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Response\JsonResponse;
 
 jimport('joomla.filesystem.file');
 
@@ -123,9 +125,21 @@ class TjucmControllerItemForm extends JControllerForm
 				$app->close();
 			}
 
+			$isNew = (empty($data['id'])) ? 1 : 0;
+
+			// Plugin trigger on before item save
+			JPluginHelper::importPlugin('actionlog');
+			$dispatcher = JDispatcher::getInstance();
+			$dispatcher->trigger('tjUcmOnBeforeSaveItem', array($data, $isNew));
+
 			if ($model->save($data))
 			{
 				$result['id'] = $model->getState($model->getName() . '.id');
+
+				// Plugin trigger on after item save
+				JPluginHelper::importPlugin('actionlog');
+				$dispatcher = JDispatcher::getInstance();
+				$dispatcher->trigger('tjUcmOnafterSaveItem', array($data, $isNew));
 
 				echo new JResponseJson($result, Text::_('COM_TJUCM_ITEM_SAVED_SUCCESSFULLY'));
 				$app->close();
@@ -202,8 +216,18 @@ class TjucmControllerItemForm extends JControllerForm
 			$fieldData['client'] = $client;
 			$fieldData['created_by'] = $table->created_by;
 
+			// Plugin trigger on before item date save
+			JPluginHelper::importPlugin('actionlog');
+			$dispatcher = JDispatcher::getInstance();
+			$dispatcher->trigger('tjUcmOnBeforeSaveItemData', array($recordId, $client, $data));
+
 			// If data is valid then save the data into DB
 			$response = $model->saveFieldsData($fieldData);
+
+			// Plugin trigger on after item data save
+			JPluginHelper::importPlugin('actionlog');
+			$dispatcher = JDispatcher::getInstance();
+			$dispatcher->trigger('tjUcmOnAfterSaveItemData', array($recordId, $client, $data));
 
 			echo new JResponseJson($response);
 			$app->close();
@@ -313,8 +337,18 @@ class TjucmControllerItemForm extends JControllerForm
 			$formData['client'] = $client;
 			$formData['created_by'] = $table->created_by;
 
+			// Plugin trigger on before item date save
+			JPluginHelper::importPlugin('actionlog');
+			$dispatcher = JDispatcher::getInstance();
+			$dispatcher->trigger('tjUcmOnBeforeSaveItemData', array($recordId, $client, $data));
+
 			// If data is valid then save the data into DB
 			$response = $model->saveFieldsData($formData);
+
+			// Plugin trigger on before item date save
+			JPluginHelper::importPlugin('actionlog');
+			$dispatcher = JDispatcher::getInstance();
+			$dispatcher->trigger('tjUcmOnAfterSaveItemData', array($recordId, $client, $data));
 
 			$msg = null;
 
@@ -519,7 +553,7 @@ class TjucmControllerItemForm extends JControllerForm
 	public function copyItem()
 	{
 		// Check for request forgeries.
-		//~ Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
+		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
 		$app = Factory::getApplication();
 		$post = $app->input->post;
@@ -721,5 +755,39 @@ class TjucmControllerItemForm extends JControllerForm
 				$app->close();
 			}
 		}
+	}
+	/**
+	 * Method to get Related Field Options for the field.
+	 *
+	 * @return   null
+	 *
+	 * @since    1.0.0
+	 */
+	public function getUpdatedRelatedFieldOptions()
+	{
+		$app     = Factory::getApplication();
+		$fieldId = $app->input->get('fieldId', '', 'STRING');
+
+		// Check for request forgeries.
+		if (!Session::checkToken())
+		{
+			echo new JsonResponse(null, Text::_('JINVALID_TOKEN'), true);
+			$app->close();
+		}
+
+		// Get object of TJ-Fields field model
+		JLoader::import('components.com_tjfields.models.field', JPATH_ADMINISTRATOR);
+		$tjFieldsModelField = JModelLegacy::getInstance('Field', 'TjfieldsModel');
+		$options = $tjFieldsModelField->getRelatedFieldOptions($fieldId);
+
+		$relatedFieldOptions = array();
+
+		foreach ($options as $option)
+		{
+			$relatedFieldOptions[] = HTMLHelper::_('select.option', trim($option['value']), trim($option['text']));
+		}
+
+		echo new JsonResponse($relatedFieldOptions);
+		$app->close();
 	}
 }

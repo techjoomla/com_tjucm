@@ -103,6 +103,17 @@ class TjucmViewItemform extends JViewLegacy
 		$app  = Factory::getApplication();
 		$input = $app->input;
 		$user = Factory::getUser();
+
+		if (!$user->id)
+		{
+			$msg = JText::_('COM_TJUCM_LOGIN_MSG');
+
+			// Get current url.
+			$current = JUri::getInstance()->toString();
+			$url = base64_encode($current);
+			JFactory::getApplication()->redirect(JRoute::_('index.php?option=com_users&view=login&return=' . $url, false), $msg);
+		}
+
 		$this->state   = $this->get('State');
 		$this->id = $input->getInt('id', $input->getInt('content_id', 0));
 
@@ -126,28 +137,6 @@ class TjucmViewItemform extends JViewLegacy
 		{
 			$input->set('cluster_id', $this->item->cluster_id);
 			$clusterId = $this->item->cluster_id;
-		}
-
-		// Get com_cluster component status
-		if (ComponentHelper::getComponent('com_cluster', true)->enabled)
-		{
-			// Get com_subusers component status
-			$subUserExist = ComponentHelper::getComponent('com_subusers', true)->enabled;
-
-			// Check user have permission to edit record of assigned cluster
-			if ($subUserExist && !empty($clusterId) && !$user->authorise('core.manageall', 'com_cluster'))
-			{
-				JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
-
-				// Check user has permission for mentioned cluster
-				if (!RBACL::authorise($user->id, 'com_cluster', 'core.manage', $clusterId))
-				{
-					$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
-					$app->setHeader('status', 403, true);
-
-					return;
-				}
-			}
 		}
 
 		// Get a copy record id
@@ -232,6 +221,17 @@ class TjucmViewItemform extends JViewLegacy
 		$typeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
 		$typeTable->load(array('unique_identifier' => $this->client));
 		$typeParams = json_decode($typeTable->params);
+
+		if ($this->item->id)
+		{
+			if (!TjucmAccess::canEdit($typeTable->id, $this->item->id) && !TjucmAccess::canEditOwn($typeTable->id, $this->item->id))
+			{
+				$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
+				$app->setHeader('status', 403, true);
+
+				return;
+			}
+		}
 
 		// Check if the UCM type is unpublished
 		if ($typeTable->state == "0")

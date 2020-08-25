@@ -85,3 +85,12 @@ display:block !important;
 .rating.nohover > input:checked ~ label:hover,
 .rating.nohover > label:hover ~ input:checked ~ label, /* lighten current selection */
 .rating.nohover > input:checked ~ label:hover ~ label { color: #FFD700;  } 
+
+#item-form #tjucm_loader{
+    height:auto;
+    position:absolute;
+    top:45%;
+    left:45%;
+    opacity: 0.5;
+    display:none;
+}

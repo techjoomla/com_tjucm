@@ -57,6 +57,7 @@ JFactory::getDocument()->addScriptDeclaration("
 		currentUcmType.append('client', '" . $this->client . "');
 		var afterCheckCompatibilityOfUcmType = function(error, response){
 			response = JSON.parse(response);
+
 			if (response.data.length > 0)
 			{
 				jQuery('.copyToOther').removeClass('hide');
@@ -69,12 +70,15 @@ JFactory::getDocument()->addScriptDeclaration("
 		// Code to check ucm type compatibility to copy item
 		com_tjucm.Services.Items.chekCompatibility(currentUcmType, afterCheckCompatibilityOfUcmType);
 	});
+
 	function copyItem()
 	{
 		var afterCopyItem = function(error, response){
 			response = JSON.parse(response);
+
 			// Close pop up and display message
 			jQuery( '#copyModal' ).modal('hide');
+
 			if(response.data !== null)
 			{
 				Joomla.renderMessages({'success':[response.message]});
@@ -84,7 +88,9 @@ JFactory::getDocument()->addScriptDeclaration("
 				Joomla.renderMessages({'error':[response.message]});
 			}
 		}
+
 		var copyItemData =  jQuery('#adminForm').serialize();
+
 		// Code to copy item to ucm type
 		com_tjucm.Services.Items.copyItem(copyItemData, afterCopyItem);
 	}

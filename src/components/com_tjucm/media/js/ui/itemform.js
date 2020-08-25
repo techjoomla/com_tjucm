@@ -302,7 +302,7 @@ jQuery(window).load(function()
 					tjUcmClickedOnPrev = 0;
 				}
 
-				jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+				jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 			}
 		}
 		else
@@ -334,7 +334,7 @@ jQuery(window).load(function()
 				tjUcmClickedOnPrev = 0;
 			}
 
-			jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+			jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 		}
 	});
 });
@@ -558,10 +558,13 @@ var tjUcmItemForm = {
 		else if(jQuery(fieldObj).hasClass('tjfieldTjList'))
 		{
 			/* This condition used for tjlist option actial values updated  - This is used for single & multiple values*/
-
 			if (jQuery(fieldObj).val() !='' && jQuery(fieldObj).val() != undefined)
 			{
 				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
+			}
+			else
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), '');
 			}
 
 			/* Check other options multiple values exist and its not empty */
@@ -585,13 +588,20 @@ var tjUcmItemForm = {
 				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
 			}
 		}
-		else if (jQuery(fieldObj).attr('type') != 'file')
+		else if (jQuery(fieldObj).attr('type') == 'file')
 		{
-			tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
+			tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj)[0].files[0]);
 		}
 		else
 		{
-			tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj)[0].files[0]);
+			if (jQuery(fieldObj).val() == null)
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), '');
+			}
+			else
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
+			}
 		}
 
 		// Call function if field name exist in request data
@@ -603,6 +613,10 @@ var tjUcmItemForm = {
 		return true;
 	},
 	afterDataSave: function (error, response){
+
+		/* Hide loader when record is saved*/
+		jQuery("#item-form #tjucm_loader").hide();
+
 		response = JSON.parse(response);
 		/* Remove the dirty class fromt the form once the field data is saved*/
 		jQuery('#item-form').removeClass('dirty');
@@ -675,7 +689,7 @@ var tjUcmItemForm = {
 					Joomla.renderMessages({'error':[response.message]});
 				}
 
-				jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+				jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 			}
 
 			if (response.messages !== null)
@@ -686,7 +700,7 @@ var tjUcmItemForm = {
 						Joomla.renderMessages({'error':[value]});
 					});
 
-					jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+					jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 				}
 			}
 		}
@@ -769,7 +783,7 @@ var tjUcmItemForm = {
 			{
 				tjUcmItemForm.setVisibilityOfNavigationButtons();
 				jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
-				jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+				jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 
 				return false;
 			}
@@ -786,6 +800,10 @@ var tjUcmItemForm = {
 		jQuery("#item-form .wf-editor-toggle").each(function(index) {
 			this.click();
 		});
+
+		/* Show loader when record is saved*/
+		jQuery("#item-form #tjucm_loader").show();
+		jQuery("html, body").animate({scrollTop: jQuery("#item-form #tjucm_loader").position().top}, "slow");
 
 		tjUcmItemForm.getUcmParentRecordId(tjUcmSaveRecordAsDraft, function (){
 			var tjUcmForm = document.getElementById('item-form');
@@ -815,7 +833,7 @@ var tjUcmItemForm = {
 			/* Reset the variable*/
 			tjUcmFormSubmitCallingButtonId = '';
 
-			jQuery('input[type="checkbox"]').each(function (){
+			jQuery('#item-form input[type="checkbox"]').each(function (){
 				if (jQuery(this).prop('checked') == true)
 				{
 					tjUcmItemFormData.append(jQuery(this).attr('name'), 1);
@@ -823,6 +841,13 @@ var tjUcmItemForm = {
 				else
 				{
 					tjUcmItemFormData.append(jQuery(this).attr('name'), 0);
+				}
+			});
+
+			jQuery('#item-form select').each(function (){
+				if (jQuery(this).val() == null)
+				{
+					tjUcmItemFormData.append(jQuery(this).attr('name'), '');
 				}
 			});
 
@@ -897,7 +922,6 @@ var tjUcmItemForm = {
 			/* Disable the save button till the record is saved*/
 			jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
 
-
 			tjUcmItemForm.getUcmParentRecordId(1, function (){
 				tjUcmSectionFormData.delete('task');
 				tjUcmSectionFormData.delete('option');
@@ -917,7 +941,7 @@ var tjUcmItemForm = {
 		}
 		else
 		{
-			jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+			jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 
 			return false;
 		}
@@ -982,6 +1006,51 @@ var tjUcmItemForm = {
 				jQuery("#previous_button").attr('disabled', true);
 			}
 		}
+	},
+	getRelatedFieldOptions: function (relatedFieldId, fieldId) {
+		var tjUcmItemFormData = new FormData();
+		var FieldsData = {fieldId: fieldId};
+
+		var tjUcmUpdateRelatedFieldsOptions = function (error, response){
+			response = JSON.parse(response);
+			tjucmRelatedFieldUpdatedOptions = response.data;
+
+			if(tjucmRelatedFieldUpdatedOptions == '')
+			{
+				return false;
+			}
+
+			var selectOption = '';
+			var op = '';
+			var data = response.data;
+
+			for(var index = 0; index < data.length; ++index)
+			{
+				selectOption = '';
+				if(FieldsData.SelectedValues !== null && typeof FieldsData.SelectedValues !== 'undefined' && FieldsData.SelectedValues.length > 0)
+				{
+					if (FieldsData.SelectedValues.includes(data[index].value))
+					{
+						selectOption = ' selected="selected" ';
+					}
+				}
+
+				op="<option value='"+data[index].value+"' "+selectOption+" > " + data[index]['text'] + "</option>" ;
+				jQuery('#'+relatedFieldId).append(op);
+			}
+
+			// Update to chz-done selects*/
+			jQuery('#'+relatedFieldId).trigger("liszt:updated");
+		};
+
+		FieldsData.SelectedValues = jQuery('#'+relatedFieldId).val();
+
+		if (jQuery.trim(fieldId) != '' && fieldId != 'undefined')
+		{
+			jQuery('#'+relatedFieldId+', .chzn-results').empty();
+			tjUcmItemFormData.append('fieldId', fieldId);
+			com_tjucm.Services.Item.getRelatedFieldOptions(tjUcmItemFormData, tjUcmUpdateRelatedFieldsOptions);
+		}
 	}
 };
 
@@ -1007,7 +1076,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 			if(!confirm(Joomla.JText._("COM_TJUCM_ITEMFORM_SUBMIT_ALERT")))
 			{
 				jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
-				jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+				jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 
 				return false;
 			}
@@ -1018,7 +1087,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 		else
 		{
 			jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
-			jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+			jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 
 			return false;
 		}
@@ -1040,7 +1109,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 							Joomla.renderMessages({'error':[value]});
 						});
 
-						jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+						jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 					}
 				}
 
@@ -1048,7 +1117,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 				{
 					Joomla.renderMessages({'info':[returnedData.message]});
 
-					jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+					jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 				}
 
 				if (returnedData.data !== null)

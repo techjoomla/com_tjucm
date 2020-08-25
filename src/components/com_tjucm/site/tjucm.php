@@ -34,6 +34,7 @@ JLoader::load('TjucmHelpersTjucm');
 TjucmHelpersTjucm::getLanguageConstantForJs();
 
 // Initialise UCM
+JLoader::register('TjucmAccess', JPATH_SITE . '/components/com_tjucm/includes/access.php');
 JLoader::register('TJUCM', JPATH_SITE . '/components/com_tjucm/includes/tjucm.php');
 TJUCM::init();
 

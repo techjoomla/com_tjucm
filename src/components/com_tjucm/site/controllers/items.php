@@ -151,10 +151,17 @@ class TjucmControllerItems extends TjucmController
 			elseif (count($headers) == count($data))
 			{
 				$itemData = array();
+				$parentId = 0;
 
 				// Prepare item data for item creation
 				foreach ($data as $key => $value)
 				{
+					if ($headers[$key] === 'parent_id')
+					{
+						$parentId = $value;
+						continue;
+					}
+
 					$fieldName = array_search($headers[$key], $fieldHeaders);
 					$value = trim($value);
 
@@ -163,32 +170,49 @@ class TjucmControllerItems extends TjucmController
 						if (isset($fieldsArray[$fieldName]->options) && !empty($fieldsArray[$fieldName]->options))
 						{
 							$fieldParams = new Registry($fieldsArray[$fieldName]->params);
+							$fieldOptions = array_column($fieldsArray[$fieldName]->options, 'options');
 
 							// If there are multiple values for a field then we need to send those as array
 							if (strpos($value, '||') !== false && $fieldParams->get('multiple'))
 							{
 								$optionValue = array_map('trim', explode("||", $value));
 								$multiSelectValues = array();
+								$otherOptionsValues = array();
 
-								foreach ($fieldsArray[$fieldName]->options as $option)
+								foreach ($optionValue as $option)
 								{
-									if (in_array($option->options, $optionValue))
+									if (in_array($option, $fieldOptions))
 									{
-										$multiSelectValues[] = $option->value;
+										$multiSelectValues[] = $option;
 									}
+									else
+									{
+										if ($fieldParams->get('other'))
+										{
+											$otherOptionsValues[] = $option;
+										}
+									}
+								}
+
+								if (!empty($otherOptionsValues))
+								{
+									$multiSelectValues[] = 'tjlistothervalue';
+									$multiSelectValues[] = implode(',', $otherOptionsValues);
 								}
 
 								$itemData[$fieldName] = $multiSelectValues;
 							}
 							else
 							{
-								foreach ($fieldsArray[$fieldName]->options as $option)
+								if (in_array($value, $fieldOptions))
 								{
-									if ($option->options == $value)
+									$itemData[$fieldName] = $value;
+								}
+								else
+								{
+									if ($fieldParams->get('other'))
 									{
-										$itemData[$fieldName] = $option->value;
-
-										break;
+										$itemData[$fieldName] = array('tjlistothervalue', $value);
 									}
 								}
 							}
@@ -229,7 +253,7 @@ class TjucmControllerItems extends TjucmController
 					if ($data !== false)
 					{
 						// Save the record in UCM
-						if ($tjucmItemFormModel->save(array('client' => $client)))
+						if ($tjucmItemFormModel->save(array('client' => $client, 'parent_id' => $parentId)))
 						{
 							$contentId = (int) $tjucmItemFormModel->getState($tjucmItemFormModel->getName() . '.id');
 
@@ -304,6 +328,10 @@ class TjucmControllerItems extends TjucmController
 		$ucmTypeTable = Table::getInstance('Type', 'TjucmTable');
 		$ucmTypeTable->load(array("unique_identifier" => $client));
 
+		// Check if UCM type is subform
+		$ucmTypeParams = new Registry($ucmTypeTable->params);
+		$isSubform     = $ucmTypeParams->get('is_subform');
+
 		// Get fields in the given UCM type
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
 		$tjFieldsFieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
@@ -313,6 +341,12 @@ class TjucmControllerItems extends TjucmController
 		$tjFieldsFieldsModel->setState('list.direction', 'asc');
 		$fields = $tjFieldsFieldsModel->getItems();
 		$fieldsLabel = array_column($fields, 'label');
+
+		if ($isSubform)
+		{
+			// Add parentid in colunm
+			array_push($fieldsLabel, 'parent_id');
+		}
 
 		// Generate schema CSV file with CSV headers as label of the fields for given UCM type and save it in temp folder
 		$fileName = preg_replace('/[^A-Za-z0-9\-]/', '', $ucmTypeTable->title) . '.csv';
