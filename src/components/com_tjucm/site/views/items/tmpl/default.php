@@ -20,6 +20,7 @@ JHtml::_('formbehavior.chosen', 'select');
 JHtml::_('jquery.token');
 
 $importItemsPopUpUrl = JUri::root() . '/index.php?option=com_tjucm&view=items&layout=importitems&tmpl=component&client=' . $this->client;
+$copyItemPopupUrl = JUri::root() . 'index.php?option=com_tjucm&view=items&layout=copyitems&tmpl=component&client=' . $this->client;
 JFactory::getDocument()->addScriptDeclaration('
 	jQuery(document).ready(function(){
 		jQuery("#adminForm #import-items").click(function() {
@@ -51,47 +52,24 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 $fieldsData = array();
 
 JFactory::getDocument()->addScriptDeclaration("
-	jQuery(window).load(function()
-	{
-		var currentUcmType = new FormData();
-		currentUcmType.append('client', '" . $this->client . "');
-		var afterCheckCompatibilityOfUcmType = function(error, response){
-			response = JSON.parse(response);
-
-			if (response.data.length > 0)
-			{
-				jQuery('.copyToOther').removeClass('hide');
-				jQuery.each(response.data, function(key, value) {
-				 jQuery('#ucm_list').append(jQuery('<option></option>').attr('value',value.value).text(value.text)); 
-				 jQuery('#ucm_list').trigger('liszt:updated');
-				});
-			}
-		};
-
-		// Code to check ucm type compatibility to copy item
-		com_tjucm.Services.Items.chekCompatibility(currentUcmType, afterCheckCompatibilityOfUcmType);
-	});
-
-	function copyItem()
+	function copySameUcmTypeItem()
 	{
 		var afterCopyItem = function(error, response){
 			response = JSON.parse(response);
-
-			// Close pop up and display message
-			jQuery( '#copyModal' ).modal('hide');
-
+			console.log(response);
 			if(response.data !== null)
 			{
 				Joomla.renderMessages({'success':[response.message]});
+				window.parent.location.reload();
 			}
 			else
 			{
 				Joomla.renderMessages({'error':[response.message]});
 			}
 		}
-
+	
 		var copyItemData =  jQuery('#adminForm').serialize();
-
+		
 		// Code to copy item to ucm type
 		com_tjucm.Services.Items.copyItem(copyItemData, afterCopyItem);
 	}
@@ -132,6 +110,33 @@ $statusColumnWidth = 0;
 				</a>
 				<?php
 			}
+			if ($this->canCopyItem)
+			{
+				if ($this->canCopyToSameeUcmType)
+				{?>
+					<a onclick="if(document.adminForm.boxchecked.value==0){alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{copySameUcmTypeItem()}" class="btn btn-default btn-small">
+					<i class="fa fa-clone"></i> <?php echo JText::_('COM_TJUCM_COPY_ITEM'); ?>
+					</a><?php
+				}
+				else
+				{
+				?>
+				<a href="#" onclick="if(document.adminForm.boxchecked.value==0){alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{jQuery( '#collapseModal' ).modal('show'); return true;}" id="copy-items" class="btn btn-default btn-small">
+					<i class="fa fa-clone"></i> <?php echo JText::_('COM_TJUCM_COPY_ITEM'); ?>
+				</a>
+				<?php
+				}
+				?>
+				<?php echo JHtml::_(
+					'bootstrap.renderModal',
+					'collapseModal',
+					array(
+						'title'  => JText::_('COM_TJUCM_COPY_ITEMS'),
+					),
+					$this->loadTemplate('copyitems')
+				); ?>
+				<?php
+			}
 		}
 		?>
 	</div>
@@ -148,10 +153,12 @@ $statusColumnWidth = 0;
 				{?>
 			<thead>
 				<tr>
+					<?php if ($this->canCopyItem) { ?>
 					<!-- TODO- copy and copy to other feature is not fully stable hence relate buttons are hidden-->
 					<th width="1%" class="hidden">
 						<input type="checkbox" name="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 					</th>
+					<?php } ?>
 					<?php
 					if (isset($this->items[0]->state))
 					{

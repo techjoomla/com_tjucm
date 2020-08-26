@@ -55,6 +55,7 @@ $xmlFormObject = $displayData['xmlFormObject'];
 $formObject    = $displayData['formObject'];
 $ucmTypeId     = $displayData['ucmTypeId'];
 $allowDraftSave = $displayData['ucmTypeParams']->allow_draft_save;
+$i = $displayData['key'];
 
 $appendUrl = '';
 $csrf = "&" . Session::getFormToken() . '=1';
@@ -64,6 +65,8 @@ $canDeleteOwn = TjucmAccess::canDeleteOwn($ucmTypeId, $item->id);
 $canEditState = TjucmAccess::canEditState($ucmTypeId, $item->id);
 $canEdit      = TjucmAccess::canEdit($ucmTypeId, $item->id);
 $canDelete    = TjucmAccess::canDelete($ucmTypeId, $item->id);
+
+$canCopyItem        = $user->authorise('core.type.copyitem', 'com_tjucm.type.' . $ucmTypeId);
 
 if (!empty($created_by))
 {
@@ -98,10 +101,12 @@ if ($canDeleteOwn)
 ?>
 <div class="tjucm-wrapper">
 <tr class="row<?php echo $item->id?>">
+	<?php if ($canCopyItem) { ?>
 	<!-- TODO- copy and copy to other feature is not fully stable hence relate buttons are hidden-->
 	<td class="center hide">
-		<?php echo JHtml::_('grid.id', '', $item->id); ?>
+		<?php echo JHtml::_('grid.id', $i, $item->id); ?>
 	</td>
+	<?php } ?>
 	<?php
 	if (isset($item->state))
 	{

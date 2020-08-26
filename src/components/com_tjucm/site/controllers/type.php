@@ -15,6 +15,7 @@ use Joomla\CMS\Session\Session;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\Component\ComponentHelper;
 
 /**
  * Type controller class.
@@ -79,7 +80,61 @@ class TjucmControllerType extends JControllerForm
 			}
 		}
 
+		if (count($validUcmType) <= 1)
+		{
+			$validUcmType = false;
+		}
+
 		echo new JResponseJson($validUcmType);
+		$app->close();
+	}
+
+	/**
+	 * Method to get Cluster field
+	 *
+	 * @return  boolean
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	public function getClusterField()
+	{
+		// Check for request forgeries.
+		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
+
+		$app = Factory::getApplication();
+		$post = $app->input->post;
+		$client = $post->get('client', '', 'STRING');
+
+		if (empty($client))
+		{
+			echo new JResponseJson(null);
+			$app->close();
+		}
+
+		// Show records belonging to users cluster if com_cluster is installed and enabled - start
+		$clusterExist = ComponentHelper::getComponent('com_cluster', true)->enabled;
+
+		if (empty($clusterExist))
+		{
+			echo new JResponseJson(null);
+			$app->close();
+		}
+
+		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
+		$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
+		$fieldTable->load(array('client' => $client, 'type' => 'cluster'));
+
+		if (!$fieldTable->id)
+		{
+			echo new JResponseJson(null);
+			$app->close();
+		}
+
+		JFormHelper::addFieldPath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models/fields/');
+		$cluster = JFormHelper::loadFieldType('cluster', false);
+		$clusterList = $cluster->getOptionsExternally();
+
+		echo new JResponseJson($clusterList);
 		$app->close();
 	}
 }
