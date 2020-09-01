@@ -9,6 +9,7 @@
 com_tjucm.Services.Items = new (com_tjucm.Services.Base.extend({
     checkCompatibilityUrl: window.tjSiteRoot + "index.php?option=com_tjucm&task=type.getCompatableUcmType",
     copyItemUrl: window.tjSiteRoot + "index.php?option=com_tjucm&format=json&task=itemform.copyItem",
+    getClusterFieldUrl: window.tjSiteRoot + "index.php?option=com_tjucm&&task=type.getClusterField",
     config: {
         headers: {}
     },
@@ -17,6 +18,11 @@ com_tjucm.Services.Items = new (com_tjucm.Services.Base.extend({
         "message": ""
     },
     chekCompatibility: function (currentUcmType, callback){
+        this.config.processData = false;
+        this.config.contentType = false;
+        this.post(this.checkCompatibilityUrl, currentUcmType, this.config, callback);
+    },
+    getClusterField: function (currentUcmType, callback){
         this.config.processData = false;
         this.config.contentType = false;
         this.post(this.checkCompatibilityUrl, currentUcmType, this.config, callback);

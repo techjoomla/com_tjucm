@@ -59,8 +59,8 @@ JFactory::getDocument()->addScriptDeclaration("
 			console.log(response);
 			if(response.data !== null)
 			{
-				Joomla.renderMessages({'success':[response.message]});
 				window.parent.location.reload();
+				Joomla.renderMessages({'success':[response.message]});
 			}
 			else
 			{
@@ -155,7 +155,7 @@ $statusColumnWidth = 0;
 				<tr>
 					<?php if ($this->canCopyItem) { ?>
 					<!-- TODO- copy and copy to other feature is not fully stable hence relate buttons are hidden-->
-					<th width="1%" class="hidden">
+					<th width="1%" class="">
 						<input type="checkbox" name="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 					</th>
 					<?php } ?>
@@ -305,34 +305,10 @@ $statusColumnWidth = 0;
 		}
 	}
 	?>
+	<input type="hidden" name="client" value="<?php echo $this->client ?>"/>
 	<input type="hidden" name="boxchecked" value="0"/>
 	<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>"/>
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>"/>
-	
-	<!-- Modal Pop Up for Copy Item to Other-->
-	<div id="copyModal" class="copyModal modal fade" role="dialog">
-		<div class="modal-dialog">
-			<!-- Modal content-->
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close novalidate" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">×</span>
-					</button>
-					<h3><?php echo JText::_("COM_TJUCM_SELECT_SOURCE_FORM");?></h3>
-				</div>
-				<div class="modal-body">
-					<?php echo JHTML::_('select.genericlist', '', 'filter[ucm_list]', 'class="ucm_list input-medium" onchange=""', 'text', 'value', $this->state->get('filter.ucm_list'), 'ucm_list'); ?>
-					<input type="hidden" name="sourceClient" value="<?php echo $this->client;?>"/>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn" onclick="document.getElementById('ucm_list').value='';" data-dismiss="modal"><?php echo JText::_("COM_TJUCM_CANCEL_COPY");?></button>
-					<a class="btn btn-success" onclick="copyItem()">
-						<?php echo JText::_("COM_TJUCM_PROCESS_DATA");?>
-					</a>
-				</div>
-			</div>
-		</div>
-	</div>
 	<?php echo JHtml::_('form.token'); ?>
 </form>
 </div>

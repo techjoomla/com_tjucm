@@ -102,6 +102,10 @@ class TjucmControllerType extends JControllerForm
 		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
 		$app = Factory::getApplication();
+
+		$lang = Factory::getLanguage();
+		$lang->load('com_tjfields', JPATH_SITE);
+
 		$post = $app->input->post;
 		$client = $post->get('client', '', 'STRING');
 

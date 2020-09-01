@@ -103,7 +103,7 @@ if ($canDeleteOwn)
 <tr class="row<?php echo $item->id?>">
 	<?php if ($canCopyItem) { ?>
 	<!-- TODO- copy and copy to other feature is not fully stable hence relate buttons are hidden-->
-	<td class="center hide">
+	<td class="center">
 		<?php echo JHtml::_('grid.id', $i, $item->id); ?>
 	</td>
 	<?php } ?>
