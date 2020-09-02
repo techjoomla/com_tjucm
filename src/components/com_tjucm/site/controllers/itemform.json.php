@@ -601,7 +601,7 @@ class TjucmControllerItemForm extends JControllerForm
 					{
 						$response = $model->queueItemCopy($cid, $sourceClient, $targetClient, Factory::getuser()->id, $clusterId);
 
-						$msg = ($response) ? Text::_("COM_TJUCM_ITEM_COPY_SUCCESSFULLY") : Text::_("COM_TJUCM_FORM_SAVE_FAILED");
+						$msg = ($response) ? Text::_("COM_TJUCM_ITEM_COPY_TO_QUEUE_SUCCESSFULLY") : Text::_("COM_TJUCM_FORM_SAVE_FAILED");
 					}
 				}
 				else
@@ -756,6 +756,14 @@ class TjucmControllerItemForm extends JControllerForm
 
 						if ($recordId)
 						{
+							$formData = array();
+							$formData['content_id'] = $recordId;
+							$formData['fieldsvalue'] = $extraFieldsData;
+							$formData['client'] = $targetClient;
+
+							// If data is valid then save the data into DB
+							$response = $model->saveExtraFields($formData);
+
 							foreach ($fileFieldArray as $fileField)
 							{
 								$fileFieldValue = round(microtime(true)) . "_" . JUserHelper::genRandomPassword(5) . "_" . $fileField['value'];
@@ -772,14 +780,6 @@ class TjucmControllerItemForm extends JControllerForm
 									$fielValuedTable->store();
 								}
 							}
-
-							$formData = array();
-							$formData['content_id'] = $recordId;
-							$formData['fieldsvalue'] = $extraFieldsData;
-							$formData['client'] = $targetClient;
-
-							// If data is valid then save the data into DB
-							$response = $model->saveExtraFields($formData);
 
 							$msg = ($response) ? Text::_("COM_TJUCM_ITEM_COPY_SUCCESSFULLY") : Text::_("COM_TJUCM_FORM_SAVE_FAILED");
 						}
