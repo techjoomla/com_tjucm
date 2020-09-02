@@ -56,7 +56,6 @@ JFactory::getDocument()->addScriptDeclaration("
 	{
 		var afterCopyItem = function(error, response){
 			response = JSON.parse(response);
-			console.log(response);
 			if(response.data !== null)
 			{
 				window.parent.location.reload();

@@ -10,11 +10,8 @@
 // No direct access
 defined('_JEXEC') or die;
 
-use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Factory;
-use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\Session\Session;
 
 Factory::getDocument()->addScriptDeclaration("
 	jQuery(window).load(function()
@@ -79,9 +76,6 @@ Factory::getDocument()->addScriptDeclaration("
 	}
 ");
 ?>
-<!--
-<form action="" id="adminForm" name="adminForm" method="post" enctype="multipart/form-data">
--->
 	<div>
 		<div class="modal-body">
 			<div class="container-fluid">
@@ -102,10 +96,6 @@ Factory::getDocument()->addScriptDeclaration("
 				<i class="fa fa-clone"></i>
 				<?php echo Text::_('COM_TJUCM_COPY_ITEMS_BUTTON'); ?>
 			</button>
-		</div>
-		<div class="clearfix">&nbsp;</div>
-		<div class="col-sm-12">
-			<div id="records-import-msg" style="display:none;" class="alert alert-info"><?php echo Text::_("COM_TJUCM_ITEMS_IMPORTING_MSG")?></div>
 		</div>
 	</div>
 	<input type="hidden" name="option" value="com_tjucm"/>

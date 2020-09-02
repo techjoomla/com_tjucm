@@ -16,6 +16,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Table\Table;
 
 /**
  * Type controller class.
@@ -125,7 +126,7 @@ class TjucmControllerType extends JControllerForm
 		}
 
 		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
-		$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
+		$fieldTable = Table::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
 		$fieldTable->load(array('client' => $client, 'type' => 'cluster'));
 
 		if (!$fieldTable->id)
