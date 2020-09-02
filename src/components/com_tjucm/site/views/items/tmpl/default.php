@@ -56,14 +56,16 @@ JFactory::getDocument()->addScriptDeclaration("
 	{
 		var afterCopyItem = function(error, response){
 			response = JSON.parse(response);
+			
+			sessionStorage.setItem('message', response.message);
 			if(response.data !== null)
 			{
 				window.parent.location.reload();
-				Joomla.renderMessages({'success':[response.message]});
+				sessionStorage.setItem('class', 'alert alert-success');
 			}
 			else
 			{
-				Joomla.renderMessages({'error':[response.message]});
+				sessionStorage.setItem('class', 'alert alert-danger');
 			}
 		}
 	
@@ -77,8 +79,21 @@ JFactory::getDocument()->addScriptDeclaration("
 $statusColumnWidth = 0;
 
 ?>
+<script>
+	jQuery(document).ready(function(){
+		console.log(sessionStorage.getItem('message'));
+		if(sessionStorage.getItem('message'))
+		{
+			jQuery('#message').html('<div class="'+sessionStorage.getItem('class')+'"><a href="#" class="close" data-dismiss="alert">&times;</a>'+sessionStorage.getItem('message')+'</div>');
+		}
+		sessionStorage.removeItem("class");
+		sessionStorage.removeItem("message");
+	});
+</script>
+
 <div class="tjucm-wrapper">
 <form action="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>" enctype="multipart/form-data" method="post" name="adminForm" id="adminForm" class="form-validate">
+<div id="message" class=""></div>
 <?php
 	if (isset($this->items))
 	{

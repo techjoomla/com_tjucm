@@ -571,7 +571,7 @@ class TjucmModelItems extends JModelList
 		{
 			if ($client != $type->unique_identifier)
 			{
-				$result = $typeModel->getCompatableUcmType($client, $type->unique_identifier);
+				$result = $typeModel->getCompatibleUcmTypes($client, $type->unique_identifier);
 
 				if ($result)
 				{

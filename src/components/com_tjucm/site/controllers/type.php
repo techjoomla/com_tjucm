@@ -43,7 +43,7 @@ class TjucmControllerType extends JControllerForm
 	 * 
 	 * @since    __DEPLOY_VERSION__
 	 */
-	public function getCompatableUcmType()
+	public function getCompatibleUcmTypes()
 	{
 		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
@@ -71,7 +71,7 @@ class TjucmControllerType extends JControllerForm
 		{
 			if ($type->unique_identifier != $client)
 			{
-				$result = $typeModel->getCompatableUcmType($client, $type->unique_identifier);
+				$result = $typeModel->getCompatibleUcmTypes($client, $type->unique_identifier);
 
 				if ($result)
 				{
@@ -97,7 +97,7 @@ class TjucmControllerType extends JControllerForm
 	 *
 	 * @since   __DEPLOY_VERSION__
 	 */
-	public function getClusterField()
+	public function getClusterFieldOptions()
 	{
 		// Check for request forgeries.
 		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));

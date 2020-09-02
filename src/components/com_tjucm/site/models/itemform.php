@@ -1141,7 +1141,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 *
 	 * @since __DEPLOY_VERSION__
 	 */
-	public static function pushDataToQueue($ucmId, $sourceClient, $targetClient, $userId, $clusterId=0)
+	public static function queueItemCopy($ucmId, $sourceClient, $targetClient, $userId, $clusterId=0)
 	{
 		$return = [];
 

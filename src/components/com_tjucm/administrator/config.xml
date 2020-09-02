@@ -3,7 +3,7 @@
     <fieldset name="permissions" description="JCONFIG_PERMISSIONS_DESC" label="JCONFIG_PERMISSIONS_LABEL">
         <field name="rules" type="rules" component="com_tjucm" class="inputbox" filter="rules" validate="rules" label="JCONFIG_PERMISSIONS_LABEL" section="component" />
     </fieldset>
-    <fieldset name="component" label="JCONFIG_COPY_ITEM_SETTING_LABEL">
+    <fieldset name="component" label="COM_TJUCM_COPY_ITEM_SETTING_LABEL">
 		<field name="tjqueue_copy_items" class="btn-group" type="radio" default="0" label="COM_TJUCM_USE_TJQUEUE_WHILE_COPY_ITEM" description="COM_TJUCM_USE_TJQUEUE_WHILE_COPY_ITEM_DESC">
 			<option value="0">COM_TJUCM_NO</option>
 			<option value="1">COM_TJUCM_YES</option>

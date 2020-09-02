@@ -561,7 +561,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 		$sourceClient = $app->input->get('client', '', 'string');
 		$filter = $app->input->get('filter', '', 'ARRAY');
-		$targetClient = $filter['ucm_list'];
+		$targetClient = $filter['target_ucm'];
 
 		if (!$targetClient)
 		{
@@ -576,7 +576,7 @@ class TjucmControllerItemForm extends JControllerForm
 		if ($sourceClient != $targetClient)
 		{
 			// Server side Validation for source and UCM Type
-			$result = $typeModel->getCompatableUcmType($sourceClient, $targetClient);
+			$result = $typeModel->getCompatibleUcmTypes($sourceClient, $targetClient);
 		}
 		else
 		{
@@ -599,7 +599,7 @@ class TjucmControllerItemForm extends JControllerForm
 				{
 					foreach ($copyIds as $cid)
 					{
-						$response = $model->pushDataToQueue($cid, $sourceClient, $targetClient, Factory::getuser()->id, $clusterId);
+						$response = $model->queueItemCopy($cid, $sourceClient, $targetClient, Factory::getuser()->id, $clusterId);
 
 						$msg = ($response) ? Text::_("COM_TJUCM_ITEM_COPY_SUCCESSFULLY") : Text::_("COM_TJUCM_FORM_SAVE_FAILED");
 					}

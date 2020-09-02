@@ -24,8 +24,8 @@ Factory::getDocument()->addScriptDeclaration("
 			if (response.data)
 			{
 				jQuery.each(response.data, function(key, value) {
-				 jQuery('#ucm_list').append(jQuery('<option></option>').attr('value',value.value).text(value.text)); 
-				 jQuery('#ucm_list').trigger('liszt:updated');
+				 jQuery('#target_ucm').append(jQuery('<option></option>').attr('value',value.value).text(value.text)); 
+				 jQuery('#target_ucm').trigger('liszt:updated');
 				});
 			}
 			else
@@ -51,21 +51,22 @@ Factory::getDocument()->addScriptDeclaration("
 				jQuery('.clusterListField').addClass('hide');
 			}
 		};
-		com_tjucm.Services.Items.getClusterField(currentUcmType, afterGetClusterField);
+		com_tjucm.Services.Items.getClusterFieldOptions(currentUcmType, afterGetClusterField);
 	});
 	
 	function copyItem()
 	{
 		var afterCopyItem = function(error, response){
 			response = JSON.parse(response);
-			console.log(response);
+			
+			sessionStorage.setItem('message', response.message);
 			if(response.data !== null)
 			{
-				Joomla.renderMessages({'success':[response.message]});
+				sessionStorage.setItem('class', 'alert alert-success');
 			}
 			else
 			{
-				Joomla.renderMessages({'error':[response.message]});
+				sessionStorage.setItem('class', 'alert alert-danger');
 			}
 		}
 	
@@ -81,7 +82,7 @@ Factory::getDocument()->addScriptDeclaration("
 			<div class="container-fluid">
 				<div class="control-group span6 ucmListField">
 					<label class="control-label"><strong><?php echo Text::_('COM_TJUCM_COPY_ITEMS_SELECT_UCM_TYPE'); ?></strong></label>
-					<?php echo JHTML::_('select.genericlist', '', 'filter[ucm_list]', 'class="ucm_list" onchange=""', 'text', 'value', $this->state->get('filter.ucm_list'), 'ucm_list' ); ?>
+					<?php echo JHTML::_('select.genericlist', '', 'filter[target_ucm]', 'class="target_ucm" onchange=""', 'text', 'value', $this->state->get('filter.target_ucm'), 'target_ucm' ); ?>
 				</div>
 				<div class="control-group span6 clusterListField">
 					<label class="control-label"><strong><?php echo Text::_('COM_TJUCM_COPY_ITEMS_SELECT_CLUSTER'); ?></strong></label>
@@ -90,7 +91,7 @@ Factory::getDocument()->addScriptDeclaration("
 			</div>
 		</div>
 		<div class="modal-footer">
-			<button type="button" class="btn" onclick="document.getElementById('ucm_list').value='';document.getElementById('cluster_list').value='';" data-dismiss="modal">
+			<button type="button" class="btn" onclick="document.getElementById('target_ucm').value='';document.getElementById('cluster_list').value='';" data-dismiss="modal">
 			Cancel</button>
 			<button class="btn btn-primary" onclick="copyItem()">
 				<i class="fa fa-clone"></i>
