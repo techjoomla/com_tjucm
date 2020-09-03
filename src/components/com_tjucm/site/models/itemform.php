@@ -505,7 +505,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 */
 	public function save($data)
 	{
-		$user = JFactory::getUser($data['created_by']);
+		$user = empty($data['created_by']) ? Factory::getUser() : Factory::getUser($data['created_by']);
 
 		// Guest users are not allowed to add the records
 		if (empty($user->id))
@@ -541,7 +541,7 @@ class TjucmModelItemForm extends JModelAdmin
 		}
 
 		$ucmTypeParams = new Registry($tjUcmTypeTable->params);
-		
+
 		// Check if UCM type is subform
 		$isSubform     = $ucmTypeParams->get('is_subform');
 
@@ -573,17 +573,14 @@ class TjucmModelItemForm extends JModelAdmin
 		{
 			$allowedCount = $ucmTypeParams->get('allowed_count', 0, 'INT');
 
-			if (!$data['isCli'])
+			// Check if the user is allowed to add record for given UCM type
+			$canAdd = TjucmAccess::canCreate($data['type_id'], $data['created_by']);
+
+			if (!$canAdd)
 			{
-				// Check if the user is allowed to add record for given UCM type
-				$canAdd = TjucmAccess::canCreate($data['type_id']);
+				$this->setError(JText::_('COM_TJUCM_FORM_SAVE_FAILED_AUTHORIZATION_ERROR'));
 
-				if (!$canAdd)
-				{
-					$this->setError(JText::_('COM_TJUCM_FORM_SAVE_FAILED_AUTHORIZATION_ERROR'));
-
-					return false;
-				}
+				return false;
 			}
 
 			// Check allowed limit if its set for given UCM type
@@ -1132,10 +1129,11 @@ class TjucmModelItemForm extends JModelAdmin
 	/**
 	 * Method to push data in queue.
 	 *
-	 * @param   string      $ucmId         Ucm id
-	 * @param   string      $sourceClient  Source client
-	 * @param   array       $targetClient  Target client
-	 * @param   Object      $clusterId     Cluster id
+	 * @param   string  $ucmId         Ucm id
+	 * @param   string  $sourceClient  Source client
+	 * @param   array   $targetClient  Target client
+	 * @param   Object  $userId        User id who wants to copy item
+	 * @param   Object  $clusterId     Cluster id
 	 *
 	 * @return  boolean value.
 	 *

@@ -28,8 +28,10 @@ require_once JPATH_SITE . '/components/com_tjucm/includes/defines.php';
  */
 class TjucmAccess
 {
-	public static function canCreate($ucmTypeId)
+	public static function canCreate($ucmTypeId, $userId = 0)
 	{
+		$user = empty($userId) ? Factory::getUser() : Factory::getUser($userId);
+
 		if (TjucmAccess::hasCluster($ucmTypeId))
 		{
 			// Get com_subusers component status
@@ -40,12 +42,12 @@ class TjucmAccess
 			{
 				JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
 
-				return RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.createitem.' . $ucmTypeId);
+				return RBACL::check($user->id, 'com_cluster', 'core.createitem.' . $ucmTypeId);
 			}
 		}
 		else
 		{
-			return JFactory::getUser()->authorise('core.type.createitem', 'com_tjucm.type.' . $ucmTypeId);
+			return $user->authorise('core.type.createitem', 'com_tjucm.type.' . $ucmTypeId);
 		}
 	}
 
