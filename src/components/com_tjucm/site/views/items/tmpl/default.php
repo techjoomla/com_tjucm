@@ -319,7 +319,7 @@ $statusColumnWidth = 0;
 		}
 	}
 	?>
-	<input type="hidden" name="client" value="<?php echo $this->client ?>"/>
+	<input type="hidden" id="client" name="client" value="<?php echo $this->client ?>"/>
 	<input type="hidden" name="boxchecked" value="0"/>
 	<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>"/>
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>"/>
