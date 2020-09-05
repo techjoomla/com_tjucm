@@ -101,7 +101,7 @@ class TjucmViewItems extends JViewLegacy
 		$this->draft        = array("" => JText::_('COM_TJUCM_DATA_STATUS_SELECT_OPTION'),
 			"0" => JText::_("COM_TJUCM_DATA_STATUS_SAVE"), "1" => JText::_('COM_TJUCM_DATA_STATUS_DRAFT'));
 		$this->canCopyItem = $user->authorise('core.type.copyitem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$this->canCopyToSameeUcmType = $model->canCopyToSameUcmType($this->client);
+		$this->canCopyToSameUcmType = $model->canCopyToSameUcmType($this->client);
 
 		// If did not get the client from url then get if from menu param
 		if (empty($this->client))

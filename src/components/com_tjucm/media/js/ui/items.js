@@ -43,24 +43,26 @@ jQuery(window).load(function()
 });
 
 // Method to Copy items
-function copyItem()
-{
-	var afterCopyItem = function(error, response){
-		response = JSON.parse(response);
-		
-		sessionStorage.setItem('message', response.message);
-		if(response.data !== null)
-		{
-			sessionStorage.setItem('class', 'alert alert-success');
+var tjUcmItems = {
+	copyItem : function()
+	{
+		var afterCopyItem = function(error, response){
+			response = JSON.parse(response);
+			
+			sessionStorage.setItem('message', response.message);
+			if(response.data !== null)
+			{
+				sessionStorage.setItem('class', 'alert alert-success');
+			}
+			else
+			{
+				sessionStorage.setItem('class', 'alert alert-danger');
+			}
 		}
-		else
-		{
-			sessionStorage.setItem('class', 'alert alert-danger');
-		}
+
+		var copyItemData =  jQuery('#adminForm').serialize();
+
+		// Code to copy item to ucm type
+		com_tjucm.Services.Items.copyItem(copyItemData, afterCopyItem);
 	}
-
-	var copyItemData =  jQuery('#adminForm').serialize();
-
-	// Code to copy item to ucm type
-	com_tjucm.Services.Items.copyItem(copyItemData, afterCopyItem);
 }

@@ -81,7 +81,6 @@ $statusColumnWidth = 0;
 ?>
 <script>
 	jQuery(document).ready(function(){
-		console.log(sessionStorage.getItem('message'));
 		if(sessionStorage.getItem('message'))
 		{
 			jQuery('#message').html('<div class="'+sessionStorage.getItem('class')+'"><a href="#" class="close" data-dismiss="alert">&times;</a>'+sessionStorage.getItem('message')+'</div>');
@@ -126,7 +125,7 @@ $statusColumnWidth = 0;
 			}
 			if ($this->canCopyItem)
 			{
-				if ($this->canCopyToSameeUcmType)
+				if ($this->canCopyToSameUcmType)
 				{?>
 					<a onclick="if(document.adminForm.boxchecked.value==0){alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{copySameUcmTypeItem()}" class="btn btn-default btn-small">
 					<i class="fa fa-clone"></i> <?php echo JText::_('COM_TJUCM_COPY_ITEM'); ?>
