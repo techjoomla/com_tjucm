@@ -30,7 +30,6 @@ class TjucmAccess
 {
 	public static function canCreate($ucmTypeId, $userId = 0)
 	{
-		
 		$user = empty($userId) ? Factory::getUser() : Factory::getUser($userId);
 
 		if (TjucmAccess::hasCluster($ucmTypeId))
