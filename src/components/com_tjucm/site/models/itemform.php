@@ -343,18 +343,18 @@ class TjucmModelItemForm extends JModelAdmin
 	public function getTypeForm($data = array(), $loadData = true)
 	{
 		$draft = isset($data['draft']) ? $data['draft'] : 0;
-		$clientPart = explode(".", $data['client']);
+		$client = $data['client'];
+		$contentId = empty($data['id']) ? '' : $data['id'];
+		$clientPart = explode(".", $client);
 
-		// Path of empty form XML to create form object dynamically
-		$formPath = JPATH_SITE . '/components/com_tjucm/models/forms/' . $clientPart[1] . 'form_extra.xml';
+		$data = array();
+		$data['clientComponent'] = $clientPart[0];
+		$data['view'] = $clientPart[1];
+		$data['client'] = $client;
+		$data['content_id'] = $contentId;
+		$data['layout'] = 'edit';
 
-		// Get the form.
-		$form = $this->loadForm(
-			$data['client'], $formPath,
-			array('control' => 'jform',
-				'load_data' => $loadData,
-			)
-		);
+		$form = $this->getFormObject($data);
 
 		// If data is being saved in draft mode then dont check if the fields are required
 		if ($draft)
@@ -410,25 +410,25 @@ class TjucmModelItemForm extends JModelAdmin
 			return false;
 		}
 
+		$section = $data['section'];
+		$client  = $data['client'];
+		$clientPart = explode(".", $client);
+
+		$data = array();
+		$data['clientComponent'] = $clientPart[0];
+		$data['view'] = $clientPart[1];
+		$data['client'] = $client;
+		$data['layout'] = 'edit';
+
+		$parentForm = $this->getFormObject($data);
+
 		// Create xml with the fieldset of provided section
 		$newXML = new SimpleXMLElement('<form></form>');
 		$newXmlFilePath = JPATH_SITE . '/components/com_tjucm/models/forms/tempfieldsetform.xml';
 
-		// Get path of parent UCM type XML
-		$fieldNamePart = explode('.', $data['client']);
-		$parentFormPath = JPATH_SITE . "/administrator/components/com_tjucm/models/forms/" . $fieldNamePart[1] . "_extra.xml";
-
-		// Get parent form.
-		$parentForm = $this->loadForm(
-			'com_tjucm.itemform', $parentFormPath,
-			array('control' => 'jform',
-				'load_data' => false,
-			)
-		);
-
 		// Get the fieldset XML from parent form
 		$formXml = $parentForm->getXml();
-		$fieldsetXml = $formXml->xpath('//fieldset[@name="' . $data['section'] . '" and not(ancestor::field/form/*)]');
+		$fieldsetXml = $formXml->xpath('//fieldset[@name="' . $section . '" and not(ancestor::field/form/*)]');
 
 		if ($fieldsetXml[0] instanceof \SimpleXMLElement)
 		{
