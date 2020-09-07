@@ -320,7 +320,7 @@ class TjucmControllerTypes extends JControllerAdmin
 
 								foreach ($options as &$option)
 								{
-									$fieldOptions['fieldoption'.$optionCount] = array("name" => $option->options, "value" => $option->value);
+									$fieldOptions['fieldoption' . $optionCount] = array("name" => $option->options, "value" => $option->value);
 									$optionCount++;
 								}
 							}
