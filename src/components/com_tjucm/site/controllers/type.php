@@ -66,6 +66,8 @@ class TjucmControllerType extends JControllerForm
 		$typeModel = BaseDatabaseModel::getInstance('Type', 'TjucmModel');
 
 		$validUcmType = array();
+		$validUcmType[0]['value'] = "";
+		$validUcmType[0]['text'] = Text::_('COM_TJUCM_COPY_ITEMS_SELECT_UCM_TYPE');
 
 		foreach ($ucmTypes as $key => $type)
 		{
@@ -75,8 +77,8 @@ class TjucmControllerType extends JControllerForm
 
 				if ($result)
 				{
-					$validUcmType[$key]['value'] = $type->unique_identifier;
-					$validUcmType[$key]['text']  = $type->title;
+					$validUcmType[$key + 1]['value'] = $type->unique_identifier;
+					$validUcmType[$key + 1]['text']  = $type->title;
 				}
 			}
 		}
