@@ -164,6 +164,10 @@ class TjucmControllerItem extends JControllerLegacy
 			// If there isn't any menu item active, redirect to list view
 			$itemId = $tjUcmFrontendHelper->getItemId('index.php?option=com_tjucm&view=items' . $this->client);
 			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl . '&Itemid=' . $itemId, false));
+			
+			// Call trigger on after publish/unpublish the record
+			$dispatcher = JDispatcher::getInstance();
+			$dispatcher->trigger('tjUcmOnAfterStateChangeItem', array($id, $state));
 		}
 		else
 		{

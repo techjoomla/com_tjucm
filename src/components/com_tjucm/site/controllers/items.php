@@ -150,8 +150,9 @@ class TjucmControllerItems extends TjucmController
 			}
 			elseif (count($headers) == count($data))
 			{
-				$itemData = array();
-				$parentId = 0;
+				$itemData   = array();
+				$parentId   = 0;
+				$categoryId = 0;
 
 				// Prepare item data for item creation
 				foreach ($data as $key => $value)
@@ -226,6 +227,19 @@ class TjucmControllerItems extends TjucmController
 								$itemData[$fieldName] = $clusterTable->id;
 							}
 						}
+						elseif ($fieldsArray[$fieldName]->type == 'itemcategory')
+						{
+							if (JLoader::import('components.com_categories.tables.category', JPATH_ADMINISTRATOR))
+							{
+								$categoryTable = Table::getInstance('Category', 'CategoriesTable');
+								$categoryTable->load(array('title' => $value, 'extension' => $client, 'published' => 1));
+
+								if (property_exists($categoryTable, 'id'))
+								{
+									$itemData[$fieldName] = $categoryId = $categoryTable->id;
+								}
+							}
+						}
 						else
 						{
 							$itemData[$fieldName] = trim($value);
@@ -253,7 +267,7 @@ class TjucmControllerItems extends TjucmController
 					if ($data !== false)
 					{
 						// Save the record in UCM
-						if ($tjucmItemFormModel->save(array('client' => $client, 'parent_id' => $parentId)))
+						if ($tjucmItemFormModel->save(array('client' => $client, 'parent_id' => $parentId, 'category_id' => $categoryId)))
 						{
 							$contentId = (int) $tjucmItemFormModel->getState($tjucmItemFormModel->getName() . '.id');
 
