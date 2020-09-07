@@ -13,6 +13,8 @@ defined('_JEXEC') or die;
 jimport('joomla.application.component.modellist');
 
 use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\Table\Table;
 
 /**
  * Methods supporting a list of Tjucm records.
@@ -207,7 +209,9 @@ class TjucmModelItems extends JModelList
 		$query->from($db->quoteName('#__tj_ucm_data', 'a'));
 
 		// Join over the users for the checked out user
-		$query->join("LEFT", $db->quoteName('#__tjfields_fields_value', 'fv') . ' ON (' . $db->quoteName('fv.content_id') . ' = ' . $db->quoteName('a.id') . ')');
+		$query->join(
+		"LEFT", $db->quoteName('#__tjfields_fields_value', 'fv') . ' ON (' . $db->quoteName('fv.content_id') . ' = ' . $db->quoteName('a.id') . ')'
+		);
 
 		$client = $this->getState('ucm.client');
 
@@ -540,5 +544,51 @@ class TjucmModelItems extends JModelList
 		{
 			return false;
 		}
+	}
+
+	/**
+	 * Method to check the compatibility between ucm types
+	 *
+	 * @param   string  $client  Client
+	 * 
+	 * @return  mixed
+	 * 
+	 * @since    __DEPLOY_VERSION__
+	 */
+	public function canCopyToSameUcmType($client)
+	{
+		JLoader::import('components.com_tjucm.models.types', JPATH_ADMINISTRATOR);
+		$typesModel = BaseDatabaseModel::getInstance('Types', 'TjucmModel');
+		$typesModel->setState('filter.state', 1);
+		$ucmTypes 	= $typesModel->getItems();
+
+		JLoader::import('components.com_tjucm.models.type', JPATH_ADMINISTRATOR);
+		$typeModel = BaseDatabaseModel::getInstance('Type', 'TjucmModel');
+
+		$checkUcmCompatability = false;
+
+		foreach ($ucmTypes as $key => $type)
+		{
+			if ($client != $type->unique_identifier)
+			{
+				$result = $typeModel->getCompatibleUcmTypes($client, $type->unique_identifier);
+
+				if ($result)
+				{
+					$checkUcmCompatability = true;
+				}
+			}
+		}
+
+		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
+		$fieldTable = Table::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
+		$fieldTable->load(array('client' => $client, 'type' => 'cluster'));
+
+		if (!$checkUcmCompatability && !$fieldTable->id)
+		{
+			return true;
+		}
+
+		return false;
 	}
 }

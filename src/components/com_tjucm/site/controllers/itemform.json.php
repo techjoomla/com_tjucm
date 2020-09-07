@@ -20,6 +20,7 @@ use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Response\JsonResponse;
+use Joomla\CMS\Component\ComponentHelper;
 
 jimport('joomla.filesystem.file');
 
@@ -558,15 +559,29 @@ class TjucmControllerItemForm extends JControllerForm
 		$app = Factory::getApplication();
 		$post = $app->input->post;
 
-		$sourceClient = $app->input->get('sourceClient', '', 'string');
+		$sourceClient = $app->input->get('client', '', 'string');
 		$filter = $app->input->get('filter', '', 'ARRAY');
-		$targetClient = $filter['ucm_list'];
+		$targetClient = $filter['target_ucm'];
+
+		if (!$targetClient)
+		{
+			$targetClient = $sourceClient;
+		}
+
+		$clusterId = $filter['cluster_list'];
 
 		JLoader::import('components.com_tjucm.models.type', JPATH_ADMINISTRATOR);
 		$typeModel = BaseDatabaseModel::getInstance('Type', 'TjucmModel');
 
-		// Server side Validation for source and UCM Type
-		$result = $typeModel->getCompatableUcmType($sourceClient, $targetClient);
+		if ($sourceClient != $targetClient)
+		{
+			// Server side Validation for source and UCM Type
+			$result = $typeModel->getCompatibleUcmTypes($sourceClient, $targetClient);
+		}
+		else
+		{
+			$result = true;
+		}
 
 		if ($result)
 		{
@@ -577,177 +592,197 @@ class TjucmControllerItemForm extends JControllerForm
 			if (count($copyIds))
 			{
 				$model = $this->getModel('itemform');
-				$model->setClient($targetClient);
+				$ucmConfigs = ComponentHelper::getParams('com_tjucm');
+				$useTjQueue = $ucmConfigs->get('tjqueue_copy_items');
 
-				foreach ($copyIds as $cid)
+				if ($useTjQueue)
 				{
-					$ucmOldData = array();
-					$ucmOldData['clientComponent'] = 'com_tjucm';
-					$ucmOldData['content_id'] = $cid;
-					$ucmOldData['layout'] = 'edit';
-					$ucmOldData['client']     = $sourceClient;
-					$fileFieldArray = array();
-
-					// Get the field values
-					$extraFieldsData = $model->loadFormDataExtra($ucmOldData);
-
-					// Code to replace source field name with destination field name
-					foreach ($extraFieldsData as $fieldKey => $fieldValue)
+					foreach ($copyIds as $cid)
 					{
-						$prefixSourceClient = str_replace(".", "_", $sourceClient);
-						$fieldName = explode($prefixSourceClient . "_", $fieldKey);
-						$prefixTargetClient = str_replace(".", "_", $targetClient);
-						$targetFieldName = $prefixTargetClient . '_' . $fieldName[1];
-						$tjFieldsTable = $tjFieldsHelper->getFieldData($targetFieldName);
-						$fieldId = $tjFieldsTable->id;
-						$fieldType = $tjFieldsTable->type;
-						$fielParams = json_decode($tjFieldsTable->params);
-						$sourceTjFieldsTable = $tjFieldsHelper->getFieldData($fieldKey);
-						$sourceFieldParams = json_decode($sourceTjFieldsTable->params);
-						$subFormData = array();
+						$response = $model->queueItemCopy($cid, $sourceClient, $targetClient, Factory::getuser()->id, $clusterId);
 
-						if ($tjFieldsTable->type == 'ucmsubform' || $tjFieldsTable->type == 'subform')
+						$msg = ($response) ? Text::_("COM_TJUCM_ITEM_COPY_TO_QUEUE_SUCCESSFULLY") : Text::_("COM_TJUCM_FORM_SAVE_FAILED");
+					}
+				}
+				else
+				{
+					$model->setClient($targetClient);
+
+					foreach ($copyIds as $cid)
+					{
+						$ucmOldData = array();
+						$ucmOldData['clientComponent'] = 'com_tjucm';
+						$ucmOldData['content_id'] = $cid;
+						$ucmOldData['layout'] = 'edit';
+						$ucmOldData['client']     = $sourceClient;
+						$fileFieldArray = array();
+
+						// Get the field values
+						$extraFieldsData = $model->loadFormDataExtra($ucmOldData);
+
+						// Code to replace source field name with destination field name
+						foreach ($extraFieldsData as $fieldKey => $fieldValue)
 						{
-							$params = json_decode($tjFieldsTable->params)->formsource;
-							$subFormClient = explode('components/com_tjucm/models/forms/', $params);
-							$subFormClient = explode('form_extra.xml', $subFormClient[1]);
-							$subFormClient = 'com_tjucm.' . $subFormClient[0];
+							$prefixSourceClient = str_replace(".", "_", $sourceClient);
+							$fieldName = explode($prefixSourceClient . "_", $fieldKey);
+							$prefixTargetClient = str_replace(".", "_", $targetClient);
+							$targetFieldName = $prefixTargetClient . '_' . $fieldName[1];
+							$tjFieldsTable = $tjFieldsHelper->getFieldData($targetFieldName);
+							$fieldId = $tjFieldsTable->id;
+							$fieldType = $tjFieldsTable->type;
+							$fielParams = json_decode($tjFieldsTable->params);
+							$sourceTjFieldsTable = $tjFieldsHelper->getFieldData($fieldKey);
+							$sourceFieldParams = json_decode($sourceTjFieldsTable->params);
+							$subFormData = array();
 
-							$params = $sourceFieldParams->formsource;
-							$subFormSourceClient = explode('components/com_tjucm/models/forms/', $params);
-							$subFormSourceClient = explode('form_extra.xml', $subFormSourceClient[1]);
-							$subFormSourceClient = 'com_tjucm.' . $subFormSourceClient[0];
-
-							$subFormData = (array) json_decode($fieldValue);
-						}
-
-						if ($fieldType == 'file')
-						{
-							$fileData = array();
-							$fileData['field_id'] = $fieldId;
-							$fileData['value'] = $fieldValue;
-							$fileData['params'] = $fielParams;
-							$fileData['sourceparams'] = $sourceFieldParams;
-							$fileFieldArray[] = $fileData;
-						}
-
-						if ($subFormData)
-						{
-							foreach ($subFormData as $keyData => $data)
+							if ($tjFieldsTable->type == 'ucmsubform' || $tjFieldsTable->type == 'subform')
 							{
-								$prefixSourceClient = str_replace(".", "_", $sourceClient);
-								$fieldName = explode($prefixSourceClient . "_", $keyData);
-								$prefixTargetClient = str_replace(".", "_", $targetClient);
-								$subTargetFieldName = $prefixTargetClient . '_' . $fieldName[1];
-								$data = (array) $data;
+								$params = json_decode($tjFieldsTable->params)->formsource;
+								$subFormClient = explode('components/com_tjucm/models/forms/', $params);
+								$subFormClient = explode('form_extra.xml', $subFormClient[1]);
+								$subFormClient = 'com_tjucm.' . $subFormClient[0];
 
-								foreach ((array) $data as $key => $d)
+								$params = $sourceFieldParams->formsource;
+								$subFormSourceClient = explode('components/com_tjucm/models/forms/', $params);
+								$subFormSourceClient = explode('form_extra.xml', $subFormSourceClient[1]);
+								$subFormSourceClient = 'com_tjucm.' . $subFormSourceClient[0];
+
+								$subFormData = (array) json_decode($fieldValue);
+							}
+
+							if ($fieldType == 'file')
+							{
+								$fileData = array();
+								$fileData['field_id'] = $fieldId;
+								$fileData['value'] = $fieldValue;
+								$fileData['params'] = $fielParams;
+								$fileData['sourceparams'] = $sourceFieldParams;
+								$fileFieldArray[] = $fileData;
+							}
+
+							if ($subFormData)
+							{
+								foreach ($subFormData as $keyData => $data)
 								{
-									$prefixSourceClient = str_replace(".", "_", $subFormSourceClient);
-									$fieldName = explode($prefixSourceClient . "_", $key);
-									$prefixTargetClient = str_replace(".", "_", $subFormClient);
-									$subFieldName = $prefixTargetClient . '_' . $fieldName[1];
+									$prefixSourceClient = str_replace(".", "_", $sourceClient);
+									$fieldName = explode($prefixSourceClient . "_", $keyData);
+									$prefixTargetClient = str_replace(".", "_", $targetClient);
+									$subTargetFieldName = $prefixTargetClient . '_' . $fieldName[1];
+									$data = (array) $data;
 
-									JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/tables');
-									$fieldTable = JTable::getInstance('field', 'TjfieldsTable');
-
-									$fieldTable->load(array('name' => $key));
-
-									if ($fieldName[1] == 'contentid')
+									foreach ((array) $data as $key => $d)
 									{
-										$d = '';
-									}
+										$prefixSourceClient = str_replace(".", "_", $subFormSourceClient);
+										$fieldName = explode($prefixSourceClient . "_", $key);
+										$prefixTargetClient = str_replace(".", "_", $subFormClient);
+										$subFieldName = $prefixTargetClient . '_' . $fieldName[1];
 
-									$temp = array();
-									unset($data[$key]);
+										JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/tables');
+										$fieldTable = JTable::getInstance('field', 'TjfieldsTable');
 
-									if (is_array($d))
-									{
-										// TODO Temprary used switch case need to modify code
-										switch ($fieldTable->type)
+										$fieldTable->load(array('name' => $key));
+
+										if ($fieldName[1] == 'contentid')
 										{
-											case 'tjlist':
-											case 'related':
-											case 'multi_select':
-												foreach ($d as $option)
-												{
-													$temp[] = $option->value;
-												}
+											$d = '';
+										}
 
-												if (!empty($temp))
-												{
-													$data[$subFieldName] = $temp;
-												}
+										$temp = array();
+										unset($data[$key]);
 
-											break;
+										if (is_array($d))
+										{
+											// TODO Temprary used switch case need to modify code
+											switch ($fieldTable->type)
+											{
+												case 'tjlist':
+												case 'related':
+												case 'multi_select':
+													foreach ($d as $option)
+													{
+														$temp[] = $option->value;
+													}
 
-											default:
-												foreach ($d as $option)
-												{
-													$data[$subFieldName] = $option->value;
-												}
-											break;
+													if (!empty($temp))
+													{
+														$data[$subFieldName] = $temp;
+													}
+
+												break;
+
+												default:
+													foreach ($d as $option)
+													{
+														$data[$subFieldName] = $option->value;
+													}
+												break;
+											}
+										}
+										else
+										{
+											$data[$subFieldName] = $d;
 										}
 									}
-									else
-									{
-										$data[$subFieldName] = $d;
-									}
+
+									unset($subFormData[$keyData]);
+									$subFormData[$subTargetFieldName] = $data;
 								}
 
-								unset($subFormData[$keyData]);
-								$subFormData[$subTargetFieldName] = $data;
+								unset($extraFieldsData[$fieldKey]);
+								$extraFieldsData[$targetFieldName] = $subFormData;
 							}
-
-							unset($extraFieldsData[$fieldKey]);
-							$extraFieldsData[$targetFieldName] = $subFormData;
-						}
-						else
-						{
-							unset($extraFieldsData[$fieldKey]);
-							$extraFieldsData[$targetFieldName] = $fieldValue;
-						}
-					}
-
-					$ucmData = array();
-					$ucmData['id'] 			= 0;
-					$ucmData['client'] 		= $targetClient;
-					$ucmData['parent_id'] 	= 0;
-					$ucmData['state']		= 0;
-					$ucmData['draft']	 	= 1;
-
-					// Save data into UCM data table
-					$result = $model->save($ucmData);
-					$recordId = $model->getState($model->getName() . '.id');
-
-					if ($recordId)
-					{
-						foreach ($fileFieldArray as $fileField)
-						{
-							$fileFieldValue = round(microtime(true)) . "_" . JUserHelper::genRandomPassword(5) . "_" . $fileField['value'];
-
-							if (copy($fileField['sourceparams']->uploadpath . $fileField['value'], $fileField['params']->uploadpath . $fileFieldValue))
+							else
 							{
-								JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/tables');
-								$fielValuedTable = JTable::getInstance('fieldsvalue', 'TjfieldsTable');
-								$fielValuedTable->field_id = $fileField['field_id'];
-								$fielValuedTable->content_id = $recordId;
-								$fielValuedTable->value = $fileFieldValue;
-								$fielValuedTable->user_id = Factory::getUser()->id;
-								$fielValuedTable->client = $targetClient;
-								$fielValuedTable->store();
+								unset($extraFieldsData[$fieldKey]);
+								$extraFieldsData[$targetFieldName] = $fieldValue;
 							}
 						}
 
-						$formData = array();
-						$formData['content_id'] = $recordId;
-						$formData['fieldsvalue'] = $extraFieldsData;
-						$formData['client'] = $targetClient;
+						$ucmData = array();
+						$ucmData['id'] 			= 0;
+						$ucmData['client'] 		= $targetClient;
+						$ucmData['parent_id'] 	= 0;
+						$ucmData['state']		= 0;
+						$ucmData['draft']	 	= 1;
 
-						// If data is valid then save the data into DB
-						$response = $model->saveExtraFields($formData);
+						if ($clusterId)
+						{
+							$ucmData['cluster_id']	 	= $clusterId;
+						}
 
-						$msg = ($response) ? Text::_("COM_TJUCM_ITEM_COPY_SUCCESSFULLY") : Text::_("COM_TJUCM_FORM_SAVE_FAILED");
+						// Save data into UCM data table
+						$result = $model->save($ucmData);
+						$recordId = $model->getState($model->getName() . '.id');
+
+						if ($recordId)
+						{
+							$formData = array();
+							$formData['content_id'] = $recordId;
+							$formData['fieldsvalue'] = $extraFieldsData;
+							$formData['client'] = $targetClient;
+
+							// If data is valid then save the data into DB
+							$response = $model->saveExtraFields($formData);
+
+							foreach ($fileFieldArray as $fileField)
+							{
+								$fileFieldValue = round(microtime(true)) . "_" . JUserHelper::genRandomPassword(5) . "_" . $fileField['value'];
+
+								if (copy($fileField['sourceparams']->uploadpath . $fileField['value'], $fileField['params']->uploadpath . $fileFieldValue))
+								{
+									JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/tables');
+									$fielValuedTable = JTable::getInstance('fieldsvalue', 'TjfieldsTable');
+									$fielValuedTable->field_id = $fileField['field_id'];
+									$fielValuedTable->content_id = $recordId;
+									$fielValuedTable->value = $fileFieldValue;
+									$fielValuedTable->user_id = Factory::getUser()->id;
+									$fielValuedTable->client = $targetClient;
+									$fielValuedTable->store();
+								}
+							}
+
+							$msg = ($response) ? Text::_("COM_TJUCM_ITEM_COPY_SUCCESSFULLY") : Text::_("COM_TJUCM_FORM_SAVE_FAILED");
+						}
 					}
 				}
 
@@ -756,6 +791,7 @@ class TjucmControllerItemForm extends JControllerForm
 			}
 		}
 	}
+
 	/**
 	 * Method to get Related Field Options for the field.
 	 *

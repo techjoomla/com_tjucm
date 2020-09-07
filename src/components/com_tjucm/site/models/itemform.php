@@ -22,6 +22,12 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\Registry\Registry;
 use Joomla\CMS\Language\Text;
+use TJQueue\Admin\TJQueueProduce;
+
+if (ComponentHelper::getComponent('com_tjqueue', true)->enabled)
+{
+	jimport('tjqueueproduce', JPATH_SITE . '/administrator/components/com_tjqueue/libraries');
+}
 
 JLoader::register('TjucmAccess', JPATH_SITE . '/components/com_tjucm/includes/access.php');
 
@@ -499,7 +505,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 */
 	public function save($data)
 	{
-		$user = JFactory::getUser();
+		$user = empty($data['created_by']) ? Factory::getUser() : Factory::getUser($data['created_by']);
 
 		// Guest users are not allowed to add the records
 		if (empty($user->id))
@@ -535,7 +541,7 @@ class TjucmModelItemForm extends JModelAdmin
 		}
 
 		$ucmTypeParams = new Registry($tjUcmTypeTable->params);
-		
+
 		// Check if UCM type is subform
 		$isSubform     = $ucmTypeParams->get('is_subform');
 
@@ -568,7 +574,7 @@ class TjucmModelItemForm extends JModelAdmin
 			$allowedCount = $ucmTypeParams->get('allowed_count', 0, 'INT');
 
 			// Check if the user is allowed to add record for given UCM type
-			$canAdd = TjucmAccess::canCreate($data['type_id']);
+			$canAdd = TjucmAccess::canCreate($data['type_id'], $data['created_by']);
 
 			if (!$canAdd)
 			{
@@ -1118,5 +1124,58 @@ class TjucmModelItemForm extends JModelAdmin
 		}
 
 		return $returnData;
+	}
+
+	/**
+	 * Method to push data in queue.
+	 *
+	 * @param   string  $ucmId         Ucm id
+	 * @param   string  $sourceClient  Source client
+	 * @param   array   $targetClient  Target client
+	 * @param   Object  $userId        User id who wants to copy item
+	 * @param   Object  $clusterId     Cluster id
+	 *
+	 * @return  boolean value.
+	 *
+	 * @since __DEPLOY_VERSION__
+	 */
+	public static function queueItemCopy($ucmId, $sourceClient, $targetClient, $userId, $clusterId=0)
+	{
+		$return = [];
+
+		$messageBody = new stdClass;
+		$messageBody->ucmId = $ucmId;
+		$messageBody->sourceClient = $sourceClient;
+		$messageBody->targetClient = $targetClient;
+		$messageBody->userId = $userId;
+
+		if ($clusterId)
+		{
+			$messageBody->clusterId = $clusterId;
+		}
+
+		try
+		{
+			$TJQueueProduce = new TJQueueProduce;
+
+			// Set message body
+			$TJQueueProduce->message->setBody(json_encode($messageBody));
+
+			// @Params client, value
+			$TJQueueProduce->message->setProperty('client', 'core.copyitem');
+			$TJQueueProduce->produce();
+		}
+		catch (Exception $e)
+		{
+			$return['success'] = 0;
+			$return['message'] = $e->getMessage();
+
+			return $return;
+		}
+
+		$return['success'] = 1;
+		$return['message'] = '';
+
+		return $return;
 	}
 }

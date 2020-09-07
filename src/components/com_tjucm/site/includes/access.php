@@ -28,8 +28,10 @@ require_once JPATH_SITE . '/components/com_tjucm/includes/defines.php';
  */
 class TjucmAccess
 {
-	public static function canCreate($ucmTypeId)
+	public static function canCreate($ucmTypeId, $userId = 0)
 	{
+		$user = empty($userId) ? Factory::getUser() : Factory::getUser($userId);
+
 		if (TjucmAccess::hasCluster($ucmTypeId))
 		{
 			// Get com_subusers component status
@@ -40,17 +42,19 @@ class TjucmAccess
 			{
 				JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
 
-				return RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.createitem.' . $ucmTypeId);
+				return RBACL::check($user->id, 'com_cluster', 'core.createitem.' . $ucmTypeId);
 			}
 		}
 		else
 		{
-			return JFactory::getUser()->authorise('core.type.createitem', 'com_tjucm.type.' . $ucmTypeId);
+			return $user->authorise('core.type.createitem', 'com_tjucm.type.' . $ucmTypeId);
 		}
 	}
 
-	public static function canImport($ucmTypeId)
+	public static function canImport($ucmTypeId, $userId = 0)
 	{
+		$user = empty($userId) ? Factory::getUser() : Factory::getUser($userId);
+
 		if (TjucmAccess::hasCluster($ucmTypeId))
 		{
 			// Get com_subusers component status
@@ -61,22 +65,24 @@ class TjucmAccess
 			{
 				JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
 
-				return RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.importitem.' . $ucmTypeId) && RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.createtitem.' . $ucmTypeId);
+				return RBACL::check($user->id, 'com_cluster', 'core.importitem.' . $ucmTypeId) && RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.createtitem.' . $ucmTypeId);
 			}
 		}
 		else
 		{
-			return JFactory::getUser()->authorise('core.type.importitem', 'com_tjucm.type.' . $ucmTypeId);
+			return $user->authorise('core.type.importitem', 'com_tjucm.type.' . $ucmTypeId);
 		}
 	}
 
-	public static function canView($ucmTypeId, $contentId)
+	public static function canView($ucmTypeId, $contentId, $userId = 0)
 	{
+		$user = empty($userId) ? Factory::getUser() : Factory::getUser($userId);
+
 		JLoader::import('components.com_tjucm.tables.item', JPATH_ADMINISTRATOR);
 		$itemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', JFactory::getDbo()));
 		$itemTable->load($contentId);
 
-		if (JFactory::getUser()->id == $itemTable->created_by)
+		if ($user->id == $itemTable->created_by)
 		{
 			return true;
 		}
@@ -85,7 +91,7 @@ class TjucmAccess
 
 		if (TjucmAccess::hasCluster($ucmTypeId))
 		{
-			if (RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.viewallitem.' . $ucmTypeId))
+			if (RBACL::check($user->id, 'com_cluster', 'core.viewallitem.' . $ucmTypeId))
 			{
 				return true;
 			}
@@ -96,22 +102,24 @@ class TjucmAccess
 			// Check user have permission to edit record of assigned cluster
 			if ($subUserExist)
 			{
-				return RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.viewitem.' . $ucmTypeId, $itemTable->cluster_id);
+				return RBACL::check($user->id, 'com_cluster', 'core.viewitem.' . $ucmTypeId, $itemTable->cluster_id);
 			}
 		}
 		else
 		{
-			return JFactory::getUser()->authorise('core.type.viewitem', 'com_tjucm.type.' . $ucmTypeId);
+			return $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $ucmTypeId);
 		}
 	}
 
-	public static function canEdit($ucmTypeId, $contentId)
+	public static function canEdit($ucmTypeId, $contentId, $userId = 0)
 	{
+		$user = empty($userId) ? Factory::getUser() : Factory::getUser($userId);
+
 		if (TjucmAccess::hasCluster($ucmTypeId))
 		{
 			JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
 
-			if (RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.editallitem.' . $ucmTypeId))
+			if (RBACL::check($user->id, 'com_cluster', 'core.editallitem.' . $ucmTypeId))
 			{
 				return true;
 			}
@@ -126,22 +134,24 @@ class TjucmAccess
 				$itemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', JFactory::getDbo()));
 				$itemTable->load($contentId);
 
-				return RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.edititem.' . $ucmTypeId, $itemTable->cluster_id);
+				return RBACL::check($user->id, 'com_cluster', 'core.edititem.' . $ucmTypeId, $itemTable->cluster_id);
 			}
 		}
 		else
 		{
-			return JFactory::getUser()->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmTypeId);
+			return $user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmTypeId);
 		}
 	}
 
-	public static function canEditState($ucmTypeId, $contentId)
+	public static function canEditState($ucmTypeId, $contentId, $userId = 0)
 	{
+		$user = empty($userId) ? Factory::getUser() : Factory::getUser($userId);
+
 		if (TjucmAccess::hasCluster($ucmTypeId))
 		{
 			JLoader::import("components.com_subusers.includes.rbacl", JPATH_ADMINISTRATOR);
 
-			if (RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.editallitemstate.' . $ucmTypeId))
+			if (RBACL::check($user->id, 'com_cluster', 'core.editallitemstate.' . $ucmTypeId))
 			{
 				return true;
 			}
@@ -156,17 +166,19 @@ class TjucmAccess
 				$itemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', JFactory::getDbo()));
 				$itemTable->load($contentId);
 
-				return RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.edititemstate.' . $ucmTypeId, $itemTable->cluster_id);
+				return RBACL::check($user->id, 'com_cluster', 'core.edititemstate.' . $ucmTypeId, $itemTable->cluster_id);
 			}
 		}
 		else
 		{
-			return JFactory::getUser()->authorise('core.type.edititemstate', 'com_tjucm.type.' . $ucmTypeId);
+			return $user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $ucmTypeId);
 		}
 	}
 
-	public static function canEditOwn($ucmTypeId, $contentId)
+	public static function canEditOwn($ucmTypeId, $contentId, $userId = 0)
 	{
+		$user = empty($userId) ? Factory::getUser() : Factory::getUser($userId);
+
 		if (TjucmAccess::hasCluster($ucmTypeId))
 		{
 			// Get com_subusers component status
@@ -180,22 +192,24 @@ class TjucmAccess
 				$itemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', JFactory::getDbo()));
 				$itemTable->load($contentId);
 
-				return RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.editownitem.' . $ucmTypeId, $itemTable->cluster_id);
+				return RBACL::check($user->id, 'com_cluster', 'core.editownitem.' . $ucmTypeId, $itemTable->cluster_id);
 			}
 		}
 		else
 		{
-			return JFactory::getUser()->authorise('core.type.editownitem', 'com_tjucm.type.' . $ucmTypeId);
+			return $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $ucmTypeId);
 		}
 	}
 
-	public static function canDelete($ucmTypeId, $contentId)
+	public static function canDelete($ucmTypeId, $contentId, $userId = 0)
 	{
+		$user = empty($userId) ? Factory::getUser() : Factory::getUser($userId);
+
 		if (TjucmAccess::hasCluster($ucmTypeId))
 		{
 			JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
 
-			if (RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.deleteallitem.' . $ucmTypeId))
+			if (RBACL::check($user->id, 'com_cluster', 'core.deleteallitem.' . $ucmTypeId))
 			{
 				return true;
 			}
@@ -210,17 +224,19 @@ class TjucmAccess
 				$itemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', JFactory::getDbo()));
 				$itemTable->load($contentId);
 
-				return RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.deleteitem.' . $ucmTypeId, $itemTable->cluster_id);
+				return RBACL::check($user->id, 'com_cluster', 'core.deleteitem.' . $ucmTypeId, $itemTable->cluster_id);
 			}
 		}
 		else
 		{
-			return JFactory::getUser()->authorise('core.type.deleteitem', 'com_tjucm.type.' . $ucmTypeId);
+			return $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $ucmTypeId);
 		}
 	}
 
-	public static function canDeleteOwn($ucmTypeId, $contentId)
+	public static function canDeleteOwn($ucmTypeId, $contentId, $userId = 0)
 	{
+		$user = empty($userId) ? Factory::getUser() : Factory::getUser($userId);
+
 		if (TjucmAccess::hasCluster($ucmTypeId))
 		{
 			// Get com_subusers component status
@@ -234,12 +250,12 @@ class TjucmAccess
 				$itemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', JFactory::getDbo()));
 				$itemTable->load($contentId);
 
-				return RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.deleteownitem.' . $ucmTypeId, $itemTable->cluster_id);
+				return RBACL::check($user->id, 'com_cluster', 'core.deleteownitem.' . $ucmTypeId, $itemTable->cluster_id);
 			}
 		}
 		else
 		{
-			return JFactory::getUser()->authorise('core.type.deleteownitem', 'com_tjucm.type.' . $ucmTypeId);
+			return $user->authorise('core.type.deleteownitem', 'com_tjucm.type.' . $ucmTypeId);
 		}
 	}
 

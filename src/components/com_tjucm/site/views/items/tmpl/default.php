@@ -20,6 +20,7 @@ JHtml::_('formbehavior.chosen', 'select');
 JHtml::_('jquery.token');
 
 $importItemsPopUpUrl = JUri::root() . '/index.php?option=com_tjucm&view=items&layout=importitems&tmpl=component&client=' . $this->client;
+$copyItemPopupUrl = JUri::root() . 'index.php?option=com_tjucm&view=items&layout=copyitems&tmpl=component&client=' . $this->client;
 JFactory::getDocument()->addScriptDeclaration('
 	jQuery(document).ready(function(){
 		jQuery("#adminForm #import-items").click(function() {
@@ -51,47 +52,25 @@ $itemId = $tjUcmFrontendHelper->getItemId($link);
 $fieldsData = array();
 
 JFactory::getDocument()->addScriptDeclaration("
-	jQuery(window).load(function()
-	{
-		var currentUcmType = new FormData();
-		currentUcmType.append('client', '" . $this->client . "');
-		var afterCheckCompatibilityOfUcmType = function(error, response){
-			response = JSON.parse(response);
-
-			if (response.data.length > 0)
-			{
-				jQuery('.copyToOther').removeClass('hide');
-				jQuery.each(response.data, function(key, value) {
-				 jQuery('#ucm_list').append(jQuery('<option></option>').attr('value',value.value).text(value.text)); 
-				 jQuery('#ucm_list').trigger('liszt:updated');
-				});
-			}
-		};
-
-		// Code to check ucm type compatibility to copy item
-		com_tjucm.Services.Items.chekCompatibility(currentUcmType, afterCheckCompatibilityOfUcmType);
-	});
-
-	function copyItem()
+	function copySameUcmTypeItem()
 	{
 		var afterCopyItem = function(error, response){
 			response = JSON.parse(response);
-
-			// Close pop up and display message
-			jQuery( '#copyModal' ).modal('hide');
-
+			
+			sessionStorage.setItem('message', response.message);
 			if(response.data !== null)
 			{
-				Joomla.renderMessages({'success':[response.message]});
+				window.parent.location.reload();
+				sessionStorage.setItem('class', 'alert alert-success');
 			}
 			else
 			{
-				Joomla.renderMessages({'error':[response.message]});
+				sessionStorage.setItem('class', 'alert alert-danger');
 			}
 		}
-
+	
 		var copyItemData =  jQuery('#adminForm').serialize();
-
+		
 		// Code to copy item to ucm type
 		com_tjucm.Services.Items.copyItem(copyItemData, afterCopyItem);
 	}
@@ -100,8 +79,20 @@ JFactory::getDocument()->addScriptDeclaration("
 $statusColumnWidth = 0;
 
 ?>
+<script>
+	jQuery(document).ready(function(){
+		if(sessionStorage.getItem('message'))
+		{
+			jQuery('#message').html('<div class="'+sessionStorage.getItem('class')+'"><a href="#" class="close" data-dismiss="alert">&times;</a>'+sessionStorage.getItem('message')+'</div>');
+		}
+		sessionStorage.removeItem("class");
+		sessionStorage.removeItem("message");
+	});
+</script>
+
 <div class="tjucm-wrapper">
 <form action="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>" enctype="multipart/form-data" method="post" name="adminForm" id="adminForm" class="form-validate">
+<div id="message" class=""></div>
 <?php
 	if (isset($this->items))
 	{
@@ -132,6 +123,33 @@ $statusColumnWidth = 0;
 				</a>
 				<?php
 			}
+			if ($this->canCopyItem)
+			{
+				if ($this->canCopyToSameUcmType)
+				{?>
+					<a onclick="if(document.adminForm.boxchecked.value==0){alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{copySameUcmTypeItem()}" class="btn btn-default btn-small">
+					<i class="fa fa-clone"></i> <?php echo JText::_('COM_TJUCM_COPY_ITEM'); ?>
+					</a><?php
+				}
+				else
+				{
+				?>
+				<a href="#" onclick="if(document.adminForm.boxchecked.value==0){alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{jQuery( '#collapseModal' ).modal('show'); return true;}" id="copy-items" class="btn btn-default btn-small">
+					<i class="fa fa-clone"></i> <?php echo JText::_('COM_TJUCM_COPY_ITEM'); ?>
+				</a>
+				<?php
+				}
+				?>
+				<?php echo JHtml::_(
+					'bootstrap.renderModal',
+					'collapseModal',
+					array(
+						'title'  => JText::_('COM_TJUCM_COPY_ITEMS'),
+					),
+					$this->loadTemplate('copyitems')
+				); ?>
+				<?php
+			}
 		}
 		?>
 	</div>
@@ -148,10 +166,12 @@ $statusColumnWidth = 0;
 				{?>
 			<thead>
 				<tr>
+					<?php if ($this->canCopyItem) { ?>
 					<!-- TODO- copy and copy to other feature is not fully stable hence relate buttons are hidden-->
-					<th width="1%" class="hidden">
+					<th width="1%" class="">
 						<input type="checkbox" name="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 					</th>
+					<?php } ?>
 					<?php
 					if (isset($this->items[0]->state))
 					{
@@ -298,34 +318,10 @@ $statusColumnWidth = 0;
 		}
 	}
 	?>
+	<input type="hidden" id="client" name="client" value="<?php echo $this->client ?>"/>
 	<input type="hidden" name="boxchecked" value="0"/>
 	<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>"/>
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>"/>
-	
-	<!-- Modal Pop Up for Copy Item to Other-->
-	<div id="copyModal" class="copyModal modal fade" role="dialog">
-		<div class="modal-dialog">
-			<!-- Modal content-->
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close novalidate" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">×</span>
-					</button>
-					<h3><?php echo JText::_("COM_TJUCM_SELECT_SOURCE_FORM");?></h3>
-				</div>
-				<div class="modal-body">
-					<?php echo JHTML::_('select.genericlist', '', 'filter[ucm_list]', 'class="ucm_list input-medium" onchange=""', 'text', 'value', $this->state->get('filter.ucm_list'), 'ucm_list'); ?>
-					<input type="hidden" name="sourceClient" value="<?php echo $this->client;?>"/>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn" onclick="document.getElementById('ucm_list').value='';" data-dismiss="modal"><?php echo JText::_("COM_TJUCM_CANCEL_COPY");?></button>
-					<a class="btn btn-success" onclick="copyItem()">
-						<?php echo JText::_("COM_TJUCM_PROCESS_DATA");?>
-					</a>
-				</div>
-			</div>
-		</div>
-	</div>
 	<?php echo JHtml::_('form.token'); ?>
 </form>
 </div>
