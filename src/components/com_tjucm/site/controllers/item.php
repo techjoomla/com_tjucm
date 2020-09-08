@@ -30,11 +30,6 @@ class TjucmControllerItem extends JControllerLegacy
 		$this->client  = JFactory::getApplication()->input->get('client');
 		$this->created_by  = JFactory::getApplication()->input->get('created_by');
 
-		// Get UCM type id from uniquue identifier
-		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
-		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
-		$this->ucmTypeId = $tjUcmModelType->getTypeId($this->client);
-
 		// If client is empty then get client from menu params
 		if (empty($this->client))
 		{
@@ -57,6 +52,11 @@ class TjucmControllerItem extends JControllerLegacy
 				}
 			}
 		}
+
+		// Get UCM type id from uniquue identifier
+		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		$this->ucmTypeId = $tjUcmModelType->getTypeId($this->client);
 
 		$this->appendUrl = "";
 
@@ -129,18 +129,18 @@ class TjucmControllerItem extends JControllerLegacy
 
 		// Initialise variables.
 		$app = JFactory::getApplication();
+		$id = $app->input->getInt('id');
 		$tjUcmFrontendHelper = new TjucmHelpersTjucm;
 
 		// Checking if the user can remove object
-		$canEdit       = $this->canEdit($this->ucmTypeId);
-		$canEditState  = $this->canEditState($this->ucmTypeId);
+		$canEdit       = TjucmAccess::canEdit($this->ucmTypeId, $id);
+		$canEditState  = TjucmAccess::canEditState($this->ucmTypeId, $id);
 
 		if ($canEdit || $canEditState)
 		{
 			$model = $this->getModel('Item', 'TjucmModel');
 
 			// Get the user data.
-			$id    = $app->input->getInt('id');
 			$state = $app->input->getInt('state');
 
 			// Attempt to save the data.
@@ -164,7 +164,7 @@ class TjucmControllerItem extends JControllerLegacy
 			// If there isn't any menu item active, redirect to list view
 			$itemId = $tjUcmFrontendHelper->getItemId('index.php?option=com_tjucm&view=items' . $this->client);
 			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl . '&Itemid=' . $itemId, false));
-			
+
 			// Call trigger on after publish/unpublish the record
 			$dispatcher = JDispatcher::getInstance();
 			$dispatcher->trigger('tjUcmOnAfterStateChangeItem', array($id, $state));
@@ -193,15 +193,15 @@ class TjucmControllerItem extends JControllerLegacy
 		// Initialise variables.
 		$app = JFactory::getApplication();
 
+		// Get the user data.
+		$id = $app->input->getInt('id', 0);
+
 		// Checking if the user can remove object
-		$canDelete = $this->canDelete($this->ucmTypeId);
+		$canDelete = TjucmAccess::canDelete($this->ucmTypeId, $id);
 
 		if ($canDelete)
 		{
 			$model = $this->getModel('Item', 'TjucmModel');
-
-			// Get the user data.
-			$id = $app->input->getInt('id', 0);
 
 			// Attempt to save the data.
 			$return = $model->delete($id);
