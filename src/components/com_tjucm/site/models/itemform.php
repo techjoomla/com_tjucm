@@ -641,7 +641,7 @@ class TjucmModelItemForm extends JModelAdmin
 		{
 			$clusterFieldName = str_replace('.', '_', $fieldData['client']) . '_clusterclusterid';
 			$ownerShipFieldName = str_replace('.', '_', $fieldData['client']) . '_ownershipcreatedby';
-			$itemCategoryFieldName = str_replace('.', '_', $fieldData['client']) . '_itemcategory';
+			$itemCategoryFieldName = str_replace('.', '_', $fieldData['client']) . '_itemcategoryitemcategory';
 
 			if (array_key_exists($clusterFieldName, $fieldData['fieldsvalue'])
 				|| array_key_exists($ownerShipFieldName, $fieldData['fieldsvalue'])

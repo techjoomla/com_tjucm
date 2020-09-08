@@ -49,7 +49,7 @@ $firstListColumn = key($tmpListColumn);
 	{
 		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
 		$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
-		$fieldTable->load(array('client' => $this->client, 'type' => 'cluster'));
+		$fieldTable->load(array('client' => $this->client, 'type' => 'cluster', 'state' => '1'));
 
 		if ($fieldTable->id)
 		{
@@ -109,6 +109,33 @@ $firstListColumn = key($tmpListColumn);
 			<?php
 		}
 	}
+
+	// Get the item category filter
+	JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
+	$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
+	$fieldTable->load(array('client' => $this->client, 'type' => 'itemcategory', 'state' => '1'));
+
+	if ($fieldTable->id)
+	{
+		$selectCategory = new stdClass;
+		$selectCategory->value = '';
+		$selectCategory->text = JText::_("COM_TJUCM_FILTER_SELECT_CATEGORY_LABEL");
+
+		$categoryOptions = JHtml::_('category.options', $this->client, $config = array('filter.published' => array(1)));
+		$categoryOptions = array_merge(array($selectCategory), $categoryOptions);
+		?>
+		<div class="btn-group pull-right hidden-xs">
+			<?php
+				echo JHtml::_(
+					'select.genericlist', $categoryOptions, "itemcategory", 'class="input-medium"
+					size="1" onchange="this.form.submit();"', "value", "text",
+					$this->state->get($this->client . '.filter.category_id', '', 'INT')
+				);
+			?>
+		</div>
+		<?php
+	}
+
 	// Load filter fields
 	JLoader::import('components.com_tjfields.models.options', JPATH_ADMINISTRATOR);
 	JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
