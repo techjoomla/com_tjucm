@@ -112,6 +112,10 @@ class TjucmControllerType extends JControllerForm
 		$post = $app->input->post;
 		$client = $post->get('client', '', 'STRING');
 
+		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
+		$typeTable = Table::getInstance('type', 'TjucmTable');
+		$typeTable->load(array('unique_identifier' => $client));
+
 		if (empty($client))
 		{
 			echo new JResponseJson(null);
@@ -137,11 +141,51 @@ class TjucmControllerType extends JControllerForm
 			$app->close();
 		}
 
-		JFormHelper::addFieldPath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models/fields/');
-		$cluster = JFormHelper::loadFieldType('cluster', false);
-		$clusterList = $cluster->getOptionsExternally();
+		JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
+		JLoader::import("/components/com_cluster/includes/cluster", JPATH_ADMINISTRATOR);
+		$clustersModel = ClusterFactory::model('Clusters', array('ignore_request' => true));
+		$clusters = $clustersModel->getItems();
 
-		echo new JResponseJson($clusterList);
+		// Get list of clusters with data in UCM type
+		$db = Factory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select($db->quoteName('cluster_id'));
+		$query->from($db->quoteName('#__tj_ucm_data'));
+		$query->where($db->quoteName('client') . '=' . $db->quote($client));
+		$query->group($db->quoteName('cluster_id'));
+		$db->setQuery($query);
+		$clustersWithData = $db->loadColumn();
+
+		$usersClusters = array();
+
+		$clusterObj = new stdclass;
+		$clusterObj->text = Text::_("COM_TJFIELDS_OWNERSHIP_CLUSTER");
+		$clusterObj->value = "";
+
+		$usersClusters[] = $clusterObj;
+
+		if (!empty($clusters))
+		{
+			foreach ($clusters as $clusterList)
+			{
+				if (RBACL::check(Factory::getUser()->id, 'com_cluster', 'core.viewitem.' . $typeTable->id, $clusterList->id) || RBACL::check(Factory::getUser()->id, 'com_cluster', 'core.viewallitem.' . $typeTable->id))
+				{
+					if (!empty($clusterList->id))
+					{
+						if (in_array($clusterList->id, $clustersWithData))
+						{
+							$clusterObj = new stdclass;
+							$clusterObj->text = $clusterList->name;
+							$clusterObj->value = $clusterList->id;
+
+							$usersClusters[] = $clusterObj;
+						}
+					}
+				}
+			}
+		}
+
+		echo new JResponseJson($usersClusters);
 		$app->close();
 	}
 }
