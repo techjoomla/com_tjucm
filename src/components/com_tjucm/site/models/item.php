@@ -17,6 +17,7 @@ jimport('joomla.event.dispatcher');
 require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
 
 use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 
 /**
  * Tjucm model.
