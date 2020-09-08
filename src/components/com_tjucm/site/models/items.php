@@ -596,7 +596,7 @@ class TjucmModelItems extends JModelList
 		}
 
 		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
-		$fieldTable = Table::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
+		$fieldTable = Table::getInstance('Field', 'TjfieldsTable', array('dbo', JFactory::getDbo()));
 		$fieldTable->load(array('client' => $client, 'type' => 'cluster'));
 
 		if (!$checkUcmCompatability && !$fieldTable->id)
