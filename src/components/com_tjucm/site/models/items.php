@@ -140,6 +140,13 @@ class TjucmModelItems extends JModelList
 			$this->setState($ucmType . '.filter.cluster_id', $clusterId);
 		}
 
+		$categoryId = $app->getUserStateFromRequest($this->context . '.' . $ucmType . '.itemcategory', 'itemcategory');
+
+		if ($categoryId)
+		{
+			$this->setState($ucmType . '.filter.category_id', $categoryId);
+		}
+
 		$draft = $app->getUserStateFromRequest($this->context . '.draft', 'draft');
 		$this->setState('filter.draft', $draft);
 
@@ -332,6 +339,14 @@ class TjucmModelItems extends JModelList
 		if ($clusterId)
 		{
 			$query->where($db->quoteName('a.cluster_id') . ' = ' . $clusterId);
+		}
+
+		// Filter by category
+		$categoryId = (int) $this->getState($client . '.filter.category_id');
+
+		if ($categoryId)
+		{
+			$query->where($db->quoteName('a.category_id') . ' = ' . $categoryId);
 		}
 
 		// Add the list ordering clause.
