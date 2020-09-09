@@ -362,7 +362,7 @@ class TjucmModelItems extends JModelList
 
 		$query->group($db->qn('a.id'));
 
-		if ($orderCol && $orderDirn)
+		if ($orderCol && $orderDirn && (!is_numeric($orderCol) || array_key_exists($orderCol, $this->fields)))
 		{
 			$query->order($db->escape($db->qn($orderCol) . ' ' . $orderDirn));
 		}
@@ -382,48 +382,61 @@ class TjucmModelItems extends JModelList
 		$items = parent::getItems();
 
 		// Get id of multi-select fields
-		$fields = implode(',', array_keys($this->fields));
+		$contentIds = array_column($items, 'id');
+		$client = $this->getState('ucm.client');
 
-		if ($fields != '')
+		if (!empty($contentIds) && !empty($client))
 		{
+			// Get fields which can have multiple values
 			$db = JFactory::getDbo();
 			$query = $db->getQuery(true);
 			$query->select($db->qn('id'));
 			$query->from($db->qn('#__tjfields_fields'));
-			$query->where($db->qn('id') . ' IN(' . $fields . ')');
+			$query->where($db->qn('client') . ' = ' . $db->q($client));
 			$query->where($db->qn('type') . ' IN("multi_select", "tjlist")');
 			$query->where('(' . $db->qn('params') . ' LIKE ' . $db->q('%multiple":"true%') . ' OR ' . $db->qn('params') . ' LIKE ' . $db->q('%multiple":"1%') . ')');
 			$db->setQuery($query);
-
 			$fieldsList = $db->loadColumn();
 
-			foreach ($items as $k => &$item)
+			if (!empty($fieldsList))
 			{
-				$item = (ARRAY) $item;
+				// Get fields which can have multiple values
+				$db = JFactory::getDbo();
+				$query = $db->getQuery(true);
+				$query->select($db->qn(array('content_id', 'field_id', 'value')));
+				$query->from($db->qn('#__tjfields_fields_value'));
+				$query->where($db->qn('content_id') . ' IN(' . implode(', ', $contentIds) . ')');
+				$query->where($db->qn('field_id') . ' IN(' . implode(', ', $fieldsList) . ')');
+				$db->setQuery($query);
+				$multiSelectValues = $db->loadObjectList();
 
-				foreach ($fieldsList as $field)
+				$mappedData = array();
+
+				foreach ($multiSelectValues as $multiSelectValue)
 				{
-					if ($item[$field] == '')
-					{
-						continue;
-					}
-
-					$query = $db->getQuery(true);
-					$query->select($db->qn('value'));
-					$query->from($db->qn('#__tjfields_fields_value'));
-					$query->where($db->qn('content_id') . ' = ' . $item['id']);
-					$query->where($db->qn('client') . ' = ' . $db->q($item['client']));
-					$query->where($db->qn('field_id') . ' = ' . $field);
-					$db->setQuery($query);
-					$values = $db->loadColumn();
-
-					if (count($values) > 1)
-					{
-						$item[$field] = $values;
-					}
+					$mappedData[$multiSelectValue->content_id][$multiSelectValue->field_id][] = $multiSelectValue->value;
 				}
 
-				$item = (OBJECT) $item;
+				foreach ($items as $k => &$item)
+				{
+					$item = (ARRAY) $item;
+
+					foreach ($mappedData as $contentId => $mappedContentData)
+					{
+						if ($contentId == $item['id'])
+						{
+							foreach ($mappedContentData as $fieldId => $value)
+							{
+								$item[$fieldId] = $value;
+							}
+
+							unset($mappedContentData[$contentId]);
+						}
+					}
+
+					$item = (OBJECT) $item;
+				}
+
 			}
 		}
 
@@ -548,6 +561,7 @@ class TjucmModelItems extends JModelList
 		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
 		$fieldsModel->setState('filter.showonlist', 1);
 		$fieldsModel->setState('filter.state', 1);
+		$fieldsModel->setState('filter.showonlist', 1);
 		$fieldsModel->setState('list.ordering', 'ordering');
 		$fieldsModel->setState('list.direction', 'ASC');
 		$client = $this->getState('ucm.client');
