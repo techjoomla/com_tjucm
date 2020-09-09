@@ -212,7 +212,7 @@ $statusColumnWidth = 0;
 							?>
 
 							<th style="word-break: break-word;" width="<?php echo (85 - $statusColumnWidth) / count($this->listcolumn) . '%';?>">
-								<?php echo JHtml::_('grid.sort', htmlspecialchars($col_name, ENT_COMPAT, 'UTF-8'), $fieldId, $listDirn, $listOrder); ?>
+								<?php echo JHtml::_('grid.sort', htmlspecialchars($col_name->label, ENT_COMPAT, 'UTF-8'), $fieldId, $listDirn, $listOrder); ?>
 							</th>
 							<?php
 						}

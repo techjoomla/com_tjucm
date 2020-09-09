@@ -210,7 +210,14 @@ class TjucmModelItems extends JModelList
 
 		foreach ($this->fields as $fieldId => $field)
 		{
-			$query->select('MAX(CASE WHEN fv.field_id=' . $fieldId . ' THEN value END) `' . $fieldId . '`');
+			if ($field->type == 'number')
+			{
+				$query->select('CAST(MAX(CASE WHEN fv.field_id=' . $fieldId . ' THEN value END) AS SIGNED)  `' . $fieldId . '`');
+			}
+			else
+			{
+				$query->select('MAX(CASE WHEN fv.field_id=' . $fieldId . ' THEN value END) `' . $fieldId . '`');
+			}
 		}
 
 		$query->from($db->qn('#__tj_ucm_data', 'a'));
@@ -455,14 +462,14 @@ class TjucmModelItems extends JModelList
 			foreach ($this->fields as $fieldId => $field)
 			{
 				// For field specific search
-				if (stripos($search, $field . ':') === 0)
+				if (stripos($search, $field->label . ':') === 0)
 				{
 					$filterFieldsCount++;
 
 					$subQuery->join('LEFT', $db->qn('#__tjfields_fields_value', 'v' . $filterFieldsCount) . ' ON (' . $db->qn('v' .
 					'.content_id') . ' = ' . $db->qn('v' . $filterFieldsCount . '.content_id') . ')');
 
-					$search = trim(str_replace($field . ':', '', $search));
+					$search = trim(str_replace($field->label . ':', '', $search));
 					$subQuery->where($db->qn('v' . $filterFieldsCount . '.field_id') . ' = ' . $fieldId);
 					$subQuery->where($db->qn('v' . $filterFieldsCount . '.value') . ' LIKE ' . $db->q('%' . $search . '%'));
 					$filterFieldFound = 1;
@@ -556,7 +563,7 @@ class TjucmModelItems extends JModelList
 
 		foreach ($items as $item)
 		{
-			$data[$item->id] = $item->label;
+			$data[$item->id] = $item;
 		}
 
 		return $data;
