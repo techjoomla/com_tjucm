@@ -181,7 +181,6 @@ foreach ($fieldSets as $fieldset)
 							$output = $layout->render(array('fieldXml' => $xmlField, 'field' => $field));
 
 							// To align text, textarea, textareacounter, editor and tjlist fields properly
-
 							if ($field->type == 'Textarea'|| $field->type == 'Textareacounter'|| $field->type == 'Text' || $field->type == 'Editor' || $field->type == 'tjlist')
 							{
 								?>

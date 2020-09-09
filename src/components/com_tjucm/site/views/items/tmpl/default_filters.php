@@ -20,7 +20,7 @@ $firstListColumn = key($tmpListColumn);
 	<div class="pull-left">
 		<input type="text" name="filter_search" id="filter_search"
 			title="<?php echo empty($firstListColumn) ? JText::_('JSEARCH_FILTER') :
-			JText::sprintf('COM_TJUCM_ITEMS_SEARCH_TITLE', $this->listcolumn[$firstListColumn]); ?>"
+			JText::sprintf('COM_TJUCM_ITEMS_SEARCH_TITLE', $this->listcolumn[$firstListColumn]->label); ?>"
 			value="<?php echo $this->escape($this->state->get($this->client . '.filter.search')); ?>"
 			placeholder="<?php echo JText::_('JSEARCH_FILTER'); ?>"/>
 	</div>

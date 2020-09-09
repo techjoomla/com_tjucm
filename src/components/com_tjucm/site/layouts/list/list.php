@@ -36,6 +36,7 @@ $fieldLayout['Video'] = $fieldLayout['Audio'] = $fieldLayout['Url'] = "link";
 $fieldLayout['Calendar'] = "calendar";
 $fieldLayout['Cluster'] = "cluster";
 $fieldLayout['Related'] = $fieldLayout['Sql'] = "sql";
+$fieldLayout['Subform'] = "subform";
 $fieldLayout['Ownership'] = "ownership";
 $fieldLayout['Editor'] = "editor";
 
@@ -249,7 +250,20 @@ if ($canDeleteOwn)
 								) ? $fieldLayout[ucfirst($tjFieldsFieldTable->type)] : 'field';
 								$layout = new JLayoutFile($layoutToUse, JPATH_ROOT . '/components/com_tjfields/layouts/fields');
 								$output = $layout->render(array('fieldXml' => $fieldXml, 'field' => $field));
-								echo $output;
+
+								// To align text, textarea, textareacounter, editor and tjlist fields properly
+								if ($field->type == 'Textarea'|| $field->type == 'Textareacounter'|| $field->type == 'Text' || $field->type == 'Editor' || $field->type == 'tjlist')
+								{
+									?>
+									<div class="tj-wordwrap">
+										<?php echo $output; ?>
+									</div>
+									<?php
+								}
+								else
+								{
+									echo $output;
+								}
 							}
 						}
 					?>
