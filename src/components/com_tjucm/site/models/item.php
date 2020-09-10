@@ -17,6 +17,7 @@ jimport('joomla.event.dispatcher');
 require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
 
 use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 
 /**
  * Tjucm model.
@@ -251,10 +252,36 @@ class TjucmModelItem extends JModelAdmin
 	{
 		$table = $this->getTable();
 		$table->load($id);
-		$table->draft = $state == 1 ? 0 : 1;
 		$table->state = $state;
 
-		return $table->store();
+		// Only if item is published
+		if ($state == 1)
+		{
+			$table->draft = 0;
+		}
+
+		if ($table->store())
+		{
+			JLoader::import('components.com_tjucm.models.items', JPATH_SITE);
+			$itemsModel = BaseDatabaseModel::getInstance('Items', 'TjucmModel', array('ignore_request' => true));
+			$itemsModel->setState("parent_id", $id);
+			$children = $itemsModel->getItems();
+
+			foreach ($children as $child)
+			{
+				$childTable = $this->getTable();
+				$childTable->load($child->id);
+				$childTable->state = $state;
+
+				// Only if item is published
+				if ($state == 1)
+				{
+					$childTable->draft = 0;
+				}
+
+				$childTable->store();
+			}
+		}
 	}
 
 	/**

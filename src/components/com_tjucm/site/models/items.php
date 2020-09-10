@@ -46,6 +46,9 @@ class TjucmModelItems extends JModelList
 			);
 		}
 
+		$this->fields = array();
+		$this->specialSortableFields = array();
+
 		parent::__construct($config);
 	}
 
@@ -140,6 +143,13 @@ class TjucmModelItems extends JModelList
 			$this->setState($ucmType . '.filter.cluster_id', $clusterId);
 		}
 
+		$categoryId = $app->getUserStateFromRequest($this->context . '.' . $ucmType . '.itemcategory', 'itemcategory');
+
+		if ($categoryId)
+		{
+			$this->setState($ucmType . '.filter.category_id', $categoryId);
+		}
+
 		$draft = $app->getUserStateFromRequest($this->context . '.draft', 'draft');
 		$this->setState('filter.draft', $draft);
 
@@ -192,7 +202,8 @@ class TjucmModelItems extends JModelList
 	 */
 	protected function getListQuery()
 	{
-		$this->fields = $this->getFields();
+		// Call function to initialise fields lists
+		$this->getFields();
 
 		// Create a new query object.
 		$db    = $this->getDbo();
@@ -203,35 +214,42 @@ class TjucmModelItems extends JModelList
 
 		foreach ($this->fields as $fieldId => $field)
 		{
-			$query->select('MAX(CASE WHEN fv.field_id=' . $fieldId . ' THEN value END) `' . $fieldId . '`');
+			if ($field->type == 'number')
+			{
+				$query->select('CAST(MAX(CASE WHEN fv.field_id=' . $fieldId . ' THEN value END) AS SIGNED)  `' . $fieldId . '`');
+			}
+			else
+			{
+				$query->select('MAX(CASE WHEN fv.field_id=' . $fieldId . ' THEN value END) `' . $fieldId . '`');
+			}
 		}
 
-		$query->from($db->quoteName('#__tj_ucm_data', 'a'));
+		$query->from($db->qn('#__tj_ucm_data', 'a'));
 
-		// Join over the users for the checked out user
+		// Join over fields value table
 		$query->join(
-		"LEFT", $db->quoteName('#__tjfields_fields_value', 'fv') . ' ON (' . $db->quoteName('fv.content_id') . ' = ' . $db->quoteName('a.id') . ')'
+		"LEFT", $db->qn('#__tjfields_fields_value', 'fv') . ' ON (' . $db->qn('fv.content_id') . ' = ' . $db->qn('a.id') . ')'
 		);
 
 		$client = $this->getState('ucm.client');
 
 		if (!empty($client))
 		{
-			$query->where($db->quoteName('a.client') . ' = ' . $db->quote($db->escape($client)));
+			$query->where($db->qn('a.client') . ' = ' . $db->q($db->escape($client)));
 		}
 
 		$ucmTypeId = $this->getState('ucmType.id', '', 'INT');
 
 		if (!empty($ucmTypeId))
 		{
-			$query->where($db->quoteName('a.type_id') . ' = ' . (INT) $ucmTypeId);
+			$query->where($db->qn('a.type_id') . ' = ' . (INT) $ucmTypeId);
 		}
 
 		$createdBy = $this->getState('created_by', '', 'INT');
 
 		if (!empty($createdBy))
 		{
-			$query->where($db->quoteName('a.created_by') . ' = ' . (INT) $createdBy);
+			$query->where($db->qn('a.created_by') . ' = ' . (INT) $createdBy);
 		}
 
 		// Filter for parent record
@@ -239,7 +257,7 @@ class TjucmModelItems extends JModelList
 
 		if (is_numeric($parentId))
 		{
-			$query->where($db->quoteName('a.parent_id') . ' = ' . $parentId);
+			$query->where($db->qn('a.parent_id') . ' = ' . $parentId);
 		}
 
 		// Show records belonging to users cluster if com_cluster is installed and enabled - start
@@ -278,7 +296,7 @@ class TjucmModelItems extends JModelList
 					$usersClusters[] = 0;
 				}
 
-				$query->where($db->quoteName('a.cluster_id') . ' IN (' . implode(",", $usersClusters) . ')');
+				$query->where($db->qn('a.cluster_id') . ' IN (' . implode(",", $usersClusters) . ')');
 			}
 		}
 
@@ -287,11 +305,11 @@ class TjucmModelItems extends JModelList
 
 		if (is_numeric($published))
 		{
-			$query->where($db->quoteName('a.state') . ' = ' . (INT) $published);
+			$query->where($db->qn('a.state') . ' = ' . (INT) $published);
 		}
 		elseif ($published === '')
 		{
-			$query->where(($db->quoteName('a.state') . ' IN (0, 1)'));
+			$query->where(($db->qn('a.state') . ' IN (0, 1)'));
 		}
 
 		// Filter by draft status
@@ -299,7 +317,7 @@ class TjucmModelItems extends JModelList
 
 		if (in_array($draft, array('0', '1')))
 		{
-			$query->where($db->quoteName('a.draft') . ' = ' . $draft);
+			$query->where($db->qn('a.draft') . ' = ' . $draft);
 		}
 
 		// Search by content id
@@ -311,7 +329,7 @@ class TjucmModelItems extends JModelList
 
 			if (stripos($search, 'id:') === 0)
 			{
-				$query->where($db->quoteName('a.id') . ' = ' . (int) str_replace('id:', '', $search));
+				$query->where($db->qn('a.id') . ' = ' . (int) str_replace('id:', '', $search));
 			}
 		}
 
@@ -320,7 +338,7 @@ class TjucmModelItems extends JModelList
 
 		if (!empty($fromDate) || !empty($toDate))
 		{
-			$query->where('DATE(' . $db->quoteName('a.created_date') . ') ' . ' BETWEEN ' . $db->quote($fromDate) . ' AND ' . $db->quote($toDate));
+			$query->where('DATE(' . $db->qn('a.created_date') . ') ' . ' BETWEEN ' . $db->q($fromDate) . ' AND ' . $db->q($toDate));
 		}
 
 		// Search on fields data
@@ -331,21 +349,155 @@ class TjucmModelItems extends JModelList
 
 		if ($clusterId)
 		{
-			$query->where($db->quoteName('a.cluster_id') . ' = ' . $clusterId);
+			$query->where($db->qn('a.cluster_id') . ' = ' . $clusterId);
 		}
+
+		// Filter by category
+		$categoryId = (int) $this->getState($client . '.filter.category_id');
+
+		if ($categoryId)
+		{
+			$query->where($db->qn('a.category_id') . ' = ' . $categoryId);
+		}
+
+		$query->group($db->qn('a.id'));
+
+		// Sort data
+		$this->sortContent($query);
+
+		return $query;
+	}
+
+	/**
+	 * Get list items
+	 *
+	 * @return  ARRAY
+	 *
+	 * @since    1.6
+	 */
+	public function getItems()
+	{
+		$items = parent::getItems();
+
+		// Get id of multi-select fields
+		$contentIds = array_column($items, 'id');
+		$client = $this->getState('ucm.client');
+
+		if (!empty($contentIds) && !empty($client))
+		{
+			// Get fields which can have multiple values
+			$db = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select($db->qn('id'));
+			$query->from($db->qn('#__tjfields_fields'));
+			$query->where($db->qn('client') . ' = ' . $db->q($client));
+			$query->where($db->qn('type') . ' IN("multi_select", "tjlist")');
+			$query->where('(' . $db->qn('params') . ' LIKE ' . $db->q('%multiple":"true%') . ' OR ' . $db->qn('params') . ' LIKE ' . $db->q('%multiple":"1%') . ')');
+			$db->setQuery($query);
+			$fieldsList = $db->loadColumn();
+
+			if (!empty($fieldsList))
+			{
+				// Get fields which can have multiple values
+				$db = JFactory::getDbo();
+				$query = $db->getQuery(true);
+				$query->select($db->qn(array('content_id', 'field_id', 'value')));
+				$query->from($db->qn('#__tjfields_fields_value'));
+				$query->where($db->qn('content_id') . ' IN(' . implode(', ', $contentIds) . ')');
+				$query->where($db->qn('field_id') . ' IN(' . implode(', ', $fieldsList) . ')');
+				$db->setQuery($query);
+				$multiSelectValues = $db->loadObjectList();
+
+				$mappedData = array();
+
+				foreach ($multiSelectValues as $multiSelectValue)
+				{
+					$mappedData[$multiSelectValue->content_id][$multiSelectValue->field_id][] = $multiSelectValue->value;
+				}
+
+				foreach ($items as $k => &$item)
+				{
+					$item = (ARRAY) $item;
+
+					foreach ($mappedData as $contentId => $mappedContentData)
+					{
+						if ($contentId == $item['id'])
+						{
+							foreach ($mappedContentData as $fieldId => $value)
+							{
+								$item[$fieldId] = $value;
+							}
+
+							unset($mappedContentData[$contentId]);
+						}
+					}
+
+					$item = (OBJECT) $item;
+				}
+
+			}
+		}
+
+		return $items;
+	}
+
+	/**
+	 * Function to sort content as per field values
+	 *
+	 * @param   OBJECT  &$query  query object
+	 *
+	 * @return  VOID
+	 *
+	 * @since    1.2.1
+	 */
+	private function sortContent(&$query)
+	{
+		$db = JFactory::getDbo();
 
 		// Add the list ordering clause.
 		$orderCol  = $this->state->get('list.ordering');
 		$orderDirn = $this->state->get('list.direction');
 
-		$query->group($db->quoteName('a.id'));
-
-		if ($orderCol && $orderDirn)
+		if ($orderCol && $orderDirn && (!is_numeric($orderCol) || array_key_exists($orderCol, $this->fields)))
 		{
-			$query->order($db->escape($db->qn($orderCol) . ' ' . $orderDirn));
-		}
+			if ($this->specialSortableFields[$orderCol]->type == 'itemcategory')
+			{
+				$query->select($db->qn('c.title', 'itemcategorytitle'));
 
-		return $query;
+				// Join over category table
+				$query->join(
+					"LEFT", $db->qn('#__categories', 'c') . ' ON (' . $db->qn('a.category_id') . ' = ' . $db->qn('c.id') . ')'
+				);
+
+				$query->order($db->escape($db->qn('itemcategorytitle') . ' ' . $orderDirn));
+			}
+			elseif ($this->specialSortableFields[$orderCol]->type == 'cluster')
+			{
+				$query->select($db->qn('cl.name', 'clustertitle'));
+
+				// Join over cluster table
+				$query->join(
+					"LEFT", $db->qn('#__tj_clusters', 'cl') . ' ON (' . $db->qn('a.cluster_id') . ' = ' . $db->qn('cl.id') . ')'
+				);
+
+				$query->order($db->escape($db->qn('clustertitle') . ' ' . $orderDirn));
+			}
+			elseif ($this->specialSortableFields[$orderCol]->type == 'ownership')
+			{
+				$query->select($db->qn('u.name', 'ownershiptitle'));
+
+				// Join over user table
+				$query->join(
+					"LEFT", $db->qn('#__users', 'u') . ' ON (' . $db->qn('a.created_by') . ' = ' . $db->qn('u.id') . ')'
+				);
+
+				$query->order($db->escape($db->qn('ownershiptitle') . ' ' . $orderDirn));
+			}
+			else
+			{
+				$query->order($db->escape($db->qn($orderCol) . ' ' . $orderDirn));
+			}
+		}
 	}
 
 	/**
@@ -355,7 +507,7 @@ class TjucmModelItems extends JModelList
 	 * 
 	 * @param   OBJECT  &$query  query object
 	 *
-	 * @return   Array  Content Ids
+	 * @return  VOID
 	 *
 	 * @since    1.2.1
 	 */
@@ -364,7 +516,7 @@ class TjucmModelItems extends JModelList
 		$db = $this->getDbo();
 		$subQuery = $db->getQuery(true);
 		$subQuery->select(1);
-		$subQuery->from($db->quoteName('#__tjfields_fields_value', 'v'));
+		$subQuery->from($db->qn('#__tjfields_fields_value', 'v'));
 
 		// Flag to mark if field specific search is done from the search box
 		$filterFieldFound = 0;
@@ -380,14 +532,14 @@ class TjucmModelItems extends JModelList
 			foreach ($this->fields as $fieldId => $field)
 			{
 				// For field specific search
-				if (stripos($search, $field . ':') === 0)
+				if (stripos($search, $field->label . ':') === 0)
 				{
 					$filterFieldsCount++;
 
 					$subQuery->join('LEFT', $db->qn('#__tjfields_fields_value', 'v' . $filterFieldsCount) . ' ON (' . $db->qn('v' .
 					'.content_id') . ' = ' . $db->qn('v' . $filterFieldsCount . '.content_id') . ')');
 
-					$search = trim(str_replace($field . ':', '', $search));
+					$search = trim(str_replace($field->label . ':', '', $search));
 					$subQuery->where($db->qn('v' . $filterFieldsCount . '.field_id') . ' = ' . $fieldId);
 					$subQuery->where($db->qn('v' . $filterFieldsCount . '.value') . ' LIKE ' . $db->q('%' . $search . '%'));
 					$filterFieldFound = 1;
@@ -404,7 +556,7 @@ class TjucmModelItems extends JModelList
 
 			$subQuery->join('LEFT', $db->qn('#__tjfields_fields_value', 'v' . $filterFieldsCount) . ' ON (' . $db->qn('v' .
 			'.content_id') . ' = ' . $db->qn('v' . $filterFieldsCount . '.content_id') . ')');
-			$subQuery->where($db->quoteName('v' . $filterFieldsCount . '.value') . ' LIKE ' . $db->q('%' . $search . '%'));
+			$subQuery->where($db->qn('v' . $filterFieldsCount . '.value') . ' LIKE ' . $db->q('%' . $search . '%'));
 		}
 
 		// For filterable fields
@@ -466,6 +618,7 @@ class TjucmModelItems extends JModelList
 		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
 		$fieldsModel->setState('filter.showonlist', 1);
 		$fieldsModel->setState('filter.state', 1);
+		$fieldsModel->setState('filter.showonlist', 1);
 		$fieldsModel->setState('list.ordering', 'ordering');
 		$fieldsModel->setState('list.direction', 'ASC');
 		$client = $this->getState('ucm.client');
@@ -477,14 +630,17 @@ class TjucmModelItems extends JModelList
 
 		$items = $fieldsModel->getItems();
 
-		$data = array();
-
 		foreach ($items as $item)
 		{
-			$data[$item->id] = $item->label;
+			if (in_array($item->type, array('itemcategory', 'cluster', 'ownership')))
+			{
+				$this->specialSortableFields[$item->id] = $item;
+			}
+
+			$this->fields[$item->id] = $item;
 		}
 
-		return $data;
+		return $this->fields;
 	}
 
 	/**
@@ -508,7 +664,7 @@ class TjucmModelItems extends JModelList
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('*');
-		$query->from($db->quoteName('#__tjfields_fields_value', 'fv'));
+		$query->from($db->qn('#__tjfields_fields_value', 'fv'));
 		$query->join('INNER', $db->qn('#__tjfields_fields', 'f') . ' ON (' . $db->qn('f.id') . ' = ' . $db->qn('fv.field_id') . ')');
 		$query->where($db->qn('f.state') . '=1');
 		$query->where($db->qn('fv.content_id') . ' IN (' . $contentIds . ')');
@@ -530,10 +686,10 @@ class TjucmModelItems extends JModelList
 		{
 			$db = JFactory::getDbo();
 			$query = $db->getQuery(true);
-			$query->select("count(" . $db->quoteName('id') . ")");
-			$query->from($db->quoteName('#__tjfields_fields'));
-			$query->where($db->quoteName('client') . '=' . $db->quote($client));
-			$query->where($db->quoteName('showonlist') . '=1');
+			$query->select("count(" . $db->qn('id') . ")");
+			$query->from($db->qn('#__tjfields_fields'));
+			$query->where($db->qn('client') . '=' . $db->q($client));
+			$query->where($db->qn('showonlist') . '=1');
 			$db->setQuery($query);
 
 			$result = $db->loadResult();
@@ -581,7 +737,7 @@ class TjucmModelItems extends JModelList
 		}
 
 		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
-		$fieldTable = Table::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
+		$fieldTable = Table::getInstance('Field', 'TjfieldsTable', array('dbo', JFactory::getDbo()));
 		$fieldTable->load(array('client' => $client, 'type' => 'cluster'));
 
 		if (!$checkUcmCompatability && !$fieldTable->id)

@@ -16,6 +16,11 @@ jimport('joomla.application.component.controller');
 JLoader::registerPrefix('Tjucm', JPATH_COMPONENT);
 JLoader::register('TjucmController', JPATH_COMPONENT . '/controller.php');
 
+// Load tj-fields language files
+$lang = JFactory::getLanguage();
+$lang->load('com_tjfields', JPATH_ADMINISTRATOR);
+$lang->load('com_tjfields', JPATH_SITE);
+
 // Load backend helper
 $path = JPATH_ADMINISTRATOR . '/components/com_tjucm/helpers/tjucm.php';
 

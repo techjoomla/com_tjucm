@@ -102,6 +102,7 @@ class TjucmViewItems extends JViewLegacy
 			"0" => JText::_("COM_TJUCM_DATA_STATUS_SAVE"), "1" => JText::_('COM_TJUCM_DATA_STATUS_DRAFT'));
 		$this->canCopyItem = $user->authorise('core.type.copyitem', 'com_tjucm.type.' . $this->ucmTypeId);
 		$this->canCopyToSameUcmType = $model->canCopyToSameUcmType($this->client);
+		$this->sortableFields = array('text', 'number', 'checkbox', 'textarea', 'textareacounter', 'calendar', 'email', 'radio', 'single_select', 'itemcategory', 'cluster', 'ownership');
 
 		// If did not get the client from url then get if from menu param
 		if (empty($this->client))

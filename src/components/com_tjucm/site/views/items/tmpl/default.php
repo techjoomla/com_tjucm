@@ -209,12 +209,23 @@ $statusColumnWidth = 0;
 								$tjFieldsFieldTable->load($fieldId);
 								$fieldsData[$fieldId] = $tjFieldsFieldTable;
 							}
-							?>
 
-							<th style="word-break: break-word;" width="<?php echo (85 - $statusColumnWidth) / count($this->listcolumn) . '%';?>">
-								<?php echo JHtml::_('grid.sort', htmlspecialchars($col_name, ENT_COMPAT, 'UTF-8'), $fieldId, $listDirn, $listOrder); ?>
-							</th>
-							<?php
+							if (in_array($col_name->type, $this->sortableFields))
+							{
+								?>
+								<th style="word-break: break-word;" width="<?php echo (85 - $statusColumnWidth) / count($this->listcolumn) . '%';?>">
+									<?php echo JHtml::_('grid.sort', htmlspecialchars($col_name->label, ENT_COMPAT, 'UTF-8'), $fieldId, $listDirn, $listOrder); ?>
+								</th>
+								<?php
+							}
+							else
+							{
+								?>
+								<th style="word-break: break-word;" width="<?php echo (85 - $statusColumnWidth) / count($this->listcolumn) . '%';?>">
+									<?php echo $col_name->label; ?>
+								</th>
+								<?php
+							}
 						}
 						?>
 						<th class="center" width="10%">
