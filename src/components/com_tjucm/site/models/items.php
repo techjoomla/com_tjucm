@@ -46,6 +46,9 @@ class TjucmModelItems extends JModelList
 			);
 		}
 
+		$this->fields = array();
+		$this->specialSortableFields = array();
+
 		parent::__construct($config);
 	}
 
@@ -199,7 +202,8 @@ class TjucmModelItems extends JModelList
 	 */
 	protected function getListQuery()
 	{
-		$this->fields = $this->getFields();
+		// Call function to initialise fields lists
+		$this->getFields();
 
 		// Create a new query object.
 		$db    = $this->getDbo();
@@ -222,7 +226,7 @@ class TjucmModelItems extends JModelList
 
 		$query->from($db->qn('#__tj_ucm_data', 'a'));
 
-		// Join over the users for the checked out user
+		// Join over fields value table
 		$query->join(
 		"LEFT", $db->qn('#__tjfields_fields_value', 'fv') . ' ON (' . $db->qn('fv.content_id') . ' = ' . $db->qn('a.id') . ')'
 		);
@@ -356,16 +360,10 @@ class TjucmModelItems extends JModelList
 			$query->where($db->qn('a.category_id') . ' = ' . $categoryId);
 		}
 
-		// Add the list ordering clause.
-		$orderCol  = $this->state->get('list.ordering');
-		$orderDirn = $this->state->get('list.direction');
-
 		$query->group($db->qn('a.id'));
 
-		if ($orderCol && $orderDirn && (!is_numeric($orderCol) || array_key_exists($orderCol, $this->fields)))
-		{
-			$query->order($db->escape($db->qn($orderCol) . ' ' . $orderDirn));
-		}
+		// Sort data
+		$this->sortContent($query);
 
 		return $query;
 	}
@@ -444,13 +442,72 @@ class TjucmModelItems extends JModelList
 	}
 
 	/**
+	 * Function to sort content as per field values
+	 *
+	 * @param   OBJECT  &$query  query object
+	 *
+	 * @return  VOID
+	 *
+	 * @since    1.2.1
+	 */
+	private function sortContent(&$query)
+	{
+		$db = JFactory::getDbo();
+
+		// Add the list ordering clause.
+		$orderCol  = $this->state->get('list.ordering');
+		$orderDirn = $this->state->get('list.direction');
+
+		if ($orderCol && $orderDirn && (!is_numeric($orderCol) || array_key_exists($orderCol, $this->fields)))
+		{
+			if ($this->specialSortableFields[$orderCol]->type == 'itemcategory')
+			{
+				$query->select($db->qn('c.title', 'itemcategorytitle'));
+
+				// Join over category table
+				$query->join(
+					"LEFT", $db->qn('#__categories', 'c') . ' ON (' . $db->qn('a.category_id') . ' = ' . $db->qn('c.id') . ')'
+				);
+
+				$query->order($db->escape($db->qn('itemcategorytitle') . ' ' . $orderDirn));
+			}
+			elseif ($this->specialSortableFields[$orderCol]->type == 'cluster')
+			{
+				$query->select($db->qn('cl.name', 'clustertitle'));
+
+				// Join over cluster table
+				$query->join(
+					"LEFT", $db->qn('#__tj_clusters', 'cl') . ' ON (' . $db->qn('a.cluster_id') . ' = ' . $db->qn('cl.id') . ')'
+				);
+
+				$query->order($db->escape($db->qn('clustertitle') . ' ' . $orderDirn));
+			}
+			elseif ($this->specialSortableFields[$orderCol]->type == 'ownership')
+			{
+				$query->select($db->qn('u.name', 'ownershiptitle'));
+
+				// Join over user table
+				$query->join(
+					"LEFT", $db->qn('#__users', 'u') . ' ON (' . $db->qn('a.created_by') . ' = ' . $db->qn('u.id') . ')'
+				);
+
+				$query->order($db->escape($db->qn('ownershiptitle') . ' ' . $orderDirn));
+			}
+			else
+			{
+				$query->order($db->escape($db->qn($orderCol) . ' ' . $orderDirn));
+			}
+		}
+	}
+
+	/**
 	 * Function to filter content as per field values
 	 *
 	 * @param   string  $client  Client
 	 * 
 	 * @param   OBJECT  &$query  query object
 	 *
-	 * @return   Array  Content Ids
+	 * @return  VOID
 	 *
 	 * @since    1.2.1
 	 */
@@ -573,14 +630,17 @@ class TjucmModelItems extends JModelList
 
 		$items = $fieldsModel->getItems();
 
-		$data = array();
-
 		foreach ($items as $item)
 		{
-			$data[$item->id] = $item;
+			if (in_array($item->type, array('itemcategory', 'cluster', 'ownership')))
+			{
+				$this->specialSortableFields[$item->id] = $item;
+			}
+
+			$this->fields[$item->id] = $item;
 		}
 
-		return $data;
+		return $this->fields;
 	}
 
 	/**
