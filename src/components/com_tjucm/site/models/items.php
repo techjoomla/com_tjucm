@@ -267,7 +267,7 @@ class TjucmModelItems extends JModelList
 		{
 			JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
 			$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
-			$fieldTable->load(array('client' => $client, 'type' => 'cluster'));
+			$fieldTable->load(array('client' => $client, 'type' => 'cluster', 'state' => '1'));
 
 			if ($fieldTable->id)
 			{
@@ -738,7 +738,7 @@ class TjucmModelItems extends JModelList
 
 		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
 		$fieldTable = Table::getInstance('Field', 'TjfieldsTable', array('dbo', JFactory::getDbo()));
-		$fieldTable->load(array('client' => $client, 'type' => 'cluster'));
+		$fieldTable->load(array('client' => $client, 'type' => 'cluster', 'state' => '1'));
 
 		if (!$checkUcmCompatability && !$fieldTable->id)
 		{
