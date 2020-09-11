@@ -391,7 +391,6 @@ class TjucmModelItems extends JModelList
 			$query->select($db->qn('id'));
 			$query->from($db->qn('#__tjfields_fields'));
 			$query->where($db->qn('client') . ' = ' . $db->q($client));
-			$query->where($db->qn('type') . ' IN("multi_select", "tjlist")');
 			$query->where('(' . $db->qn('params') . ' LIKE ' . $db->q('%multiple":"true%') . ' OR ' . $db->qn('params') . ' LIKE ' . $db->q('%multiple":"1%') . ')');
 			$db->setQuery($query);
 			$fieldsList = $db->loadColumn();
