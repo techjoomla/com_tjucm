@@ -306,27 +306,12 @@ $statusColumnWidth = 0;
 	if ($this->allowedToAdd)
 	{
 		?>
-		<a target="_blank"
-		href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false); ?>"
+		<a href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false); ?>"
 		class="btn btn-success btn-small">
 			<i class="icon-plus"></i>
 			<?php echo JText::_('COM_TJUCM_ADD_ITEM'); ?>
 		</a>
 		<?php
-		if ($this->canImport)
-		{
-			?>
-			<!-- TODO- copy and copy to other feature is not fully stable hence relate buttons are hidden-->
-			<div class="hide">
-				<a target="_blank" href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false, 2); ?>" class="btn btn-success btn-small">
-					<?php echo JText::_('COM_TJUCM_COPY_ITEM'); ?>
-				</a>
-				<a data-toggle="modal" onclick="if(document.adminForm.boxchecked.value==0){alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{jQuery( '#copyModal' ).modal('show'); return true;}" class="btn btn-success btn-small copyToOther hide">
-					<?php echo JText::_('COM_TJUCM_COPY_ITEM_TO_OTHER'); ?>
-				</a>
-			</div>
-			<?php
-		}
 	}
 	?>
 	<input type="hidden" id="client" name="client" value="<?php echo $this->client ?>"/>
