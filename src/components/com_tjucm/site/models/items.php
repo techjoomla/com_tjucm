@@ -483,7 +483,7 @@ class TjucmModelItems extends JModelList
 			}
 			elseif ($this->specialSortableFields[$orderCol]->type == 'ownership')
 			{
-				$query->select($db->qn('u.name', 'ownershiptitle'));
+				$query->select($db->qn('u.username', 'ownershiptitle'));
 
 				// Join over user table
 				$query->join(
