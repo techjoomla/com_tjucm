@@ -696,7 +696,6 @@ class TjucmControllerItemForm extends JControllerForm
 											// TODO Temprary used switch case need to modify code
 											switch ($fieldTable->type)
 											{
-												case 'tjlist':
 												case 'related':
 												case 'multi_select':
 													foreach ($d as $option)
@@ -708,7 +707,13 @@ class TjucmControllerItemForm extends JControllerForm
 													{
 														$data[$subFieldName] = $temp;
 													}
+												break;
 
+												case 'tjlist':
+													foreach ($d as $option)
+													{
+														$data[$subFieldName][] = $option;
+													}
 												break;
 
 												default:
