@@ -650,13 +650,14 @@ class TjucmControllerItemForm extends JControllerForm
 								$subFormData = (array) json_decode($fieldValue);
 							}
 
-							if ($fieldType == 'file')
+							if ($fieldType == 'file' || $fieldType == 'image')
 							{
 								$fileData = array();
 								$fileData['field_id'] = $fieldId;
 								$fileData['value'] = $fieldValue;
 								$fileData['params'] = $fielParams;
 								$fileData['sourceparams'] = $sourceFieldParams;
+								$fileData['type'] = $fieldType;
 								$fileFieldArray[] = $fileData;
 							}
 
@@ -695,7 +696,6 @@ class TjucmControllerItemForm extends JControllerForm
 											// TODO Temprary used switch case need to modify code
 											switch ($fieldTable->type)
 											{
-												case 'tjlist':
 												case 'related':
 												case 'multi_select':
 													foreach ($d as $option)
@@ -707,7 +707,13 @@ class TjucmControllerItemForm extends JControllerForm
 													{
 														$data[$subFieldName] = $temp;
 													}
+												break;
 
+												case 'tjlist':
+													foreach ($d as $option)
+													{
+														$data[$subFieldName][] = $option;
+													}
 												break;
 
 												default:
@@ -767,8 +773,12 @@ class TjucmControllerItemForm extends JControllerForm
 							foreach ($fileFieldArray as $fileField)
 							{
 								$fileFieldValue = round(microtime(true)) . "_" . JUserHelper::genRandomPassword(5) . "_" . $fileField['value'];
+								$filePath = JPATH_SITE . '/' . $fileField['type'] . 's/tjmedia/' . str_replace(".", "/", $sourceClient . "/");
+								$targetfilePath = JPATH_SITE . '/' . $fileField['type'] . 's/tjmedia/' . str_replace(".", "/", $targetClient . "/");
+								$sourceFilePath = ($fileField['sourceparams']->uploadpath != '') ? $fileField['sourceparams']->uploadpath : $filePath;
+								$destinationFilePath = ($fileField['params']->uploadpath != '') ? $fileField['params']->uploadpath : $filePath;
 
-								if (copy($fileField['sourceparams']->uploadpath . $fileField['value'], $fileField['params']->uploadpath . $fileFieldValue))
+								if (copy($sourceFilePath . $fileField['value'], $destinationFilePath . $fileFieldValue))
 								{
 									JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/tables');
 									$fielValuedTable = JTable::getInstance('fieldsvalue', 'TjfieldsTable');
