@@ -321,6 +321,8 @@ $statusColumnWidth = 0;
 	<?php echo JHtml::_('form.token'); ?>
 </form>
 </div>
+<div id="load" class="loader"></div>
+
 <script type="text/javascript">
 jQuery(document).ready(function () {
 	jQuery('.delete-button').click(deleteItem);

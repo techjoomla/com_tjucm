@@ -18,13 +18,17 @@ com_tjucm.Services.Base = Class.extend({
             url: url,
             headers: config.headers,
             beforeSend: function () {
+				jQuery("#load").show();
             },
             success: function (res) {
                 cb(null, res);
             },
             error: function (err) {
                 cb(err, null);
-            }
+            },
+            complete: function(){
+				jQuery("#load").hide();
+			}
         });
     },
     /**
@@ -55,13 +59,17 @@ com_tjucm.Services.Base = Class.extend({
             async: config.async,
             headers: config.headers,
             beforeSend: function () {
+				jQuery("#load").show();
             },
             success: function (res) {
                 cb(null, res);
             },
             error: function (err) {
                 cb(err, null);
-            }
+            },
+            complete: function(){
+				jQuery("#load").hide();
+			}
         });
     },
     /**
@@ -87,13 +95,17 @@ com_tjucm.Services.Base = Class.extend({
             data: data,
             headers: config.headers,
             beforeSend: function () {
+				jQuery("#load").show();
             },
             success: function (res) {
                 cb(null, res);
             },
             error: function (xhr) {
                 cb(xhr, null);
-            }
+            },
+            complete: function(){
+				jQuery("#load").hide();
+			}
         });
     }
 });
