@@ -579,21 +579,24 @@ class TjucmModelType extends JModelAdmin
 
 		$count = 0;
 
-		foreach ($sourceFields as $sourceField)
+		if (count($sourceFields) == count($targetFields))
 		{
-			$prefix = str_replace(".", "_", $sourceClient);
-			$sourceFieldName = explode($prefix . "_", $sourceField->name);
-
-			foreach ($targetFields as $targetField)
+			foreach ($sourceFields as $sourceField)
 			{
-				$prefix = str_replace(".", "_", $targetClient);
-				$targetFieldName = explode($prefix . "_", $targetField->name);
+				$prefix = str_replace(".", "_", $sourceClient);
+				$sourceFieldName = explode($prefix . "_", $sourceField->name);
 
-				// Check source and destination field name and field types are equal
-				if ($sourceFieldName == $targetFieldName && $sourceField->type == $targetField->type)
+				foreach ($targetFields as $targetField)
 				{
-						$count ++;
-						continue;
+					$prefix = str_replace(".", "_", $targetClient);
+					$targetFieldName = explode($prefix . "_", $targetField->name);
+
+					// Check source and destination field name and field types are equal
+					if ($sourceFieldName == $targetFieldName && $sourceField->type == $targetField->type)
+					{
+							$count ++;
+							continue;
+					}
 				}
 			}
 		}
