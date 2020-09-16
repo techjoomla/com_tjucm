@@ -47,6 +47,9 @@ var tjUcmItems = {
 	copyItem : function()
 	{
 		var afterCopyItem = function(error, response){
+			jQuery("#item-form #tjucm_loader").show();
+			jQuery("html, body").animate({scrollTop: jQuery("#item-form #tjucm_loader").position().top}, "slow");
+
 			response = JSON.parse(response);
 			
 			sessionStorage.setItem('message', response.message);

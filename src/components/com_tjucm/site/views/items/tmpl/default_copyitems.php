@@ -30,7 +30,7 @@ use Joomla\CMS\Language\Text;
 		<div class="modal-footer">
 			<button type="button" class="btn" onclick="document.getElementById('target_ucm').value='';document.getElementById('cluster_list').value='';" data-dismiss="modal">
 			Cancel</button>
-			<button class="btn btn-primary" onclick="tjUcmItems.copyItem();">
+			<button class="btn btn-primary" onclick="jQuery('#item-form #tjucm_loader').show(); tjUcmItems.copyItem();">
 				<i class="fa fa-clone"></i>
 				<?php echo Text::_('COM_TJUCM_COPY_ITEMS_BUTTON'); ?>
 			</button>

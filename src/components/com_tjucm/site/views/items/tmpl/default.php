@@ -55,6 +55,8 @@ JFactory::getDocument()->addScriptDeclaration("
 	function copySameUcmTypeItem()
 	{
 		var afterCopyItem = function(error, response){
+			jQuery('#item-form #tjucm_loader').hide();
+			jQuery('html, body').animate({scrollTop: jQuery('#item-form #tjucm_loader').position().top}, 'slow');
 			response = JSON.parse(response);
 			
 			sessionStorage.setItem('message', response.message);
@@ -127,7 +129,7 @@ $statusColumnWidth = 0;
 			{
 				if ($this->canCopyToSameUcmType)
 				{?>
-					<a onclick="if(document.adminForm.boxchecked.value==0){alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{copySameUcmTypeItem()}" class="btn btn-default btn-small">
+					<a onclick="if(document.adminForm.boxchecked.value==0){alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{jQuery('#item-form #tjucm_loader').show(); copySameUcmTypeItem()}" class="btn btn-default btn-small">
 					<i class="fa fa-clone"></i> <?php echo JText::_('COM_TJUCM_COPY_ITEM'); ?>
 					</a><?php
 				}
@@ -321,6 +323,12 @@ $statusColumnWidth = 0;
 	<?php echo JHtml::_('form.token'); ?>
 </form>
 </div>
+<div id="item-form">
+	<div id="tjucm_loader">
+		<img src='<?php echo JUri::root();?>media/com_tjucm/gif/loading.gif'>
+	</div>
+</div>
+
 <script type="text/javascript">
 jQuery(document).ready(function () {
 	jQuery('.delete-button').click(deleteItem);
