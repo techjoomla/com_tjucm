@@ -730,6 +730,10 @@ class TjucmControllerItemForm extends JControllerForm
 											$subformFileData['user_id'] = Factory::getUser()->id;
 											$data[$subFieldName] = $subformFileData;
 										}
+										elseif ($fieldTable->type == 'cluster')
+										{
+											$data[$subFieldName] = $clusterId;
+										}
 										else
 										{
 											$data[$subFieldName] = $d;
@@ -758,6 +762,10 @@ class TjucmControllerItemForm extends JControllerForm
 									$fileData['destFieldUploadPath'] = $fielParams->uploadpath;
 									$fileData['user_id'] = Factory::getUser()->id;
 									$extraFieldsData[$targetFieldName] = $fileData;
+								}
+								elseif($fieldType == 'cluster')
+								{
+									$extraFieldsData[$targetFieldName] = $clusterId;
 								}
 								else
 								{
