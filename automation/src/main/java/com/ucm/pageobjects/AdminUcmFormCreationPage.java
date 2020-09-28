@@ -27,7 +27,7 @@ public class AdminUcmFormCreationPage extends BaseClass {
 		PageFactory.initElements(driver, this);
 	}
 	/*
-	 * Locators for 
+	 * Locators for Ucm Form creation 
 	 */
 
 	@FindBy(how = How.XPATH, using ="//a[text()='Types']")
@@ -76,7 +76,7 @@ public class AdminUcmFormCreationPage extends BaseClass {
 	
 	/*
 	 * 
-	 * Method for formcreation
+	 * Method for ucm formcreation
 	 * 
 	 */
 
@@ -120,7 +120,6 @@ public class AdminUcmFormCreationPage extends BaseClass {
 			if(i==0)
 			{
 				WebElement singleFieldgroup = NumberofTypesfield.get(i);
-//				Thread.sleep(2000);
 				singleFieldgroup.click();
 			}
 		}

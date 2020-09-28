@@ -84,21 +84,6 @@ public class BaseClass {
 		JavascriptExecutor js1 = (JavascriptExecutor) driver;
 		js1.executeScript("window.scrollBy(0,90000)");
 	}
-	
-    public void scrollDown2() {
-    	JavascriptExecutor js2 = (JavascriptExecutor) driver;
-		js2.executeScript("window.scrollBy(0,90000)");
-	}
-    
-    public void scrollDown3() {
-    	JavascriptExecutor js3 = (JavascriptExecutor) driver;
-		js3.executeScript("window.scrollBy(0,90000)");
-	}
-    
-    public void scrollDown4() {
-    	JavascriptExecutor js4 = (JavascriptExecutor) driver;
-		js4.executeScript("window.scrollBy(0,200000)");
-	}
     
     public void scrollUp1() {
     	JavascriptExecutor jse1 = (JavascriptExecutor)driver;
@@ -131,23 +116,12 @@ public class BaseClass {
 		try {
 			System.out.println("Before suite >> setup");
 			WebDriverManager.chromedriver().setup();
-			/*ChromeOptions options = new ChromeOptions();
-			System.setProperty("webdriver.chrome.args", "--disable-logging");
-			System.setProperty("webdriver.chrome.silentOutput", "true");
-			options.addArguments("--headless", "--log-level=3", "--no-sandbox", "--disable-gpu",
-					"--window-size=1920,1200", "--ignore-certificate-errors");
-			driver = new ChromeDriver(options);
-			*/
 			driver = new ChromeDriver();
 			properties = new Properties();
 			FileInputStream fis = new FileInputStream(
 					System.getProperty("user.dir") + "/src/main/java/com/ucm/config/properties.properties");
 			properties.load(fis);
 	
-
-			// ExcelUtils_Old.setExcelFile(Constant.TESTDATAPATH, "LoginDetails");
-			// getDriver().get(ExcelUtils_Old.getCellData(2, 0)); // Site URL
-			// getDriver().get(Constant.SITEURL);
 			Screenshot.captureScreenshot(driver, "Browser Started");
 			driver.manage().window().maximize();
 			driver.manage().deleteAllCookies();
