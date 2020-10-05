@@ -99,7 +99,6 @@ foreach ($fieldSets as $fieldset)
 						<div class="col-xs-4"><?php echo $field->label; ?>:</div>
 						<div class="col-xs-8">
 							<?php
-							$count = 0;
 							$ucmSubFormXmlFieldSets = array();
 
 							// Call to extra fields
