@@ -650,17 +650,6 @@ class TjucmControllerItemForm extends JControllerForm
 								$subFormData = (array) json_decode($fieldValue);
 							}
 
-							if ($fieldType == 'file' || $fieldType == 'image')
-							{
-								$fileData = array();
-								$fileData['field_id'] = $fieldId;
-								$fileData['value'] = $fieldValue;
-								$fileData['params'] = $fielParams;
-								$fileData['sourceparams'] = $sourceFieldParams;
-								$fileData['type'] = $fieldType;
-								$fileFieldArray[] = $fileData;
-							}
-
 							if ($subFormData)
 							{
 								foreach ($subFormData as $keyData => $data)
@@ -696,7 +685,6 @@ class TjucmControllerItemForm extends JControllerForm
 											// TODO Temprary used switch case need to modify code
 											switch ($fieldTable->type)
 											{
-												case 'related':
 												case 'multi_select':
 													foreach ($d as $option)
 													{
@@ -710,6 +698,7 @@ class TjucmControllerItemForm extends JControllerForm
 												break;
 
 												case 'tjlist':
+												case 'related':
 													foreach ($d as $option)
 													{
 														$data[$subFieldName][] = $option;
@@ -723,6 +712,27 @@ class TjucmControllerItemForm extends JControllerForm
 													}
 												break;
 											}
+										}
+										elseif($fieldTable->type == 'file' || $fieldTable->type == 'image')
+										{
+											JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/tables');
+											$subDestionationFieldTable = JTable::getInstance('field', 'TjfieldsTable');
+
+											$subDestionationFieldTable->load(array('name' => $subFieldName));
+
+											$subformFileData = array();
+											$subformFileData['value'] = $d;
+											$subformFileData['copy'] = true;
+											$subformFileData['type'] = $fieldTable->type;
+											$subformFileData['sourceClient'] = $subFormSourceClient;
+											$subformFileData['sourceFieldUploadPath'] = json_decode($fieldTable->params)->uploadpath;
+											$subformFileData['destFieldUploadPath'] = json_decode($subDestionationFieldTable->params)->uploadpath;
+											$subformFileData['user_id'] = Factory::getUser()->id;
+											$data[$subFieldName] = $subformFileData;
+										}
+										elseif ($fieldTable->type == 'cluster')
+										{
+											$data[$subFieldName] = $clusterId;
 										}
 										else
 										{
@@ -740,7 +750,27 @@ class TjucmControllerItemForm extends JControllerForm
 							else
 							{
 								unset($extraFieldsData[$fieldKey]);
-								$extraFieldsData[$targetFieldName] = $fieldValue;
+
+								if ($fieldType == 'file' || $fieldType == 'image')
+								{
+									$fileData = array();
+									$fileData['value'] = $fieldValue;
+									$fileData['copy'] = true;
+									$fileData['type'] = $fieldType;
+									$fileData['sourceClient'] = $sourceClient;
+									$fileData['sourceFieldUploadPath'] = $sourceFieldParams->uploadpath;
+									$fileData['destFieldUploadPath'] = $fielParams->uploadpath;
+									$fileData['user_id'] = Factory::getUser()->id;
+									$extraFieldsData[$targetFieldName] = $fileData;
+								}
+								elseif($fieldType == 'cluster')
+								{
+									$extraFieldsData[$targetFieldName] = $clusterId;
+								}
+								else
+								{
+									$extraFieldsData[$targetFieldName] = $fieldValue;
+								}
 							}
 						}
 
@@ -769,27 +799,6 @@ class TjucmControllerItemForm extends JControllerForm
 
 							// If data is valid then save the data into DB
 							$response = $model->saveExtraFields($formData);
-
-							foreach ($fileFieldArray as $fileField)
-							{
-								$fileFieldValue = round(microtime(true)) . "_" . JUserHelper::genRandomPassword(5) . "_" . $fileField['value'];
-								$filePath = JPATH_SITE . '/' . $fileField['type'] . 's/tjmedia/' . str_replace(".", "/", $sourceClient . "/");
-								$targetfilePath = JPATH_SITE . '/' . $fileField['type'] . 's/tjmedia/' . str_replace(".", "/", $targetClient . "/");
-								$sourceFilePath = ($fileField['sourceparams']->uploadpath != '') ? $fileField['sourceparams']->uploadpath : $filePath;
-								$destinationFilePath = ($fileField['params']->uploadpath != '') ? $fileField['params']->uploadpath : $filePath;
-
-								if (copy($sourceFilePath . $fileField['value'], $destinationFilePath . $fileFieldValue))
-								{
-									JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/tables');
-									$fielValuedTable = JTable::getInstance('fieldsvalue', 'TjfieldsTable');
-									$fielValuedTable->field_id = $fileField['field_id'];
-									$fielValuedTable->content_id = $recordId;
-									$fielValuedTable->value = $fileFieldValue;
-									$fielValuedTable->user_id = Factory::getUser()->id;
-									$fielValuedTable->client = $targetClient;
-									$fielValuedTable->store();
-								}
-							}
 
 							$msg = ($response) ? Text::_("COM_TJUCM_ITEM_COPY_SUCCESSFULLY") : Text::_("COM_TJUCM_FORM_SAVE_FAILED");
 						}
