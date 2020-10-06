@@ -15,6 +15,7 @@ public class AdminDashboardTest extends BaseClass {
 		logger = extent.createTest(new Object() {
 		}.getClass().getEnclosingMethod().getName());
 		dashboardpage.dashboard();
+		
 
 	}
 

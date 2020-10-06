@@ -4,4 +4,9 @@
 /automation/target
 
 /automation/Testdata.xlsx
-
+/automation/.classpath
+/automation/.project
+/automation/.settings
+/automation/extent.html
+/automation/src/main/java/com/ucm/config/properties.properties
+/automation/src/main/java/com/ucm/utils/log4j.properties
