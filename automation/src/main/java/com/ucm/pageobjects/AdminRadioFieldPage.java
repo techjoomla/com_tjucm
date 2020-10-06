@@ -11,8 +11,8 @@ import com.mongodb.operation.DropDatabaseOperation;
 import com.ucm.config.BaseClass;
 
 /**
- * This is Page Class for sub form creation . It contains all the elements and actions
- * related to sub form creation view.
+ * This is Page Class for radio button field creation . It contains all the elements and actions
+ * related to radio button field creation view.
  * 
  */
 

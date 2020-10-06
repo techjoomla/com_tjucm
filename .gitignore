@@ -8,5 +8,7 @@
 /automation/.project
 /automation/.settings
 /automation/extent.html
+/automation/bin
+/automation/.~lock.Testdata.xlsx#
 /automation/src/main/java/com/ucm/config/properties.properties
 /automation/src/main/java/com/ucm/utils/log4j.properties

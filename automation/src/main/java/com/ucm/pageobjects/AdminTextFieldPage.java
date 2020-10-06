@@ -11,8 +11,8 @@ import com.mongodb.operation.DropDatabaseOperation;
 import com.ucm.config.BaseClass;
 
 /**
- * This is Page Class for sub form creation . It contains all the elements and actions
- * related to sub form creation view.
+ * This is Page Class for text field creation . It contains all the elements and actions
+ * related to text field creation view.
  * 
  */
 
@@ -28,7 +28,7 @@ public class AdminTextFieldPage extends BaseClass {
 		
 	}
 	/*
-	 * Locators for radio button  
+	 * Locators for text field creation  
 	 */
 
 	@FindBy(how = How.XPATH, using="//button [@class='btn btn-small button-new btn-success']")
