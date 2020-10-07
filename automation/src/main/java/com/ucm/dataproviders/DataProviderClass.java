@@ -48,7 +48,32 @@ public class DataProviderClass {
 
 		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "textfield");
 
-	}	
+	}
+	
+	@DataProvider(name = "numberfieldcreation")
+
+	public static Object[][] numberfieldcreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "numberfield");
+
+	}
+	
+	@DataProvider(name = "datefieldcreation")
+
+	public static Object[][] datefieldcreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "datefield");
+
+	}
+		
+	@DataProvider(name = "emailfieldcreation")
+
+	public static Object[][] emailfieldcreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "emailfield");
+
+	}
+	
 	
 	
 }
