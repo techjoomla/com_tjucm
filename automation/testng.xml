@@ -12,10 +12,14 @@
 			 <class name ="com.ucm.testsuite.AdminCreateSubFormTest" />
 			 <class name ="com.ucm.testsuite.AdminUcmformTest" />
 			 <class name ="com.ucm.testsuite.AdminTextFieldTest" />
-			 <class name ="com.ucm.testsuite.AdminRadioFieldTest" />
+			  <class name ="com.ucm.testsuite.AdminRadioFieldTest" />
 			 <class name ="com.ucm.testsuite.AdminNumberFieldTest" />
 			 <class name ="com.ucm.testsuite.AdminDateFieldTest" />
-			 <class name ="com.ucm.testsuite.AdminEmailFieldTest" />
+			 <class name ="com.ucm.testsuite.AdminEmailFieldTest" /> 
+			 <class name ="com.ucm.testsuite.AdminSingleSelectFieldTest" />
+			 <class name ="com.ucm.testsuite.AdminMultiSelectFieldTest" />
+			 <class name ="com.ucm.testsuite.AdminTextareaFieldTest" />
+			 
 		</classes>
 	</test> <!-- Test -->
 </suite> <!-- Suite -->

@@ -74,6 +74,29 @@ public class DataProviderClass {
 
 	}
 	
+	@DataProvider(name = "singleselectfieldcreation")
+
+	public static Object[][] singleselectfieldcreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "singleselect");
+
+	}
+	
+	@DataProvider(name = "multiselectfieldcreation")
+
+	public static Object[][] multiselectfieldcreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "multiselect");
+
+	}	
+	
+	@DataProvider(name = "textareafieldcreation")
+
+	public static Object[][] textareafieldcreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "textarea");
+
+	}		
 	
 	
 }
