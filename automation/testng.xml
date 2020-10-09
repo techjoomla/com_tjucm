@@ -9,8 +9,11 @@
 		<classes>
 			<class name="com.ucm.testsuite.AdminLoginTest" />
 			 <class name="com.ucm.testsuite.AdminDashboardTest" />  
-			 <class name ="com.ucm.testsuite.AdminCreateSubFormTest" />
+			 <!-- <class name ="com.ucm.testsuite.AdminCreateSubFormTest" /> -->
 			 <class name ="com.ucm.testsuite.AdminUcmformTest" />
+			 <class name ="com.ucm.testsuite.AdminRadioFieldTest" />
+			 <class name ="com.ucm.testsuite.AdminTextFieldTest" />
+			 			 
 				</classes>
 	</test> <!-- Test -->
 </suite> <!-- Suite -->

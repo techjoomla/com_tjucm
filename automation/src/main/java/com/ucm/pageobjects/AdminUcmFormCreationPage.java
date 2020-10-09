@@ -71,7 +71,7 @@ public class AdminUcmFormCreationPage extends BaseClass {
 	@FindBy(how = How.XPATH, using= "//table[@id='typeList']//tr[contains(@class,'row')]//a[text()='Fields']")
 	public List<WebElement> field_typecount;
 	@FindBy(how = How.XPATH, using="//button [@class='btn btn-small button-new btn-success']")
-	public WebElement click_field;
+	public WebElement click_newbutton;
 	
 	
 	/*
@@ -140,7 +140,8 @@ public class AdminUcmFormCreationPage extends BaseClass {
 			singleField.click();
 			}
 		}
-		click_field.click();
+		click_newbutton.click();
+		System.out.println("UCMform created");
 		logger.pass("click at 1st field groupin the listing page");
 		return new AdminUcmFormCreationPage(driver);
 	}

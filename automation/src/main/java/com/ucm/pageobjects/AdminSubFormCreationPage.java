@@ -84,8 +84,6 @@ public class AdminSubFormCreationPage extends BaseClass {
 	@FindBy(how = How.XPATH, using = "//fieldset[@id='jform_required']//label[@class='btn']")
 	public WebElement text_required;
 	
-	
-	
 	/*
 	 * 
 	 * Method for  Sub formcreation
@@ -120,7 +118,6 @@ public class AdminSubFormCreationPage extends BaseClass {
 		logger.pass("select view all option from dropdown");
 		selectviewAllallow.click();
 		logger.pass("Select allow option");
-		System.out.println("Subform created");
 		logger.pass("Subform created");
 		save_close_button.click();
 		logger.pass("click at save and close button");
@@ -163,6 +160,7 @@ public class AdminSubFormCreationPage extends BaseClass {
 		select_field.click();
 		text_required.click();
 		save_close_button.click();
+		System.out.println("Subform created");
 		return new AdminSubFormCreationPage(driver);
 	}
 }
