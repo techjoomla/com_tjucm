@@ -160,7 +160,7 @@ public class AdminSubFormCreationPage extends BaseClass {
 		select_field.click();
 		text_required.click();
 		save_close_button.click();
-		System.out.println("Subform created");
+		logger.pass("Subform created");
 		return new AdminSubFormCreationPage(driver);
 	}
 }

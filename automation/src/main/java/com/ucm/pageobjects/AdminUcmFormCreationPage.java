@@ -141,8 +141,7 @@ public class AdminUcmFormCreationPage extends BaseClass {
 			}
 		}
 		click_newbutton.click();
-		System.out.println("UCMform created");
-		logger.pass("click at 1st field groupin the listing page");
+		logger.pass("UCMform created");
 		return new AdminUcmFormCreationPage(driver);
 	}
 }

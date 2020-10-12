@@ -81,7 +81,7 @@ public class AdminRadioFieldPage extends BaseClass {
 		enterValue(optionvalue2,ov2);
 		logger.pass("enter option value  two");
 		text_save.click();		
-		System.out.println("UCMform radio button field");
+		logger.pass("UCMform radio button field");
 		return new AdminRadioFieldPage(driver);
 	}
 }

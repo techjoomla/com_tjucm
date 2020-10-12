@@ -7,8 +7,7 @@ public class AdminTextFieldTest extends BaseClass{
 	@Test(dataProvider = "textfieldcreation", dataProviderClass = DataProviderClass.class)
 	public void AdmintextField(String testdesc,String l,String tn, String ml) throws Exception {
 		AdminTextFieldPage textfield = new AdminTextFieldPage(driver);
-		
-		
+				
 		if (testdesc.equals("validdata")) {
 			textfield.textFieldCreation(l,tn,ml);
 		}
