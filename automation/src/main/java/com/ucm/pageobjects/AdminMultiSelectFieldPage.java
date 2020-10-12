@@ -85,7 +85,7 @@ public class AdminMultiSelectFieldPage extends BaseClass {
 		enterValue(languageValue3, lv3);
 		logger.pass("enter lang value 3");
 		text_save.click();	
-		System.out.println("multi select field created");
+		logger.pass("multi select field created");
 		return new AdminMultiSelectFieldPage(driver);
 		
 		

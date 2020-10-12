@@ -97,6 +97,35 @@ public class DataProviderClass {
 		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "textarea");
 
 	}		
+	@DataProvider(name = "editorfieldcreation")
+
+	public static Object[][] editorfieldcreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "editor");
+
+	}	
 	
+	@DataProvider(name = "filefieldcreation")
+
+	public static Object[][] filefieldcreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "file");
+
+	}
 	
+	@DataProvider(name = "tcounterfieldcreation")
+
+	public static Object[][] tcounterfieldcreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "textcounter");
+
+	}
+	
+	@DataProvider(name = "checkboxfieldcreation")
+
+	public static Object[][] checkboxfieldcreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "checkbox");
+
+	}
 }

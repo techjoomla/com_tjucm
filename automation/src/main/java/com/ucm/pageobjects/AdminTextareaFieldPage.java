@@ -65,6 +65,7 @@ public class AdminTextareaFieldPage extends BaseClass {
 		click_field_type.click();
 		selectTextarea.click();
 		saveForValidation.click();
+		logger.pass("check validation");
 		Alert altpopup = driver.switchTo().alert();
 		altpopup.accept();
 		enterValue(talable, tl);
@@ -80,7 +81,7 @@ public class AdminTextareaFieldPage extends BaseClass {
 		logger.pass("enter col value");
 		text_required.click();
 		text_save.click();	
-		System.out.println("textarea field created");
+		logger.pass("textarea field created");
 		return new AdminTextareaFieldPage(driver);
 		
 		

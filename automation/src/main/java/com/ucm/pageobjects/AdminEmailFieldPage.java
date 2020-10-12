@@ -56,6 +56,7 @@ public class AdminEmailFieldPage extends BaseClass {
 		click_field_type.click();
 		select_email.click();
 		saveForValidation.click();
+		logger.pass("check the validation");
 		Alert altpopup = driver.switchTo().alert();
 		altpopup.accept();
 		logger.pass("check validation");
@@ -70,8 +71,7 @@ public class AdminEmailFieldPage extends BaseClass {
 		text_required.click();
 		logger.pass("select field as required");
 		text_save.click();
-		logger.pass("click at save and new button");
-		System.out.println("number field created");
+		logger.pass("email field created");
 		return new AdminEmailFieldPage(driver);
 			
 	}

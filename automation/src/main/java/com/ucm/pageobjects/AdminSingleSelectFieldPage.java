@@ -73,6 +73,7 @@ public class AdminSingleSelectFieldPage extends BaseClass {
 		logger.pass("click at field type");
 		select_singl.click();
 		saveForValidation.click();
+		logger.pass("check the validation");
 		Alert altpopup = driver.switchTo().alert();
 		altpopup.accept();
 		enterValue(sslable,ssl);
@@ -102,7 +103,7 @@ public class AdminSingleSelectFieldPage extends BaseClass {
 		enterValue(countryvalue4,cv4);
 		logger.pass("entercountry value 4");
 		text_save.click();	
-		System.out.println("text field created");
+		logger.pass("text field created");
 		return new AdminSingleSelectFieldPage(driver);
 		
 		

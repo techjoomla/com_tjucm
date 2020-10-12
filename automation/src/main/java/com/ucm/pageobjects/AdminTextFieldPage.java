@@ -63,8 +63,9 @@ public class AdminTextFieldPage extends BaseClass {
 		logger.pass("click at field type");
 		select_field.click();
 		text_required.click();
+		logger.pass("save the field");
 		text_save_next.click();	
-		System.out.println("text field created");
+		logger.pass("text field created");
 		return new AdminTextFieldPage(driver);
 		
 		
