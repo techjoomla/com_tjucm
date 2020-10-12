@@ -148,6 +148,9 @@ $firstListColumn = key($tmpListColumn);
 	{
 		$tjFieldsOptionsModel = JModelLegacy::getInstance('Options', 'TjfieldsModel', array('ignore_request' => true));
 		$tjFieldsOptionsModel->setState('filter.field_id', $field->id);
+		$tjFieldsOptionsModel->setState('list.ordering', 'ordering');
+		$tjFieldsOptionsModel->setState('list.direction', 'ASC');
+
 		$options = $tjFieldsOptionsModel->getItems();
 
 		if (!empty($options))
