@@ -835,6 +835,11 @@ class TjucmModelItemForm extends JModelAdmin
 	 */
 	public function getUcmSubFormFieldDataJson($parentRecordId, $efd)
 	{
+		if (is_array($efd->value))
+		{
+			$efd->value = $efd->value[0];
+		}
+
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('id');
