@@ -100,12 +100,6 @@ class TjucmControllerItemForm extends JControllerForm
 				$app->close();
 			}
 
-			// Set the state of record as per UCM type config
-			$typeTable = $model->getTable('type');
-			$typeTable->load(array('unique_identifier' => $client));
-			$typeParams = new Registry($typeTable->params);
-			$data['state'] = $typeParams->get('publish_items', 0);
-
 			$data['client'] = $client;
 		}
 
