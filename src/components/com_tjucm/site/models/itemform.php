@@ -518,7 +518,7 @@ class TjucmModelItemForm extends JModelAdmin
 		if (empty($data['id']))
 		{
 			// Set the state of record as per UCM type config
-			$typeTable = $model->getTable('type');
+			$typeTable = $this->getTable('type');
 			$typeTable->load(array('unique_identifier' => $data['client']));
 			$typeParams = new Registry($typeTable->params);
 			$data['state'] = $typeParams->get('publish_items', 0);
