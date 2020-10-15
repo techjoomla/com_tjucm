@@ -22,7 +22,6 @@ public class AdminSingleSelectFieldPage extends BaseClass {
 	static Logger log = Logger.getLogger(AdminSingleSelectFieldPage.class);
 
 	public AdminSingleSelectFieldPage(WebDriver driver) {
-		System.out.print("in textfield page");
 		this.driver = driver;
 		PageFactory.initElements(driver, this);
 		

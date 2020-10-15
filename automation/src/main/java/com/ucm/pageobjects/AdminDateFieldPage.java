@@ -22,7 +22,6 @@ public class AdminDateFieldPage extends BaseClass {
 	static Logger log = Logger.getLogger(AdminDateFieldPage.class);
 
 	public AdminDateFieldPage(WebDriver driver) {
-		System.out.print("in textfield page");
 		this.driver = driver;
 		PageFactory.initElements(driver, this);
 		

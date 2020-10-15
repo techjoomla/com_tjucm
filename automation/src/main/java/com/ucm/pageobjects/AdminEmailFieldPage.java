@@ -22,7 +22,6 @@ public class AdminEmailFieldPage extends BaseClass {
 	static Logger log = Logger.getLogger(AdminEmailFieldPage.class);
 
 	public AdminEmailFieldPage(WebDriver driver) {
-		System.out.print("in textfield page");
 		this.driver = driver;
 		PageFactory.initElements(driver, this);
 		
