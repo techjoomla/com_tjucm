@@ -11,6 +11,7 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Component\ComponentHelper;
+use Joomla\Registry\Registry;
 
 $tmpListColumn = $this->listcolumn;
 reset($tmpListColumn);
@@ -117,11 +118,23 @@ $firstListColumn = key($tmpListColumn);
 
 	if ($fieldTable->id)
 	{
+		$fieldParams = new Registry($fieldTable->params);
+		$stateFilter = $fieldParams->get('published', '1');
+
+		if (strpos($stateFilter, ','))
+		{
+			$stateFilter = explode(',', $stateFilter);
+		}
+		else
+		{
+			$stateFilter = (ARRAY) $stateFilter;
+		}
+
 		$selectCategory = new stdClass;
 		$selectCategory->value = '';
 		$selectCategory->text = JText::_("COM_TJUCM_FILTER_SELECT_CATEGORY_LABEL");
 
-		$categoryOptions = JHtml::_('category.options', $this->client, $config = array('filter.published' => array(1)));
+		$categoryOptions = JHtml::_('category.options', $this->client, $config = array('filter.published' => $stateFilter));
 		$categoryOptions = array_merge(array($selectCategory), $categoryOptions);
 		?>
 		<div class="btn-group pull-right hidden-xs">
