@@ -149,4 +149,12 @@ public class DataProviderClass {
 		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "audio");
 
 	}
+	@DataProvider(name = "menuviewcreation")
+
+	public static Object[][] menuviewcreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "menu");
+
+	}
+
 }

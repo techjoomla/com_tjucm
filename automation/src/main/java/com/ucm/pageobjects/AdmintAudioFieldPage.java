@@ -44,6 +44,8 @@ public class AdmintAudioFieldPage extends BaseClass {
 	public WebElement text_save;
 	@FindBy(how = How.XPATH,using = "//input[@id='jform_params_query']")
 	public WebElement sendSQL;
+	@FindBy(how =How.XPATH, using = "//button[@class='btn btn-small button-save']")
+	public WebElement saveandclose;
 	
 	/*
 	 * 
@@ -62,7 +64,7 @@ public class AdmintAudioFieldPage extends BaseClass {
 		logger.pass("select Audio field");
 		text_required.click();
 		logger.pass("select field as required");
-		text_save.click();
+		saveandclose.click();
 		logger.pass("Audio field created");
 		return new AdmintAudioFieldPage(driver);
 			
