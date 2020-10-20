@@ -156,5 +156,13 @@ public class DataProviderClass {
 		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "menu");
 
 	}
+	
+	@DataProvider(name = "usercreation")
+
+	public static Object[][] usercreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "user");
+
+	}
 
 }

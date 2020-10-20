@@ -91,19 +91,7 @@ public class BaseClass {
 		jse1.executeScript("window.scrollBy(0,-1000)", "");
     }
     
-    public void scrollUp2() {
-    	JavascriptExecutor jse2 = (JavascriptExecutor)driver;
-		jse2.executeScript("window.scrollBy(0,250)", "");
-		jse2.executeScript("window.scrollBy(0,-1000)", "");
-    }
-    
-    public void scrollUp3() {
-    	JavascriptExecutor jse3 = (JavascriptExecutor)driver;
-		jse3.executeScript("window.scrollBy(0,250)", "");
-		jse3.executeScript("window.scrollBy(0,-1000)", "");
-    }
-    
-    public void selectRadioButton(WebElement name) {
+   public void selectRadioButton(WebElement name) {
     	name.click();
     }
 
@@ -114,9 +102,13 @@ public class BaseClass {
 	public void setup() {
 
 		try {
-			System.out.println("Before suite >> setup");
 			WebDriverManager.chromedriver().setup();
-			driver = new ChromeDriver();
+			ChromeOptions options = new ChromeOptions();
+			System.setProperty("webdriver.chrome.args", "--disable-logging");
+			System.setProperty("webdriver.chrome.silentOutput", "true");
+			options.addArguments("--headless", "--log-level=3", "--no-sandbox", "--disable-gpu",
+					"--window-size=1920,1200", "--ignore-certificate-errors");
+			driver = new ChromeDriver(options);
 			properties = new Properties();
 			FileInputStream fis = new FileInputStream(
 					System.getProperty("user.dir") + "/src/main/java/com/ucm/config/properties.properties");

@@ -9,7 +9,7 @@
 		<classes>
 			<class name="com.ucm.testsuite.AdminLoginTest" />
 			 <class name="com.ucm.testsuite.AdminDashboardTest" />  
-			 <class name ="com.ucm.testsuite.AdminCreateSubFormTest" />
+			 <class name ="com.ucm.testsuite.AdminCreateSubFormTest" /> 
 			 <class name ="com.ucm.testsuite.AdminUcmformTest" />
 			 <class name ="com.ucm.testsuite.AdminTextFieldTest" /> 
 			 <class name ="com.ucm.testsuite.AdminRadioFieldTest" />
@@ -27,6 +27,7 @@
 			 <class name ="com.ucm.testsuite.AdminVideoFieldTest" />
 			 <class name ="com.ucm.testsuite.AdminAudioFieldTest" /> 
 			 <class name ="com.ucm.testsuite.AdminViewMenuTest" />
+			 <class name ="com.ucm.testsuite.AdminCreateUserTest" />
 			 			 
 		</classes>
 	</test> <!-- Test -->
