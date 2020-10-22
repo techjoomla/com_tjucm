@@ -9,9 +9,9 @@
 		<classes>
 			<class name="com.ucm.testsuite.AdminLoginTest" />
 			 <class name="com.ucm.testsuite.AdminDashboardTest" />  
-			 <class name ="com.ucm.testsuite.AdminCreateSubFormTest" />
+			 <class name ="com.ucm.testsuite.AdminCreateSubFormTest" /> 
 			 <class name ="com.ucm.testsuite.AdminUcmformTest" />
-			 <class name ="com.ucm.testsuite.AdminTextFieldTest" />
+			 <class name ="com.ucm.testsuite.AdminTextFieldTest" /> 
 			 <class name ="com.ucm.testsuite.AdminRadioFieldTest" />
 			 <class name ="com.ucm.testsuite.AdminNumberFieldTest" />
 			 <class name ="com.ucm.testsuite.AdminDateFieldTest" />
@@ -22,10 +22,13 @@
 			 <class name ="com.ucm.testsuite.AdminEditorFieldTest" />
 			 <class name ="com.ucm.testsuite.AdminFileFieldTest" />
 			 <class name ="com.ucm.testsuite.AdmincounterFieldTest" />
-			 <class name ="com.ucm.testsuite.AdminCheckboxFieldTest" />
-			 
-			 
-			 
+			 <class name ="com.ucm.testsuite.AdminCheckboxFieldTest" /> 
+			 <class name ="com.ucm.testsuite.AdminSqlFieldTest" />
+			 <class name ="com.ucm.testsuite.AdminVideoFieldTest" />
+			 <class name ="com.ucm.testsuite.AdminAudioFieldTest" /> 
+			 <class name ="com.ucm.testsuite.AdminViewMenuTest" />
+			 <class name ="com.ucm.testsuite.AdminCreateUserTest" />
+			 			 
 		</classes>
 	</test> <!-- Test -->
 </suite> <!-- Suite -->

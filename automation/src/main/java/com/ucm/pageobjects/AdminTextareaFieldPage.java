@@ -22,7 +22,6 @@ public class AdminTextareaFieldPage extends BaseClass {
 	static Logger log = Logger.getLogger(AdminTextareaFieldPage.class);
 
 	public AdminTextareaFieldPage(WebDriver driver) {
-		System.out.print("in textfield page");
 		this.driver = driver;
 		PageFactory.initElements(driver, this);
 		

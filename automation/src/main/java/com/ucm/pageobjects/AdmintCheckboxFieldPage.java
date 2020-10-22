@@ -22,7 +22,6 @@ public class AdmintCheckboxFieldPage extends BaseClass {
 	static Logger log = Logger.getLogger(AdmintCheckboxFieldPage.class);
 
 	public AdmintCheckboxFieldPage(WebDriver driver) {
-		System.out.print("in textfield page");
 		this.driver = driver;
 		PageFactory.initElements(driver, this);
 		

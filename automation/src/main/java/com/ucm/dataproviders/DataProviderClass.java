@@ -128,4 +128,41 @@ public class DataProviderClass {
 		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "checkbox");
 
 	}
+	@DataProvider(name = "sqlfieldcreation")
+
+	public static Object[][] sqlfieldcreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "sql");
+
+	}
+	@DataProvider(name = "videofieldcreation")
+
+	public static Object[][] videofieldcreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "video");
+
+	}
+	@DataProvider(name = "audiofieldcreation")
+
+	public static Object[][] audiofieldcreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "audio");
+
+	}
+	@DataProvider(name = "menuviewcreation")
+
+	public static Object[][] menuviewcreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "menu");
+
+	}
+	
+	@DataProvider(name = "usercreation")
+
+	public static Object[][] usercreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "user");
+
+	}
+
 }
