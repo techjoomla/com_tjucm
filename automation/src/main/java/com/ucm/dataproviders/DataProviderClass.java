@@ -135,6 +135,13 @@ public class DataProviderClass {
 		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "sql");
 
 	}
+	@DataProvider(name = "ucmsubformfiledcreation")
+
+	public static Object[][] ucmsubformfiledcreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "ucmsubform");
+
+	}
 	@DataProvider(name = "videofieldcreation")
 
 	public static Object[][] videofieldcreation() throws IOException {
@@ -149,6 +156,8 @@ public class DataProviderClass {
 		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "audio");
 
 	}
+	
+	
 	@DataProvider(name = "menuviewcreation")
 
 	public static Object[][] menuviewcreation() throws IOException {
@@ -164,5 +173,19 @@ public class DataProviderClass {
 		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "user");
 
 	}
+	@DataProvider(name = "frontlogin")
 
+	public static Object[][] frontlogin() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "frontlogin");
+
+	}
+	@DataProvider(name = "frontpostiveflow")
+
+	public static Object[][] frontpostiveflow() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "frontpositive");
+
+	}
+	
 }
