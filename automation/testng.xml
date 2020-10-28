@@ -7,7 +7,7 @@
 	</listeners>
 	<test name="Test">
 		<classes>
-		  	<class name="com.ucm.testsuite.AdminLoginTest" />
+		  	 <class name="com.ucm.testsuite.AdminLoginTest" />
 			 <class name="com.ucm.testsuite.AdminDashboardTest" />  
 			 <class name ="com.ucm.testsuite.AdminCreateSubFormTest" /> 
 			 <class name ="com.ucm.testsuite.AdminUcmformTest" />
