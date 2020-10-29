@@ -180,6 +180,7 @@ public class DataProviderClass {
 		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "frontlogin");
 
 	}
+	
 	@DataProvider(name = "frontpostiveflow")
 
 	public static Object[][] frontpostiveflow() throws IOException {

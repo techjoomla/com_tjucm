@@ -110,7 +110,6 @@ public class FrontPostiveFlowPage extends BaseClass {
 		logger.pass("enter date");
 		JavascriptExecutor js3 = (JavascriptExecutor) driver; // for scroll
 		js3.executeScript("window.scrollBy(0,10000)");
-		
 		return new FrontPostiveFlowPage(driver);
 
 	}
@@ -149,12 +148,10 @@ public class FrontPostiveFlowPage extends BaseClass {
 		logger.pass("enter at toggle button");
 		enterValue(aboutyourself,ays);
 		logger.pass("enter about youself");
-		
-	//	enterValue(uploadimage, Constant.DEFAULTSYSTEMPATH + ui); // Giveback image		
-		
-//		JavascriptExecutor js3 = (JavascriptExecutor) driver; // for scroll
-//		js3.executeScript("window.scrollBy(0,10000)");
-		
+		enterValue(uploadimage, Constant.DEFAULTSYSTEMPATH + ui); // Giveback image		
+		JavascriptExecutor js3 = (JavascriptExecutor) driver; // for scroll
+		js3.executeScript("window.scrollBy(0,10000)");
+		logger.pass("select file name from excell and select");
 		scrollDown1();
 		enterValue(charlimit, cl);
 		logger.pass("enter character limit");

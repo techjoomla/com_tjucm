@@ -67,8 +67,8 @@ public class AdminFileFieldPage extends BaseClass {
 		logger.pass("click at file field");
 		selectFile.click();
 		logger.pass("select file field");
-//		text_required.click();
-//		logger.pass("select field as required");
+		text_required.click();
+		logger.pass("select field as required");
 		text_save.click();
 		logger.pass("file field created");
 		return new AdminFileFieldPage(driver);
