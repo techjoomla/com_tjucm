@@ -188,5 +188,12 @@ public class DataProviderClass {
 		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "frontpositive");
 
 	}
+	@DataProvider(name = "deleteucm")
+
+	public static Object[][] deleteucm() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "deleteucm");
+
+	}
 	
 }
