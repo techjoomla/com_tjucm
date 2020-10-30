@@ -18,9 +18,8 @@ import com.ucm.config.BaseClass;
  * 
  */
 
-public class DeleteucmtypePage extends BaseClass {
+public class DeleteucmtypePage extends BaseClass{
 
-	private WebDriver driver;
 	static Logger log = Logger.getLogger(DeleteucmtypePage.class);
 
 	public DeleteucmtypePage(WebDriver driver) {
