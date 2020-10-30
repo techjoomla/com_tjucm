@@ -74,6 +74,7 @@ public class AdminViewMenuPage extends BaseClass {
 	public WebElement create_showlist;
 	@FindBy(how =How.XPATH, using = "//button[@class='btn btn-small button-save']")
 	public WebElement saveandclose;
+	
 
 
 	
@@ -112,7 +113,7 @@ public class AdminViewMenuPage extends BaseClass {
 		select_button_primary.click();
 		driver.switchTo().frame("Menu Item Type"); // switch to iFrame
 		select_header.click();
-		show_edit_text.click();	
+		create_showlist.click();	
 		driver.switchTo().defaultContent();
 		ucm_config.click();
 		logger.pass("select ucmtype for list view");

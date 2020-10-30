@@ -7,7 +7,7 @@
 	</listeners>
 	<test name="Test">
 		<classes>
-			<class name="com.ucm.testsuite.AdminLoginTest" />
+		  	  <class name="com.ucm.testsuite.AdminLoginTest" />
 			 <class name="com.ucm.testsuite.AdminDashboardTest" />  
 			 <class name ="com.ucm.testsuite.AdminCreateSubFormTest" /> 
 			 <class name ="com.ucm.testsuite.AdminUcmformTest" />
@@ -24,11 +24,16 @@
 			 <class name ="com.ucm.testsuite.AdmincounterFieldTest" />
 			 <class name ="com.ucm.testsuite.AdminCheckboxFieldTest" /> 
 			 <class name ="com.ucm.testsuite.AdminSqlFieldTest" />
+			 <class name ="com.ucm.testsuite.AdminucmformfieldTest" />
 			 <class name ="com.ucm.testsuite.AdminVideoFieldTest" />
 			 <class name ="com.ucm.testsuite.AdminAudioFieldTest" /> 
-			 <class name ="com.ucm.testsuite.AdminViewMenuTest" />
-			 <class name ="com.ucm.testsuite.AdminCreateUserTest" />
-			 			 
+			  <!-- <class name ="com.ucm.testsuite.AdminViewMenuTest" />
+			 <class name ="com.ucm.testsuite.AdminCreateUserTest" /-->
+			 <class name ="com.ucm.testsuite.FrontLoginTest" />
+			 <class name ="com.ucm.testsuite.FrontPostiveFlowTest" />
+			 <class name ="com.ucm.testsuite.DeleteucmtypeTest" />
+		
+			 			 			 
 		</classes>
 	</test> <!-- Test -->
 </suite> <!-- Suite -->

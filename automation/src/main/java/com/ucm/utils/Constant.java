@@ -13,7 +13,7 @@ public class Constant {
 
 	public static final String TESTDATAPATH = "Testdata.xlsx";
 	
-	public static final String DEFAULTSYSTEMPATH = System.getProperty("user.dir");
+	public static final String DEFAULTSYSTEMPATH = System.getProperty("user.dir");	
 
 	private Constant() {
 
