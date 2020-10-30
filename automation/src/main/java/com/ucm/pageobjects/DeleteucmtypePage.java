@@ -22,11 +22,6 @@ public class DeleteucmtypePage extends BaseClass{
 
 	static Logger log = Logger.getLogger(DeleteucmtypePage.class);
 
-	public DeleteucmtypePage(WebDriver driver) {
-		this.driver = driver;
-		PageFactory.initElements(driver, this);
-	}
-	
 
 	public DeleteucmtypePage deleteucmtype() throws SQLException, ClassNotFoundException {
 
@@ -51,8 +46,7 @@ public class DeleteucmtypePage extends BaseClass{
 			String fieldsfields = "truncate table kxv_tjfields_fields";
 			ResultSet rs4 = st.executeQuery(fieldsfields);
 			logger.pass("ucm tj fields fields deleted");
-			
-			return new DeleteucmtypePage(driver);
+			return this; 
 	} 
 
 }

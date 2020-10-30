@@ -6,8 +6,7 @@ import com.ucm.pageobjects.DeleteucmtypePage;
 public class DeleteucmtypeTest extends BaseClass{
 	@Test(dataProvider = "deleteucm", dataProviderClass = DataProviderClass.class)
 	public void DeleteUcm(String testdesc) throws Exception {
-		DeleteucmtypePage deleteucm = new DeleteucmtypePage(driver);
-		
+		DeleteucmtypePage deleteucm = new DeleteucmtypePage();
 		
 		if (testdesc.equals("validdata")) {
 			deleteucm.deleteucmtype();
