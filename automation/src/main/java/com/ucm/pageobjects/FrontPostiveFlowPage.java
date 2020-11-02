@@ -114,6 +114,7 @@ public class FrontPostiveFlowPage extends BaseClass {
 		firstName.clear();
 		validNumber.clear();
 		validdate.clear();
+		validEmail.clear();
 			
 		return new FrontPostiveFlowPage(driver);
 
