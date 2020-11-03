@@ -97,19 +97,25 @@ public class FrontPostiveFlowPage extends BaseClass {
 	
 	
 	
-	public FrontPostiveFlowPage NagativeFlow(String fnf, String nf, String ve, String vd, String eu, String ays, String ui, String cl,String sv1,String vl, String al) {
+	public FrontPostiveFlowPage NagativeFlow(String fnf, String nf, String ve, String vd,String eu, String ays, String ui, String cl,String sv1,String vl, String al) {
 		formMenu.click();
-		logger.pass("click at form link");
 		enterValue(firstName,fnf);
-		logger.pass("enter 1st name");
+		logger.pass("enter 1st name -ve");
+		JavascriptExecutor jse = (JavascriptExecutor)driver;
 		enterValue(validNumber,nf);
-		logger.pass("enter phone no");
+		logger.pass("enter phone no -ve");
 		enterValue(validEmail,ve);
-		logger.pass("enter email");
+		logger.pass("enter email -ve");
 		enterValue(validdate,vd);
-		logger.pass("enter date");
-		JavascriptExecutor js3 = (JavascriptExecutor) driver; // for scroll
-		js3.executeScript("window.scrollBy(0,10000)");
+		logger.pass("enter date -ve");
+		jse.executeScript("arguments[0].scrollIntoView()", selecttoggle); 
+		logger.pass("Scroll down");
+		finalsubmit.click();
+		firstName.clear();
+		validNumber.clear();
+		validdate.clear();
+		validEmail.clear();
+			
 		return new FrontPostiveFlowPage(driver);
 
 	}
@@ -170,7 +176,6 @@ public class FrontPostiveFlowPage extends BaseClass {
 		Alert altpopup = driver.switchTo().alert();
 		altpopup.accept();
 		return new FrontPostiveFlowPage(driver);
-		
 			
 	}
 }
