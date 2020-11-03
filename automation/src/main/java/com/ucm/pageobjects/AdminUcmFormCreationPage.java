@@ -150,12 +150,14 @@ public class AdminUcmFormCreationPage extends BaseClass {
 		logger.pass("click at latest catogory link under created type");
 		click_newbutton.click();
 		enterValue(cat_title1, ct1);
-		logger.pass("");
+		logger.pass("enter title");
 		save_new_button.click();
+		logger.pass("save and new");
 		enterValue(cat_title2, ct2);
 		save_close_button.click();
+		logger.pass("save and close");
 		Type.click(); 		
-		
+		logger.pass("click at type button");
 		
 		List<WebElement> NumberOfTypesForFieldssub = field_typecount;
 		for (int k=0; k<NumberOfTypesForFieldssub.size();k++)

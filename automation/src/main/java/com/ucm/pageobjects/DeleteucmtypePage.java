@@ -52,10 +52,11 @@ public class DeleteucmtypePage extends BaseClass{
 			ResultSet rs4 = st.executeQuery(fieldsfields);
 			logger.pass("ucm tj fields fields deleted");
 			
-			String ucmcategory = "Delete FROM kxv_categories WHERE extension LIKE '%com_tjucm.pomform%'";
-			ResultSet rs5 = st.executeQuery(ucmcategory);
+			String cat = "Delete FROM kxv_categories WHERE extension LIKE '%com_tjucm.pomform%' ";
+			int rs5 = st.executeUpdate(cat);
 			logger.pass("Deleted the data in category table");
 			
+		
 			return this; 
 	} 
 
