@@ -31,21 +31,31 @@ public class DeleteucmtypePage extends BaseClass{
 			Connection conn = DriverManager.getConnection("jdbc:mysql://ucmjuly.cloudaccess.host:3306/xfhmkojr","xfhmkojr","3:E66Sy3Xqof+E");
 			//Executing SQL query and fetching the result
 			Statement st = conn.createStatement();
+			
 			String ucmtype = "truncate table kxv_tj_ucm_types";
 			ResultSet rs = st.executeQuery(ucmtype);
 			logger.pass("ucm type deleted");
+			
 			String ucmdata = "truncate table kxv_tj_ucm_data";
 			ResultSet rs1 = st.executeQuery(ucmdata);
 			logger.pass("ucm data deleted");
+			
 			String fieldgroup = "truncate table kxv_tjfields_groups";
 			ResultSet rs2 = st.executeQuery(fieldgroup);
 			logger.pass("ucm tj fields deleted");
+			
 			String fieldoption = "truncate table kxv_tjfields_options";
 			ResultSet rs3 = st.executeQuery(fieldoption);
 			logger.pass("ucm tj fields options deleted");
+			
 			String fieldsfields = "truncate table kxv_tjfields_fields";
 			ResultSet rs4 = st.executeQuery(fieldsfields);
 			logger.pass("ucm tj fields fields deleted");
+			
+			String ucmcategory = "Delete FROM kxv_categories WHERE extension LIKE '%com_tjucm.pomform%'";
+			ResultSet rs5 = st.executeQuery(ucmcategory);
+			logger.pass("Deleted the data in category table");
+			
 			return this; 
 	} 
 

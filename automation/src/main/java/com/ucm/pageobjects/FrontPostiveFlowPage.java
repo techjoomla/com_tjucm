@@ -101,15 +101,13 @@ public class FrontPostiveFlowPage extends BaseClass {
 		formMenu.click();
 		enterValue(firstName,fnf);
 		logger.pass("enter 1st name -ve");
-		JavascriptExecutor jse = (JavascriptExecutor)driver;
 		enterValue(validNumber,nf);
 		logger.pass("enter phone no -ve");
 		enterValue(validEmail,ve);
 		logger.pass("enter email -ve");
 		enterValue(validdate,vd);
 		logger.pass("enter date -ve");
-		jse.executeScript("arguments[0].scrollIntoView()", selecttoggle); 
-		logger.pass("Scroll down");
+		scrollDown1();
 		finalsubmit.click();
 		firstName.clear();
 		validNumber.clear();
