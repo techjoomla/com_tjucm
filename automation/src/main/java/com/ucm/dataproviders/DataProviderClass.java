@@ -156,6 +156,13 @@ public class DataProviderClass {
 		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "audio");
 
 	}
+	@DataProvider(name = "textcategorycreation")
+
+	public static Object[][] textcategorycreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "category");
+
+	}
 	
 	
 	@DataProvider(name = "menuviewcreation")

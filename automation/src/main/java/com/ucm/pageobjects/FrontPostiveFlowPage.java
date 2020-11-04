@@ -77,6 +77,10 @@ public class FrontPostiveFlowPage extends BaseClass {
 	public WebElement selectUser ;
 	@FindBy(how = How.NAME, using ="jform[com_tjucm_pomform_Checktermsandcondition]")
 	public WebElement checkbox ;
+	@FindBy(how = How.ID, using ="jform_com_tjucm_pomform_itemcategoryitemcategory_chzn")
+	public WebElement catclick ;
+	@FindBy(how = How.XPATH, using ="//*[@id=\"jform_com_tjucm_pomform_itemcategoryitemcategory_chzn\"]/div/ul/li[2]")
+	public WebElement catselect ;	
 	@FindBy(how = How.ID, using ="jform_com_tjucm_pomform_Videolink")
 	public WebElement vedioLink ;
 	@FindBy(how = How.NAME, using ="jform[com_tjucm_pomform_Audiolink]")
@@ -160,10 +164,13 @@ public class FrontPostiveFlowPage extends BaseClass {
 		enterValue(charlimit, cl);
 		logger.pass("enter character limit");
 		checkbox.click();
+		logger.pass("check the check box");
 	    subformClick1.click();
 	    enterValue(subformValue1,sv1);
-	    logger.pass("enter sub form link");
-		logger.pass("check the check box");
+	    logger.pass("enter sub form value");
+	    catclick.click();
+	    logger.pass("click at category dropdown");
+	    catselect.click();	    
 		enterValue(vedioLink,vl);    	
 	    logger.pass("enter vedio link");
 	    enterValue(AudioLink, al);
