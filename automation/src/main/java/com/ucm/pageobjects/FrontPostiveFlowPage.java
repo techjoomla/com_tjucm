@@ -69,6 +69,8 @@ public class FrontPostiveFlowPage extends BaseClass {
 	public WebElement aboutyourself;
 	@FindBy(how = How.ID, using ="jform_com_tjucm_pomform_EnteryourCV")
 	public WebElement uploadimage;
+	@FindBy(how = How.ID, using ="jform_com_tjucm_pomform_Onlypdffile")
+	public WebElement uploadimage1;
 	@FindBy(how = How.ID, using ="jform_com_tjucm_pomform_DescriptionAboutyourExperiences")
 	public WebElement charlimit;
 	@FindBy(how = How.XPATH, using ="//*[@id=\"jform_com_tjucm_pomform_selectallusers_chzn\"]")
@@ -101,7 +103,7 @@ public class FrontPostiveFlowPage extends BaseClass {
 	
 	
 	
-	public FrontPostiveFlowPage NagativeFlow(String fnf, String nf, String ve, String vd,String eu, String ays, String ui, String cl,String sv1,String vl, String al) {
+	public FrontPostiveFlowPage NagativeFlow(String fnf, String nf, String ve, String vd,String eu, String ays, String ui, String cl,String sv1,String vl, String al, String ui1) {
 		formMenu.click();
 		enterValue(firstName,fnf);
 		logger.pass("enter 1st name -ve");
@@ -112,11 +114,13 @@ public class FrontPostiveFlowPage extends BaseClass {
 		enterValue(validdate,vd);
 		logger.pass("enter date -ve");
 		scrollDown1();
+		enterValue(uploadimage1, Constant.DEFAULTSYSTEMPATH + ui1); // Giveback image
 		finalsubmit.click();
 		firstName.clear();
 		validNumber.clear();
 		validdate.clear();
 		validEmail.clear();
+		uploadimage1.clear();
 			
 		return new FrontPostiveFlowPage(driver);
 
@@ -130,6 +134,7 @@ public class FrontPostiveFlowPage extends BaseClass {
 		logger.pass("enter 1st name");
 		gender.click();
 		logger.pass("select gender");
+		validNumber.clear();
 		enterValue(validNumber,nf);
 		logger.pass("enter phone no");
 		enterValue(validEmail,ve);
@@ -156,7 +161,7 @@ public class FrontPostiveFlowPage extends BaseClass {
 		logger.pass("enter at toggle button");
 		enterValue(aboutyourself,ays);
 		logger.pass("enter about youself");
-		enterValue(uploadimage, Constant.DEFAULTSYSTEMPATH + ui); // Giveback image		
+		enterValue(uploadimage, Constant.DEFAULTSYSTEMPATH + ui); // Giveback image	
 		JavascriptExecutor js3 = (JavascriptExecutor) driver; // for scroll
 		js3.executeScript("window.scrollBy(0,10000)");
 		logger.pass("select file name from excell and select");

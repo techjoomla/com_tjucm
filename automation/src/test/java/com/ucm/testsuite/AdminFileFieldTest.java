@@ -5,12 +5,11 @@ import com.ucm.dataproviders.DataProviderClass;
 import com.ucm.pageobjects.AdminFileFieldPage;
 public class AdminFileFieldTest extends BaseClass{
 	@Test(dataProvider = "filefieldcreation", dataProviderClass = DataProviderClass.class)
-	public void AdminFileField(String testdesc,String fl, String fn) throws Exception {
+	public void AdminFileField(String testdesc,String fl, String fn, String ft, String fs,String pf, String pl) throws Exception {
 		AdminFileFieldPage filefield = new AdminFileFieldPage(driver);
 		
-		
 		if (testdesc.equals("validdata")) {
-			filefield.fileFieldCreation(fl,fn);
+			filefield.fileFieldCreation(fl,fn,ft,fs,pf,pl);
 		}
 	}
 }
