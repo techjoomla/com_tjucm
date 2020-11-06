@@ -195,6 +195,14 @@ public class DataProviderClass {
 		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "frontpositive");
 
 	}
+	@DataProvider(name = "frontadvancesearch")
+
+	public static Object[][] frontadvancesearch() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "advancesearch");
+
+	}	
+	
 	@DataProvider(name = "deleteucm")
 
 	public static Object[][] deleteucm() throws IOException {

@@ -30,8 +30,9 @@
 			 <class name ="com.ucm.testsuite.AdminAudioFieldTest" />  
 			  <!-- <class name ="com.ucm.testsuite.AdminViewMenuTest" />
 			 <class name ="com.ucm.testsuite.AdminCreateUserTest" /-->
-		 	  <class name ="com.ucm.testsuite.FrontLoginTest" />
+		 	 <class name ="com.ucm.testsuite.FrontLoginTest" />
 			 <class name ="com.ucm.testsuite.FrontPostiveFlowTest" />
+			 <class name ="com.ucm.testsuite.FrontAdvanceSearchTest" />
 			 <class name ="com.ucm.testsuite.DeleteucmtypeTest" />  
 		
 			 			 			 
