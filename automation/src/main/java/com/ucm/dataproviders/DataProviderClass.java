@@ -195,9 +195,9 @@ public class DataProviderClass {
 		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "frontpositive");
 
 	}
-	@DataProvider(name = "frontadvancesearch")
+	@DataProvider(name = "advancesearch")
 
-	public static Object[][] frontadvancesearch() throws IOException {
+	public static Object[][] advancesearch() throws IOException {
 
 		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "advancesearch");
 

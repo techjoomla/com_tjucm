@@ -87,7 +87,18 @@ public class FrontAdvanceSearchPage extends BaseClass {
 	public WebElement searchStatus;
 	@FindBy(how = How.XPATH, using ="//*[@id=\"draft_chzn\"]/div/ul/li[2]")
 	public WebElement selectSaved;
-
+	@FindBy(how = How.XPATH, using ="//*[@id=\"draft_chzn\"]/a/span")
+	public WebElement clickSaved;
+	@FindBy(how = How.XPATH, using ="//*[@id=\"draft_chzn\"]/div/ul/li[1]")
+	public WebElement clickselect;
+	@FindBy(how = How.XPATH, using ="//input[@name='filter_search']")
+	public WebElement clickFilter;
+	@FindBy(how = How.XPATH, using ="//input[@name='filter_search']")
+	public WebElement EnterFilter;
+	@FindBy(how = How.XPATH, using ="//*[@id=\"filter-progress-bar\"]/div[3]/button[1]")
+	public WebElement clickAtSearch;
+	@FindBy(how = How.XPATH, using ="//*[@id=\"clear-search-button\"]")
+	public WebElement clickAtclear;
 	/*
 	 * 
 	 * Method for AdvanceSearch
@@ -95,8 +106,7 @@ public class FrontAdvanceSearchPage extends BaseClass {
 	 */
 	
 	
-	
-	public FrontAdvanceSearchPage aSearch(String catl, String catn) {
+	public FrontAdvanceSearchPage aSearch(String ef) {
 		listMenu.click();
 		logger.pass("click at list menu");
 		sortPublish.click();
@@ -145,7 +155,15 @@ public class FrontAdvanceSearchPage extends BaseClass {
 		logger.pass("click at search button");
 		selectSaved.click();
 		logger.pass("select saved option from dropdown");
-		
+		clickSaved.click();
+		clickselect.click();
+		logger.pass("deselect status");
+		clickFilter.click();
+		enterValue(clickFilter, ef);
+		clickAtSearch.click();
+		logger.pass("click at search");
+		clickAtclear.click();	
+		logger.pass("click at clear");
 		
 		return new FrontAdvanceSearchPage(driver);
 
