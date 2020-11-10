@@ -1,7 +1,6 @@
 package com.ucm.pageobjects;
 
 import org.apache.log4j.Logger;
-import org.apache.tools.ant.taskdefs.Concat;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
