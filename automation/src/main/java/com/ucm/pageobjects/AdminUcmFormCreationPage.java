@@ -72,7 +72,14 @@ public class AdminUcmFormCreationPage extends BaseClass {
 	public List<WebElement> field_typecount;
 	@FindBy(how = How.XPATH, using="//button [@class='btn btn-small button-new btn-success']")
 	public WebElement click_newbutton;
-	
+	@FindBy(how = How.XPATH, using = "//table[@id='typeList']//tr[contains(@class,'row')]//a[text()='Category']")
+	public List<WebElement> catogory_count;
+	@FindBy(how = How.XPATH, using="//input[@id='jform_title']")
+	public WebElement cat_title1;
+	@FindBy(how = How.XPATH, using="//input[@id='jform_title']")
+	public WebElement cat_title2;
+	@FindBy(how = How.XPATH, using ="//button[@class='btn btn-small button-save-new']")
+	public WebElement save_new_button;
 	
 	/*
 	 * 
@@ -80,7 +87,7 @@ public class AdminUcmFormCreationPage extends BaseClass {
 	 * 
 	 */
 
-	public AdminUcmFormCreationPage ucmForm(String tn, String co, String gn) {
+	public AdminUcmFormCreationPage ucmForm(String tn, String co, String gn, String ct1, String ct2) {
 		
 		Type.click(); 
 		logger.pass("Click at type button");
@@ -109,7 +116,6 @@ public class AdminUcmFormCreationPage extends BaseClass {
 		logger.pass("select view all option from dropdown");
 		selectviewAllallow.click();
 		logger.pass("Select allow option");
-		System.out.println("Subform created");
 		logger.pass("Subform created");
 		save_close_button.click();
 		logger.pass("click at save and close button");
@@ -132,11 +138,32 @@ public class AdminUcmFormCreationPage extends BaseClass {
 		logger.pass("click at save button to save group name");
 		click_type.click();
 		logger.pass("click at type");
-		List<WebElement> NumberOfTypesForFieldssub = field_typecount;
-		for (int j=0; j<NumberOfTypesForFieldssub.size();j++)
+		
+		List<WebElement> NumberOfTypesforCatogory = catogory_count;
+		for (int j=0; j<NumberOfTypesforCatogory.size();j++)
 		{
 			if(j==0){
-				WebElement singleField = NumberOfTypesForFieldssub.get(j); 
+				WebElement singleField = NumberOfTypesforCatogory.get(j); 
+			singleField.click();
+			}
+		}
+		logger.pass("click at latest catogory link under created type");
+		click_newbutton.click();
+		enterValue(cat_title1, ct1);
+		logger.pass("enter title");
+		save_new_button.click();
+		logger.pass("save and new");
+		enterValue(cat_title2, ct2);
+		save_close_button.click();
+		logger.pass("save and close");
+		Type.click(); 		
+		logger.pass("click at type button");
+		
+		List<WebElement> NumberOfTypesForFieldssub = field_typecount;
+		for (int k=0; k<NumberOfTypesForFieldssub.size();k++)
+		{
+			if(k==0){
+				WebElement singleField = NumberOfTypesForFieldssub.get(k); 
 			singleField.click();
 			}
 		}

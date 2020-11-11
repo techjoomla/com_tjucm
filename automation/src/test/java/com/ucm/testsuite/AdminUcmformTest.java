@@ -11,13 +11,13 @@ import com.ucm.pageobjects.AdminUcmFormCreationPage;
 public class AdminUcmformTest extends BaseClass{
 
 	@Test(dataProvider = "ucmformcreation", dataProviderClass = DataProviderClass.class)
-	public void adminsubformcreation(String testdesc, String tn, String co, String gn) throws Exception {
+	public void adminsubformcreation(String testdesc, String tn, String co, String gn, String ct1, String ct2) throws Exception {
 
 		AdminUcmFormCreationPage ucmformpage = new AdminUcmFormCreationPage(driver);
-		driver.get(properties.getProperty("url") + properties.getProperty("admin"));
 		logger = extent.createTest(new Object() {}.getClass().getEnclosingMethod().getName());
+	
 		if (testdesc.equals("validdata")) {
-			ucmformpage.ucmForm(tn,co,gn);
+			ucmformpage.ucmForm(tn,co,gn, ct1, ct2);
 
 		} 
 	}

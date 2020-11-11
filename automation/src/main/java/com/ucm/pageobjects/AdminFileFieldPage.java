@@ -44,6 +44,15 @@ public class AdminFileFieldPage extends BaseClass {
 	public WebElement text_required;
 	@FindBy(how =How.XPATH, using = "//button[@class='btn btn-small button-save-new']")
 	public WebElement text_save;
+	@FindBy(how =How.NAME, using = "jform[params][accept]")
+	public WebElement filetype;
+	@FindBy(how =How.NAME, using = "jform[params][size]")
+	public WebElement filesize;
+	@FindBy(how = How.XPATH,using = "//input[@id='jform_name']")
+	public WebElement pdfFile;
+	@FindBy(how = How.XPATH, using = "//input[@id='jform_label']")
+	public WebElement pdflable;
+	
 	
 	/*
 	 * 
@@ -51,7 +60,9 @@ public class AdminFileFieldPage extends BaseClass {
 	 * 
 	 */
 	
-	public AdminFileFieldPage fileFieldCreation(String fl, String fn) {
+	public AdminFileFieldPage fileFieldCreation(String fl, String fn, String ft, String fs, String pf, String pl) {
+		
+		String s1 ="one";
 		click_field_type.click();
 		selectFile.click();
 		saveForValidation.click();
@@ -71,6 +82,24 @@ public class AdminFileFieldPage extends BaseClass {
 		logger.pass("select field as required");
 		text_save.click();
 		logger.pass("file field created");
+	
+		logger.pass("creating field by setting the accepted file type");
+		enterValue(pdflable,pl);
+		logger.pass("enter lable of file the field");
+		enterValue(pdfFile, pf);
+		logger.pass("enter the name for file field");
+		click_field_type.click();
+		logger.pass("click at file field");
+		selectFile.click();
+		logger.pass("select file field");
+		enterValue(filetype, ft);
+		logger.pass("entering the file type");
+		filesize.clear();
+		enterValue(filesize, fs);
+		text_save.click();
+		logger.pass("file field created");
+		
+		
 		return new AdminFileFieldPage(driver);
 			
 	}

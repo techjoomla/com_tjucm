@@ -156,6 +156,13 @@ public class DataProviderClass {
 		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "audio");
 
 	}
+	@DataProvider(name = "textcategorycreation")
+
+	public static Object[][] textcategorycreation() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "category");
+
+	}
 	
 	
 	@DataProvider(name = "menuviewcreation")
@@ -188,6 +195,14 @@ public class DataProviderClass {
 		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "frontpositive");
 
 	}
+	@DataProvider(name = "advancesearch")
+
+	public static Object[][] advancesearch() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "advancesearch");
+
+	}	
+	
 	@DataProvider(name = "deleteucm")
 
 	public static Object[][] deleteucm() throws IOException {
