@@ -1,7 +1,7 @@
 <?php
 /**
  * @package    TJ-UCM
- * 
+ *
  * @author     TechJoomla <extensions@techjoomla.com>
  * @copyright  Copyright (c) 2009-2019 TechJoomla. All rights reserved.
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
@@ -23,7 +23,7 @@ use Joomla\CMS\Language\Text;
 				</div>
 				<div class="control-group span6 clusterListField">
 					<label class="control-label"><strong><?php echo Text::_('COM_TJUCM_COPY_ITEMS_SELECT_CLUSTER'); ?></strong></label>
-					<?php echo JHTML::_('select.genericlist', '', 'filter[cluster_list]', 'class="cluster_list" onchange=""', 'text', 'value', $this->state->get('filter.cluster_list'), 'cluster_list' ); ?>
+					<?php echo JHTML::_('select.genericlist', '', 'filter[cluster_list]', 'class="cluster_list" onchange="" multiple', 'text', 'value', $this->state->get('filter.cluster_list'), 'cluster_list' ); ?>
 				</div>
 			</div>
 		</div>
