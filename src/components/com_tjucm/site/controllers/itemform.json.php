@@ -566,16 +566,6 @@ class TjucmControllerItemForm extends JControllerForm
 		$clusterIds = $app->input->get('cluster_list', '', 'string');
 		$clusterIds = explode(',', $clusterIds);
 
-		$db = JFactory::getDbo();
-		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
-		$typeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', $db));
-
-		if ($targetClient)
-		{
-			$typeTable->load(array('unique_identifier' => $targetClient));
-			$ucmTypeId = $typeTable->id;
-		}
-
 		JLoader::import('components.com_tjucm.models.type', JPATH_ADMINISTRATOR);
 		$typeModel = BaseDatabaseModel::getInstance('Type', 'TjucmModel');
 
