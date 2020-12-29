@@ -3,6 +3,7 @@ package com.ucm.pageobjects;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.apache.tools.ant.taskdefs.Sleep;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -106,7 +107,8 @@ public class FrontAdvanceSearchPage extends BaseClass {
 	 */
 	
 	
-	public FrontAdvanceSearchPage aSearch(String ef) {
+	public FrontAdvanceSearchPage aSearch(String ef) throws InterruptedException {
+		Thread.sleep(2000);
 		listMenu.click();
 		logger.pass("click at list menu");
 		sortPublish.click();
@@ -164,7 +166,6 @@ public class FrontAdvanceSearchPage extends BaseClass {
 		logger.pass("click at search");
 		clickAtclear.click();	
 		logger.pass("click at clear");
-		
 		return new FrontAdvanceSearchPage(driver);
 
 	}

@@ -103,7 +103,8 @@ public class FrontPostiveFlowPage extends BaseClass {
 	
 	
 	
-	public FrontPostiveFlowPage NagativeFlow(String fnf, String nf, String ve, String vd,String eu, String ays, String ui, String cl,String sv1,String vl, String al, String ui1) {
+	public FrontPostiveFlowPage NagativeFlow(String fnf, String nf, String ve, String vd,String eu, String ays, String ui, String cl,String sv1,String vl, String al, String ui1) throws InterruptedException {
+		Thread.sleep(1000);
 		formMenu.click();
 		enterValue(firstName,fnf);
 		logger.pass("enter 1st name -ve");
