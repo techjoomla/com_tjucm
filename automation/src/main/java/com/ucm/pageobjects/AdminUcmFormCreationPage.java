@@ -52,6 +52,8 @@ public class AdminUcmFormCreationPage extends BaseClass {
 	public WebElement permission_2;
 	@FindBy(how = How.XPATH, using="//select[@id='jform_rules_core.type.createitem_2']//option [@value=1]")
 	public WebElement selectoneforregister;
+	@FindBy(how = How.XPATH, using="//select[@name='jform[rules][core.type.importitem][2]'] //option [@value='1']")
+	public WebElement permissionimport;	
 	@FindBy(how = How.XPATH, using="//select[@id='jform_rules_core.type.viewitem_2']")
 	public WebElement viewAll;
 	@FindBy(how = How.XPATH, using="//select[@id='jform_rules_core.type.viewitem_2']//option[@value=1]")
@@ -80,6 +82,11 @@ public class AdminUcmFormCreationPage extends BaseClass {
 	public WebElement cat_title2;
 	@FindBy(how = How.XPATH, using ="//button[@class='btn btn-small button-save-new']")
 	public WebElement save_new_button;
+	@FindBy(how = How.XPATH, using ="//input [@id='filter_search']")
+	public WebElement cat_search;
+	@FindBy(how = How.XPATH, using ="//button [@class='btn hasTooltip']")
+	public WebElement cat_search_button;
+	
 	
 	/*
 	 * 
@@ -87,7 +94,7 @@ public class AdminUcmFormCreationPage extends BaseClass {
 	 * 
 	 */
 
-	public AdminUcmFormCreationPage ucmForm(String tn, String co, String gn, String ct1, String ct2) {
+	public AdminUcmFormCreationPage ucmForm(String tn, String co, String gn, String ct1, String ct2,String cs) {
 		
 		Type.click(); 
 		logger.pass("Click at type button");
@@ -115,10 +122,11 @@ public class AdminUcmFormCreationPage extends BaseClass {
 		viewAll.click();
 		logger.pass("select view all option from dropdown");
 		selectviewAllallow.click();
+		permissionimport.click();
+		logger.pass("select allow for import");
 		logger.pass("Select allow option");
-		logger.pass("Subform created");
 		save_close_button.click();
-		logger.pass("click at save and close button");
+		logger.pass("click at save and   close button");
 		List<WebElement> NumberofTypesfield = field_groupcount;
 		for(int i=0;i<NumberofTypesfield.size();i++)
 		{
@@ -156,6 +164,8 @@ public class AdminUcmFormCreationPage extends BaseClass {
 		enterValue(cat_title2, ct2);
 		save_close_button.click();
 		logger.pass("save and close");
+		enterValue(cat_search, cs);
+		cat_search_button.click();
 		Type.click(); 		
 		logger.pass("click at type button");
 		

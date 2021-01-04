@@ -106,7 +106,8 @@ public class FrontAdvanceSearchPage extends BaseClass {
 	 */
 	
 	
-	public FrontAdvanceSearchPage aSearch(String ef) {
+	public FrontAdvanceSearchPage aSearch(String ef) throws InterruptedException {
+		Thread.sleep(2000);
 		listMenu.click();
 		logger.pass("click at list menu");
 		sortPublish.click();
@@ -164,7 +165,6 @@ public class FrontAdvanceSearchPage extends BaseClass {
 		logger.pass("click at search");
 		clickAtclear.click();	
 		logger.pass("click at clear");
-		
 		return new FrontAdvanceSearchPage(driver);
 
 	}
