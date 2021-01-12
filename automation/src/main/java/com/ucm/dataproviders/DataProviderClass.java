@@ -201,9 +201,17 @@ public class DataProviderClass {
 
 		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "advancesearch");
 
-	}	
+	}
 	
-	@DataProvider(name = "deleteucm")
+	@DataProvider(name = "frontImport")
+
+	public static Object[][] frontImport() throws IOException {
+
+		return ExcelUtils.getExcelData(TESTDATAEXCELFILE, "frontImport");
+
+	}
+	
+		@DataProvider(name = "deleteucm")
 
 	public static Object[][] deleteucm() throws IOException {
 

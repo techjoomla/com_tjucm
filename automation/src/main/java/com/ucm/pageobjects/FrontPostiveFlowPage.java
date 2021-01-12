@@ -103,8 +103,8 @@ public class FrontPostiveFlowPage extends BaseClass {
 	
 	
 	
-	public FrontPostiveFlowPage NagativeFlow(String fnf, String nf, String ve, String vd,String eu, String ays, String ui, String cl,String sv1,String vl, String al, String ui1) throws InterruptedException {
-		Thread.sleep(1000);
+	public FrontPostiveFlowPage NagativeFlow(String fnf, String nf, String ve, String vd,String ui1) throws InterruptedException {
+		Thread.sleep(2000);
 		formMenu.click();
 		enterValue(firstName,fnf);
 		logger.pass("enter 1st name -ve");
@@ -120,15 +120,14 @@ public class FrontPostiveFlowPage extends BaseClass {
 		firstName.clear();
 		validNumber.clear();
 		validdate.clear();
-		validEmail.clear();
-		uploadimage1.clear();
-			
+		validEmail.clear();	
+		uploadimage1.clear();		
+		Thread.sleep(2000);
 		return new FrontPostiveFlowPage(driver);
 
 	}
 	
-	public FrontPostiveFlowPage PostiveFlow(String fnf, String nf, String ve, String vd, String eu, String ays, String ui, String cl,String sv1,String vl, String al) {
-		
+	public FrontPostiveFlowPage PostiveFlow(String fnf, String nf, String ve, String vd, String eu, String ays, String ui, String cl,String sv1,String vl, String al) throws InterruptedException {
 		formMenu.click();
 		logger.pass("click at form link");
 		enterValue(firstName,fnf);
