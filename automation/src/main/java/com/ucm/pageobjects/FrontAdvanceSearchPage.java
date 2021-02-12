@@ -107,7 +107,8 @@ public class FrontAdvanceSearchPage extends BaseClass {
 	
 	
 	public FrontAdvanceSearchPage aSearch(String ef) throws InterruptedException {
-		Thread.sleep(2000);
+		WebDriverWait wait = new WebDriverWait(driver, 30);
+        wait.until(ExpectedConditions.visibilityOf(listMenu));
 		listMenu.click();
 		logger.pass("click at list menu");
 		sortPublish.click();

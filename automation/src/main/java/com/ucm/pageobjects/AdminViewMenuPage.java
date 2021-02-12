@@ -75,6 +75,7 @@ public class AdminViewMenuPage extends BaseClass {
 	@FindBy(how =How.XPATH, using = "//button[@class='btn btn-small button-save']")
 	public WebElement saveandclose;
 	
+	
 
 
 	

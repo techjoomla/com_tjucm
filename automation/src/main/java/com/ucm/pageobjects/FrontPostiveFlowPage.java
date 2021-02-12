@@ -36,7 +36,7 @@ public class FrontPostiveFlowPage extends BaseClass {
 		
 	}
 	/*
-	 * Locators for SQL field creation  
+	 * Locators for postive flow 
 	 */
 	
 	@FindBy(how = How.XPATH, using = "//a[contains(text(),'UCM Form ')]")
@@ -97,14 +97,14 @@ public class FrontPostiveFlowPage extends BaseClass {
 
 	/*
 	 * 
-	 * Method for SQL field creation
+	 * Method for postive flow field creation
 	 * 
-	 */
+	 */	
 	
 	
-	
-	public FrontPostiveFlowPage NagativeFlow(String fnf, String nf, String ve, String vd,String eu, String ays, String ui, String cl,String sv1,String vl, String al, String ui1) throws InterruptedException {
-		Thread.sleep(1000);
+	public FrontPostiveFlowPage NagativeFlow(String fnf, String nf, String ve, String vd,String ui1) throws InterruptedException {
+		WebDriverWait wait = new WebDriverWait(driver, 30);
+        wait.until(ExpectedConditions.visibilityOf(formMenu));
 		formMenu.click();
 		enterValue(firstName,fnf);
 		logger.pass("enter 1st name -ve");
@@ -120,15 +120,15 @@ public class FrontPostiveFlowPage extends BaseClass {
 		firstName.clear();
 		validNumber.clear();
 		validdate.clear();
-		validEmail.clear();
-		uploadimage1.clear();
-			
+		validEmail.clear();	
+		uploadimage1.clear();		
 		return new FrontPostiveFlowPage(driver);
 
 	}
 	
-	public FrontPostiveFlowPage PostiveFlow(String fnf, String nf, String ve, String vd, String eu, String ays, String ui, String cl,String sv1,String vl, String al) {
-		
+	public FrontPostiveFlowPage PostiveFlow(String fnf, String nf, String ve, String vd, String eu, String ays, String ui, String cl,String sv1,String vl, String al) throws InterruptedException {
+		WebDriverWait wait = new WebDriverWait(driver, 30);
+        wait.until(ExpectedConditions.visibilityOf(formMenu));
 		formMenu.click();
 		logger.pass("click at form link");
 		enterValue(firstName,fnf);
@@ -149,8 +149,8 @@ public class FrontPostiveFlowPage extends BaseClass {
 		language.click();
 		selectlanguage2.click();
 		logger.pass("select languages");
-		WebDriverWait wait  = new WebDriverWait(driver, 30);
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"jform_com_tjucm_pomform_Language_chzn\"]/ul/li[2]"))).click();
+		WebDriverWait wait1  = new WebDriverWait(driver, 30);
+		wait1.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"jform_com_tjucm_pomform_Language_chzn\"]/ul/li[2]"))).click();
 		selectlanguage1.click();
 		enterValue(EnterUnivers,eu);
 		logger.pass("enter your univercity");

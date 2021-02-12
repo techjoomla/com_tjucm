@@ -9,7 +9,7 @@ public class FrontPostiveFlowTest extends BaseClass{
 		FrontPostiveFlowPage front = new FrontPostiveFlowPage(driver);
 		
 		if (testdesc.equals("negative")) {
-			front.NagativeFlow(fnf,nf,ve,vd,eu,ays,ui,cl,sv1,vl,al,ui1);
+			front.NagativeFlow(fnf,nf,ve,vd,ui1);
 		}		
 		if (testdesc.equals("validdata")) {
 			front.PostiveFlow(fnf,nf,ve,vd,eu,ays,ui,cl,sv1,vl,al);
