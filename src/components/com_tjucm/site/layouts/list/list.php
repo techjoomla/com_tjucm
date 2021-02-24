@@ -27,7 +27,7 @@ $user = Factory::getUser();
 
 // Layout for field types
 $fieldLayout = array();
-$fieldLayout['File'] = $fieldLayout['Image'] = "file";
+$fieldLayout['File'] = $fieldLayout['Image'] = $fieldLayout['Captureimage'] = "file";
 $fieldLayout['Checkbox'] = "checkbox";
 $fieldLayout['Color'] = "color";
 $fieldLayout['Tjlist'] = $fieldLayout['Radio'] = $fieldLayout['List'] = $fieldLayout['Single_select'] = $fieldLayout['Multi_select'] = "list";

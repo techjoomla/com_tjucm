@@ -20,7 +20,7 @@ $user = JFactory::getUser();
 
 // Layout for field types
 $fieldLayout = array();
-$fieldLayout['File'] = $fieldLayout['Image'] = "file";
+$fieldLayout['File'] = $fieldLayout['Image'] = $fieldLayout['Captureimage'] = "file";
 $fieldLayout['Checkbox'] = "checkbox";
 $fieldLayout['Color'] = "color";
 $fieldLayout['multi_select'] = $fieldLayout['single_select'] = $fieldLayout['Radio'] = $fieldLayout['List'] = $fieldLayout['tjlist'] = "list";
