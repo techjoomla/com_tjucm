@@ -1,7 +1,5 @@
 package com.tekdi.nfta.test;
 
-
-
 import static com.tekdi.nfta.test.NFTADriver.ObjectRepository;
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
@@ -176,11 +174,12 @@ public class Actions {
 		}
 		return Constant.KEYWORD_PASS.getValue();
 	}
-	
+
 	public String elementToBeClickable(String locator, String data) {
 		try {
 			WebDriverWait wait = new WebDriverWait(driver, 30);
-			wait.until(ExpectedConditions.elementToBeClickable(By.xpath(ObjectRepository.getProperty(locator)))).click();
+			wait.until(ExpectedConditions.elementToBeClickable(By.xpath(ObjectRepository.getProperty(locator))))
+					.click();
 			driver.findElement(By.xpath(ObjectRepository.getProperty(locator))).click();
 		} catch (Exception e) {
 			return Constant.KEYWORD_FAIL.getValue() + e.getMessage();
@@ -261,27 +260,35 @@ public class Actions {
 
 	public String acceptAlert(String locator, String data) {
 		try {
-			//driver.switchTo().alert().accept();
-			  // Switching to Alert        
-	        Alert alert = driver.switchTo().alert();		
-	        		
-	        // Capturing alert message.    
-	        String alertMessage= driver.switchTo().alert().getText();		
-	        		
-	        // Displaying alert message		
-	        System.out.println(alertMessage);	
-	        Thread.sleep(5000);
-	        		
-	        // Accepting alert		
-	        alert.accept();	
+			WebDriverWait wait=new WebDriverWait(driver, 70);
+			wait.until(ExpectedConditions.alertIsPresent());
+			driver.switchTo().alert().accept();
 		} catch (Exception e) {
 			return Constant.KEYWORD_FAIL.getValue() + e.getMessage();
-
 		}
 		return Constant.KEYWORD_PASS.getValue();
-
 	}
 
+
+	/*
+	 * public String acceptAlert(String locator, String data) { try {
+	 * 
+	 * //driver.switchTo().alert(); // Switching to Alert Alert alert =
+	 * driver.switchTo().alert();
+	 * 
+	 * // Capturing alert message. String alertMessage=
+	 * driver.switchTo().alert().getText();
+	 * 
+	 * // Displaying alert message System.out.println(alertMessage);
+	 * Thread.sleep(5000);
+	 * 
+	 * // Accepting alert alert.accept(); } catch (Exception e) { return
+	 * Constant.KEYWORD_FAIL.getValue() + e.getMessage();
+	 * 
+	 * } return Constant.KEYWORD_PASS.getValue();
+	 * 
+	 * }
+	 */
 	public String dismissAlert(String locator, String data) {
 
 		try {
@@ -336,8 +343,10 @@ public class Actions {
 
 	public String fileupload(String locator, String filePath) {
 		try {
-			driver.findElement(By.xpath(ObjectRepository.getProperty(locator))).sendKeys(System.getProperty("user.dir") + filePath);
-			//driver.findElement(By.id(ObjectRepository.getProperty(locator))).sendKeys(System.getProperty("user.dir") + filePath);
+			driver.findElement(By.xpath(ObjectRepository.getProperty(locator)))
+					.sendKeys(System.getProperty("user.dir") + filePath);
+			// driver.findElement(By.id(ObjectRepository.getProperty(locator))).sendKeys(System.getProperty("user.dir")
+			// + filePath);
 		} catch (Exception e) {
 			return Constant.KEYWORD_FAIL.getValue() + e.getStackTrace();
 		}
@@ -442,19 +451,18 @@ public class Actions {
 		}
 
 	}
- public String RandomstringCreate(String locator, String data)
- {
+
+	public String RandomstringCreate(String locator, String data) {
 		String uuid = UUID.randomUUID().toString();
 		driver.findElement(By.xpath(ObjectRepository.getProperty(locator))).sendKeys(data);
-        return Constant.KEYWORD_PASS.getValue();
-}
- 
- public String CheckElementEist(String locator, String data)
- {
-	 try {
+		return Constant.KEYWORD_PASS.getValue();
+	}
+
+	public String CheckElementEist(String locator, String data) {
+		try {
 
 			if (locator.getBytes().equals(data)) {
-				
+
 				return " -- No Data is provided --";
 			} else {
 				driver.findElement(By.xpath(ObjectRepository.getProperty(locator))).click();
@@ -469,16 +477,15 @@ public class Actions {
 				driver.findElement(By.xpath(ObjectRepository.getProperty(locator))).click();
 			}
 		} catch (Exception e) {
-			return Constant.KEYWORD_FAIL.getValue() + " (Cause of Failure >> " + e.getMessage() + " )"; 
+			return Constant.KEYWORD_FAIL.getValue() + " (Cause of Failure >> " + e.getMessage() + " )";
 
-}
-	return data;
- }
+		}
+		return data;
+	}
 
- public String verifyErrorMessage(String locator, String data) {
+	public String verifyErrorMessage(String locator, String data) {
 		try {
 			return driver.findElement(By.xpath(ObjectRepository.getProperty(locator))).getText();
-
 
 		} catch (Exception e) {
 			return Constant.KEYWORD_FAIL.getValue() + " (Cause of Failure >> " + e.getMessage() + " )";
@@ -486,7 +493,6 @@ public class Actions {
 
 	}
 
- 
 	public String pause(String locator, String data) {
 		try {
 			Thread.sleep(2000);
@@ -526,7 +532,7 @@ public class Actions {
 		return Constant.KEYWORD_PASS.getValue();
 
 	}
-	
+
 	public String enterClearTextByXpath(String locator, String data) {
 		try {
 
@@ -538,7 +544,7 @@ public class Actions {
 		}
 		return Constant.KEYWORD_PASS.getValue();
 	}
-	
+
 	public String quitBrowser(String locator, String data) {
 		try {
 			driver.quit();
