@@ -438,6 +438,61 @@ public class Actions {
 		return Constant.KEYWORD_PASS.getValue();
 	}
 
+	public String clickDropdowntrashByXpath(String locator, String data) {
+		try {
+
+			if (data.isEmpty()) {
+				return " -- No Data is provided --";
+			} else {
+				driver.findElement(By.xpath(ObjectRepository.getProperty(locator))).click();
+				List<WebElement> options = driver
+						.findElements(By.xpath(ObjectRepository.getProperty(locator) + "/div/ul/li"));
+				//.findElements(By.xpath(ObjectRepository.getProperty(locator) + "//ul[@class='chzn-results']/li"));
+
+				for (WebElement option : options) {
+					if (option.getText().equals(data)) {
+						option.click();
+						break;
+					}
+				}
+				//driver.findElement(By.xpath(ObjectRepository.getProperty(locator))).click();
+			}
+		} catch (Exception e) {
+			return Constant.KEYWORD_FAIL.getValue() + " (Cause of Failure >> " + e.getMessage() + " )";
+		}
+
+		return Constant.KEYWORD_PASS.getValue();
+	}
+
+	
+	public String clickDropdownUCM(String locator, String data) {
+		try {
+
+			if (data.isEmpty()) {
+				return " -- No Data is provided --";
+			} else {
+				driver.findElement(By.xpath(ObjectRepository.getProperty(locator))).click();
+				List<WebElement> options = driver
+						.findElements(By.xpath(ObjectRepository.getProperty(locator) + "/div/ul/li"));
+				for (WebElement option : options) {
+					if (option.getText().equals(data)) {
+						option.click();
+						break;
+					}
+				}
+				driver.findElement(By.xpath(ObjectRepository.getProperty(locator))).click();
+			}
+		} catch (Exception e) {
+			return Constant.KEYWORD_FAIL.getValue() + " (Cause of Failure >> " + e.getMessage() + " )";
+		}
+
+		return Constant.KEYWORD_PASS.getValue();
+	}
+	
+	
+	
+	
+	
 	public String verifyPopupMessage(String locator, String data) {
 		try {
 			WebDriverWait wait = new WebDriverWait(driver, 10);
@@ -545,6 +600,27 @@ public class Actions {
 		return Constant.KEYWORD_PASS.getValue();
 	}
 
+	public String SwitchtoIframe(String locator, String data) {
+		try {
+
+				driver.switchTo().frame(locator);
+				} catch (Exception e) {
+			return Constant.KEYWORD_FAIL.getValue() + e.getMessage();
+        }
+		return Constant.KEYWORD_PASS.getValue();
+	}
+
+	public String SwitchtoDefaultContent(String locator, String data) {
+		try {
+				driver.switchTo().defaultContent();
+				} catch (Exception e) {
+					
+			return Constant.KEYWORD_FAIL.getValue() + e.getMessage();
+        }
+		return Constant.KEYWORD_PASS.getValue();
+	}
+	
+	
 	public String quitBrowser(String locator, String data) {
 		try {
 			driver.quit();
