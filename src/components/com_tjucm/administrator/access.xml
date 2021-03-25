@@ -14,11 +14,13 @@
 		<action name="core.edit" title="JACTION_EDIT" description="JACTION_EDIT_COMPONENT_DESC" />
 		<action name="core.edit.state" title="JACTION_EDITSTATE" description="JACTION_EDITSTATE_COMPONENT_DESC" />
 		<action name="core.type.createitem" title="COM_TJUCM_PERMISSION_TYPE_ITEM_CREATE" description="COM_TJUCM_PERMISSION_TYPE_ITEM_CREATE_DESC" />
+		<action name="core.type.importitem" title="COM_TJUCM_PERMISSION_TYPE_ITEM_IMPORT" description="COM_TJUCM_PERMISSION_TYPE_ITEM_IMPORT_DESC" />
 		<action name="core.type.viewitem" title="COM_TJUCM_PERMISSION_TYPE_ITEM_VIEW" description="COM_TJUCM_PERMISSION_TYPE_ITEM_VIEW_DESC" />
 		<action name="core.type.edititem" title="COM_TJUCM_PERMISSION_TYPE_ITEM_EDIT" description="COM_TJUCM_PERMISSION_TYPE_ITEM_EDIT_DESC" />
 		<action name="core.type.edititemstate" title="COM_TJUCM_PERMISSION_TYPE_ITEM_EDITSTATE" description="COM_TJUCM_PERMISSION_TYPE_ITEM_EDITSTATE_DESC" />
 		<action name="core.type.editownitem" title="COM_TJUCM_PERMISSION_TYPE_ITEM_EDITOWN" description="COM_TJUCM_PERMISSION_TYPE_ITEM_EDITOWN_DESC" />
 		<action name="core.type.deleteitem" title="COM_TJUCM_PERMISSION_TYPE_ITEM_DELETE" description="COM_TJUCM_PERMISSION_TYPE_ITEM_DELETE_DESC" />
 		<action name="core.type.deleteownitem" title="COM_TJUCM_PERMISSION_TYPE_ITEM_DELETEOWN" description="COM_TJUCM_PERMISSION_TYPE_ITEM_DELETEOWN_DESC" />
+		<action name="core.type.copyitem" title="COM_TJUCM_PERMISSION_TYPE_ITEM_COPYITEM" description="COM_TJUCM_PERMISSION_TYPE_ITEM_COPYITEM_DESC" />
 	</section>
 </access>

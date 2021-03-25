@@ -21,6 +21,15 @@ use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\Registry\Registry;
+use Joomla\CMS\Language\Text;
+use TJQueue\Admin\TJQueueProduce;
+
+if (ComponentHelper::getComponent('com_tjqueue', true)->enabled)
+{
+	jimport('tjqueueproduce', JPATH_SITE . '/administrator/components/com_tjqueue/libraries');
+}
+
+JLoader::register('TjucmAccess', JPATH_SITE . '/components/com_tjucm/includes/access.php');
 
 /**
  * Tjucm model.
@@ -47,19 +56,6 @@ class TjucmModelItemForm extends JModelAdmin
 
 	// Use imported Trait in model
 	use TjfieldsFilterField;
-
-	/**
-	 * Constructor.
-	 *
-	 * @param   array  $config  An optional associative array of configuration settings.
-	 *
-	 * @see        JController
-	 * @since      1.0
-	 */
-	public function __construct($config = array())
-	{
-		parent::__construct($config);
-	}
 
 	/**
 	 * Method to auto-populate the model state.
@@ -115,9 +111,7 @@ class TjucmModelItemForm extends JModelAdmin
 		$this->setState('ucmType.id', $ucmId);
 
 		// Check published state
-		if ((!$user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmId))
-			&& (!$user->authorise('core.type.editownitem', 'com_tjucm.type.' . $ucmId))
-			&& (!$user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $ucmId)))
+		if ((!TjucmAccess::canEdit($ucmId, $id)) && (!TjucmAccess::canEditOwn($ucmId, $id)) && (!TjucmAccess::canEditState($ucmId, $id)))
 		{
 			$this->setState('filter.published', 1);
 			$this->setState('fileter.archived', 2);
@@ -157,9 +151,9 @@ class TjucmModelItemForm extends JModelAdmin
 
 		// Get UCM type id (Get if user is autorised to edit the items for this UCM type)
 		$ucmTypeId = $this->getState('ucmType.id');
-		$canEdit = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmTypeId);
-		$canEditOwn = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $ucmTypeId);
-		$canCreate = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $ucmTypeId);
+		$canEdit = TjucmAccess::canEdit($ucmTypeId, $id);
+		$canEditOwn = TjucmAccess::canEditOwn($ucmTypeId, $id);
+		$canCreate = TjucmAccess::canCreate($ucmTypeId);
 
 		// Get a level row instance.
 		$table = $this->getTable();
@@ -349,18 +343,18 @@ class TjucmModelItemForm extends JModelAdmin
 	public function getTypeForm($data = array(), $loadData = true)
 	{
 		$draft = isset($data['draft']) ? $data['draft'] : 0;
-		$clientPart = explode(".", $data['client']);
+		$client = $data['client'];
+		$contentId = empty($data['id']) ? '' : $data['id'];
+		$clientPart = explode(".", $client);
 
-		// Path of empty form XML to create form object dynamically
-		$formPath = JPATH_SITE . '/components/com_tjucm/models/forms/' . $clientPart[1] . 'form_extra.xml';
+		$data = array();
+		$data['clientComponent'] = $clientPart[0];
+		$data['view'] = $clientPart[1];
+		$data['client'] = $client;
+		$data['content_id'] = $contentId;
+		$data['layout'] = 'edit';
 
-		// Get the form.
-		$form = $this->loadForm(
-			$data['client'], $formPath,
-			array('control' => 'jform',
-				'load_data' => $loadData,
-			)
-		);
+		$form = $this->getFormObject($data);
 
 		// If data is being saved in draft mode then dont check if the fields are required
 		if ($draft)
@@ -371,6 +365,21 @@ class TjucmModelItemForm extends JModelAdmin
 			{
 				foreach ($form->getFieldset($fieldset->name) as $field)
 				{
+					// Remove required attribute from the subform fields in case of draft save
+					if ($field->type == 'Subform' || $field->type == 'Ucmsubform')
+					{
+						$subForm = $field->loadSubForm();
+						$subFormFieldSets = $subForm->getFieldsets();
+
+						foreach ($subFormFieldSets as $subFormFieldSet)
+						{
+							foreach ($subForm->getFieldset($subFormFieldSet->name) as $subFormField)
+							{
+								$subForm->setFieldAttribute($subFormField->fieldname, 'required', false);
+							}
+						}
+					}
+
 					$form->setFieldAttribute($field->fieldname, 'required', false);
 				}
 			}
@@ -401,25 +410,25 @@ class TjucmModelItemForm extends JModelAdmin
 			return false;
 		}
 
+		$section = $data['section'];
+		$client  = $data['client'];
+		$clientPart = explode(".", $client);
+
+		$data = array();
+		$data['clientComponent'] = $clientPart[0];
+		$data['view'] = $clientPart[1];
+		$data['client'] = $client;
+		$data['layout'] = 'edit';
+
+		$parentForm = $this->getFormObject($data);
+
 		// Create xml with the fieldset of provided section
 		$newXML = new SimpleXMLElement('<form></form>');
 		$newXmlFilePath = JPATH_SITE . '/components/com_tjucm/models/forms/tempfieldsetform.xml';
 
-		// Get path of parent UCM type XML
-		$fieldNamePart = explode('.', $data['client']);
-		$parentFormPath = JPATH_SITE . "/administrator/components/com_tjucm/models/forms/" . $fieldNamePart[1] . "_extra.xml";
-
-		// Get parent form.
-		$parentForm = $this->loadForm(
-			'com_tjucm.itemform', $parentFormPath,
-			array('control' => 'jform',
-				'load_data' => false,
-			)
-		);
-
 		// Get the fieldset XML from parent form
 		$formXml = $parentForm->getXml();
-		$fieldsetXml = $formXml->xpath('//fieldset[@name="' . $data['section'] . '" and not(ancestor::field/form/*)]');
+		$fieldsetXml = $formXml->xpath('//fieldset[@name="' . $section . '" and not(ancestor::field/form/*)]');
 
 		if ($fieldsetXml[0] instanceof \SimpleXMLElement)
 		{
@@ -496,7 +505,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 */
 	public function save($data)
 	{
-		$user = JFactory::getUser();
+		$user = empty($data['created_by']) ? Factory::getUser() : Factory::getUser($data['created_by']);
 
 		// Guest users are not allowed to add the records
 		if (empty($user->id))
@@ -504,6 +513,15 @@ class TjucmModelItemForm extends JModelAdmin
 			$this->setError(JText::_('COM_TJUCM_FORM_SAVE_FAILED_AUTHORIZATION_ERROR'));
 
 			return false;
+		}
+
+		if (empty($data['id']))
+		{
+			// Set the state of record as per UCM type config
+			$typeTable = $this->getTable('type');
+			$typeTable->load(array('unique_identifier' => $data['client']));
+			$typeParams = new Registry($typeTable->params);
+			$data['state'] = $typeParams->get('publish_items', 0);
 		}
 
 		// Get instance of UCM type table
@@ -533,13 +551,39 @@ class TjucmModelItemForm extends JModelAdmin
 
 		$ucmTypeParams = new Registry($tjUcmTypeTable->params);
 
+		// Check if UCM type is subform
+		$isSubform     = $ucmTypeParams->get('is_subform');
+
+		if ($isSubform)
+		{
+			if ($data['parent_id'])
+			{
+				$tableParentData = $this->getTable();
+				$tableParentData->load(array('id' => $data['parent_id']));
+
+				if (!property_exists($tableParentData->id) && (!$tableParentData->id))
+				{
+					$this->setError(Text::_('COM_TJUCM_INVALID_PARENT_ID'));
+
+					return false;
+				}
+			}
+
+			if (!$data['parent_id'])
+			{
+				$this->setError(Text::_('COM_TJUCM_SUBFORM_NOT_ALLOWED_WITH_OUT_PARENT_ID'));
+
+				return false;
+			}
+		}
+
 		// Check if user is allowed to add/edit the record
 		if (empty($data['id']))
 		{
 			$allowedCount = $ucmTypeParams->get('allowed_count', 0, 'INT');
 
 			// Check if the user is allowed to add record for given UCM type
-			$canAdd = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $data['type_id']);
+			$canAdd = TjucmAccess::canCreate($data['type_id'], $data['created_by']);
 
 			if (!$canAdd)
 			{
@@ -564,8 +608,8 @@ class TjucmModelItemForm extends JModelAdmin
 		else
 		{
 			// Check if the user can edit this record
-			$canEdit = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $data['type_id']);
-			$canEditOwn = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $data['type_id']);
+			$canEdit = TjucmAccess::canEdit($data['type_id'], $data['id']);
+			$canEditOwn = TjucmAccess::canEditOwn($data['type_id'], $data['id']);
 
 			$itemTable = $this->getTable();
 			$itemTable->load(array('id' => $data['id']));
@@ -606,7 +650,7 @@ class TjucmModelItemForm extends JModelAdmin
 		{
 			$clusterFieldName = str_replace('.', '_', $fieldData['client']) . '_clusterclusterid';
 			$ownerShipFieldName = str_replace('.', '_', $fieldData['client']) . '_ownershipcreatedby';
-			$itemCategoryFieldName = str_replace('.', '_', $fieldData['client']) . '_itemcategory';
+			$itemCategoryFieldName = str_replace('.', '_', $fieldData['client']) . '_itemcategoryitemcategory';
 
 			if (array_key_exists($clusterFieldName, $fieldData['fieldsvalue'])
 				|| array_key_exists($ownerShipFieldName, $fieldData['fieldsvalue'])
@@ -623,7 +667,16 @@ class TjucmModelItemForm extends JModelAdmin
 
 				if (!empty($fieldData['fieldsvalue'][$ownerShipFieldName]))
 				{
-					$ucmItemTable->created_by = $fieldData['fieldsvalue'][$ownerShipFieldName];
+					JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
+					$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', JFactory::getDbo()));
+					$fieldTable->load(array('name' => $ownerShipFieldName));
+					$fieldParams = new Registry($fieldTable->params);
+
+					// If enabled then the selected user will be set as creator of the UCM type item
+					if ($fieldParams->get('ucmItemOwner'))
+					{
+						$ucmItemTable->created_by = $fieldData['fieldsvalue'][$ownerShipFieldName];
+					}
 				}
 
 				if (!empty($fieldData['fieldsvalue'][$itemCategoryFieldName]))
@@ -653,8 +706,8 @@ class TjucmModelItemForm extends JModelAdmin
 		$user = JFactory::getUser();
 		$table = $this->getTable();
 		$table->load($contentId);
-		$canDelete = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $table->type_id);
-		$canDeleteown = $user->authorise('core.type.deleteownitem', 'com_tjucm.type.' . $table->type_id);
+		$canDelete = TjucmAccess::canDelete($table->type_id, $contentId);
+		$canDeleteown = TjucmAccess::canDeleteOwn($table->type_id, $contentId);
 
 		$deleteOwn = false;
 
@@ -689,9 +742,19 @@ class TjucmModelItemForm extends JModelAdmin
 				{
 					$table->load($subFormContentId);
 
+					// Plugin trigger on before item delete
+					JPluginHelper::importPlugin('actionlog');
+					$dispatcher = JDispatcher::getInstance();
+					$dispatcher->trigger('tjUcmOnBeforeDeleteItem', array($subFormContentId, $table->client));
+
 					if ($table->delete($subFormContentId) === true)
 					{
 						$this->deleteExtraFieldsData($subFormContentId, $table->client);
+
+						// Plugin trigger on after item delete
+						JPluginHelper::importPlugin('actionlog');
+						$dispatcher = JDispatcher::getInstance();
+						$dispatcher->trigger('tjUcmOnAfterDeleteItem', array($subFormContentId, $table->client));
 					}
 				}
 			}
@@ -699,9 +762,19 @@ class TjucmModelItemForm extends JModelAdmin
 			// Delete parent record
 			$table->load($id);
 
+			// Plugin trigger on before item delete
+			JPluginHelper::importPlugin('actionlog');
+			$dispatcher = JDispatcher::getInstance();
+			$dispatcher->trigger('tjUcmOnBeforeDeleteItem', array($id, $table->client));
+
 			if ($table->delete($id) === true)
 			{
 				$this->deleteExtraFieldsData($id, $table->client);
+
+				// Plugin trigger on after item delete
+				JPluginHelper::importPlugin('actionlog');
+				$dispatcher = JDispatcher::getInstance();
+				$dispatcher->trigger('tjUcmOnAfterDeleteItem', array($id, $table->client));
 
 				return $id;
 			}
@@ -771,6 +844,11 @@ class TjucmModelItemForm extends JModelAdmin
 	 */
 	public function getUcmSubFormFieldDataJson($parentRecordId, $efd)
 	{
+		if (is_array($efd->value))
+		{
+			$efd->value = $efd->value[0];
+		}
+
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('id');
@@ -851,6 +929,16 @@ class TjucmModelItemForm extends JModelAdmin
 			$subFormData->$ucmSubformContentIdFieldName = $contentId;
 
 			$concat = $efd->name . $key;
+
+			// Check if any field has value for the subform entry and if there is no value in subform then dont show it
+			$subFormDataArray = (array) $subFormData;
+			unset($subFormDataArray[$ucmSubformContentIdFieldName]);
+
+			if (empty($subFormDataArray))
+			{
+				continue;
+			}
+
 			$ucmSubFormFieldData->$concat = $subFormData;
 		}
 
@@ -1050,5 +1138,58 @@ class TjucmModelItemForm extends JModelAdmin
 		}
 
 		return $returnData;
+	}
+
+	/**
+	 * Method to push data in queue.
+	 *
+	 * @param   string  $ucmId         Ucm id
+	 * @param   string  $sourceClient  Source client
+	 * @param   array   $targetClient  Target client
+	 * @param   Object  $userId        User id who wants to copy item
+	 * @param   Object  $clusterId     Cluster id
+	 *
+	 * @return  boolean value.
+	 *
+	 * @since __DEPLOY_VERSION__
+	 */
+	public static function queueItemCopy($ucmId, $sourceClient, $targetClient, $userId, $clusterId=0)
+	{
+		$return = [];
+
+		$messageBody = new stdClass;
+		$messageBody->ucmId = $ucmId;
+		$messageBody->sourceClient = $sourceClient;
+		$messageBody->targetClient = $targetClient;
+		$messageBody->userId = $userId;
+
+		if ($clusterId)
+		{
+			$messageBody->clusterId = $clusterId;
+		}
+
+		try
+		{
+			$TJQueueProduce = new TJQueueProduce;
+
+			// Set message body
+			$TJQueueProduce->message->setBody(json_encode($messageBody));
+
+			// @Params client, value
+			$TJQueueProduce->message->setProperty('client', 'core.copyitem');
+			$TJQueueProduce->produce();
+		}
+		catch (Exception $e)
+		{
+			$return['success'] = 0;
+			$return['message'] = $e->getMessage();
+
+			return $return;
+		}
+
+		$return['success'] = 1;
+		$return['message'] = '';
+
+		return $return;
 	}
 }

@@ -13,6 +13,8 @@ defined('_JEXEC') or die;
 
 jimport('joomla.application.component.modeladmin');
 
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+
 /**
  * Tjucm model.
  *
@@ -48,6 +50,9 @@ class TjucmModelType extends JModelAdmin
 	 */
 	public function __construct($config = array())
 	{
+		$config['event_after_delete'] = 'tjUcmOnAfterTypeDelete';
+		$config['event_change_state'] = 'tjUcmOnAfterTypeChangeState';
+
 		parent::__construct($config);
 	}
 
@@ -305,7 +310,8 @@ class TjucmModelType extends JModelAdmin
 		}
 
 		// Remove white spaces from alias if any
-		$data['alias'] = str_replace(" ", "_", trim($data['alias']));
+		// $data['alias'] = str_replace(" ", "_", trim($data['alias']));
+		$data['alias'] = JFilterOutput::stringURLSafe($data['alias']);
 
 		if (!empty($data['id']))
 		{
@@ -362,6 +368,13 @@ class TjucmModelType extends JModelAdmin
 
 		if (parent::save($data))
 		{
+			$id = (int) $this->getState($this->getName() . '.id');
+			$data['typeId'] = $id;
+			$dispatcher = JDispatcher::getInstance();
+			JPluginHelper::importPlugin('actionlog', 'tjucm');
+			$isNew = ($data['id'] != 0) ? false : true;
+			$dispatcher->trigger('tjUcmOnAfterTypeSave', array($data, $isNew));
+
 			return true;
 		}
 
@@ -530,5 +543,69 @@ class TjucmModelType extends JModelAdmin
 		}
 
 		return true;
+	}
+
+	/**
+	 * Method to validation before copy items
+	 *
+	 * @param   object  $sourceClient  Source client.
+	 * @param   object  $targetClient  Tareget client.
+	 * 
+	 * @return  Boolean
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	public function getCompatibleUcmTypes($sourceClient, $targetClient)
+	{
+		$validUcmType = array();
+
+		if (!$sourceClient && !$targetClient)
+		{
+			return false;
+		}
+
+		// Get the source ucm type and target ucm type fields list
+		BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
+		$tjFieldsFieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+
+		// Get source UCM Type fields
+		$tjFieldsFieldsModel->setState('filter.client', $sourceClient);
+		$sourceFields = $tjFieldsFieldsModel->getItems();
+
+		// Get destination UCM Type fields
+		$tjFieldsFieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+		$tjFieldsFieldsModel->setState('filter.client', $targetClient);
+		$targetFields = $tjFieldsFieldsModel->getItems();
+
+		$count = 0;
+
+		if (count($sourceFields) == count($targetFields))
+		{
+			foreach ($sourceFields as $sourceField)
+			{
+				$prefix = str_replace(".", "_", $sourceClient);
+				$sourceFieldName = explode($prefix . "_", $sourceField->name);
+
+				foreach ($targetFields as $targetField)
+				{
+					$prefix = str_replace(".", "_", $targetClient);
+					$targetFieldName = explode($prefix . "_", $targetField->name);
+
+					// Check source and destination field name and field types are equal
+					if ($sourceFieldName == $targetFieldName && $sourceField->type == $targetField->type)
+					{
+							$count ++;
+							continue;
+					}
+				}
+			}
+		}
+
+		if (count($sourceFields) == $count)
+		{
+			return true;
+		}
+
+		return false;
 	}
 }

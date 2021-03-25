@@ -1,6 +1,6 @@
 /*Variable to store the updated options of related field*/
 var tjucmRelatedFieldUpdatedOptions = '';
-/*Variable to store the data of editor field*/
+/*Variable to store the data of tinyMCE editor field*/
 var tjUcmTinyMCEFieldIds = new Array();
 /*Variable to store if the next button is clicked*/
 var tjUcmClickedOnNext = 0;
@@ -10,6 +10,14 @@ var tjUcmClickedOnPrev = 0;
 var tjUcmCurrentAutoSaveState = 0;
 /*Variable to store if form is submited for final save*/
 var tjUcmFormFinalSave = 0;
+/*Variable to store the data of JCE editor field*/
+var tjUcmJCEFieldIds = new Array();
+/*Variable to store if form is saved once using bit rate config*/
+var tjUcmFormSavedByBitRateConfig = 0;
+/*Variable to store if save call is from bitrate*/
+var tjUcmSaveFormInDraftWithNoMsg = undefined;
+/*Variable to store id of button from which the save is initiated*/
+var tjUcmFormSubmitCallingButtonId = '';
 
 /* This function executes for autosave form */
 jQuery(window).load(function()
@@ -17,10 +25,22 @@ jQuery(window).load(function()
 	/*Code to get item state*/
 	var tjUcmCurrentDraftSaveState = Number(jQuery('#itemState').val());
 
+	/*value of bitrate on button*/
+	var tjUcmAllowBitrate = jQuery('#item-form #tjucm-bitrate').val();
+
+	/*value of bitrate seconds on button*/
+	var tjUcmBitrateSeconds = jQuery('#item-form #tjucm-bitrate_seconds').val();
+
 	/* If record is submitted and no longet in the draft state then dont allow autosave to work*/
 	if (tjUcmCurrentDraftSaveState === 1)
 	{
 		var tjUcmAllowAutoSave = jQuery('#item-form #tjucm-autosave').val();
+
+		/*value of bitrate button*/
+		var tjUcmAllowBitrate = jQuery('#item-form #tjucm-bitrate').val();
+
+		/*value of bitrate seconds on button*/
+		var tjUcmBitrateSeconds = jQuery('#item-form #tjucm-bitrate_seconds').val();
 
 		/*Check if auto save is enabled for UCM type*/
 		if (tjUcmAllowAutoSave == 1)
@@ -43,53 +63,115 @@ jQuery(window).load(function()
 				}
 			});
 
-			var tjUcmTinyMCE = Joomla.getOptions("plg_editor_tinymce");
-
-			/* Get the value of editor fields*/
-			if (tjUcmTinyMCE != undefined)
+			/*function to get iframe id of tinyMCE editor*/
+			if(jQuery("#item-form .js-editor-tinymce").length > 0)
 			{
-				jQuery.each(tjUcmTinyMCE.tinyMCE, function(index, value){
-					if (jQuery("#item-form #jform_"+index).length)
+				var tjUcmTinyMCE = Joomla.getOptions("plg_editor_tinymce");
+				if (tjUcmTinyMCE != undefined)
+				{
+					jQuery.each(tjUcmTinyMCE.tinyMCE, function(index, value)
 					{
-						var tjUcmEditorFieldContent = jQuery("#jform_"+index+"_ifr").contents().find('body').html();
-						tjUcmTinyMCEFieldIds[index] = tjUcmEditorFieldContent;
-					}
-					else if ((jQuery("#item-form #jform_"+index).length == 0) && (index != 'default'))
-					{
-						var tjUcmSubFormEditorFields = jQuery("textarea[id$='__"+index+"']");
-
-						if (tjUcmSubFormEditorFields.length)
+						if (jQuery("#item-form #jform_"+index).length)
 						{
-							jQuery.each(tjUcmSubFormEditorFields, function(findex, fvalue){
-								var tjUcmEditorFieldContentId = jQuery(fvalue).attr('id');
-								var tjUcmEditorFieldContent = jQuery("#"+tjUcmEditorFieldContentId+"_ifr").contents().find('body').html();
-								var tjucmTempIndex = tjUcmEditorFieldContentId.replace("jform_", "");
-								tjUcmTinyMCEFieldIds[tjucmTempIndex] = tjUcmEditorFieldContent;
-							});
+							var tjUcmEditorFieldContent = jQuery("#jform_"+index+"_ifr").contents().find('body').html();
+							tjUcmTinyMCEFieldIds[index] = tjUcmEditorFieldContent;
 						}
-					}
-				});
+						else if ((jQuery("#item-form #jform_"+index).length == 0) && (index != 'default'))
+						{
+							var tjUcmSubFormEditorFields = jQuery("textarea[id$='__"+index+"']");
 
-				/* Check after some time if the content of editor is changed and if so then save it in DB*/
-				setInterval(function () {
-					for (var key in tjUcmTinyMCEFieldIds) {
-						if (tjUcmTinyMCEFieldIds.hasOwnProperty(key)) {
-							var tjUcmEditorFieldContent = jQuery("#jform_"+key+"_ifr").contents().find('body').html();
-
-							if (tjUcmTinyMCEFieldIds[key] != tjUcmEditorFieldContent)
+							if (tjUcmSubFormEditorFields.length)
 							{
-								var tjUcmTempFieldObj = jQuery("#jform_"+key);
-
-								if (tjUcmTempFieldObj.length)
+								jQuery.each(tjUcmSubFormEditorFields, function(findex, fvalue)
 								{
-									tjUcmTempFieldObj.val(tjUcmEditorFieldContent);
-									tjUcmTinyMCEFieldIds[key] = tjUcmEditorFieldContent;
-									tjUcmItemForm.onUcmFormChange(tjUcmTempFieldObj);
+									var tjUcmEditorFieldContentId = jQuery(fvalue).attr('id');
+									var tjUcmEditorFieldContent = jQuery("#"+tjUcmEditorFieldContentId+"_ifr").contents().find('body').html();
+									var tjucmTempIndex = tjUcmEditorFieldContentId.replace("jform_", "");
+									tjUcmTinyMCEFieldIds[tjucmTempIndex] = tjUcmEditorFieldContent;
+								});
+							}
+						}
+					});
+				}
+			}
+
+			/*function to get iframe id of JCE editor*/
+			if(jQuery("#item-form .wf-editor-container").length > 0)
+			{
+				/*function to get iframe id of JCE editor*/
+				setTimeout(function(){
+					jQuery("#item-form .mceIframeContainer iframe").each(function (){
+
+					var iframeId=jQuery(this).attr('id');
+					var tjucmIframeIndex = iframeId.replace("jform_", "");
+					var tjucmJceIframeIndex = tjucmIframeIndex.replace("_ifr", "");
+					var iframeContent=jQuery("#"+iframeId).contents().find('body').html();
+
+					tjUcmJCEFieldIds[tjucmJceIframeIndex]=iframeContent;});},2000);
+			}
+
+			/* Auto save form as per configured bit rate*/
+			if (tjUcmAllowAutoSave == 1 && tjUcmAllowBitrate == 1 && tjUcmBitrateSeconds !== undefined)
+			{
+				if (jQuery("#item-form #tjUcmSectionDraftSave").length >= 1)
+				{
+					setInterval(function(){
+						if(jQuery('#item-form').hasClass('dirty') || tjUcmFormSavedByBitRateConfig === 0)
+						{
+							/* Once the form is saved using the bit rate config mark the flag*/
+							tjUcmFormSavedByBitRateConfig = 1;
+
+							jQuery("#tjUcmSectionDraftSave").click();
+						}
+
+						//For saving data of Jce editor.
+						if("#item-form .wf-editor-container")
+						{
+							for (var key in tjUcmJCEFieldIds)
+							{
+								if (tjUcmJCEFieldIds.hasOwnProperty(key))
+							 	{
+									var iframeContent = jQuery("#jform_"+key+"_ifr").contents().find('body').html();
+									if (tjUcmJCEFieldIds[key] != iframeContent)
+									{
+										var tjUcmTempFieldObj1 = jQuery("#jform_"+key);
+
+										if (tjUcmTempFieldObj1.length)
+											{
+												tjUcmTempFieldObj1.val(iframeContent);
+												tjUcmJCEFieldIds[key] = iframeContent;
+												tjUcmItemForm.onUcmFormChange(tjUcmTempFieldObj1);
+											}
+									}
 								}
 							}
 						}
-					}
-				},7000);
+
+						//For saving data of tinyMce editor
+						if(jQuery("#item-form .js-editor-tinymce").length > 0)
+						{
+							for (var key in tjUcmTinyMCEFieldIds)
+							{
+								if (tjUcmTinyMCEFieldIds.hasOwnProperty(key))
+								{
+									var tjUcmEditorFieldContent = jQuery("#jform_"+key+"_ifr").contents().find('body').html();
+
+									if (tjUcmTinyMCEFieldIds[key] != tjUcmEditorFieldContent)
+									{
+										var tjUcmTempFieldObj = jQuery("#jform_"+key);
+
+										if (tjUcmTempFieldObj.length)
+										{
+											tjUcmTempFieldObj.val(tjUcmEditorFieldContent);
+											tjUcmTinyMCEFieldIds[key] = tjUcmEditorFieldContent;
+											tjUcmItemForm.onUcmFormChange(tjUcmTempFieldObj);
+										}
+									}
+								}
+							}
+
+						} }, tjUcmBitrateSeconds*1000);
+				}
 			}
 		}
 	}
@@ -127,6 +209,19 @@ jQuery(window).load(function()
 		if (jQuery(row).find('.js-editor-tinymce textarea'))
 		{
 			var tjUcmIdOfEditorFieldInSubForm = jQuery(row).find('.js-editor-tinymce textarea').attr('id');
+
+			if (tjUcmIdOfEditorFieldInSubForm)
+			{
+				var tjUcmSubFormEditorFieldContent = jQuery("#"+tjUcmIdOfEditorFieldInSubForm+"_ifr").contents().find('body').html();
+				tjUcmIdOfEditorFieldInSubForm = tjUcmIdOfEditorFieldInSubForm.replace('jform_', '');
+				tjUcmTinyMCEFieldIds[tjUcmIdOfEditorFieldInSubForm] = tjUcmSubFormEditorFieldContent;
+			}
+		}
+
+		/* If there is any editor field in sub-form then add its reference in variable tjUcmJCEFieldIds*/
+		if (jQuery(row).find('.wf-editor-container textarea'))
+		{
+			var tjUcmIdOfEditorFieldInSubForm = jQuery(row).find('.wf-editor-container textarea').attr('id');
 
 			if (tjUcmIdOfEditorFieldInSubForm)
 			{
@@ -207,7 +302,7 @@ jQuery(window).load(function()
 					tjUcmClickedOnPrev = 0;
 				}
 
-				jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+				jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 			}
 		}
 		else
@@ -239,7 +334,7 @@ jQuery(window).load(function()
 				tjUcmClickedOnPrev = 0;
 			}
 
-			jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+			jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 		}
 	});
 });
@@ -421,6 +516,13 @@ var tjUcmItemForm = {
 
 				return true;
 			}
+			else if (tjucmRecordId == undefined)
+			{
+				/* In case of subform onchange save the entire form*/
+				tjUcmSaveFormInDraftWithNoMsg = 1;
+				tjUcmFormSubmitCallingButtonId = 'tjUcmSectionDraftSave';
+				jQuery("#tjUcmSectionDraftSave").click();
+			}
 
 			return false;
 		}
@@ -456,10 +558,13 @@ var tjUcmItemForm = {
 		else if(jQuery(fieldObj).hasClass('tjfieldTjList'))
 		{
 			/* This condition used for tjlist option actial values updated  - This is used for single & multiple values*/
-
 			if (jQuery(fieldObj).val() !='' && jQuery(fieldObj).val() != undefined)
 			{
 				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
+			}
+			else
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), '');
 			}
 
 			/* Check other options multiple values exist and its not empty */
@@ -483,13 +588,20 @@ var tjUcmItemForm = {
 				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
 			}
 		}
-		else if (jQuery(fieldObj).attr('type') != 'file')
+		else if (jQuery(fieldObj).attr('type') == 'file')
 		{
-			tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
+			tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj)[0].files[0]);
 		}
 		else
 		{
-			tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj)[0].files[0]);
+			if (jQuery(fieldObj).val() == null)
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), '');
+			}
+			else
+			{
+				tjUcmItemFieldFormData.append(jQuery(fieldObj).attr('name'), jQuery(fieldObj).val());
+			}
 		}
 
 		// Call function if field name exist in request data
@@ -501,6 +613,10 @@ var tjUcmItemForm = {
 		return true;
 	},
 	afterDataSave: function (error, response){
+
+		/* Hide loader when record is saved*/
+		jQuery("#item-form #tjucm_loader").hide();
+
 		response = JSON.parse(response);
 		/* Remove the dirty class fromt the form once the field data is saved*/
 		jQuery('#item-form').removeClass('dirty');
@@ -573,7 +689,7 @@ var tjUcmItemForm = {
 					Joomla.renderMessages({'error':[response.message]});
 				}
 
-				jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+				jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 			}
 
 			if (response.messages !== null)
@@ -584,7 +700,7 @@ var tjUcmItemForm = {
 						Joomla.renderMessages({'error':[value]});
 					});
 
-					jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+					jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 				}
 			}
 		}
@@ -625,7 +741,25 @@ var tjUcmItemForm = {
 	saveUcmFormData: function(){
 		/* Disable the action buttons before performing the action*/
 		jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
-		var tjUcmFormSubmitCallingButtonId = event.target.id;
+
+		/* In case of save through bitrate setting event will be undefined*/
+		if (event === undefined)
+		{
+			tjUcmFormSubmitCallingButtonId = 'tjUcmSectionDraftSave';
+			tjUcmSaveFormInDraftWithNoMsg = 1;
+		}
+		else
+		{
+			if (event.target.id == 'tjUcmSectionDraftSave' || event.target.id == 'tjUcmSectionFinalSave')
+			{
+				tjUcmFormSubmitCallingButtonId = event.target.id;
+			}
+			else
+			{
+				tjUcmFormSubmitCallingButtonId = 'tjUcmSectionDraftSave';
+			}
+		}
+
 		var tjUcmSaveRecordAsDraft = 1;
 
 		if (tjUcmFormSubmitCallingButtonId == 'tjUcmSectionFinalSave')
@@ -649,7 +783,7 @@ var tjUcmItemForm = {
 			{
 				tjUcmItemForm.setVisibilityOfNavigationButtons();
 				jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
-				jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+				jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 
 				return false;
 			}
@@ -657,10 +791,19 @@ var tjUcmItemForm = {
 			tjUcmSaveRecordAsDraft = 0;
 		}
 
-		/* For AJAX save need to assign values to the editor field containers*/
+		/* For AJAX save need to assign values to the editor field containers of tinyMCE editor*/
 		jQuery("#item-form .toggle-editor a").each(function(index) {
 			this.click();
 		});
+
+		/* For AJAX save need to assign values to the editor field containers of JCE editor*/
+		jQuery("#item-form .wf-editor-toggle").each(function(index) {
+			this.click();
+		});
+
+		/* Show loader when record is saved*/
+		jQuery("#item-form #tjucm_loader").show();
+		jQuery("html, body").animate({scrollTop: jQuery("#item-form #tjucm_loader").position().top}, "slow");
 
 		tjUcmItemForm.getUcmParentRecordId(tjUcmSaveRecordAsDraft, function (){
 			var tjUcmForm = document.getElementById('item-form');
@@ -687,22 +830,44 @@ var tjUcmItemForm = {
 				tjUcmFormFinalSave = 1;
 			}
 
-			jQuery('input[type="checkbox"]').each(function (){
-					if (jQuery(this).prop('checked') == true)
-					{
-						tjUcmItemFormData.append(jQuery(this).attr('name'), 1);
-					}
-					else
-					{
-						tjUcmItemFormData.append(jQuery(this).attr('name'), 0);
-					}
+			/* Reset the variable*/
+			tjUcmFormSubmitCallingButtonId = '';
+
+			jQuery('#item-form input[type="checkbox"]').each(function (){
+				if (jQuery(this).prop('checked') == true)
+				{
+					tjUcmItemFormData.append(jQuery(this).attr('name'), 1);
+				}
+				else
+				{
+					tjUcmItemFormData.append(jQuery(this).attr('name'), 0);
+				}
 			});
+
+			jQuery('#item-form select').each(function (){
+				if (jQuery(this).val() == null)
+				{
+					tjUcmItemFormData.append(jQuery(this).attr('name'), '');
+				}
+			});
+
+			/* Do not show draft save msg if the save is triggered as per bitrate config*/
+			if (tjUcmSaveFormInDraftWithNoMsg !== undefined)
+			{
+				tjUcmSaveFormInDraftWithNoMsg = undefined;
+				tjUcmItemFormData.append('showDraftMessage', 0);
+			}
 
 			com_tjucm.Services.Item.saveFormData(tjUcmItemFormData, tjUcmItemForm.afterDataSave);
 		});
 
-		/* Once data is assigned to the textarea toggle the editors*/
+		/* Once data is assigned to the textarea toggle the tinyMCE editors*/
 		jQuery("#item-form .toggle-editor a").each(function(index) {
+			this.click();
+		});
+
+		/* Once data is assigned to the textarea toggle the Jce editors*/
+		jQuery("#item-form .wf-editor-toggle").each(function(index) {
 			this.click();
 		});
 	},
@@ -757,7 +922,6 @@ var tjUcmItemForm = {
 			/* Disable the save button till the record is saved*/
 			jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', true);
 
-
 			tjUcmItemForm.getUcmParentRecordId(1, function (){
 				tjUcmSectionFormData.delete('task');
 				tjUcmSectionFormData.delete('option');
@@ -777,7 +941,7 @@ var tjUcmItemForm = {
 		}
 		else
 		{
-			jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+			jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 
 			return false;
 		}
@@ -842,6 +1006,52 @@ var tjUcmItemForm = {
 				jQuery("#previous_button").attr('disabled', true);
 			}
 		}
+	},
+	getRelatedFieldOptions: function (relatedFieldId, fieldId, clusterId) {
+		var tjUcmItemFormData = new FormData();
+		var FieldsData = {fieldId: fieldId};
+
+		var tjUcmUpdateRelatedFieldsOptions = function (error, response){
+			response = JSON.parse(response);
+			tjucmRelatedFieldUpdatedOptions = response.data;
+
+			if(tjucmRelatedFieldUpdatedOptions == '')
+			{
+				return false;
+			}
+
+			var selectOption = '';
+			var op = '';
+			var data = response.data;
+
+			for(var index = 0; index < data.length; ++index)
+			{
+				selectOption = '';
+				if(FieldsData.SelectedValues !== null && typeof FieldsData.SelectedValues !== 'undefined' && FieldsData.SelectedValues.length > 0)
+				{
+					if (FieldsData.SelectedValues.includes(data[index].value))
+					{
+						selectOption = ' selected="selected" ';
+					}
+				}
+
+				op="<option value='"+data[index].value+"' "+selectOption+" > " + data[index]['text'] + "</option>" ;
+				jQuery('#'+relatedFieldId).append(op);
+			}
+
+			// Update to chz-done selects*/
+			jQuery('#'+relatedFieldId).trigger("liszt:updated");
+		};
+
+		FieldsData.SelectedValues = jQuery('#'+relatedFieldId).val();
+
+		if (jQuery.trim(fieldId) != '' && fieldId != 'undefined')
+		{
+			jQuery('#'+relatedFieldId+', .chzn-results').empty();
+			tjUcmItemFormData.append('fieldId', fieldId);
+			tjUcmItemFormData.append('clusterId', clusterId);
+			com_tjucm.Services.Item.getRelatedFieldOptions(tjUcmItemFormData, tjUcmUpdateRelatedFieldsOptions);
+		}
 	}
 };
 
@@ -867,7 +1077,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 			if(!confirm(Joomla.JText._("COM_TJUCM_ITEMFORM_SUBMIT_ALERT")))
 			{
 				jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
-				jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+				jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 
 				return false;
 			}
@@ -878,7 +1088,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 		else
 		{
 			jQuery(".form-actions button[type='button'], .form-actions input[type='button']").attr('disabled', false);
-			jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+			jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 
 			return false;
 		}
@@ -900,7 +1110,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 							Joomla.renderMessages({'error':[value]});
 						});
 
-						jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+						jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 					}
 				}
 
@@ -908,7 +1118,7 @@ function steppedFormSave(form_id, status, showDraftSuccessMsg)
 				{
 					Joomla.renderMessages({'info':[returnedData.message]});
 
-					jQuery("html, body").animate({scrollTop: jQuery("#item-form").position().top}, "slow");
+					jQuery("html, body").animate({scrollTop: jQuery("#system-message-container").position().top}, "slow");
 				}
 
 				if (returnedData.data !== null)
@@ -1015,7 +1225,6 @@ function itemformactions(tab_id, navDirection)
 	{
 		jQuery('#tjucm_myTabTabs > .active').next('li').prev('a').trigger('click');
 	}
-
 
 	var nextTabName = jQuery('ul#' + getTabId).find('li.active').next('li').children('a').attr('href');
 	var prevTabName = jQuery('ul#' + getTabId).find('li.active').prev('li').children('a').attr('href');
