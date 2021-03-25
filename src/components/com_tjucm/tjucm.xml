@@ -6,8 +6,8 @@
 	<author>Techjoomla</author>
 	<authorEmail>extensions@techjoomla.com</authorEmail>
 	<authorUrl>https://techjoomla.com</authorUrl>
-	<creationDate>25th Oct 2019</creationDate>
-	<version>1.2.2</version>
+	<creationDate>2nd Dec 2019</creationDate>
+	<version>1.2.3</version>
 	<description><![CDATA[<h3>TJ-UCM - Universal Content Manager</h3>]]></description>
 	<scriptfile>script.php</scriptfile>
 	<install>
@@ -36,9 +36,12 @@
 		<folder>layouts</folder>
 		<folder>controllers</folder>
 		<folder>helpers</folder>
+		<folder>includes</folder>
 	</files>
 	<media destination="com_tjucm" folder="media">
 		<folder>js</folder>
+		<folder>css</folder>
+		<folder>gif</folder>
 	</media>
 	<languages folder="languages/site">
 		<language tag="en-GB">en-GB/en-GB.com_tjucm.ini</language>
@@ -53,7 +56,6 @@
 			<filename>tjucm.php</filename>
 			<folder>controllers</folder>
 			<folder>assets</folder>
-			<folder>classes</folder>
 			<folder>helpers</folder>
 			<folder>models</folder>
 			<folder>houseKeeping</folder>

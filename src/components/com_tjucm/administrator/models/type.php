@@ -13,6 +13,8 @@ defined('_JEXEC') or die;
 
 jimport('joomla.application.component.modeladmin');
 
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+
 /**
  * Tjucm model.
  *
@@ -48,8 +50,8 @@ class TjucmModelType extends JModelAdmin
 	 */
 	public function __construct($config = array())
 	{
-		JLoader::import('components.com_tjucm.classes.funlist', JPATH_ADMINISTRATOR);
-		$this->common  = new TjucmFunList;
+		$config['event_after_delete'] = 'tjUcmOnAfterTypeDelete';
+		$config['event_change_state'] = 'tjUcmOnAfterTypeChangeState';
 
 		parent::__construct($config);
 	}
@@ -308,36 +310,23 @@ class TjucmModelType extends JModelAdmin
 		}
 
 		// Remove white spaces from alias if any
-		$data['alias'] = str_replace(" ", "_", trim($data['alias']));
+		// $data['alias'] = str_replace(" ", "_", trim($data['alias']));
+		$data['alias'] = JFilterOutput::stringURLSafe($data['alias']);
 
 		if (!empty($data['id']))
 		{
 			$field_group = $this->getGroupCount($data['unique_identifier']);
-
-			// Not able to get count using getTotal method of category model
-			$field_category = $this->common->getDataValues('#__categories', 'count(*)', 'extension = "' . $data['unique_identifier'] . '"', 'loadResult');
-
-			// $field_category = $this->getCategoryCount($data['unique_identifier']);
+			$field_category = $this->getCategoryCount($data['unique_identifier']);
 
 			if ($field_group == 0 && $field_category == 0)
 			{
-				$data['unique_identifier'] = 'com_tjucm.' . $data['alias'];
+				$data['unique_identifier'] = 'com_tjucm.' . preg_replace("/[^a-zA-Z0-9]/", "", $data['alias']);
 			}
 		}
 		else
 		{
-			$data['unique_identifier'] = 'com_tjucm.' . $data['alias'];
+			$data['unique_identifier'] = 'com_tjucm.' . preg_replace("/[^a-zA-Z0-9]/", "", $data['alias']);
 		}
-
-		$params = array();
-		$params['is_subform'] = $data['is_subform'];
-		$params['allow_draft_save'] = $data['allow_draft_save'];
-		$params['allow_auto_save'] = $data['allow_auto_save'];
-		$params['publish_items'] = $data['publish_items'];
-		$params['allowed_count'] = $data['allowed_count'];
-		$params['layout'] = $data['layout'];
-		$params['details_layout'] = $data['details_layout'];
-		$params['list_layout'] = $data['list_layout'];
 
 		// If UCM type is a subform then need to add content_id as hidden field in the form - For flat subform storage
 		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
@@ -345,7 +334,7 @@ class TjucmModelType extends JModelAdmin
 		$tjfieldsFieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
 		$tjfieldsFieldTable->load(array('name' => str_replace('.', '_', $data['unique_identifier']) . '_contentid'));
 
-		if ($params['is_subform'] == 1 && empty($tjfieldsFieldTable->id))
+		if ($data['params']['is_subform'] == 1 && empty($tjfieldsFieldTable->id))
 		{
 			JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
 			$fieldGroup = array("name" => "hidden", "title" => "hidden", "client" => $data['unique_identifier'], "state" => 1);
@@ -365,22 +354,27 @@ class TjucmModelType extends JModelAdmin
 			$input->post->set('client_type', '');
 		}
 
-		// If UCM type is a subform then it cant be saved as draft and auto save is also disabled
-		if ($params['is_subform'] == 1)
+		// Check the params 'Group' of fields & UCM type is a subform then it cant be saved as draft and auto save is also disabled
+		if ($data['params']['is_subform'] == 1)
 		{
-			$params['allow_draft_save'] = $params['allow_auto_save'] = $params['allowed_count'] = 0;
+			$data['params']['allow_draft_save']  = $data['params']['allow_auto_save'] = $data['params']['allowed_count'] = 0;
 		}
 
 		// If auto save is enabled then draft save is enabled by default
-		if ($params['allow_auto_save'] == 1)
+		if ($data['params']['allow_auto_save'] == 1)
 		{
-			$params['allow_draft_save'] = 1;
+			$data['params']['allow_draft_save'] = 1;
 		}
-
-		$data['params'] = json_encode($params);
 
 		if (parent::save($data))
 		{
+			$id = (int) $this->getState($this->getName() . '.id');
+			$data['typeId'] = $id;
+			$dispatcher = JDispatcher::getInstance();
+			JPluginHelper::importPlugin('actionlog', 'tjucm');
+			$isNew = ($data['id'] != 0) ? false : true;
+			$dispatcher->trigger('tjUcmOnAfterTypeSave', array($data, $isNew));
+
 			return true;
 		}
 
@@ -417,10 +411,10 @@ class TjucmModelType extends JModelAdmin
 	public function getCategoryCount($client)
 	{
 		JLoader::import('components.com_categories.models.categories', JPATH_ADMINISTRATOR);
-		$categories_model = JModelLegacy::getInstance('Categories', 'CategoriesModel');
-		$categories_model->setState('filter.extension', $client);
+		$categoryModel = JModelLegacy::getInstance('Categories', 'CategoriesModel', array('ignore_request' => true));
+		$categoryModel->setState('filter.extension', $client);
 
-		return $categories_model->getTotal();
+		return $categoryModel->getTotal();
 	}
 
 	/**
@@ -543,11 +537,75 @@ class TjucmModelType extends JModelAdmin
 
 			// Delete UCM type
 			if (!parent::delete($pk))
-			{	
+			{
 				return false;
 			}
 		}
 
 		return true;
+	}
+
+	/**
+	 * Method to validation before copy items
+	 *
+	 * @param   object  $sourceClient  Source client.
+	 * @param   object  $targetClient  Tareget client.
+	 * 
+	 * @return  Boolean
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	public function getCompatibleUcmTypes($sourceClient, $targetClient)
+	{
+		$validUcmType = array();
+
+		if (!$sourceClient && !$targetClient)
+		{
+			return false;
+		}
+
+		// Get the source ucm type and target ucm type fields list
+		BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
+		$tjFieldsFieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+
+		// Get source UCM Type fields
+		$tjFieldsFieldsModel->setState('filter.client', $sourceClient);
+		$sourceFields = $tjFieldsFieldsModel->getItems();
+
+		// Get destination UCM Type fields
+		$tjFieldsFieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+		$tjFieldsFieldsModel->setState('filter.client', $targetClient);
+		$targetFields = $tjFieldsFieldsModel->getItems();
+
+		$count = 0;
+
+		if (count($sourceFields) == count($targetFields))
+		{
+			foreach ($sourceFields as $sourceField)
+			{
+				$prefix = str_replace(".", "_", $sourceClient);
+				$sourceFieldName = explode($prefix . "_", $sourceField->name);
+
+				foreach ($targetFields as $targetField)
+				{
+					$prefix = str_replace(".", "_", $targetClient);
+					$targetFieldName = explode($prefix . "_", $targetField->name);
+
+					// Check source and destination field name and field types are equal
+					if ($sourceFieldName == $targetFieldName && $sourceField->type == $targetField->type)
+					{
+							$count ++;
+							continue;
+					}
+				}
+			}
+		}
+
+		if (count($sourceFields) == $count)
+		{
+			return true;
+		}
+
+		return false;
 	}
 }

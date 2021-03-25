@@ -46,22 +46,6 @@ class TjucmModelItem extends JModelAdmin
 	use TjfieldsFilterField;
 
 	/**
-	 * Constructor.
-	 *
-	 * @param   array  $config  An optional associative array of configuration settings.
-	 *
-	 * @see        JController
-	 * @since      1.6
-	 */
-	public function __construct($config = array())
-	{
-		JLoader::import('components.com_tjucm.classes.funlist', JPATH_ADMINISTRATOR);
-		$this->common  = new TjucmFunList;
-
-		parent::__construct($config);
-	}
-
-	/**
 	 * Get an array of data items
 	 *
 	 * @param   string  $client  client value
@@ -290,7 +274,10 @@ class TjucmModelItem extends JModelAdmin
 		$input  = JFactory::getApplication()->input;
 		$filter = JFilterInput::getInstance();
 
-		$data['type_id'] = $this->common->getDataValues('#__tj_ucm_types', 'id AS type_id', 'unique_identifier = "' . $this->client . '"', 'loadResult');
+		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
+		$tjUcmTypeTable = JTable::getInstance('TjucmTableType', 'JTable', array('dbo', JFactory::getDbo()));
+		$tjUcmTypeTable->load(array('unique_identifier' => $this->client));
+		$data['type_id'] = $tjUcmTypeTable->id;
 
 		if (parent::save($data))
 		{

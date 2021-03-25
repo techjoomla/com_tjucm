@@ -38,15 +38,7 @@ class TjucmViewItems extends JViewLegacy
 
 	protected $canCreate;
 
-	protected $canView;
-
-	protected $canEdit;
-
-	protected $canChange;
-
-	protected $canEditOwn;
-
-	protected $canDelete;
+	protected $canImport;
 
 	protected $menuparams;
 
@@ -55,6 +47,12 @@ class TjucmViewItems extends JViewLegacy
 	protected $showList;
 
 	protected $created_by;
+
+	protected $ucmTypeParams;
+
+	protected $title;
+
+	protected $draft;
 
 	/**
 	 * Display the view
@@ -69,6 +67,16 @@ class TjucmViewItems extends JViewLegacy
 	{
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
+
+		if (!$user->id)
+		{
+			$msg = JText::_('COM_TJUCM_LOGIN_MSG');
+
+			// Get current url.
+			$current = JUri::getInstance()->toString();
+			$url = base64_encode($current);
+			JFactory::getApplication()->redirect(JRoute::_('index.php?option=com_users&view=login&return=' . $url, false), $msg);
+		}
 
 		// Check the view access to the items.
 		if (!$user->id)
@@ -88,13 +96,13 @@ class TjucmViewItems extends JViewLegacy
 		$model              = $this->getModel("Items");
 		$this->ucmTypeId    = $id = $model->getState('ucmType.id');
 		$this->client       = $model->getState('ucm.client');
-		$this->canCreate    = $user->authorise('core.type.createitem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$this->canView      = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$this->canEdit      = $user->authorise('core.type.edititem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$this->canChange    = $user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $this->ucmTypeId);
-		$this->canEditOwn   = $user->authorise('core.type.editownitem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$this->canDelete    = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $this->ucmTypeId);
-		$this->canDeleteOwn = $user->authorise('core.type.deleteownitem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$this->canCreate    = TjucmAccess::canCreate($this->ucmTypeId);
+		$this->canImport    = TjucmAccess::canImport($this->ucmTypeId);
+		$this->draft        = array("" => JText::_('COM_TJUCM_DATA_STATUS_SELECT_OPTION'),
+			"0" => JText::_("COM_TJUCM_DATA_STATUS_SAVE"), "1" => JText::_('COM_TJUCM_DATA_STATUS_DRAFT'));
+		$this->canCopyItem = $user->authorise('core.type.copyitem', 'com_tjucm.type.' . $this->ucmTypeId);
+		$this->canCopyToSameUcmType = $model->canCopyToSameUcmType($this->client);
+		$this->sortableFields = array('text', 'number', 'checkbox', 'textarea', 'textareacounter', 'calendar', 'email', 'radio', 'single_select', 'itemcategory', 'cluster', 'ownership');
 
 		// If did not get the client from url then get if from menu param
 		if (empty($this->client))
@@ -111,9 +119,22 @@ class TjucmViewItems extends JViewLegacy
 
 				if (!empty($this->ucm_type))
 				{
-					$this->client     = 'com_tjucm.' . $this->ucm_type;
+					JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
+					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+					$ucmTypeTable->load(array('alias' => $this->ucm_type));
+					$this->client = $ucmTypeTable->unique_identifier;
+					$this->title = $ucmTypeTable->title;
 				}
 			}
+		}
+
+		// To get title of list as per the ucm type
+		if (!isset($this->title))
+		{
+			JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
+			$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+			$ucmTypeTable->load(array('unique_identifier' => $this->client));
+			$this->title = $ucmTypeTable->title;
 		}
 
 		// If there are no fields column to show in list view then dont allow to show data
@@ -133,11 +154,11 @@ class TjucmViewItems extends JViewLegacy
 		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
 		$typeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
 		$typeTable->load(array('unique_identifier' => $this->client));
-		$typeParams = json_decode($typeTable->params);
+		$this->ucmTypeParams = json_decode($typeTable->params);
 
-		if (isset($typeParams->list_layout) && !empty($typeParams->list_layout))
+		if (isset($this->ucmTypeParams->list_layout) && !empty($this->ucmTypeParams->list_layout))
 		{
-			$this->setLayout($typeParams->list_layout);
+			$this->setLayout($this->ucmTypeParams->list_layout);
 		}
 
 		$allowedCount = (!empty($typeTable->allowed_count))?$typeTable->allowed_count:'0';
@@ -149,11 +170,6 @@ class TjucmViewItems extends JViewLegacy
 			{
 				$this->allowedToAdd = $itemFormModel->allowedToAddTypeData($userId, $this->client, $allowedCount);
 			}
-		}
-
-		if ($this->created_by == $userId)
-		{
-			$this->canView = true;
 		}
 
 		// Check for errors.

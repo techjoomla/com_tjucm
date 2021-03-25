@@ -10,38 +10,38 @@
 // No direct access
 defined('_JEXEC') or die;
 
-JHtml::_('behavior.keepalive');
-JHtml::_('behavior.tooltip');
-JHtml::_('behavior.formvalidation');
-JHtml::_('formbehavior.chosen', 'select');
-JHtml::_('jquery.token');
+use Joomla\CMS\HTML\HTMLHelper;
+
+HTMLHelper::_('behavior.keepalive');
+HTMLHelper::_('behavior.tooltip');
+HTMLHelper::_('behavior.formvalidation');
+HTMLHelper::_('formbehavior.chosen', 'select');
+HTMLHelper::_('jquery.token');
+
+/*
+* Script to show alert box if form changes are made and user is closing/refreshing/navigating the tab
+* without saving the content
+*/
+HTMLHelper::script('media/com_tjucm/js/vendor/jquery/jquery.are-you-sure.js');
+
+/*
+* Script to show alert box if form changes are made and user is closing/refreshing/navigating the tab
+* without saving the content on iphone|ipad|ipod|opera
+*/
+HTMLHelper::script('media/com_tjucm/js/vendor/shim/ays-beforeunload-shim.js');
+
+HTMLHelper::script('administrator/components/com_tjfields/assets/js/tjfields.js');
 
 // Load admin language file
 $lang = JFactory::getLanguage();
 $lang->load('com_tjucm', JPATH_SITE);
-$doc = JFactory::getDocument();
-$doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/jquery.form.js');
-$doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/itemform.js');
-$doc->addScript(JUri::root() . 'administrator/components/com_tjfields/assets/js/tjfields.js');
-JHtml::_('stylesheet', 'administrator/components/com_tjucm/assets/css/tjucm.css');
-
-/*
- * Script to show alert box if form changes are made and user is closing/refreshing/navigating the tab
- * without saving the content
- */
-$doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/jquery.are-you-sure.js');
-
-/*
- * Script to show alert box if form changes are made and user is closing/refreshing/navigating the tab
- * without saving the content on iphone|ipad|ipod|opera
- */
-$doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/ays-beforeunload-shim.js');
 
 $jinput                    = JFactory::getApplication();
 $editRecordId              = $jinput->input->get("id", '', 'INT');
 $baseUrl                   = $jinput->input->server->get('REQUEST_URI', '', 'STRING');
 $calledFrom                = (strpos($baseUrl, 'administrator')) ? 'backend' : 'frontend';
 $layout                    = ($calledFrom == 'frontend') ? 'default' : 'edit';
+$dynamicLayout             = $this->setLayout($this->layout);
 $fieldsets_counter_deafult = 0;
 $setnavigation             = false;
 
@@ -116,17 +116,42 @@ JFactory::getDocument()->addScriptDeclaration('
 		</fieldset>
 	</div>
 	<?php
-	if ($this->form_extra)
-	{
-		?>
-		<div class="form-horizontal">
-		<?php
-		// Code to display the form
-		echo $this->loadTemplate('extrafields');
-		?>
-		</div>
-		<?php
-	}
+		if ($this->form_extra)
+		{
+			if ($this->id != '0')
+			{
+				?>
+				<div class="page-header">
+					<h1 class="page-title">
+					<?php echo JText::_("COM_TJUCM_EDIT_FORM") . ": " . strtoupper($this->title); ?>
+					<h1>
+				</div>
+				<?php
+			}
+			else
+			{
+			?>
+			<div class="page-header">
+				<h1 class="page-title">
+					<?php echo strtoupper($this->title); ?>
+				<h1>
+				</div><?php
+			}?>
+			<div class="form-horizontal">
+			<?php
+			// Code to display the form
+			if ($dynamicLayout == "default")
+			{
+				echo $this->loadTemplate('extrafields');
+			}
+			else
+			{
+				echo $this->loadTemplate('grid');
+			}
+			?>
+			</div>
+			<?php
+		}
 
 	if ($editRecordId)
 	{
@@ -162,23 +187,23 @@ JFactory::getDocument()->addScriptDeclaration('
 
 		if (isset($setnavigation) && $setnavigation == true)
 		{
-			if (!empty($this->allow_draft_save))
-			{
-				?>
-				<button type="button" class="btn btn-primary" id="previous_button" >
-					<i class="icon-arrow-left-2"></i>
-					<?php echo JText::_('COM_TJUCM_PREVIOUS_BUTTON'); ?>
-				</button>
-				<button type="button" class="btn btn-primary" id="next_button" >
-					<?php echo JText::_('COM_TJUCM_NEXT_BUTTON'); ?>
-					<i class="icon-arrow-right-2"></i>
-				</button>
-				<?php
-			}
+			?>
+			<button type="button" class="btn btn-primary" id="previous_button" >
+				<i class="icon-arrow-left-2"></i>
+				<?php echo JText::_('COM_TJUCM_PREVIOUS_BUTTON'); ?>
+			</button>
+			<button type="button" class="btn btn-primary" id="next_button" >
+				<?php echo JText::_('COM_TJUCM_NEXT_BUTTON'); ?>
+				<i class="icon-arrow-right-2"></i>
+			</button>
+			<?php
 		}
 
 		if ($calledFrom == 'frontend')
 		{
+			?>
+			<span class="pull-right">
+			<?php
 			if (($this->allow_auto_save || $this->allow_draft_save) && $itemState)
 			{
 				?>
@@ -190,13 +215,20 @@ JFactory::getDocument()->addScriptDeclaration('
 			?>
 			<input type="button" class="btn btn-success" value="<?php echo JText::_("COM_TJUCM_SAVE_ITEM"); ?>"
 			id="tjUcmSectionFinalSave" onclick="tjUcmItemForm.saveUcmFormData();" />
+			<input type="button" class="btn btn-warning" value="<?php echo JText::_("COM_TJUCM_CANCEL_BUTTON"); ?>" onclick="Joomla.submitbutton('itemform.cancel');" />
+			</span>
 			<?php
 		}
 		?>
+	</div>
+	<div id="tjucm_loader">
+		<img src='<?php echo JUri::root();?>media/com_tjucm/gif/loading.gif'>
 	</div>
 	<input type="hidden" name="layout" value="<?php echo $layout ?>"/>
 	<input type="hidden" name="task" value="itemform.save"/>
 	<input type="hidden" name="form_status" id="form_status" value=""/>
 	<input type="hidden" name="tjucm-autosave" id="tjucm-autosave" value="<?php echo $this->allow_auto_save;?>"/>
-	<?php echo JHtml::_('form.token'); ?>
+	<input type="hidden" name="tjucm-bitrate" id="tjucm-bitrate" value="<?php echo $this->allow_bit_rate;?>"/>
+	<input type="hidden" name="tjucm-bitrate_seconds" id="tjucm-bitrate_seconds" value="<?php echo $this->allow_bit_rate_seconds;?>"/>	
+	<?php echo HTMLHelper::_('form.token'); ?>
 </form>

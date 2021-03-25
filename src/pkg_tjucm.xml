@@ -6,13 +6,14 @@
 	<description>TJUCM - Universal Content Manager Package</description>
 	<copyright>Copyright (c) 2009-2019 Techjoomla. All rights reserved.</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
-	<creationDate>25th Oct 2019</creationDate>
+	<creationDate>2nd Dec 2019</creationDate>
 	<packagename>ucm</packagename>
-	<version>1.2.2</version>
+	<version>1.2.3</version>
 	<packager>Techjoomla Team</packager>
 	<scriptfile>script.pkg_tjucm.php</scriptfile>
-	<files folder="components">
-		<file type="component" id="com_tjucm">com_tjucm.zip</file>
-		<file type="component" id="com_tjfields">com_tjfields.zip</file>
+	<files>
+		<file type="component" id="com_tjucm">components/com_tjucm.zip</file>
+		<file type="component" id="com_tjfields">components/com_tjfields.zip</file>
+		<file type="plugin" id="tjucm">plugins/actionlog/tjucm.zip</file>
 	</files>
 </extension>

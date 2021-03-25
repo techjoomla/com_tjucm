@@ -17,6 +17,7 @@ jimport('joomla.event.dispatcher');
 require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
 
 use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 
 /**
  * Tjucm model.
@@ -44,7 +45,6 @@ class TjucmModelItem extends JModelAdmin
 	protected function populateState()
 	{
 		$app  = JFactory::getApplication('com_tjucm');
-		$user = JFactory::getUser();
 
 		// Load state from the request.
 		$id = $app->input->getInt('id');
@@ -68,7 +68,10 @@ class TjucmModelItem extends JModelAdmin
 
 				if (!empty($ucm_type))
 				{
-					$ucmType     = 'com_tjucm.' . $ucm_type;
+					JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
+					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+					$ucmTypeTable->load(array('alias' => $ucm_type));
+					$ucmType = $ucmTypeTable->unique_identifier;
 				}
 			}
 		}
@@ -80,9 +83,7 @@ class TjucmModelItem extends JModelAdmin
 		$this->setState('ucmType.id', $ucmId);
 
 		// Check published state
-		if ((!$user->authorise('core.type.edititem', 'com_tjucm.type.' . $ucmId))
-			&& (!$user->authorise('core.type.editownitem', 'com_tjucm.type.' . $ucmId))
-			&& (!$user->authorise('core.type.edititemstate', 'com_tjucm.type.' . $ucmId)))
+		if ((!TjucmAccess::canEdit($ucmId, $id)) && (!TjucmAccess::canEditOwn($ucmId, $id)) && (!TjucmAccess::canEditState($ucmId, $id)))
 		{
 			$this->setState('filter.published', 1);
 			$this->setState('fileter.archived', 2);
@@ -170,8 +171,6 @@ class TjucmModelItem extends JModelAdmin
 	 */
 	public function &getData($id = null)
 	{
-		$user = JFactory::getUser();
-
 		$this->item = false;
 
 		if (empty($id))
@@ -181,7 +180,7 @@ class TjucmModelItem extends JModelAdmin
 
 		// Get UCM type id (Get if user is autorised to edit the items for this UCM type)
 		$ucmTypeId = $this->getState('ucmType.id');
-		$canView = $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $ucmTypeId);
+		$canView = TjucmAccess::canView($ucmTypeId, $id);
 
 		// Get a level row instance.
 		$table = $this->getTable();
@@ -211,7 +210,7 @@ class TjucmModelItem extends JModelAdmin
 
 			if (!empty($this->item->id))
 			{
-				if ($canView || ($this->item->created_by == $user->id))
+				if ($canView || ($this->item->created_by == JFactory::getUser()->id))
 				{
 					$this->item->params->set('access-view', true);
 				}
@@ -242,109 +241,6 @@ class TjucmModelItem extends JModelAdmin
 	}
 
 	/**
-	 * Get the id of an item by alias
-	 *
-	 * @param   string  $alias  Item alias
-	 *
-	 * @return  mixed
-	 */
-	public function getItemIdByAlias($alias)
-	{
-		$table = $this->getTable();
-
-		$table->load(array('alias' => $alias));
-
-		return $table->id;
-	}
-
-	/**
-	 * Method to check in an item.
-	 *
-	 * @param   integer  $id  The id of the row to check out.
-	 *
-	 * @return  boolean True on success, false on failure.
-	 *
-	 * @since    1.6
-	 */
-	public function checkin($id = null)
-	{
-		// Get the id.
-		$id = (!empty($id)) ? $id : (int) $this->getState('item.id');
-
-		if ($id)
-		{
-			// Initialise the table
-			$table = $this->getTable();
-
-			// Attempt to check the row in.
-			if (method_exists($table, 'checkin'))
-			{
-				if (!$table->checkin($id))
-				{
-					return false;
-				}
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Method to check out an item for editing.
-	 *
-	 * @param   integer  $id  The id of the row to check out.
-	 *
-	 * @return  boolean True on success, false on failure.
-	 *
-	 * @since    1.6
-	 */
-	public function checkout($id = null)
-	{
-		// Get the user id.
-		$id = (!empty($id)) ? $id : (int) $this->getState('item.id');
-
-		if ($id)
-		{
-			// Initialise the table
-			$table = $this->getTable();
-
-			// Get the current user object.
-			$user = JFactory::getUser();
-
-			// Attempt to check the row out.
-			if (method_exists($table, 'checkout'))
-			{
-				if (!$table->checkout($user->get('id'), $id))
-				{
-					return false;
-				}
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Get the name of a category by id
-	 *
-	 * @param   int  $id  Category id
-	 *
-	 * @return  Object|null	Object if success, null in case of failure
-	 */
-	public function getCategoryName($id)
-	{
-		$db    = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query
-			->select('title')
-			->from('#__categories')
-			->where('id = ' . $id);
-		$db->setQuery($query);
-
-		return $db->loadObject();
-	}
-
-	/**
 	 * Publish the element
 	 *
 	 * @param   int  &$id    Item id
@@ -356,10 +252,36 @@ class TjucmModelItem extends JModelAdmin
 	{
 		$table = $this->getTable();
 		$table->load($id);
-		$table->draft = $state == 1 ? 0 : 1;
 		$table->state = $state;
 
-		return $table->store();
+		// Only if item is published
+		if ($state == 1)
+		{
+			$table->draft = 0;
+		}
+
+		if ($table->store())
+		{
+			JLoader::import('components.com_tjucm.models.items', JPATH_SITE);
+			$itemsModel = BaseDatabaseModel::getInstance('Items', 'TjucmModel', array('ignore_request' => true));
+			$itemsModel->setState("parent_id", $id);
+			$children = $itemsModel->getItems();
+
+			foreach ($children as $child)
+			{
+				$childTable = $this->getTable();
+				$childTable->load($child->id);
+				$childTable->state = $state;
+
+				// Only if item is published
+				if ($state == 1)
+				{
+					$childTable->draft = 0;
+				}
+
+				$childTable->store();
+			}
+		}
 	}
 
 	/**
@@ -374,8 +296,7 @@ class TjucmModelItem extends JModelAdmin
 		$app = JFactory::getApplication('com_tjucm');
 
 		$ucmTypeId = $this->getState('ucmType.id');
-		$user = JFactory::getUser();
-		$canDelete = $user->authorise('core.type.deleteitem', 'com_tjucm.type.' . $ucmTypeId);
+		$canDelete = TjucmAccess::canDelete($ucmTypeId, $id);
 
 		if ($canDelete)
 		{
@@ -389,39 +310,5 @@ class TjucmModelItem extends JModelAdmin
 
 			return false;
 		}
-	}
-
-	/**
-	 * Method to getAliasFieldNameByView
-	 *
-	 * @param   array  $view  An array of record primary keys.
-	 *
-	 * @return  boolean  True if successful, false if an error occurs.
-	 *
-	 * @since   1.0
-	 */
-	public function getAliasFieldNameByView($view)
-	{
-		switch ($view)
-		{
-			case 'type':
-			case 'typeform':
-				return 'alias';
-			break;
-		}
-	}
-
-	/**
-	 * Method to check if a user has permissions to view ucm items of given type
-	 *
-	 * @param   int  $typeId  Type Id
-	 *
-	 * @return  boolean
-	 */
-	public function canView($typeId)
-	{
-		$user = JFactory::getUser();
-
-		return $user->authorise('core.type.viewitem', 'com_tjucm.type.' . $typeId);
 	}
 }

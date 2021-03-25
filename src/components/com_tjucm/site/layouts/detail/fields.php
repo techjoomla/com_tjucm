@@ -1,10 +1,10 @@
 <?php
 /**
- * @package	TJ-UCM
- * 
- * @author	 TechJoomla <extensions@techjoomla.com>
+ * @package    TJ-UCM
+ *
+ * @author     TechJoomla <extensions@techjoomla.com>
  * @copyright  Copyright (c) 2009-2019 TechJoomla. All rights reserved.
- * @license	GNU General Public License version 2 or later; see LICENSE.txt
+ * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 // No direct access
@@ -20,8 +20,9 @@ $user = JFactory::getUser();
 
 // Layout for field types
 $fieldLayout = array();
-$fieldLayout['File'] = $fieldLayout['Image'] = "file";
+$fieldLayout['File'] = $fieldLayout['Image'] = $fieldLayout['Captureimage'] = "file";
 $fieldLayout['Checkbox'] = "checkbox";
+$fieldLayout['Color'] = "color";
 $fieldLayout['multi_select'] = $fieldLayout['single_select'] = $fieldLayout['Radio'] = $fieldLayout['List'] = $fieldLayout['tjlist'] = "list";
 $fieldLayout['Itemcategory'] = "itemcategory";
 $fieldLayout['Video'] = $fieldLayout['Audio'] = $fieldLayout['Url'] = "link";
@@ -30,6 +31,7 @@ $fieldLayout['Cluster'] = "cluster";
 $fieldLayout['Related'] = $fieldLayout['SQL'] = "sql";
 $fieldLayout['Subform'] = "subform";
 $fieldLayout['Ownership'] = "ownership";
+$fieldLayout['Editor'] = "editor";
 
 // Load the tj-fields helper
 JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_SITE);
@@ -61,6 +63,7 @@ foreach ($fieldSets as $fieldset)
 	$count++;
 	$fieldCount = 0;
 	?>
+	<div class="tjucm-wrapper">
 	<div class="row">
 		<?php
 		foreach ($formObject->getFieldset($fieldset->name) as $field)
@@ -96,7 +99,6 @@ foreach ($fieldSets as $fieldset)
 						<div class="col-xs-4"><?php echo $field->label; ?>:</div>
 						<div class="col-xs-8">
 							<?php
-							$count = 0;
 							$ucmSubFormXmlFieldSets = array();
 
 							// Call to extra fields
@@ -176,7 +178,20 @@ foreach ($fieldSets as $fieldset)
 
 							$layout = new JLayoutFile($layoutToUse, JPATH_ROOT . '/components/com_tjfields/layouts/fields');
 							$output = $layout->render(array('fieldXml' => $xmlField, 'field' => $field));
-							echo $output;
+
+							// To align text, textarea, textareacounter, editor and tjlist fields properly
+							if ($field->type == 'Textarea'|| $field->type == 'Textareacounter'|| $field->type == 'Text' || $field->type == 'Editor' || $field->type == 'tjlist')
+							{
+								?>
+								<div class="tj-wordwrap">
+									<?php echo $output; ?>
+								</div>
+								<?php
+							}
+							else
+							{
+								echo $output;
+							}
 							?>
 						</div>
 					</div>
@@ -186,5 +201,6 @@ foreach ($fieldSets as $fieldset)
 		}
 	?>
 	</div>
+</div>
 	<?php
 }

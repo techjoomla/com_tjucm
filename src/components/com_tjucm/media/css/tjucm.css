@@ -1,0 +1,33 @@
+/* CSS for frontend*/
+#item-form .radio input{
+margin-left:5px !important;
+}
+
+#item-form .chzn-container{
+width:200px !important;
+}
+
+#item-form .field-calendar input{
+    display: inline !important;
+}
+ #item-form textarea{
+    height: inherit !important;
+}
+
+#item-form .minicolors-theme-bootstrap .hex {
+    width: 100px !important;
+    height: auto;
+}
+
+.tjucm-wrapper .tj-wordwrap{
+word-break: break-word;
+}
+
+#item-form #tjucm_loader{
+    height:auto;
+    position:absolute;
+    top:45%;
+    left:45%;
+    opacity: 0.5;
+    display:none;
+}
