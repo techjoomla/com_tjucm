@@ -1,0 +1,14 @@
+/screenshots
+/test-output
+/target
+*.class
+/.project
+/.settings
+hs_err_pid9856*
+*.log
+/bin
+/pipeline
+*.zip
+
+
+
