@@ -1,19 +1,26 @@
 package com.tekdi.nfta.test;
 
 import static com.tekdi.nfta.test.NFTADriver.ObjectRepository;
-import static io.restassured.RestAssured.*;
-import static org.hamcrest.Matchers.*;
+import static com.tekdi.nfta.test.NFTADriver.stepcount;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.FileHandler;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -22,8 +29,12 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.google.common.base.Function;
+import com.google.common.base.Stopwatch;
 import com.paulhammant.ngwebdriver.ByAngular;
 import com.tekdi.nfta.config.Constant;
 
@@ -32,8 +43,26 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 public class Actions {
 
 	WebDriver driver;
-
+	private FileHandler fh;
 	Logger logger = Logger.getLogger(Actions.class.getName());
+
+	Actions() {
+		try {
+			SimpleDateFormat format = new SimpleDateFormat("dd-MM-YY_HHmmss");
+			fh = new FileHandler(
+					System.getProperty(Constant.PROJECT_ROOT_DIRECTORY.getValue()) + Constant.LOGS_PATH.getValue()
+							+ "actionlogs_" + format.format(Calendar.getInstance().getTime()) + ".log");
+			logger.addHandler(fh);
+			SimpleFormatter formatter = new SimpleFormatter();
+			fh.setFormatter(formatter);
+			logger.setUseParentHandlers(false);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * openBrowser will instantiate a new instance of a specified browser
@@ -322,6 +351,203 @@ public class Actions {
 		return Constant.KEYWORD_PASS.getValue();
 
 	}
+	
+	public String verifyPopupMessageByXpath(String locator, String data) {
+		Stopwatch timer = Stopwatch.createStarted();
+		try {
+                        System.out.println("Method-verifyPopupMessageByXpath");
+			WebDriverWait wait = new WebDriverWait(driver, 10);
+			WebElement element = wait.until(
+					ExpectedConditions.visibilityOfElementLocated(By.xpath(ObjectRepository.getProperty(locator))));
+			logger.info(element.getText());
+			return Constant.KEYWORD_PASS.getValue() + " " + element.getText();
+
+		} catch (Exception e) {
+			logger.info("verifyPopupMessageByXpath action took: " + timer + " stepID: " + stepcount++);
+			return Constant.KEYWORD_FAIL.getValue() + " (Cause of Failure >> " + e.getMessage() + " )";
+		}
+
+	}
+	
+	public String clickOnRadioWithLabel(String locator, String data) {
+		Stopwatch timer = Stopwatch.createStarted();
+		try {
+                        System.out.println("Method-clickOnRadioWithLabel");
+			if (data.equalsIgnoreCase("Yes")) {
+				WebDriverWait wait = new WebDriverWait(driver, 30);
+				wait.until(ExpectedConditions.elementToBeClickable(
+						By.xpath(ObjectRepository.getProperty(locator) + "//label[contains(text(),'Yes')]"))).click();
+				driver.findElement(By.xpath(ObjectRepository.getProperty(locator + "//label[contains(text(),'Yes')]")))
+						.click();
+				System.out.println(locator);
+			} else if (data.equalsIgnoreCase("No")) {
+				WebDriverWait wait = new WebDriverWait(driver, 30);
+				wait.until(ExpectedConditions.elementToBeClickable(
+						By.xpath(ObjectRepository.getProperty(locator) + "//label[contains(text(),'No')]"))).click();
+				driver.findElement(By.xpath(ObjectRepository.getProperty(locator + "//label[contains(text(),'No')]")))
+						.click();
+			} else if (data.equalsIgnoreCase("Private")) {
+				WebDriverWait wait = new WebDriverWait(driver, 30);
+				wait.until(ExpectedConditions.elementToBeClickable(
+						By.xpath(ObjectRepository.getProperty(locator) + "//label[contains(text(),'Private')]")))
+						.click();
+				driver.findElement(
+						By.xpath(ObjectRepository.getProperty(locator + "//label[contains(text(),'Private')]")))
+						.click();
+			} else if (data.equalsIgnoreCase("Create Online Event")) {
+				WebDriverWait wait = new WebDriverWait(driver, 30);
+				wait.until(ExpectedConditions.elementToBeClickable(By.xpath(
+						ObjectRepository.getProperty(locator) + "//label[contains(text(),'Create Online Event')]")))
+						.click();
+				driver.findElement(By.xpath(
+						ObjectRepository.getProperty(locator + "//label[contains(text(),'Create Online Event')]")))
+						.click();
+			} else if (data.equalsIgnoreCase("Choose from existing")) {
+				WebDriverWait wait = new WebDriverWait(driver, 30);
+				wait.until(ExpectedConditions.elementToBeClickable(By.xpath(
+						ObjectRepository.getProperty(locator) + "//label[contains(text(),'Choose from existing')]")))
+						.click();
+				driver.findElement(By.xpath(
+						ObjectRepository.getProperty(locator + "//label[contains(text(),'Choose from existing')]")))
+						.click();
+			}
+
+		} catch (Exception e) {
+			return Constant.KEYWORD_FAIL.getValue() + " (Cause of Failure >> " + e.getMessage() + " )";
+		}
+		logger.info("clickOnRadioWithLabel action took: " + timer + " stepID: " + stepcount++);
+		return Constant.KEYWORD_PASS.getValue();
+
+	}
+	
+	public String clickOnRadioWithValue(String locator, String data) {
+		Stopwatch timer = Stopwatch.createStarted();
+		try {
+                        System.out.println("Method-clickOnRadioWithValue");
+			if (data.equalsIgnoreCase("Yes")) {
+				WebDriverWait wait = new WebDriverWait(driver, 30);
+				wait.until(ExpectedConditions
+						.elementToBeClickable(By.xpath(ObjectRepository.getProperty(locator) + "[@value='1']")))
+						.click();
+				driver.findElement(By.xpath(ObjectRepository.getProperty(locator + "//input[@value='1']"))).click();
+				System.out.println(locator);
+			} else if (data.equalsIgnoreCase("No")) {
+				WebDriverWait wait = new WebDriverWait(driver, 30);
+				wait.until(ExpectedConditions
+						.elementToBeClickable(By.xpath(ObjectRepository.getProperty(locator) + "//input[@value='0']")))
+						.click();
+				driver.findElement(By.xpath(ObjectRepository.getProperty(locator + "//input[@value='0']"))).click();
+			}
+
+		} catch (Exception e) {
+			return Constant.KEYWORD_FAIL.getValue() + " (Cause of Failure >> " + e.getMessage() + " )";
+		}
+		logger.info("clickOnRadioWithValue action took: " + timer + " stepID: " + stepcount++);
+		return Constant.KEYWORD_PASS.getValue();
+
+	}
+	
+	public String elementToBeClickableDropdown(String locator, String data) {
+		Stopwatch timer = Stopwatch.createStarted();
+		try {
+                        System.out.println("Method-elementToBeClickableDropdown");
+			WebDriverWait wait = new WebDriverWait(driver, 10);
+			wait.until(ExpectedConditions.elementToBeClickable(By.xpath(ObjectRepository.getProperty(locator))))
+					.click();
+			driver.findElement(By.xpath(ObjectRepository.getProperty(locator))).click();
+			Thread.sleep(1000);
+			List<WebElement> options = driver
+					.findElements(By.xpath(ObjectRepository.getProperty(locator) + "/div/ul/li"));
+			for (WebElement option : options) {
+				if (option.getText().equals(data)) {
+					option.click();
+					break;
+				}
+			}
+		} catch (Exception e) {
+			return Constant.KEYWORD_FAIL.getValue() + e.getMessage();
+
+		}
+		logger.info("elementToBeclickableDropdown action took: " + timer + " stepID: " + stepcount++);
+		return Constant.KEYWORD_PASS.getValue();
+	}
+
+	
+	public String waitForPageLoad() {
+		Stopwatch timer = Stopwatch.createStarted();
+		try {
+                        System.out.println("Method-waitForPageLoad");
+			System.out.println("entered");
+			Wait<WebDriver> wait = new WebDriverWait(driver, 30);
+			wait.until(new Function<WebDriver, Boolean>() {
+				public Boolean apply(WebDriver driver) {
+					System.out.println("Current Window State : " + String
+							.valueOf(((JavascriptExecutor) driver).executeScript("return document.readyState")));
+					return String.valueOf(((JavascriptExecutor) driver).executeScript("return document.readyState"))
+							.equals("complete");
+				}
+			});
+		} catch (Exception e) {
+			return Constant.KEYWORD_FAIL.getValue() + " (Cause of Failure >> " + e.getMessage() + " )";
+		}
+		logger.info("waitForPageLoad action took: " + timer + " stepID: " + stepcount++);
+		return Constant.KEYWORD_PASS.getValue();
+	}
+
+	
+	/**
+	 * selectClassDropdownByXpath using locator as XPath
+	 * 
+	 * @param locator
+	 * @param data
+	 * @return
+	 */
+
+	public String selectClassDropdownByXpath(String locator, String data) {
+		Stopwatch timer = Stopwatch.createStarted();
+		try {
+                        System.out.println("Method-selectClassDropdownByXpath");
+			Thread.sleep(2000);
+			Select s = new Select(driver.findElement(By.xpath(ObjectRepository.getProperty(locator))));
+			s.selectByVisibleText(data);
+
+		} catch (Exception e) {
+			return Constant.KEYWORD_FAIL.getValue() + e.getMessage();
+		}
+		logger.info("selectClassDropdownByXpath action took: " + timer + " stepID: " + stepcount++);
+		return Constant.KEYWORD_PASS.getValue();
+	}
+	
+	public String clickOnLinkByLinkTextByLocator(String locator, String data) {
+		Stopwatch timer = Stopwatch.createStarted();
+		try {
+                        System.out.println("Method-clickOnLinkByLinkTextByLocator");
+			WebDriverWait wait = new WebDriverWait(driver, 30);
+			wait.until(ExpectedConditions
+					.visibilityOfAllElementsLocatedBy(By.linkText(ObjectRepository.getProperty(locator))));
+			driver.findElement(By.linkText(ObjectRepository.getProperty(locator))).click();
+		} catch (Exception e) {
+			return Constant.KEYWORD_FAIL.getValue() + e.getMessage();
+		}
+		logger.info("clickOnLinkByLinkTextByLocator action took: " + timer + " stepID: " + stepcount++);
+		return Constant.KEYWORD_PASS.getValue();
+
+	}
+	
+	public String clickOnLinkByLinkTextByData(String locator, String data) {
+		Stopwatch timer = Stopwatch.createStarted();
+		try {
+                        System.out.println("Method-clickOnLinkByLinkTextByData");
+			WebDriverWait wait = new WebDriverWait(driver, 30);
+			wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.linkText(data)));
+			driver.findElement(By.linkText(data)).click();
+		} catch (Exception e) {
+			return Constant.KEYWORD_FAIL.getValue() + e.getMessage();
+		}
+		logger.info("clickOnLinkByLinkTextByData action took: " + timer + " stepID: " + stepcount++);
+		return Constant.KEYWORD_PASS.getValue();
+	}
+
 
 	public String fileupload(String locator, String filePath) {
 		try {

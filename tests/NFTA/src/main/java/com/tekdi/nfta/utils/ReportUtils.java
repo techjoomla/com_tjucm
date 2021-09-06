@@ -21,7 +21,7 @@ public class ReportUtils {
 	public static void createReport() {
 
 		Date d = new Date();
-		result_FolderName = "Reports" + "_" + java.time.LocalDate.now();
+		result_FolderName = "Reports";
 		new File(result_FolderName).mkdirs();
 
 		FileInputStream fs;
@@ -127,10 +127,6 @@ public class ReportUtils {
 									} else if ((data.startsWith("Fail") || data.startsWith("FAIL")) && result_col) {
 										out_test_steps.write(
 												"<td align=center bgcolor=red><FONT COLOR=#000000 FACE= Arial  SIZE=1>");
-										result = "FAIL";
-									} else if ((data.startsWith("Skip") || data.startsWith("SKIP")) && result_col) {
-										out_test_steps.write(
-												"<td align=center bgcolor=yellow><FONT COLOR=#000000 FACE= Arial  SIZE=1>");
 										result = "FAIL";
 									} else
 										out_test_steps.write(
