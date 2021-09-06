@@ -21,6 +21,7 @@ public enum Constant {
 	PROJECT_ROOT_DIRECTORY("user.dir"), 
 	TEST_RESOURCES_PATH("/nftaresources/testresources/"),
 	NFTA_RESOURCES_PATH("/nftaresources/"), 
+	LOGS_PATH("/target/"), 
 	TEST_CASE_RESULT("Result"),
 	TEST_DATA_EXCEL("TestData.xlsx"),
 	OBJECT_REPOSITORY_DATA("objectrepository.properties"),

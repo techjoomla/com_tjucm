@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.logging.Logger;
-
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -123,11 +122,11 @@ public class ExcelUtils {
 		}
 		row = worksheet.getRow(rownum - 1);
 		cell = row.getCell(colNum);
-		
-		if(cell==null) {
+
+		if (cell == null) {
 			return "";
 		}
-		
+
 		switch (cell.getCellTypeEnum()) {
 		case STRING:
 			return cell.getStringCellValue();
@@ -144,64 +143,31 @@ public class ExcelUtils {
 
 	}
 
-	public boolean setCellData(String sheetname, String colName, int rowNum, String data) {
-
-		try {
-			fis = new FileInputStream(path);
-		} catch (FileNotFoundException e) {
-			logger.severe(e.getMessage());
-			return false;
-		}
-		try {
-			workbook = new XSSFWorkbook(fis);
-		} catch (IOException e) {
-			logger.severe(e.getMessage());
-			return false;
-		}
-		if (rowNum <= 0)
-			return false;
-		int index = workbook.getSheetIndex(sheetname);
-		int colNum = -1;
-		if (index == -1)
-			return false;
-		worksheet = workbook.getSheetAt(index);
-		row = worksheet.getRow(0);
-		for (int i = 0; i < row.getLastCellNum(); i++) {
-			if (row.getCell(i).getStringCellValue().trim().equals(colName))
-				colNum = i;
-		}
-		if (colNum == -1)
-			return false;
-		worksheet.autoSizeColumn(colNum);
-		row = worksheet.getRow(rowNum - 1);
-		if (row == null)
-			row = worksheet.createRow(rowNum - 1);
-		cell = row.getCell(colNum);
-		if (cell == null)
-			cell = row.createCell(colNum);
-		cell.setCellValue(data);
-		try {
-			fos = new FileOutputStream(path);
-		} catch (FileNotFoundException e) {
-			logger.severe(e.getMessage());
-			return false;
-		}
-		try {
-			workbook.write(fos);
-		} catch (IOException e) {
-			logger.severe(e.getMessage());
-			return false;
-		}
-		try {
-			fos.close();
-		} catch (IOException e) {
-			logger.severe(e.getMessage());
-			return false;
-		}
-
-		return true;
-
-	}
+	
+	 public boolean setCellData(String sheetname, String colName, int rowNum,
+	 String data) {
+	  
+	 try { fis = new FileInputStream(path); } catch (FileNotFoundException e) {
+	 logger.severe(e.getMessage()); return false; } try { workbook = new
+	 XSSFWorkbook(fis); } catch (IOException e) { logger.severe(e.getMessage());
+	 return false; } if (rowNum <= 0) return false; int index =
+	 workbook.getSheetIndex(sheetname); int colNum = -1; if (index == -1) return
+	 false; worksheet = workbook.getSheetAt(index); row = worksheet.getRow(0); for
+	 (int i = 0; i < row.getLastCellNum(); i++) { if
+	 (row.getCell(i).getStringCellValue().trim().equals(colName)) colNum = i; } if
+	 (colNum == -1) return false; worksheet.autoSizeColumn(colNum); row =
+	 worksheet.getRow(rowNum - 1); if (row == null) row =
+	 worksheet.createRow(rowNum - 1); cell = row.getCell(colNum); if (cell ==
+	 null) cell = row.createCell(colNum); cell.setCellValue(data); try { fos = new
+	 FileOutputStream(path); } catch (FileNotFoundException e) {
+	 logger.severe(e.getMessage()); return false; } try { workbook.write(fos); }
+	 catch (IOException e) { logger.severe(e.getMessage()); return false; } try {
+	 fos.close(); } catch (IOException e) { logger.severe(e.getMessage()); return
+	 false; }
+	 
+	 return true;
+	 
+	 }
 
 	public boolean isSheetExist(String sheetname) {
 		int index = workbook.getSheetIndex(sheetname);
@@ -227,53 +193,32 @@ public class ExcelUtils {
 		return row.getLastCellNum();
 	}
 
-	public boolean addColumn(String sheetName, String colName) {
+	
+	 public boolean addColumn(String sheetName, String colName) {
+	 
+	 try { fis = new FileInputStream(path); } catch (FileNotFoundException e) {
+	 logger.severe(e.getMessage()); return false; } try { workbook = new
+	 XSSFWorkbook(fis); } catch (IOException e) { logger.severe(e.getMessage());
+	 return false; } int index = workbook.getSheetIndex(sheetName); if (index ==
+	 -1) { logger.severe(sheetName + Constant.ERROR_FINDINGSHEET.getValue());
+	 return false; } worksheet = workbook.getSheetAt(index); row =
+	 worksheet.getRow(0); if (row == null) row = worksheet.createRow(0); if
+	 (row.getLastCellNum() == -1) cell = row.createCell(0); else cell =
+	 row.createCell(row.getLastCellNum()); cell.setCellValue(colName); try { fos =
+	 new FileOutputStream(path); } catch (FileNotFoundException e) {
+	 logger.severe(e.getMessage()); return false; } try { workbook.write(fos); }
+	 catch (IOException e) { logger.severe(e.getMessage()); return false; }
+	 try
 
-		try {
-			fis = new FileInputStream(path);
-		} catch (FileNotFoundException e) {
-			logger.severe(e.getMessage());
-			return false;
-		}
-		try {
-			workbook = new XSSFWorkbook(fis);
-		} catch (IOException e) {
-			logger.severe(e.getMessage());
-			return false;
-		}
-		int index = workbook.getSheetIndex(sheetName);
-		if (index == -1) {
-			logger.severe(sheetName + Constant.ERROR_FINDINGSHEET.getValue());
-			return false;
-		}
-		worksheet = workbook.getSheetAt(index);
-		row = worksheet.getRow(0);
-		if (row == null)
-			row = worksheet.createRow(0);
-		if (row.getLastCellNum() == -1)
-			cell = row.createCell(0);
-		else
-			cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(colName);
-		try {
-			fos = new FileOutputStream(path);
-		} catch (FileNotFoundException e) {
-			logger.severe(e.getMessage());
-			return false;
-		}
-		try {
-			workbook.write(fos);
-		} catch (IOException e) {
-			logger.severe(e.getMessage());
-			return false;
-		}
-		try {
-			fos.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		return true;
+	{
+		fos.close();
+	}catch(
+	IOException e)
+	{
+		e.printStackTrace();
+		return false;
 	}
+
+	return true;
 }
+	}
