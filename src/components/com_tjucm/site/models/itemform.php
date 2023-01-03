@@ -561,7 +561,7 @@ class TjucmModelItemForm extends JModelAdmin
 				$tableParentData = $this->getTable();
 				$tableParentData->load(array('id' => $data['parent_id']));
 
-				if (!property_exists($tableParentData->id) && (!$tableParentData->id))
+				if (!property_exists($tableParentData, 'id') && (!$tableParentData->id))
 				{
 					$this->setError(Text::_('COM_TJUCM_INVALID_PARENT_ID'));
 
