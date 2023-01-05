@@ -53,12 +53,7 @@ if ($this->form_extra)
 					?>
 					<div class="col-xs-12 col-md-6">
 						<div class="form-group">
-							<div class="col-sm-4 control-label">
-								<?php echo $field->label; ?>
-							</div>
-							<div class="col-sm-8">
-								<?php echo $field->input; ?>
-							</div>
+							<?php echo $field->renderField(); ?>
 							<?php
 							// TODO :- Check and remove
 							if ($field->type == 'File')

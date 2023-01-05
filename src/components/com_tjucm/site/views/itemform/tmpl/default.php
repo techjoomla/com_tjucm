@@ -31,6 +31,7 @@ HTMLHelper::script('media/com_tjucm/js/vendor/jquery/jquery.are-you-sure.js');
 HTMLHelper::script('media/com_tjucm/js/vendor/shim/ays-beforeunload-shim.js');
 
 HTMLHelper::script('administrator/components/com_tjfields/assets/js/tjfields.js');
+HTMLHelper::script('media/jui/js/cms-uncompressed.js');
 
 // Load admin language file
 $lang = JFactory::getLanguage();
