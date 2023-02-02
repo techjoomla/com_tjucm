@@ -10,6 +10,8 @@
 // No direct access
 defined('_JEXEC') or die;
 use \Joomla\CMS\Layout\LayoutHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
 
 JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/');
 JHtml::_('bootstrap.tooltip');
@@ -207,7 +209,7 @@ $sortFields = $this->getSortFields();
 							$category_url    = JRoute::_('index.php?option=com_categories&extension=' . $item->unique_identifier);
 							$field_group_url = JRoute::_('index.php?option=com_tjfields&view=groups&client=' . $item->unique_identifier);
 							$fields_url      = JRoute::_('index.php?option=com_tjfields&view=fields&client=' . $item->unique_identifier . '&extension=' . $item->unique_identifier);
-							$conditionsUrl   = JRoute::_('index.php?option=com_tjfields&view=conditions&client=' . $item->unique_identifier);
+							$conditionsUrl   = Route::_('index.php?option=com_tjfields&view=conditions&client=' . $item->unique_identifier);
 							$type_addnew_data_url   = JRoute::_('index.php?option=com_tjucm&view=item&layout=edit&client=' . $item->unique_identifier);
 							$type_data_url   = JRoute::_('index.php?option=com_tjucm&view=items&client=' . $item->unique_identifier);
 
@@ -277,7 +279,7 @@ $sortFields = $this->getSortFields();
 								<a href="<?php echo $category_url; ?>"><?php echo JText::_('COM_TJUCM_TYPES_CATEGORY_URL');?></a>
 								&nbsp;|&nbsp;<a href="<?php echo $field_group_url; ?>"><?php echo JText::_('COM_TJUCM_TYPES_FIELD_GROUP_URL');?></a>
 								&nbsp;|&nbsp;<a href="<?php echo $fields_url; ?>"><?php echo JText::_('COM_TJUCM_TYPES_FIELDS_URL');?></a>
-								&nbsp;|&nbsp;<a href="<?php echo $conditionsUrl; ?>"><?php echo JText::_('COM_TJUCM_TYPES_CONDITIONS_URL');?></a>
+								&nbsp;|&nbsp;<a href="<?php echo $conditionsUrl; ?>"><?php echo Text::_('COM_TJUCM_TYPES_CONDITIONS_URL');?></a>
 								<!-- &nbsp;|&nbsp;<a href="<?php echo $type_addnew_data_url; ?>"><?php echo JText::_('COM_TJUCM_TYPES_ADD_NEW_DATA_URL');?></a>
 								&nbsp;|&nbsp;<a href="<?php echo $type_data_url; ?>"><?php echo JText::_('COM_TJUCM_TYPES_DATA_URL');?></a> -->
 							</td>
