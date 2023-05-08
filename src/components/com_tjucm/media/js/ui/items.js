@@ -10,7 +10,7 @@ jQuery(window).load(function()
 		if (response.data)
 		{
 			jQuery.each(response.data, function(key, value) {
-			 jQuery('#target_ucm').append(jQuery('<option></option>').attr('value',value.value).text(value.text)); 
+			 jQuery('#target_ucm').append(jQuery('<option></option>').attr('value',value.value).text(value.text));
 			 jQuery('#target_ucm').trigger('liszt:updated');
 			});
 		}
@@ -19,7 +19,7 @@ jQuery(window).load(function()
 			jQuery('.ucmListField').addClass('hide');
 		}
 	};
-	
+
 	// Code to check ucm type compatibility to copy item
 	com_tjucm.Services.Items.chekCompatibility(currentUcmType, afterCheckCompatibilityOfUcmType);
 
@@ -28,7 +28,7 @@ jQuery(window).load(function()
 		if (response.data != null)
 		{
 			jQuery.each(response.data, function(key, value) {
-			 jQuery('#cluster_list').append(jQuery('<option></option>').attr('value',value.value).text(value.text)); 
+			 jQuery('#cluster_list').append(jQuery('<option></option>').attr('value',value.value).text(value.text));
 			 jQuery('#cluster_list').trigger('liszt:updated');
 			});
 		}
@@ -37,7 +37,7 @@ jQuery(window).load(function()
 			jQuery('.clusterListField').addClass('hide');
 		}
 	};
-	
+
 	// To get the cluster fields options
 	com_tjucm.Services.Items.getClusterFieldOptions(currentUcmType, afterGetClusterField);
 });
@@ -51,7 +51,7 @@ var tjUcmItems = {
 			jQuery("html, body").animate({scrollTop: jQuery("#item-form #tjucm_loader").position().top}, "slow");
 
 			response = JSON.parse(response);
-			
+
 			sessionStorage.setItem('message', response.message);
 			if(response.data !== null)
 			{
@@ -63,7 +63,16 @@ var tjUcmItems = {
 			}
 		}
 
-		var copyItemData =  jQuery('#adminForm').serialize();
+		var copyItemData =  jQuery('#adminForm').serializeArray();
+		var clusterId    = jQuery('.cluster_list').val();
+
+		// Update cluster Ids
+		copyItemData.push({
+			name: "cluster_list",
+			value: clusterId
+		});
+
+		copyItemData = jQuery.param(copyItemData);
 
 		// Code to copy item to ucm type
 		com_tjucm.Services.Items.copyItem(copyItemData, afterCopyItem);
