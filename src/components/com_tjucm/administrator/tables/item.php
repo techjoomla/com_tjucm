@@ -10,6 +10,12 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\Table\Observer\ContentHistory;
+use Joomla\CMS\Table\Observer\AbstractObserver;
+use Joomla\CMS\Table\Table;
+use Joomla\Data\DataObject;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
 
 use Joomla\Utilities\ArrayHelper;
 
@@ -18,12 +24,12 @@ use Joomla\Utilities\ArrayHelper;
  *
  * @since  1.6
  */
-class TjucmTableitem extends JTable
+class TjucmTableitem extends Table
 {
 	/**
 	 * Constructor
 	 *
-	 * @param   JDatabase  &$db  A database connector object
+	 * @param   DataObjectbase  &$db  A database connector object
 	 */
 	public function __construct(&$db)
 	{
@@ -39,33 +45,33 @@ class TjucmTableitem extends JTable
 	 *
 	 * @return  null|string  null is operation was satisfactory, otherwise returns an error
 	 *
-	 * @see     JTable:bind
+	 * @see     Table:bind
 	 * @since   1.5
 	 */
 	public function bind($data, $ignore = '')
 	{
 		if (empty($data['id']))
 		{
-			$data['created_by'] = JFactory::getUser()->id;
-			$data['created_date'] = JFactory::getDate()->toSql();
+			$data['created_by'] = Factory::getUser()->id;
+			$data['created_date'] = Factory::getDate()->toSql();
 		}
 		else
 		{
-			$data['modified_by'] = JFactory::getUser()->id;
-			$data['modified_date'] = JFactory::getDate()->toSql();
+			$data['modified_by'] = Factory::getUser()->id;
+			$data['modified_date'] = Factory::getDate()->toSql();
 		}
 
 		return parent::bind($data, $ignore);
 	}
 
 	/**
-	 * This function convert an array of JAccessRule objects into an rules array.
+	 * This function convert an array of Rule objects into an rules array.
 	 *
-	 * @param   array  $jaccessrules  An array of JAccessRule objects.
+	 * @param   array  $jaccessrules  An array of Rule objects.
 	 *
 	 * @return  array
 	 */
-	private function JAccessRulestoArray($jaccessrules)
+	private function RulestoArray($jaccessrules)
 	{
 		$rules = array();
 
@@ -139,7 +145,7 @@ class TjucmTableitem extends JTable
 			// Nothing to set publishing state on, return false.
 			else
 			{
-				throw new Exception(500, JText::_('JLIB_DATABASE_ERROR_NO_ROWS_SELECTED'));
+				throw new Exception(500, Text::_('JLIB_DATABASE_ERROR_NO_ROWS_SELECTED'));
 			}
 		}
 
@@ -189,7 +195,7 @@ class TjucmTableitem extends JTable
 	 *
 	 * @return string The asset name
 	 *
-	 * @see JTable::_getAssetName
+	 * @see Table::_getAssetName
 	 */
 	protected function _getAssetName()
 	{
@@ -201,17 +207,17 @@ class TjucmTableitem extends JTable
 	/**
 	 * Returns the parent asset's id. If you have a tree structure, retrieve the parent's id using the external key field
 	 *
-	 * @param   JTable   $table  Table name
+	 * @param   Table   $table  Table name
 	 * @param   integer  $id     Id
 	 *
-	 * @see JTable::_getAssetParentId
+	 * @see Table::_getAssetParentId
 	 *
 	 * @return mixed The id on success, false on failure.
 	 */
-	protected function _getAssetParentId(JTable $table = null, $id = null)
+	protected function _getAssetParentId(Table $table = null, $id = null)
 	{
 		// We will retrieve the parent-asset from the Asset-table
-		$assetParent = JTable::getInstance('Asset');
+		$assetParent = Table::getInstance('Asset');
 
 		// Default: if no asset-parent can be found we take the global asset
 		$assetParentId = $assetParent->getRootId();

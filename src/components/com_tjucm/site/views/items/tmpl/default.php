@@ -9,6 +9,15 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Session\Session;
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\Layout\FileLayout;
 
 JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
 JHtml::_('bootstrap.tooltip');
@@ -19,8 +28,8 @@ JHtml::_('behavior.modal');
 JHtml::_('formbehavior.chosen', 'select');
 JHtml::_('jquery.token');
 
-$importItemsPopUpUrl = JUri::root() . '/index.php?option=com_tjucm&view=items&layout=importitems&tmpl=component&client=' . $this->client;
-$copyItemPopupUrl = JUri::root() . 'index.php?option=com_tjucm&view=items&layout=copyitems&tmpl=component&client=' . $this->client;
+$importItemsPopUpUrl = Uri::root() . '/index.php?option=com_tjucm&view=items&layout=importitems&tmpl=component&client=' . $this->client;
+$copyItemPopupUrl = Uri::root() . 'index.php?option=com_tjucm&view=items&layout=copyitems&tmpl=component&client=' . $this->client;
 JFactory::getDocument()->addScriptDeclaration('
 	jQuery(document).ready(function(){
 		jQuery("#adminForm #import-items").click(function() {
@@ -29,13 +38,13 @@ JFactory::getDocument()->addScriptDeclaration('
 	});
 ');
 
-$user = JFactory::getUser();
+$user = Factory::getUser();
 $userId = $user->get('id');
 $tjUcmFrontendHelper = new TjucmHelpersTjucm;
 $listOrder  = $this->escape($this->state->get('list.ordering'));
 $listDirn   = $this->escape($this->state->get('list.direction'));
 $appendUrl = '';
-$csrf = "&" . JSession::getFormToken() . '=1';
+$csrf = "&" . Session::getFormToken() . '=1';
 
 if (!empty($this->created_by))
 {
@@ -93,7 +102,7 @@ $statusColumnWidth = 0;
 </script>
 
 <div class="tjucm-wrapper">
-<form action="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>" enctype="multipart/form-data" method="post" name="adminForm" id="adminForm" class="form-validate">
+<form action="<?php echo Route::_($link . '&Itemid=' . $itemId); ?>" enctype="multipart/form-data" method="post" name="adminForm" id="adminForm" class="form-validate">
 <div id="message" class=""></div>
 <?php
 	if (isset($this->items))
@@ -101,7 +110,7 @@ $statusColumnWidth = 0;
 	?>
 		<div class="page-header">
 			<h1 class="page-title">
-			<?php echo strtoupper($this->title) . " " . JText::_("COM_TJUCM_FORM_LIST"); ?>
+			<?php echo strtoupper($this->title) . " " . Text::_("COM_TJUCM_FORM_LIST"); ?>
 			</h1>
 		</div> <?php
 	}
@@ -113,15 +122,15 @@ $statusColumnWidth = 0;
 		if ($this->allowedToAdd)
 		{
 			?>
-			<a href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false); ?>" class="btn btn-success btn-small">
-				<i class="icon-plus"></i> <?php echo JText::_('COM_TJUCM_ADD_ITEM'); ?>
+			<a href="<?php echo Route::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false); ?>" class="btn btn-success btn-small">
+				<i class="icon-plus"></i> <?php echo Text::_('COM_TJUCM_ADD_ITEM'); ?>
 			</a>
 			<?php
 			if ($this->canImport)
 			{
 				?>
 				<a href="#" id="import-items" class="btn btn-default btn-small">
-					<i class="fa fa-upload"></i> <?php echo JText::_('COM_TJUCM_IMPORT_ITEM'); ?>
+					<i class="fa fa-upload"></i> <?php echo Text::_('COM_TJUCM_IMPORT_ITEM'); ?>
 				</a>
 				<?php
 			}
@@ -129,24 +138,24 @@ $statusColumnWidth = 0;
 			{
 				if ($this->canCopyToSameUcmType)
 				{?>
-					<a onclick="if(document.adminForm.boxchecked.value==0){alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{jQuery('#item-form #tjucm_loader').show(); copySameUcmTypeItem()}" class="btn btn-default btn-small">
-					<i class="fa fa-clone"></i> <?php echo JText::_('COM_TJUCM_COPY_ITEM'); ?>
+					<a onclick="if(document.adminForm.boxchecked.value==0){alert(Joomla.Text._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{jQuery('#item-form #tjucm_loader').show(); copySameUcmTypeItem()}" class="btn btn-default btn-small">
+					<i class="fa fa-clone"></i> <?php echo Text::_('COM_TJUCM_COPY_ITEM'); ?>
 					</a><?php
 				}
 				else
 				{
 				?>
-				<a href="#" onclick="if(document.adminForm.boxchecked.value==0){alert(Joomla.JText._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{jQuery( '#collapseModal' ).modal('show'); return true;}" id="copy-items" class="btn btn-default btn-small">
-					<i class="fa fa-clone"></i> <?php echo JText::_('COM_TJUCM_COPY_ITEM'); ?>
+				<a href="#" onclick="if(document.adminForm.boxchecked.value==0){alert(Joomla.Text._('JLIB_HTML_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST'));}else{jQuery( '#collapseModal' ).modal('show'); return true;}" id="copy-items" class="btn btn-default btn-small">
+					<i class="fa fa-clone"></i> <?php echo Text::_('COM_TJUCM_COPY_ITEM'); ?>
 				</a>
 				<?php
 				}
 				?>
-				<?php echo JHtml::_(
+				<?php echo HTMLHelper::_(
 					'bootstrap.renderModal',
 					'collapseModal',
 					array(
-						'title'  => JText::_('COM_TJUCM_COPY_ITEMS'),
+						'title'  => Text::_('COM_TJUCM_COPY_ITEMS'),
 					),
 					$this->loadTemplate('copyitems')
 				); ?>
@@ -171,7 +180,7 @@ $statusColumnWidth = 0;
 					<?php if ($this->canCopyItem) { ?>
 					<!-- TODO- copy and copy to other feature is not fully stable hence relate buttons are hidden-->
 					<th width="1%" class="">
-						<input type="checkbox" name="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
+						<input type="checkbox" name="checkall-toggle" value="" title="<?php echo Text::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 					</th>
 					<?php } ?>
 					<?php
@@ -179,13 +188,13 @@ $statusColumnWidth = 0;
 					{
 						?>
 							<th class="center" width="3%">
-							<?php echo JHtml::_('grid.sort', 'JPUBLISHED', 'a.state', $listDirn, $listOrder); ?>
+							<?php echo HTMLHelper::_('grid.sort', 'JPUBLISHED', 'a.state', $listDirn, $listOrder); ?>
 							</th>
 						<?php
 						}
 						?>
 						<th width="2%">
-							<?php echo JHtml::_('grid.sort', 'COM_TJUCM_ITEMS_ID', 'a.id', $listDirn, $listOrder); ?>
+							<?php echo HTMLHelper::_('grid.sort', 'COM_TJUCM_ITEMS_ID', 'a.id', $listDirn, $listOrder); ?>
 						</th>
 						<?php
 						if (!empty($this->ucmTypeParams->allow_draft_save) && $this->ucmTypeParams->allow_draft_save == 1)
@@ -193,7 +202,7 @@ $statusColumnWidth = 0;
 							$statusColumnWidth = 2;
 						?>
 							<th width="2%">
-								<?php echo JHtml::_('grid.sort', 'COM_TJUCM_DATA_STATUS', 'a.draft', $listDirn, $listOrder); ?>
+								<?php echo HTMLHelper::_('grid.sort', 'COM_TJUCM_DATA_STATUS', 'a.draft', $listDirn, $listOrder); ?>
 							</th>
 						<?php
 						}
@@ -206,8 +215,8 @@ $statusColumnWidth = 0;
 							}
 							else
 							{
-								JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
-								$tjFieldsFieldTable = JTable::getInstance('field', 'TjfieldsTable');
+								Table::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
+								$tjFieldsFieldTable = Table::getInstance('field', 'TjfieldsTable');
 								$tjFieldsFieldTable->load($fieldId);
 								$fieldsData[$fieldId] = $tjFieldsFieldTable;
 							}
@@ -216,7 +225,7 @@ $statusColumnWidth = 0;
 							{
 								?>
 								<th style="word-break: break-word;" width="<?php echo (85 - $statusColumnWidth) / count($this->listcolumn) . '%';?>">
-									<?php echo JHtml::_('grid.sort', htmlspecialchars($col_name->label, ENT_COMPAT, 'UTF-8'), $fieldId, $listDirn, $listOrder); ?>
+									<?php echo HTMLHelper::_('grid.sort', htmlspecialchars($col_name->label, ENT_COMPAT, 'UTF-8'), $fieldId, $listDirn, $listOrder); ?>
 								</th>
 								<?php
 							}
@@ -231,7 +240,7 @@ $statusColumnWidth = 0;
 						}
 						?>
 						<th class="center" width="10%">
-							<?php echo JText::_('COM_TJUCM_ITEMS_ACTIONS'); ?>
+							<?php echo Text::_('COM_TJUCM_ITEMS_ACTIONS'); ?>
 						</th>
 				</tr>
 			</thead>
@@ -250,7 +259,7 @@ $statusColumnWidth = 0;
 
 				$view = explode('.', $this->client);
 				JLoader::import('components.com_tjucm.models.itemform', JPATH_SITE);
-				$itemFormModel    = JModelLegacy::getInstance('ItemForm', 'TjucmModel');
+				$itemFormModel    = BaseDatabaseModel::getInstance('ItemForm', 'TjucmModel');
 				$formObject = $itemFormModel->getFormExtra(
 					array(
 						"clientComponent" => 'com_tjucm',
@@ -262,7 +271,7 @@ $statusColumnWidth = 0;
 				foreach ($this->items as $i => $item)
 				{
 					// Call the JLayout to render the fields in the details view
-					$layout = new JLayoutFile('list.list', JPATH_ROOT . '/components/com_tjucm/');
+					$layout = new FileLayout('list.list', JPATH_ROOT . '/components/com_tjucm/');
 					echo $layout->render(
 						array(
 							'itemsData' => $item,
@@ -282,14 +291,14 @@ $statusColumnWidth = 0;
 			else
 			{
 				?>
-				<div class="alert alert-warning"><?php echo JText::_('COM_TJUCM_NO_DATA_FOUND');?></div>
+				<div class="alert alert-warning"><?php echo Text::_('COM_TJUCM_NO_DATA_FOUND');?></div>
 			<?php
 			}
 		}
 		else
 		{
 		?>
-			<div class="alert alert-warning"><?php echo JText::_('COM_TJUCM_NO_DATA_FOUND');?></div>
+			<div class="alert alert-warning"><?php echo Text::_('COM_TJUCM_NO_DATA_FOUND');?></div>
 		<?php
 		}
 		?>
@@ -308,10 +317,10 @@ $statusColumnWidth = 0;
 	if ($this->allowedToAdd)
 	{
 		?>
-		<a href="<?php echo JRoute::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false); ?>"
+		<a href="<?php echo Route::_('index.php?option=com_tjucm&task=itemform.edit' . $appendUrl, false); ?>"
 		class="btn btn-success btn-small">
 			<i class="icon-plus"></i>
-			<?php echo JText::_('COM_TJUCM_ADD_ITEM'); ?>
+			<?php echo Text::_('COM_TJUCM_ADD_ITEM'); ?>
 		</a>
 		<?php
 	}
@@ -320,12 +329,12 @@ $statusColumnWidth = 0;
 	<input type="hidden" name="boxchecked" value="0"/>
 	<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>"/>
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>"/>
-	<?php echo JHtml::_('form.token'); ?>
+	<?php echo HTMLHelper::_('form.token'); ?>
 </form>
 </div>
 <div id="item-form">
 	<div id="tjucm_loader">
-		<img src='<?php echo JUri::root();?>media/com_tjucm/gif/loading.gif'>
+		<img src='<?php echo Uri::root();?>media/com_tjucm/gif/loading.gif'>
 	</div>
 </div>
 
@@ -336,7 +345,7 @@ jQuery(document).ready(function () {
 
 function deleteItem()
 {
-	if (!confirm("<?php echo JText::_('COM_TJUCM_DELETE_MESSAGE'); ?>"))
+	if (!confirm("<?php echo Text::_('COM_TJUCM_DELETE_MESSAGE'); ?>"))
 	{
 		return false;
 	}

@@ -9,9 +9,13 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Filter\OutputFilter;
+use Joomla\CMS\Language\Text;
 
 $fieldsets_counter = 0;
-$layout  = JFactory::getApplication()->input->get('layout');
+$layout  = Factory::getApplication()->input->get('layout');
 
 if ($this->form_extra)
 {
@@ -24,7 +28,7 @@ if ($this->form_extra)
 		{
 			if ($fieldsets_counter == 0)
 			{
-				echo JHtml::_('bootstrap.startTabSet', 'tjucm_myTab');
+				echo HTMLHelper::_('bootstrap.startTabSet', 'tjucm_myTab');
 			}
 
 			$fieldsets_counter++;
@@ -35,8 +39,8 @@ if ($this->form_extra)
 				{
 					if (!$field->hidden)
 					{
-						$tabName = JFilterOutput::stringURLUnicodeSlug(trim($fieldset->name));
-						echo JHtml::_("bootstrap.addTab", "tjucm_myTab", $tabName, $fieldset->name);
+						$tabName = OutputFilter::stringURLUnicodeSlug(trim($fieldset->name));
+						echo HTMLHelper::_("bootstrap.addTab", "tjucm_myTab", $tabName, $fieldset->name);
 						break;
 					}
 				}
@@ -99,7 +103,7 @@ if ($this->form_extra)
 				{
 					if (!$field->hidden)
 					{
-						echo JHtml::_("bootstrap.endTab");
+						echo HTMLHelper::_("bootstrap.endTab");
 						break;
 					}
 				}
@@ -109,14 +113,14 @@ if ($this->form_extra)
 
 	if (count($fieldSets) > 1)
 	{
-		echo JHtml::_('bootstrap.endTabSet');
+		echo HTMLHelper::_('bootstrap.endTabSet');
 	}
 }
 else
 {
 	?>
 	<div class="alert alert-info">
-		<?php echo JText::_('COM_TJLMS_NO_EXTRA_FIELDS_FOUND');?>
+		<?php echo Text::_('COM_TJLMS_NO_EXTRA_FIELDS_FOUND');?>
 	</div>
 	<?php
 }

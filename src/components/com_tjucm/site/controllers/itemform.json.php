@@ -10,16 +10,18 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\MVC\Controller\FormController;
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\Session\Session;
+use Joomla\CMS\Response\JsonResponse;
+use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Factory;
 use Joomla\CMS\User\User;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\Session\Session;
 use Joomla\CMS\Router\Route;
 use Joomla\Registry\Registry;
-use Joomla\CMS\MVC\Model\BaseDatabaseModel;
-use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\Response\JsonResponse;
 use Joomla\CMS\Component\ComponentHelper;
 
 jimport('joomla.filesystem.file');
@@ -31,7 +33,7 @@ require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
  *
  * @since  1.6
  */
-class TjucmControllerItemForm extends JControllerForm
+class TjucmControllerItemForm extends FormController
 {
 	// Use imported Trait in model
 	use TjfieldsFilterField;
@@ -56,7 +58,7 @@ class TjucmControllerItemForm extends JControllerForm
 		if (!empty($this->client))
 		{
 			JLoader::import('components.tables.type', JPATH_ADMINISTRATOR);
-			$tjUcmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', Factory::getDbo()));
+			$tjUcmTypeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', Factory::getDbo()));
 			$tjUcmTypeTable->load(array('unique_identifier' => $this->client));
 
 			if (!empty($tjUcmTypeTable->id))
@@ -80,7 +82,7 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	public function save($key = null, $urlVar = null)
 	{
-		JSession::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
+		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
 		$app   = Factory::getApplication();
 		$post  = $app->input->post;
@@ -123,7 +125,7 @@ class TjucmControllerItemForm extends JControllerForm
 			$isNew = (empty($data['id'])) ? 1 : 0;
 
 			// Plugin trigger on before item save
-			JPluginHelper::importPlugin('actionlog');
+			PluginHelper::importPlugin('actionlog');
 			$dispatcher = JDispatcher::getInstance();
 			$dispatcher->trigger('tjUcmOnBeforeSaveItem', array($data, $isNew));
 
@@ -132,7 +134,7 @@ class TjucmControllerItemForm extends JControllerForm
 				$result['id'] = $model->getState($model->getName() . '.id');
 
 				// Plugin trigger on after item save
-				JPluginHelper::importPlugin('actionlog');
+				PluginHelper::importPlugin('actionlog');
 				$dispatcher = JDispatcher::getInstance();
 				$dispatcher->trigger('tjUcmOnafterSaveItem', array($data, $isNew));
 
@@ -149,7 +151,7 @@ class TjucmControllerItemForm extends JControllerForm
 		}
 		catch (Exception $e)
 		{
-			echo new JResponseJson($e);
+			echo new JsonResponse($e);
 			$app->close();
 		}
 	}
@@ -163,7 +165,7 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	public function saveFieldData()
 	{
-		JSession::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
+		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
 		$app       = Factory::getApplication();
 		$post      = $app->input->post;
@@ -181,7 +183,7 @@ class TjucmControllerItemForm extends JControllerForm
 		if (empty($fieldData))
 		{
 			$app->enqueueMessage(Text::_('COM_TJUCM_FORM_VALIDATATION_FAILED'), 'error');
-			echo new JResponseJson(null);
+			echo new JsonResponse(null);
 			$app->close();
 		}
 
@@ -198,7 +200,7 @@ class TjucmControllerItemForm extends JControllerForm
 				$errors = $model->getErrors();
 				$this->processErrors($errors);
 
-				echo new JResponseJson(null);
+				echo new JsonResponse(null);
 				$app->close();
 			}
 
@@ -212,7 +214,7 @@ class TjucmControllerItemForm extends JControllerForm
 			$fieldData['created_by'] = $table->created_by;
 
 			// Plugin trigger on before item date save
-			JPluginHelper::importPlugin('actionlog');
+			PluginHelper::importPlugin('actionlog');
 			$dispatcher = JDispatcher::getInstance();
 			$dispatcher->trigger('tjUcmOnBeforeSaveItemData', array($recordId, $client, $data));
 
@@ -220,16 +222,16 @@ class TjucmControllerItemForm extends JControllerForm
 			$response = $model->saveFieldsData($fieldData);
 
 			// Plugin trigger on after item data save
-			JPluginHelper::importPlugin('actionlog');
+			PluginHelper::importPlugin('actionlog');
 			$dispatcher = JDispatcher::getInstance();
 			$dispatcher->trigger('tjUcmOnAfterSaveItemData', array($recordId, $client, $data));
 
-			echo new JResponseJson($response);
+			echo new JsonResponse($response);
 			$app->close();
 		}
 		catch (Exception $e)
 		{
-			echo new JResponseJson($e);
+			echo new JsonResponse($e);
 			$app->close();
 		}
 	}
@@ -243,7 +245,7 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	public function saveFormData()
 	{
-		JSession::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
+		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
 		$app          = Factory::getApplication();
 		$post         = $app->input->post;
@@ -259,7 +261,7 @@ class TjucmControllerItemForm extends JControllerForm
 		if (empty($formData) || empty($client))
 		{
 			$app->enqueueMessage(Text::_('COM_TJUCM_FORM_VALIDATATION_FAILED'), 'error');
-			echo new JResponseJson(null);
+			echo new JsonResponse(null);
 			$app->close();
 		}
 
@@ -319,7 +321,7 @@ class TjucmControllerItemForm extends JControllerForm
 				$errors = $model->getErrors();
 				$this->processErrors($errors);
 
-				echo new JResponseJson(null);
+				echo new JsonResponse(null);
 				$app->close();
 			}
 
@@ -333,7 +335,7 @@ class TjucmControllerItemForm extends JControllerForm
 			$formData['created_by'] = $table->created_by;
 
 			// Plugin trigger on before item date save
-			JPluginHelper::importPlugin('actionlog');
+			PluginHelper::importPlugin('actionlog');
 			$dispatcher = JDispatcher::getInstance();
 			$dispatcher->trigger('tjUcmOnBeforeSaveItemData', array($recordId, $client, $data));
 
@@ -341,7 +343,7 @@ class TjucmControllerItemForm extends JControllerForm
 			$response = $model->saveFieldsData($formData);
 
 			// Plugin trigger on before item date save
-			JPluginHelper::importPlugin('actionlog');
+			PluginHelper::importPlugin('actionlog');
 			$dispatcher = JDispatcher::getInstance();
 			$dispatcher->trigger('tjUcmOnAfterSaveItemData', array($recordId, $client, $data));
 
@@ -381,12 +383,12 @@ class TjucmControllerItemForm extends JControllerForm
 				$msg = Text::_("COM_TJUCM_FORM_SAVE_FAILED_AUTHORIZATION_ERROR");
 			}
 
-			echo new JResponseJson($response, $msg);
+			echo new JsonResponse($response, $msg);
 			$app->close();
 		}
 		catch (Exception $e)
 		{
-			echo new JResponseJson($e);
+			echo new JsonResponse($e);
 			$app->close();
 		}
 	}
@@ -403,7 +405,7 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	public function saveItemFieldData($key = null, $urlVar = null)
 	{
-		JSession::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
+		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
 		$post = Factory::getApplication()->input->post;
 		$model = $this->getModel('itemform');
@@ -466,7 +468,7 @@ class TjucmControllerItemForm extends JControllerForm
 		}
 		catch (Exception $e)
 		{
-			echo new JResponseJson($e);
+			echo new JsonResponse($e);
 			$app->close();
 		}
 	}
@@ -516,7 +518,7 @@ class TjucmControllerItemForm extends JControllerForm
 	 */
 	public function getRelatedFieldOptions()
 	{
-		JSession::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
+		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
 		$app = Factory::getApplication();
 		$post = $app->input->post;
@@ -527,14 +529,14 @@ class TjucmControllerItemForm extends JControllerForm
 
 		if (empty($client) || empty($contentId))
 		{
-			echo new JResponseJson(null);
+			echo new JsonResponse(null);
 			$app->close();
 		}
 
 		$app->input->set('id', $contentId);
 		$updatedOptionsForRelatedField = $model->getUdatedRelatedFieldOptions($client, $contentId);
 
-		echo new JResponseJson($updatedOptionsForRelatedField);
+		echo new JsonResponse($updatedOptionsForRelatedField);
 		$app->close();
 	}
 
@@ -661,8 +663,8 @@ class TjucmControllerItemForm extends JControllerForm
 										$prefixTargetClient = str_replace(".", "_", $subFormClient);
 										$subFieldName = $prefixTargetClient . '_' . $fieldName[1];
 
-										JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/tables');
-										$fieldTable = JTable::getInstance('field', 'TjfieldsTable');
+										Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/tables');
+										$fieldTable = Table::getInstance('field', 'TjfieldsTable');
 
 										$fieldTable->load(array('name' => $key));
 
@@ -709,8 +711,8 @@ class TjucmControllerItemForm extends JControllerForm
 										}
 										elseif($fieldTable->type == 'file' || $fieldTable->type == 'image')
 										{
-											JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/tables');
-											$subDestionationFieldTable = JTable::getInstance('field', 'TjfieldsTable');
+											Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/tables');
+											$subDestionationFieldTable = Table::getInstance('field', 'TjfieldsTable');
 
 											$subDestionationFieldTable->load(array('name' => $subFieldName));
 
@@ -799,7 +801,7 @@ class TjucmControllerItemForm extends JControllerForm
 					}
 				}
 
-				echo new JResponseJson($response, $msg);
+				echo new JsonResponse($response, $msg);
 				$app->close();
 			}
 		}
@@ -833,7 +835,7 @@ class TjucmControllerItemForm extends JControllerForm
 
 		// Get object of TJ-Fields field model
 		JLoader::import('components.com_tjfields.models.field', JPATH_ADMINISTRATOR);
-		$tjFieldsModelField = JModelLegacy::getInstance('Field', 'TjfieldsModel');
+		$tjFieldsModelField = BaseDatabaseModel::getInstance('Field', 'TjfieldsModel');
 		$options = $tjFieldsModelField->getRelatedFieldOptions($fieldId);
 
 		$relatedFieldOptions = array();

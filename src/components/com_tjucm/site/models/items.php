@@ -9,19 +9,22 @@
  */
 
 defined('_JEXEC') or die;
+use Joomla\CMS\MVC\Model\ListModel;
+use Joomla\CMS\Factory;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\Table\Table;
+use Joomla\Data\DataObject;
 
 jimport('joomla.application.component.modellist');
 
 use Joomla\CMS\Component\ComponentHelper;
-use Joomla\CMS\MVC\Model\BaseDatabaseModel;
-use Joomla\CMS\Table\Table;
 
 /**
  * Methods supporting a list of Tjucm records.
  *
  * @since  1.6
  */
-class TjucmModelItems extends JModelList
+class TjucmModelItems extends ListModel
 {
 	/**
 	 * Constructor.
@@ -68,20 +71,20 @@ class TjucmModelItems extends JModelList
 	 */
 	protected function populateState($ordering = "a.id", $direction = "DESC")
 	{
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
-		$db = JFactory::getDbo();
+		$app  = Factory::getApplication();
+		$user = Factory::getUser();
+		$db = Factory::getDbo();
 
-		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
-		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$tjUcmModelType = BaseDatabaseModel::getInstance('Type', 'TjucmModel');
 
 		$typeId  = $app->input->get('id', 0, "INT");
 		$ucmType = $app->input->get('client', '', "STRING");
 
 		if (empty($typeId) || empty($ucmType))
 		{
-			JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
-			$typeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', $db));
+			Table::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
+			$typeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', $db));
 
 			if ($typeId && empty($ucmType))
 			{
@@ -111,7 +114,7 @@ class TjucmModelItems extends JModelList
 				if (!empty($ucmTypeAlias))
 				{
 					JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
-					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+					$ucmTypeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', Factory::getDbo()));
 					$ucmTypeTable->load(array('alias' => $ucmTypeAlias));
 					$ucmType = $ucmTypeTable->unique_identifier;
 					$typeId  = $ucmTypeTable->id;
@@ -125,7 +128,7 @@ class TjucmModelItems extends JModelList
 
 		// Set state for field filters
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
-		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+		$fieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
 		$fieldsModel->setState('filter.client', $ucmType);
 		$fieldsModel->setState('filter.filterable', 1);
 		$fields = $fieldsModel->getItems();
@@ -174,8 +177,8 @@ class TjucmModelItems extends JModelList
 
 		if (!empty($fromDate) || !empty($toDate))
 		{
-			$fromDate = empty($fromDate) ? JFactory::getDate('now -1 month')->toSql() : JFactory::getDate($fromDate)->toSql();
-			$toDate = empty($toDate) ? JFactory::getDate('now')->toSql() : JFactory::getDate($toDate)->toSql();
+			$fromDate = empty($fromDate) ? Factory::getDate('now -1 month')->toSql() : Factory::getDate($fromDate)->toSql();
+			$toDate = empty($toDate) ? Factory::getDate('now')->toSql() : Factory::getDate($toDate)->toSql();
 
 			// If from date is less than to date then swipe the dates
 			if ($fromDate > $toDate)
@@ -196,7 +199,7 @@ class TjucmModelItems extends JModelList
 	/**
 	 * Build an SQL query to load the list data.
 	 *
-	 * @return   JDatabaseQuery
+	 * @return   DataObjectbaseQuery
 	 *
 	 * @since    1.6
 	 */
@@ -266,7 +269,7 @@ class TjucmModelItems extends JModelList
 		if ($clusterExist)
 		{
 			JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
-			$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
+			$fieldTable = Table::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
 			$fieldTable->load(array('client' => $client, 'type' => 'cluster', 'state' => '1'));
 
 			if ($fieldTable->id)
@@ -386,7 +389,7 @@ class TjucmModelItems extends JModelList
 		if (!empty($contentIds) && !empty($client))
 		{
 			// Get fields which can have multiple values
-			$db = JFactory::getDbo();
+			$db = Factory::getDbo();
 			$query = $db->getQuery(true);
 			$query->select($db->qn('id'));
 			$query->from($db->qn('#__tjfields_fields'));
@@ -398,7 +401,7 @@ class TjucmModelItems extends JModelList
 			if (!empty($fieldsList))
 			{
 				// Get fields which can have multiple values
-				$db = JFactory::getDbo();
+				$db = Factory::getDbo();
 				$query = $db->getQuery(true);
 				$query->select($db->qn(array('content_id', 'field_id', 'value')));
 				$query->from($db->qn('#__tjfields_fields_value'));
@@ -451,7 +454,7 @@ class TjucmModelItems extends JModelList
 	 */
 	private function sortContent(&$query)
 	{
-		$db = JFactory::getDbo();
+		$db = Factory::getDbo();
 
 		// Add the list ordering clause.
 		$orderCol  = $this->state->get('list.ordering');
@@ -560,7 +563,7 @@ class TjucmModelItems extends JModelList
 
 		// For filterable fields
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
-		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+		$fieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
 		$fieldsModel->setState('filter.client', $client);
 		$fieldsModel->setState('filter.filterable', 1);
 		$fields = $fieldsModel->getItems();
@@ -614,7 +617,7 @@ class TjucmModelItems extends JModelList
 	{
 		// Load fields model
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
-		$fieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+		$fieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
 		$fieldsModel->setState('filter.showonlist', 1);
 		$fieldsModel->setState('filter.state', 1);
 		$fieldsModel->setState('filter.showonlist', 1);
@@ -660,7 +663,7 @@ class TjucmModelItems extends JModelList
 			return false;
 		}
 
-		$db = JFactory::getDbo();
+		$db = Factory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('*');
 		$query->from($db->qn('#__tjfields_fields_value', 'fv'));
@@ -683,7 +686,7 @@ class TjucmModelItems extends JModelList
 	{
 		if (!empty($client))
 		{
-			$db = JFactory::getDbo();
+			$db = Factory::getDbo();
 			$query = $db->getQuery(true);
 			$query->select("count(" . $db->qn('id') . ")");
 			$query->from($db->qn('#__tjfields_fields'));
@@ -736,7 +739,7 @@ class TjucmModelItems extends JModelList
 		}
 
 		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
-		$fieldTable = Table::getInstance('Field', 'TjfieldsTable', array('dbo', JFactory::getDbo()));
+		$fieldTable = Table::getInstance('Field', 'TjfieldsTable', array('dbo', Factory::getDbo()));
 		$fieldTable->load(array('client' => $client, 'type' => 'cluster', 'state' => '1'));
 
 		if (!$checkUcmCompatability && !$fieldTable->id)

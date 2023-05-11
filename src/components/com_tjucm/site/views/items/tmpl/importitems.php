@@ -10,11 +10,11 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Factory;
-use Joomla\CMS\Uri\Uri;
-use Joomla\CMS\Language\Text;
 use Joomla\CMS\Session\Session;
 
 HTMLHelper::_('bootstrap.tooltip');
@@ -44,7 +44,7 @@ Factory::getDocument()->addScriptDeclaration('
 				{
 					jQuery("#uploadForm #csv-file-upload").css("border-color", "red");
 					jQuery("#system-message-container").html();
-					Joomla.renderMessages({"error":[Joomla.JText._("COM_TJUCM_ITEMS_INVALID_CSV_FILE")]});
+					Joomla.renderMessages({"error":[Joomla.Text._("COM_TJUCM_ITEMS_INVALID_CSV_FILE")]});
 
 					return false;
 				}
@@ -55,7 +55,7 @@ Factory::getDocument()->addScriptDeclaration('
 	});
 ');
 ?>
-<form action="<?php echo JUri::root(); ?>index.php?option=com_tjucm&task=item.import&tmpl=component&client=<?php echo $this->client;?>" id="uploadForm" name="uploadForm" method="post" enctype="multipart/form-data">
+<form action="<?php echo Uri::root(); ?>index.php?option=com_tjucm&task=item.import&tmpl=component&client=<?php echo $this->client;?>" id="uploadForm" name="uploadForm" method="post" enctype="multipart/form-data">
 	<h2>
 		<?php echo Text::_("COM_TJUCM_IMPORT_ITEM");?>
 	</h2>

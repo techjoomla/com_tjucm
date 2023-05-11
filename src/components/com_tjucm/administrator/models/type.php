@@ -10,17 +10,24 @@
 
 // No direct access.
 defined('_JEXEC') or die;
-
-jimport('joomla.application.component.modeladmin');
-
+use Joomla\CMS\MVC\Model\AdminModel;
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\Form\Form;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\CMS\Filter\InputFilter;
+use Joomla\CMS\Filter\OutputFilter;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+
+
 
 /**
  * Tjucm model.
  *
  * @since  1.6
  */
-class TjucmModelType extends JModelAdmin
+class TjucmModelType extends AdminModel
 {
 	/**
 	 * @var      string    The prefix to use with controller messages.
@@ -63,13 +70,13 @@ class TjucmModelType extends JModelAdmin
 	 * @param   string  $prefix  A prefix for the table class name. Optional.
 	 * @param   array   $config  Configuration array for model. Optional.
 	 *
-	 * @return    JTable    A database object
+	 * @return    Table    A database object
 	 *
 	 * @since    1.6
 	 */
 	public function getTable($type = 'Type', $prefix = 'TjucmTable', $config = array())
 	{
-		return JTable::getInstance($type, $prefix, $config);
+		return Table::getInstance($type, $prefix, $config);
 	}
 
 	/**
@@ -78,14 +85,14 @@ class TjucmModelType extends JModelAdmin
 	 * @param   array    $data      An optional array of data for the form to interogate.
 	 * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not.
 	 *
-	 * @return  JForm  A JForm object on success, false on failure
+	 * @return  Form  A Form object on success, false on failure
 	 *
 	 * @since    1.6
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
 		// Initialise variables.
-		$app = JFactory::getApplication();
+		$app = Factory::getApplication();
 
 		// Get the form.
 		$form = $this->loadForm(
@@ -113,7 +120,7 @@ class TjucmModelType extends JModelAdmin
 	protected function loadFormData()
 	{
 		// Check the session for previously entered form data.
-		$data = JFactory::getApplication()->getUserState('com_tjucm.edit.type.data', array());
+		$data = Factory::getApplication()->getUserState('com_tjucm.edit.type.data', array());
 
 		if (empty($data))
 		{
@@ -164,19 +171,19 @@ class TjucmModelType extends JModelAdmin
 	 */
 	public function duplicate(&$pks)
 	{
-		$user = JFactory::getUser();
+		$user = Factory::getUser();
 
 		// Access checks.
 		if (!$user->authorise('core.create', 'com_tjucm'))
 		{
-			throw new Exception(JText::_('JERROR_CORE_CREATE_NOT_PERMITTED'));
+			throw new Exception(Text::_('JERROR_CORE_CREATE_NOT_PERMITTED'));
 		}
 
 		$dispatcher = JEventDispatcher::getInstance();
 		$context    = $this->option . '.' . $this->name;
 
 		// Include the plugins for the save events.
-		JPluginHelper::importPlugin($this->events_map['save']);
+		PluginHelper::importPlugin($this->events_map['save']);
 
 		$table = $this->getTable();
 
@@ -218,7 +225,7 @@ class TjucmModelType extends JModelAdmin
 	/**
 	 * Prepare and sanitise the table prior to saving.
 	 *
-	 * @param   JTable  $table  Table Object
+	 * @param   Table  $table  Table Object
 	 *
 	 * @return void
 	 *
@@ -233,7 +240,7 @@ class TjucmModelType extends JModelAdmin
 			// Set ordering to the last item if not set
 			if (@$table->ordering === '')
 			{
-				$db = JFactory::getDbo();
+				$db = Factory::getDbo();
 				$db->setQuery('SELECT MAX(ordering) FROM #__tj_ucm_types');
 				$max             = $db->loadResult();
 				$table->ordering = $max + 1;
@@ -252,8 +259,8 @@ class TjucmModelType extends JModelAdmin
 	 */
 	public function save($data)
 	{
-		$input  = JFactory::getApplication()->input;
-		$filter = JFilterInput::getInstance();
+		$input  = Factory::getApplication()->input;
+		$filter = InputFilter::getInstance();
 
 		// Alter the title for save as copy
 		if ($input->get('task') == 'save2copy')
@@ -283,20 +290,20 @@ class TjucmModelType extends JModelAdmin
 		{
 			if ($data['alias'] == null)
 			{
-				if (JFactory::getConfig()->get('unicodeslugs') == 1)
+				if (Factory::getConfig()->get('unicodeslugs') == 1)
 				{
-					$data['alias'] = JFilterOutput::stringURLUnicodeSlug($data['title']);
+					$data['alias'] = OutputFilter::stringURLUnicodeSlug($data['title']);
 				}
 				else
 				{
-					$data['alias'] = JFilterOutput::stringURLSafe($data['title']);
+					$data['alias'] = OutputFilter::stringURLSafe($data['title']);
 				}
 
 				$table = $this->getTable();
 
 				if ($table->load(array('alias' => $data['alias'])))
 				{
-					$msg = JText::_('COM_TJUCM_SAVE_WARNING');
+					$msg = Text::_('COM_TJUCM_SAVE_WARNING');
 				}
 
 				list($title, $alias) = $this->generateNewAlias($data['alias'], $data['title']);
@@ -304,14 +311,14 @@ class TjucmModelType extends JModelAdmin
 
 				if (isset($msg))
 				{
-					JFactory::getApplication()->enqueueMessage($msg, 'warning');
+					Factory::getApplication()->enqueueMessage($msg, 'warning');
 				}
 			}
 		}
 
 		// Remove white spaces from alias if any
 		// $data['alias'] = str_replace(" ", "_", trim($data['alias']));
-		$data['alias'] = JFilterOutput::stringURLSafe($data['alias']);
+		$data['alias'] = OutputFilter::stringURLSafe($data['alias']);
 
 		if (!empty($data['id']))
 		{
@@ -330,15 +337,15 @@ class TjucmModelType extends JModelAdmin
 
 		// If UCM type is a subform then need to add content_id as hidden field in the form - For flat subform storage
 		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
-		$db = JFactory::getDbo();
-		$tjfieldsFieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
+		$db = Factory::getDbo();
+		$tjfieldsFieldTable = Table::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
 		$tjfieldsFieldTable->load(array('name' => str_replace('.', '_', $data['unique_identifier']) . '_contentid'));
 
 		if ($data['params']['is_subform'] == 1 && empty($tjfieldsFieldTable->id))
 		{
-			JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
+			BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
 			$fieldGroup = array("name" => "hidden", "title" => "hidden", "client" => $data['unique_identifier'], "state" => 1);
-			$tjFieldsGroupModel = JModelLegacy::getInstance('Group', 'TjfieldsModel', array('ignore_request' => true));
+			$tjFieldsGroupModel = BaseDatabaseModel::getInstance('Group', 'TjfieldsModel', array('ignore_request' => true));
 			$tjFieldsGroupModel->save($fieldGroup);
 			$fieldGroupId = (int) $tjFieldsGroupModel->getState($tjFieldsGroupModel->getName() . '.id');
 			$field = array(
@@ -348,7 +355,7 @@ class TjucmModelType extends JModelAdmin
 			"client" => $data['unique_identifier'],
 			"state" => 1,
 			"group_id" => $fieldGroupId, );
-			$tjFieldsFieldModel = JModelLegacy::getInstance('Field', 'TjfieldsModel', array('ignore_request' => true));
+			$tjFieldsFieldModel = BaseDatabaseModel::getInstance('Field', 'TjfieldsModel', array('ignore_request' => true));
 			$input->post->set('client_type', end(explode(".", $data['unique_identifier'])));
 			$tjFieldsFieldModel->save($field);
 			$input->post->set('client_type', '');
@@ -371,7 +378,7 @@ class TjucmModelType extends JModelAdmin
 			$id = (int) $this->getState($this->getName() . '.id');
 			$data['typeId'] = $id;
 			$dispatcher = JDispatcher::getInstance();
-			JPluginHelper::importPlugin('actionlog', 'tjucm');
+			PluginHelper::importPlugin('actionlog', 'tjucm');
 			$isNew = ($data['id'] != 0) ? false : true;
 			$dispatcher->trigger('tjUcmOnAfterTypeSave', array($data, $isNew));
 
@@ -393,7 +400,7 @@ class TjucmModelType extends JModelAdmin
 	public function getGroupCount($client)
 	{
 		JLoader::import('components.com_tjfields.models.groups', JPATH_ADMINISTRATOR);
-		$items_model = JModelLegacy::getInstance('Groups', 'TjfieldsModel');
+		$items_model = BaseDatabaseModel::getInstance('Groups', 'TjfieldsModel');
 		$items_model->setState('filter.client', $client);
 
 		return $items_model->getTotal();
@@ -411,7 +418,7 @@ class TjucmModelType extends JModelAdmin
 	public function getCategoryCount($client)
 	{
 		JLoader::import('components.com_categories.models.categories', JPATH_ADMINISTRATOR);
-		$categoryModel = JModelLegacy::getInstance('Categories', 'CategoriesModel', array('ignore_request' => true));
+		$categoryModel = BaseDatabaseModel::getInstance('Categories', 'CategoriesModel', array('ignore_request' => true));
 		$categoryModel->setState('filter.extension', $client);
 
 		return $categoryModel->getTotal();
@@ -494,13 +501,13 @@ class TjucmModelType extends JModelAdmin
 			$table->load(array('id' => $pk));
 
 			// Get all field groups in the UCM type
-			$fieldGroupsModel = JModelLegacy::getInstance('Groups', 'TjfieldsModel', array('ignore_request' => true));
+			$fieldGroupsModel = BaseDatabaseModel::getInstance('Groups', 'TjfieldsModel', array('ignore_request' => true));
 			$fieldGroupsModel->setState("filter.client", $table->unique_identifier);
 			$fieldGroups = $fieldGroupsModel->getItems();
 
 			if (!empty($fieldGroups))
 			{
-				$tjFieldsGroupModel = JModelLegacy::getInstance('group', 'TjfieldsModel', array('ignore_request' => true));
+				$tjFieldsGroupModel = BaseDatabaseModel::getInstance('group', 'TjfieldsModel', array('ignore_request' => true));
 
 				foreach ($fieldGroups as $fieldGroup)
 				{
@@ -515,14 +522,14 @@ class TjucmModelType extends JModelAdmin
 			}
 
 			// Get all field records related to the UCM type
-			$itemsModel = JModelLegacy::getInstance('Items', 'TjucmModel', array('ignore_request' => true));
+			$itemsModel = BaseDatabaseModel::getInstance('Items', 'TjucmModel', array('ignore_request' => true));
 			$itemsModel->setState("ucm.client", $table->unique_identifier);
 			$items = $itemsModel->getItems();
 
 			// Delete records related to the UCM type
 			if (!empty($items))
 			{
-				$itemFormModel = JModelLegacy::getInstance('ItemForm', 'TjucmModel', array('ignore_request' => true));
+				$itemFormModel = BaseDatabaseModel::getInstance('ItemForm', 'TjucmModel', array('ignore_request' => true));
 
 				foreach ($items as $item)
 				{

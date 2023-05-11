@@ -8,27 +8,32 @@
  */
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
 
-JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
-JHtml::_('behavior.tooltip');
-JHtml::_('behavior.formvalidation');
-JHtml::_('formbehavior.chosen', 'select');
-JHtml::_('behavior.keepalive');
-JHtml::_('jquery.token');
+HTMLHelper::addIncludePath(JPATH_COMPONENT . '/helpers/html');
+HTMLHelper::_('bootstrap.tooltip');
+HTMLHelper::_('behavior.formvalidator');
+HTMLHelper::_('formbehavior.chosen', 'select');
+HTMLHelper::_('behavior.keepalive');
+HTMLHelper::_('jquery.token');
 
 // Load admin language file
-$lang = JFactory::getLanguage();
+$lang = Factory::getLanguage();
 $lang->load('com_tjucm', JPATH_SITE);
-$doc = JFactory::getDocument();
-$doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/jquery.form.js');
-$doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/itemform.js');
-$doc->addScript(JUri::root() . 'administrator/components/com_tjucm/assets/js/tjfield.js');
+$doc = Factory::getDocument();
+$doc->addScript(Uri::root() . 'administrator/components/com_tjucm/assets/js/jquery.form.js');
+$doc->addScript(Uri::root() . 'administrator/components/com_tjucm/assets/js/itemform.js');
+$doc->addScript(Uri::root() . 'administrator/components/com_tjucm/assets/js/tjfield.js');
 
-$jinput = JFactory::getApplication();
+$jinput = Factory::getApplication();
 $baseUrl = $jinput->input->server->get('REQUEST_URI', '', 'STRING');
 $calledFrom = (strpos($baseUrl, 'administrator')) ? 'backend' : 'frontend';
 $layout = ($calledFrom == 'frontend') ? 'default' : 'edit';
-$client  = JFactory::getApplication()->input->get('client');
+$client  = Factory::getApplication()->input->get('client');
 ?>
 <script type="text/javascript">
 
@@ -47,17 +52,17 @@ $client  = JFactory::getApplication()->input->get('client');
 			}
 			else
 			{
-				alert('<?php echo $this->escape(JText::_('JGLOBAL_VALIDATION_FORM_FAILED')); ?>');
+				alert('<?php echo $this->escape(Text::_('JGLOBAL_VALIDATION_FORM_FAILED')); ?>');
 			}
 		}
 	}
 </script>
 
-<form action="<?php echo JRoute::_('index.php?option=com_tjucm&view=item&layout=' . $layout . '&id=' . (int) $this->item->id); ?>" method="post" enctype="multipart/form-data" name="adminForm" id="item-form" class="form-validate">
+<form action="<?php echo Route::_('index.php?option=com_tjucm&view=item&layout=' . $layout . '&id=' . (int) $this->item->id); ?>" method="post" enctype="multipart/form-data" name="adminForm" id="item-form" class="form-validate">
 	<div class="form-horizontal">
 		<?php if (!$this->form_extra): ?>
-			<?php echo JHtml::_('bootstrap.startTabSet', 'tjucm_myTab', array('active' => 'personal-information')); ?>
-			<?php echo JHtml::_('bootstrap.addTab', 'tjucm_myTab', 'general', JText::_('COM_TJUCM_TITLE_ITEM', true)); ?>
+			<?php echo HTMLHelper::_('bootstrap.startTabSet', 'tjucm_myTab', array('active' => 'personal-information')); ?>
+			<?php echo HTMLHelper::_('bootstrap.addTab', 'tjucm_myTab', 'general', Text::_('COM_TJUCM_TITLE_ITEM', true)); ?>
 		<?php endif; ?>
 					<div class="row-fluid">
 						<div class="span10 form-horizontal">
@@ -81,32 +86,32 @@ $client  = JFactory::getApplication()->input->get('client');
 				<?php endif; ?>
 
 			<?php if (!$this->form_extra): ?>
-						<?php echo JHtml::_('bootstrap.endTab'); ?>
+						<?php echo HTMLHelper::_('bootstrap.endTab'); ?>
 			<?php endif; ?>
-		<?php echo JHtml::_('bootstrap.endTabSet'); ?>
+		<?php echo HTMLHelper::_('bootstrap.endTabSet'); ?>
 		<div class="alert alert-success" style="display: block;">
 			<div class="msg">
 				<div>
-				<?php echo JText::_("COM_TJUCM_NOTE_ON_FORM"); ?>
+				<?php echo Text::_("COM_TJUCM_NOTE_ON_FORM"); ?>
 				</div>
 			</div>
 		</div>
 		<div class="form-actions">
-			<button type="button" class="btn btn-primary" id="previous_button" onclick="itemformactions('tjucm_myTab','prev')"><?php echo JText::_('COM_TJUCM_PREVIOUS_BUTTON'); ?><i class="fa fa-arrow-circle-o-right"></i></button>
-			<button type="button" class="btn btn-primary" id="next_button" onclick="itemformactions('tjucm_myTab','next')"><?php echo JText::_('COM_TJUCM_NEXT_BUTTON'); ?><i class="fa fa-arrow-circle-o-right"></i></button>
+			<button type="button" class="btn btn-primary" id="previous_button" onclick="itemformactions('tjucm_myTab','prev')"><?php echo Text::_('COM_TJUCM_PREVIOUS_BUTTON'); ?><i class="fa fa-arrow-circle-o-right"></i></button>
+			<button type="button" class="btn btn-primary" id="next_button" onclick="itemformactions('tjucm_myTab','next')"><?php echo Text::_('COM_TJUCM_NEXT_BUTTON'); ?><i class="fa fa-arrow-circle-o-right"></i></button>
 			<?php
 			if ($calledFrom == 'frontend')
 			{
 			?>
-				<input type="button" class="btn btn-success" value="<?php echo JText::_("COM_TJUCM_SAVE_ITEM"); ?>" id="finalSave" onclick="finalsave('item-form');">
-				<input type="button" class="btn btn-success" value="<?php echo JText::_("COM_TJUCM_SAVE_AS_DRAFT_ITEM"); ?>" onclick="saveAsDraft('item-form');">
-				<input type="button" class="btn btn-danger" value="<?php echo JText::_("COM_TJUCM_CANCEL_BUTTON"); ?>" onclick="Joomla.submitbutton('itemform.cancel');">
+				<input type="button" class="btn btn-success" value="<?php echo Text::_("COM_TJUCM_SAVE_ITEM"); ?>" id="finalSave" onclick="finalsave('item-form');">
+				<input type="button" class="btn btn-success" value="<?php echo Text::_("COM_TJUCM_SAVE_AS_DRAFT_ITEM"); ?>" onclick="saveAsDraft('item-form');">
+				<input type="button" class="btn btn-danger" value="<?php echo Text::_("COM_TJUCM_CANCEL_BUTTON"); ?>" onclick="Joomla.submitbutton('itemform.cancel');">
 			<?php
 			}
 			?>
 		</div>
 		<input type="hidden" name="layout" value="<?php echo $layout ?>"/>
 		<input type="hidden" name="task" value="item.save"/>
-		<?php echo JHtml::_('form.token'); ?>
+		<?php echo HTMLHelper::_('form.token'); ?>
 	</div>
 </form>

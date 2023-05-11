@@ -10,8 +10,14 @@
 
 // No direct access.
 defined('_JEXEC') or die;
+use Joomla\CMS\MVC\Model\AdminModel;
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\Form\Form;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\CMS\Filter\InputFilter;
 
-jimport('joomla.application.component.modeladmin');
 jimport('joomla.filesystem.file');
 
 require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
@@ -20,7 +26,7 @@ require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
  *
  * @since  1.6
  */
-class TjucmModelItem extends JModelAdmin
+class TjucmModelItem extends AdminModel
 {
 	/**
 	 * @var      string    The prefix to use with controller messages.
@@ -74,13 +80,13 @@ class TjucmModelItem extends JModelAdmin
 	 * @param   string  $prefix  A prefix for the table class name. Optional.
 	 * @param   array   $config  Configuration array for model. Optional.
 	 *
-	 * @return    JTable    A database object
+	 * @return    Table    A database object
 	 *
 	 * @since    1.6
 	 */
 	public function getTable($type = 'Item', $prefix = 'TjucmTable', $config = array())
 	{
-		return JTable::getInstance($type, $prefix, $config);
+		return Table::getInstance($type, $prefix, $config);
 	}
 
 	/**
@@ -89,14 +95,14 @@ class TjucmModelItem extends JModelAdmin
 	 * @param   array    $data      An optional array of data for the form to interogate.
 	 * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not.
 	 *
-	 * @return  JForm  A JForm object on success, false on failure
+	 * @return  Form  A Form object on success, false on failure
 	 *
 	 * @since    1.6
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
 		// Initialise variables.
-		$app = JFactory::getApplication();
+		$app = Factory::getApplication();
 
 		// Get the form.
 		$form = $this->loadForm(
@@ -124,7 +130,7 @@ class TjucmModelItem extends JModelAdmin
 	protected function loadFormData()
 	{
 		// Check the session for previously entered form data.
-		$data = JFactory::getApplication()->getUserState('com_tjucm.edit.item.data', array());
+		$data = Factory::getApplication()->getUserState('com_tjucm.edit.item.data', array());
 
 		if (empty($data))
 		{
@@ -169,19 +175,19 @@ class TjucmModelItem extends JModelAdmin
 	 */
 	public function duplicate(&$pks)
 	{
-		$user = JFactory::getUser();
+		$user = Factory::getUser();
 
 		// Access checks.
 		if (!$user->authorise('core.create', 'com_tjucm'))
 		{
-			throw new Exception(JText::_('JERROR_CORE_CREATE_NOT_PERMITTED'));
+			throw new Exception(Text::_('JERROR_CORE_CREATE_NOT_PERMITTED'));
 		}
 
 		$dispatcher = JEventDispatcher::getInstance();
 		$context    = $this->option . '.' . $this->name;
 
 		// Include the plugins for the save events.
-		JPluginHelper::importPlugin($this->events_map['save']);
+		PluginHelper::importPlugin($this->events_map['save']);
 
 		$table = $this->getTable();
 
@@ -235,7 +241,7 @@ class TjucmModelItem extends JModelAdmin
 	/**
 	 * Prepare and sanitise the table prior to saving.
 	 *
-	 * @param   JTable  $table  Table Object
+	 * @param   Table  $table  Table Object
 	 *
 	 * @return void
 	 *
@@ -250,7 +256,7 @@ class TjucmModelItem extends JModelAdmin
 			// Set ordering to the last item if not set
 			if (@$table->ordering === '')
 			{
-				$db = JFactory::getDbo();
+				$db = Factory::getDbo();
 				$db->setQuery('SELECT MAX(ordering) FROM #__tj_ucm_data');
 				$max             = $db->loadResult();
 				$table->ordering = $max + 1;
@@ -271,11 +277,11 @@ class TjucmModelItem extends JModelAdmin
 	 */
 	public function save($data, $extra_jform_data = '', $post = '')
 	{
-		$input  = JFactory::getApplication()->input;
-		$filter = JFilterInput::getInstance();
+		$input  = Factory::getApplication()->input;
+		$filter = InputFilter::getInstance();
 
 		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
-		$tjUcmTypeTable = JTable::getInstance('TjucmTableType', 'JTable', array('dbo', JFactory::getDbo()));
+		$tjUcmTypeTable = Table::getInstance('TjucmTableType', 'Table', array('dbo', Factory::getDbo()));
 		$tjUcmTypeTable->load(array('unique_identifier' => $this->client));
 		$data['type_id'] = $tjUcmTypeTable->id;
 

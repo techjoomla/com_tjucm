@@ -10,15 +10,17 @@
 
 // No direct access
 defined('_JEXEC') or die;
-
-jimport('joomla.application.component.view');
+use Joomla\CMS\MVC\View\HtmlView;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Toolbar\ToolbarHelper;
 
 /**
  * View to edit
  *
  * @since  1.6
  */
-class TjucmViewItem extends JViewLegacy
+class TjucmViewItem extends HtmlView
 {
 	protected $state;
 
@@ -43,8 +45,8 @@ class TjucmViewItem extends JViewLegacy
 
 		// Get form for extra fields.
 
-		$this->client  = JFactory::getApplication()->input->get('client');
-		$id  = JFactory::getApplication()->input->get('id');
+		$this->client  = Factory::getApplication()->input->get('client');
+		$id  = Factory::getApplication()->input->get('id');
 		$model = $this->getModel('item');
 		$view = explode('.', $this->client);
 
@@ -80,9 +82,9 @@ class TjucmViewItem extends JViewLegacy
 	 */
 	protected function addToolbar()
 	{
-		JFactory::getApplication()->input->set('hidemainmenu', true);
+		Factory::getApplication()->input->set('hidemainmenu', true);
 
-		$user  = JFactory::getUser();
+		$user  = Factory::getUser();
 		$isNew = ($this->item->id == 0);
 
 		if (isset($this->item->checked_out))
@@ -96,39 +98,39 @@ class TjucmViewItem extends JViewLegacy
 
 		$canDo = TjucmHelper::getActions();
 
-		JToolBarHelper::title(JText::_('COM_TJUCM_TITLE_ITEM'), 'icon-pencil');
+		ToolbarHelper::title(Text::_('COM_TJUCM_TITLE_ITEM'), 'icon-pencil');
 
 		// If not checked out, can save the item.
 		if (!$checkedOut && ($canDo->get('core.edit') || ($canDo->get('core.create'))))
 		{
-			JToolBarHelper::apply('item.apply', 'JTOOLBAR_APPLY');
-			JToolBarHelper::save('item.save', 'JTOOLBAR_SAVE');
+			ToolbarHelper::apply('item.apply', 'JTOOLBAR_APPLY');
+			ToolbarHelper::save('item.save', 'JTOOLBAR_SAVE');
 		}
 
 		if (!$checkedOut && ($canDo->get('core.create')))
 		{
-			JToolBarHelper::custom('item.save2new', 'save-new.png', 'save-new_f2.png', 'JTOOLBAR_SAVE_AND_NEW', false);
+			ToolbarHelper::custom('item.save2new', 'save-new.png', 'save-new_f2.png', 'JTOOLBAR_SAVE_AND_NEW', false);
 		}
 
 		// If an existing item, can save to a copy.
 		if (!$isNew && $canDo->get('core.create'))
 		{
-			JToolBarHelper::custom('item.save2copy', 'save-copy.png', 'save-copy_f2.png', 'JTOOLBAR_SAVE_AS_COPY', false);
+			ToolbarHelper::custom('item.save2copy', 'save-copy.png', 'save-copy_f2.png', 'JTOOLBAR_SAVE_AS_COPY', false);
 		}
 
 		// Button for version control
 		if ($this->state->params->get('save_history', 1) && $user->authorise('core.edit'))
 		{
-			JToolbarHelper::versions('com_tjucm.item', $this->item->id);
+			ToolbarHelper::versions('com_tjucm.item', $this->item->id);
 		}
 
 		if (empty($this->item->id))
 		{
-			JToolBarHelper::cancel('item.cancel', 'JTOOLBAR_CANCEL');
+			ToolbarHelper::cancel('item.cancel', 'JTOOLBAR_CANCEL');
 		}
 		else
 		{
-			JToolBarHelper::cancel('item.cancel', 'JTOOLBAR_CLOSE');
+			ToolbarHelper::cancel('item.cancel', 'JTOOLBAR_CLOSE');
 		}
 	}
 }

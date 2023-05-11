@@ -9,12 +9,15 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Filter\OutputFilter;
+use Joomla\CMS\Language\Text;
 ?>
 
 <?php
 	if ($this->form_extra):
 		//~ echo $this->form_extra->getFieldsets(0)->name;
-		echo JHtml::_('bootstrap.startTabSet', 'myTab', array('active' => 'personal-information'));
+		echo HTMLHelper::_('bootstrap.startTabSet', 'myTab', array('active' => 'personal-information'));
 	endif;
 ?>
 
@@ -24,8 +27,8 @@ defined('_JEXEC') or die;
 		<?php foreach ($fieldArray->getFieldsets() as $fieldName => $fieldset): ?>
 			<!-- Fields go here -->
 				<?php
-				$tabName = JFilterOutput::stringURLUnicodeSlug(trim($fieldset->name));
-				echo JHtml::_("bootstrap.addTab", "myTab", $tabName, $fieldset->name);
+				$tabName = OutputFilter::stringURLUnicodeSlug(trim($fieldset->name));
+				echo HTMLHelper::_("bootstrap.addTab", "myTab", $tabName, $fieldset->name);
 				?>
 				<!-- Iterate through the fields and display them. -->
 					<?php foreach($this->form_extra as $field1): ?>
@@ -46,13 +49,13 @@ defined('_JEXEC') or die;
 						<?php endforeach;?>
 					<?php endforeach;?>
 				<?php
-				echo JHtml::_("bootstrap.endTab");
+				echo HTMLHelper::_("bootstrap.endTab");
 				?>
 		<?php endforeach; ?>
 	<?php endforeach; ?>
 <?php else: ?>
 	<div class="alert alert-info">
-		<?php echo JText::_('COM_TJLMS_NO_EXTRA_FIELDS_FOUND');?>
+		<?php echo Text::_('COM_TJLMS_NO_EXTRA_FIELDS_FOUND');?>
 	</div>
 <?php endif; ?>
 

@@ -10,6 +10,12 @@
 
 // No direct access.
 defined('_JEXEC') or die;
+use Joomla\CMS\MVC\Model\AdminModel;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Object\CMSObject;
 
 jimport('joomla.application.component.modelitem');
 jimport('joomla.event.dispatcher');
@@ -17,14 +23,13 @@ jimport('joomla.event.dispatcher');
 require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
 
 use Joomla\Utilities\ArrayHelper;
-use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 
 /**
  * Tjucm model.
  *
  * @since  1.6
  */
-class TjucmModelItem extends JModelAdmin
+class TjucmModelItem extends AdminModel
 {
 	private $client = '';
 
@@ -44,7 +49,7 @@ class TjucmModelItem extends JModelAdmin
 	 */
 	protected function populateState()
 	{
-		$app  = JFactory::getApplication('com_tjucm');
+		$app  = Factory::getApplication('com_tjucm');
 
 		// Load state from the request.
 		$id = $app->input->getInt('id');
@@ -69,15 +74,15 @@ class TjucmModelItem extends JModelAdmin
 				if (!empty($ucm_type))
 				{
 					JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
-					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+					$ucmTypeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', Factory::getDbo()));
 					$ucmTypeTable->load(array('alias' => $ucm_type));
 					$ucmType = $ucmTypeTable->unique_identifier;
 				}
 			}
 		}
 
-		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
-		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$tjUcmModelType = BaseDatabaseModel::getInstance('Type', 'TjucmModel');
 		$ucmId = $tjUcmModelType->getTypeId($ucmType);
 
 		$this->setState('ucmType.id', $ucmId);
@@ -123,12 +128,12 @@ class TjucmModelItem extends JModelAdmin
 		$item = $db->loadObject();
 
 		// Variable to store creator name and id
-		$created_by = JFactory::getUser($item->created_by);
+		$created_by = Factory::getUser($item->created_by);
 		$created_by = array("id" => $created_by->id, "name" => $created_by->name);
 		$item->created_by = $created_by;
 
 		// Variable to store modifier name and id
-		$modified_by = JFactory::getUser($item->modified_by);
+		$modified_by = Factory::getUser($item->modified_by);
 		$modified_by = array("id" => $modified_by->id, "name" => $modified_by->name);
 		$item->modified_by = $modified_by;
 
@@ -197,7 +202,7 @@ class TjucmModelItem extends JModelAdmin
 				// Check for published state if filter set.
 				if (((is_numeric($published)) || (is_numeric($archived))) && (($table->state != $published) && ($table->state != $archived)))
 				{
-					return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
+					return JError::raiseError(404, Text::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
 				}
 			}
 
@@ -210,7 +215,7 @@ class TjucmModelItem extends JModelAdmin
 
 			if (!empty($this->item->id))
 			{
-				if ($canView || ($this->item->created_by == JFactory::getUser()->id))
+				if ($canView || ($this->item->created_by == Factory::getUser()->id))
 				{
 					$this->item->params->set('access-view', true);
 				}
@@ -218,26 +223,26 @@ class TjucmModelItem extends JModelAdmin
 		}
 		else
 		{
-			return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
+			return JError::raiseError(404, Text::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
 		}
 
 		return $this->item;
 	}
 
 	/**
-	 * Get an instance of JTable class
+	 * Get an instance of Table class
 	 *
-	 * @param   string  $type    Name of the JTable class to get an instance of.
+	 * @param   string  $type    Name of the Table class to get an instance of.
 	 * @param   string  $prefix  Prefix for the table class name. Optional.
-	 * @param   array   $config  Array of configuration values for the JTable object. Optional.
+	 * @param   array   $config  Array of configuration values for the Table object. Optional.
 	 *
-	 * @return  JTable|bool JTable if success, false on failure.
+	 * @return  Table|bool Table if success, false on failure.
 	 */
 	public function getTable($type = 'Item', $prefix = 'TjucmTable', $config = array())
 	{
 		$this->addTablePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/tables');
 
-		return JTable::getInstance($type, $prefix, $config);
+		return Table::getInstance($type, $prefix, $config);
 	}
 
 	/**
@@ -293,7 +298,7 @@ class TjucmModelItem extends JModelAdmin
 	 */
 	public function delete(&$id)
 	{
-		$app = JFactory::getApplication('com_tjucm');
+		$app = Factory::getApplication('com_tjucm');
 
 		$ucmTypeId = $this->getState('ucmType.id');
 		$canDelete = TjucmAccess::canDelete($ucmTypeId, $id);
@@ -306,7 +311,7 @@ class TjucmModelItem extends JModelAdmin
 		}
 		else
 		{
-			throw new Exception(JText::_('JERROR_ALERTNOAUTHOR'), 403);
+			throw new Exception(Text::_('JERROR_ALERTNOAUTHOR'), 403);
 
 			return false;
 		}

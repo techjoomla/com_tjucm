@@ -9,9 +9,11 @@
 
 // No direct access
 defined('_JEXEC') or die('Restricted access');
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Layout\FileLayout;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Session\Session;
@@ -46,7 +48,7 @@ $TjfieldsHelper = new TjfieldsHelper;
 
 // Load itemForm model
 JLoader::import('components.com_tjucm.models.itemform', JPATH_SITE);
-$tjucmItemFormModel = JModelLegacy::getInstance('ItemForm', 'TjucmModel');
+$tjucmItemFormModel = BaseDatabaseModel::getInstance('ItemForm', 'TjucmModel');
 
 // Get JLayout data
 $item          = $displayData['itemsData'];
@@ -105,7 +107,7 @@ if ($canDeleteOwn)
 	<?php if ($canCopyItem) { ?>
 	<!-- TODO- copy and copy to other feature is not fully stable hence relate buttons are hidden-->
 	<td class="center">
-		<?php echo JHtml::_('grid.id', $i, $item->id); ?>
+		<?php echo HTMLHelper::_('grid.id', $i, $item->id); ?>
 	</td>
 	<?php } ?>
 	<?php
@@ -185,7 +187,7 @@ if ($canDeleteOwn)
 
 										// Call to extra fields
 										JLoader::import('components.com_tjucm.models.item', JPATH_SITE);
-										$tjucmItemModel = JModelLegacy::getInstance('Item', 'TjucmModel');
+										$tjucmItemModel = BaseDatabaseModel::getInstance('Item', 'TjucmModel');
 
 										// Get Subform field data
 										$fieldData = $TjfieldsHelper->getFieldData($field->getAttribute('name'));
@@ -227,7 +229,7 @@ if ($canDeleteOwn)
 												$ucmSubFormRecordData = $tjucmItemModel->getData($subFormData->$contentIdFieldname);
 
 												// Call the JLayout recursively to render fields of ucmsubform
-												$layout = new JLayoutFile('fields', JPATH_ROOT . '/components/com_tjucm/layouts/detail');
+												$layout = new FileLayout('fields', JPATH_ROOT . '/components/com_tjucm/layouts/detail');
 												echo $layout->render(array('xmlFormObject' => $ucmSubFormXmlFieldSets, 'formObject' => $ucmSubformFormObject, 'itemData' => $ucmSubFormRecordData, 'isSubForm' => 1));
 
 												if (count($ucmSubFormData) > $count)
@@ -248,7 +250,7 @@ if ($canDeleteOwn)
 										ucfirst($tjFieldsFieldTable->type), $fieldLayout
 									)
 								) ? $fieldLayout[ucfirst($tjFieldsFieldTable->type)] : 'field';
-								$layout = new JLayoutFile($layoutToUse, JPATH_ROOT . '/components/com_tjfields/layouts/fields');
+								$layout = new FileLayout($layoutToUse, JPATH_ROOT . '/components/com_tjfields/layouts/fields');
 								$output = $layout->render(array('fieldXml' => $fieldXml, 'field' => $field));
 
 								// To align text, textarea, textareacounter, editor and tjlist fields properly

@@ -10,13 +10,18 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\Helper\ContentHelper;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Object\CMSObject;
 
 /**
  * Tjucm helper.
  *
  * @since  1.6
  */
-class TjucmHelper extends JHelperContent
+class TjucmHelper extends ContentHelper
 {
 	/**
 	 * Configure the Linkbar.
@@ -28,7 +33,7 @@ class TjucmHelper extends JHelperContent
 	public static function addSubmenu($vName = '')
 	{
 		JHtmlSidebar::addEntry(
-			JText::_('COM_TJUCM_TITLE_TYPES'),
+			Text::_('COM_TJUCM_TITLE_TYPES'),
 			'index.php?option=com_tjucm&view=types',
 			$vName == 'types'
 		);
@@ -47,7 +52,7 @@ class TjucmHelper extends JHelperContent
 	 */
 	public static function getFiles($pk, $table, $field)
 	{
-		$db = JFactory::getDbo();
+		$db = Factory::getDbo();
 		$query = $db->getQuery(true);
 
 		$query
@@ -67,7 +72,7 @@ class TjucmHelper extends JHelperContent
 	 * @param   string   $section    The access section name.
 	 * @param   integer  $id         The item ID.
 	 *
-	 * @return  JObject
+	 * @return  CMSObject
 	 *
 	 * @since   3.2
 	 */

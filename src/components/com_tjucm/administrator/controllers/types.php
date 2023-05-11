@@ -10,9 +10,11 @@
 
 // No direct access.
 defined('_JEXEC') or die;
-
-jimport('joomla.application.component.controlleradmin');
-
+use Joomla\CMS\MVC\Controller\AdminController;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Router\Route;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Session\Session;
@@ -27,7 +29,7 @@ JLoader::register('TjControllerHouseKeeping', JPATH_SITE . "/libraries/techjooml
  *
  * @since  1.6
  */
-class TjucmControllerTypes extends JControllerAdmin
+class TjucmControllerTypes extends AdminController
 {
 	use TjControllerHouseKeeping;
 
@@ -128,7 +130,7 @@ class TjucmControllerTypes extends JControllerAdmin
 		Session::checkToken('get') or jexit(Text::_('JINVALID_TOKEN'));
 
 		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
-		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
+		BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
 		$app = Factory::getApplication();
 		$input = $app->input;
 		$cids = $input->get('cid', array(), 'ARRAY');
@@ -141,7 +143,7 @@ class TjucmControllerTypes extends JControllerAdmin
 			$ucmTypeTable->load(array("id" => $cid));
 			$ucmTypeData = (object) $ucmTypeTable->getProperties();
 
-			$tjFieldsGroupsModel = JModelLegacy::getInstance('Groups', 'TjfieldsModel', array('ignore_request' => true));
+			$tjFieldsGroupsModel = BaseDatabaseModel::getInstance('Groups', 'TjfieldsModel', array('ignore_request' => true));
 			$tjFieldsGroupsModel->setState('list.ordering', 'a.ordering');
 			$tjFieldsGroupsModel->setState('list.direction', 'asc');
 			$tjFieldsGroupsModel->setState("filter.client", $ucmTypeData->unique_identifier);
@@ -152,7 +154,7 @@ class TjucmControllerTypes extends JControllerAdmin
 			// Getting fields of fieldGroups
 			foreach ($fieldGroups as $groupKey => $groupValue)
 			{
-				$tjFieldsFieldsModel = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+				$tjFieldsFieldsModel = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
 				$tjFieldsFieldsModel->setState("filter.group_id", $fieldGroups[$groupKey]->id);
 				$tjFieldsFieldsModel->setState('list.ordering', 'a.ordering');
 				$tjFieldsFieldsModel->setState('list.direction', 'asc');
@@ -163,7 +165,7 @@ class TjucmControllerTypes extends JControllerAdmin
 				// Getting options of field
 				foreach ($fields as $fieldKey => $fieldValue)
 				{
-					$tjFieldsOptionsModel = JModelLegacy::getInstance('Options', 'TjfieldsModel', array('ignore_request' => true));
+					$tjFieldsOptionsModel = BaseDatabaseModel::getInstance('Options', 'TjfieldsModel', array('ignore_request' => true));
 					$tjFieldsOptionsModel->setState("filter.field_id", $fields[$fieldKey]->id);
 
 					// Variable to store Options of Field
@@ -188,8 +190,8 @@ class TjucmControllerTypes extends JControllerAdmin
 			$jsonExportData = json_encode($exportData);
 
 			header("Content-type: application/vnd.ms-excel");
-			header("Content-disposition: json" . JHtml::date('now', 'Y-M-D-H-i-s', true) . ".json");
-			header("Content-disposition: filename=" . 'ucmTypeData' . JHtml::date('now', 'Y-M-D-H-i-s', true) . ".json");
+			header("Content-disposition: json" . HTMLHelper::date('now', 'Y-M-D-H-i-s', true) . ".json");
+			header("Content-disposition: filename=" . 'ucmTypeData' . HTMLHelper::date('now', 'Y-M-D-H-i-s', true) . ".json");
 
 			ob_clean();
 			echo $jsonExportData;
@@ -198,7 +200,7 @@ class TjucmControllerTypes extends JControllerAdmin
 		else
 		{
 			$app->enqueueMessage(Text::_('COM_TJUCM_SOMETHING_WENT_WRONG'), 'error');
-			$link = JUri::base() . substr(JRoute::_('index.php?option=com_tjucm&view=types&layout=default', false), strlen(JUri::base(true)) + 1);
+			$link = Uri::base() . substr(Route::_('index.php?option=com_tjucm&view=types&layout=default', false), strlen(Uri::base(true)) + 1);
 			$this->setRedirect($link);
 		}
 	}
@@ -216,8 +218,8 @@ class TjucmControllerTypes extends JControllerAdmin
 		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
 		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
-		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
-		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
+		BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 
 		$app = Factory::getApplication();
 		$input = $app->input;
@@ -229,7 +231,7 @@ class TjucmControllerTypes extends JControllerAdmin
 		if ($importFile['type'] != "application/json")
 		{
 			$app->enqueueMessage(Text::_('COM_TJUCM_TYPE_IMPORT_INVALID_FILE_UPLOAD_ERROR'), 'error');
-			$app->redirect(JUri::root() . 'administrator/index.php?option=com_tjucm&view=types&layout=import&tmpl=component');
+			$app->redirect(Uri::root() . 'administrator/index.php?option=com_tjucm&view=types&layout=import&tmpl=component');
 		}
 
 		$uploadPath = $safefilename = Factory::getConfig()->get('tmp_path') . '/' . File::makeSafe($importFile['name']);
@@ -238,7 +240,7 @@ class TjucmControllerTypes extends JControllerAdmin
 		if (!File::upload($importFile['tmp_name'], $uploadPath))
 		{
 			$app->enqueueMessage(Text::_('COM_TJUCM_TYPE_IMPORT_FILE_UPLOAD_ERROR'), 'error');
-			$app->redirect(JUri::root() . 'administrator/index.php?option=com_tjucm&view=types&layout=import&tmpl=component');
+			$app->redirect(Uri::root() . 'administrator/index.php?option=com_tjucm&view=types&layout=import&tmpl=component');
 		}
 
 		// Read the file
@@ -248,7 +250,7 @@ class TjucmControllerTypes extends JControllerAdmin
 		if ($ucmTypesData === null)
 		{
 			$app->enqueueMessage(Text::_('COM_TJUCM_TYPE_IMPORT_INVALID_FILE_CONTENT_ERROR'), 'error');
-			$app->redirect(JUri::root() . 'administrator/index.php?option=com_tjucm&view=types&layout=import&tmpl=component');
+			$app->redirect(Uri::root() . 'administrator/index.php?option=com_tjucm&view=types&layout=import&tmpl=component');
 		}
 
 		foreach ($ucmTypesData as $ucmTypeData)
@@ -284,7 +286,7 @@ class TjucmControllerTypes extends JControllerAdmin
 			$ucmTypeData['created_date'] = Factory::getDate()->toSql(true);
 
 			// Add record in ucm type table
-			$tjUcmTypeModel = JModelLegacy::getInstance('Type', 'TjucmModel', array('ignore_request' => true));
+			$tjUcmTypeModel = BaseDatabaseModel::getInstance('Type', 'TjucmModel', array('ignore_request' => true));
 			$tjUcmTypeModel->save($ucmTypeData);
 			$ucmTypeId = (int) $tjUcmTypeModel->getState($tjUcmTypeModel->getName() . '.id');
 
@@ -302,7 +304,7 @@ class TjucmControllerTypes extends JControllerAdmin
 					$fieldGroupData['asset_id'] = '';
 					$fieldGroupData['created_by'] = $user->id;
 
-					$tjFieldsGroupModel = JModelLegacy::getInstance('Group', 'TjfieldsModel', array('ignore_request' => true));
+					$tjFieldsGroupModel = BaseDatabaseModel::getInstance('Group', 'TjfieldsModel', array('ignore_request' => true));
 					$tjFieldsGroupModel->save($fieldGroupData);
 					$fieldGroupId = (int) $tjFieldsGroupModel->getState($tjFieldsGroupModel->getName() . '.id');
 
@@ -348,7 +350,7 @@ class TjucmControllerTypes extends JControllerAdmin
 
 							$input->post->set('client_type', end(explode(".", $ucmTypeData['unique_identifier'])));
 
-							$tjFieldsFieldModel = JModelLegacy::getInstance('Field', 'TjfieldsModel', array('ignore_request' => true));
+							$tjFieldsFieldModel = BaseDatabaseModel::getInstance('Field', 'TjfieldsModel', array('ignore_request' => true));
 							$tjFieldsFieldModel->save($field);
 							$fieldId = (int) $tjFieldsFieldModel->getState($tjFieldsFieldModel->getName() . '.id');
 							$input->post->set('client_type', '');
@@ -373,6 +375,6 @@ class TjucmControllerTypes extends JControllerAdmin
 		}
 
 		$app->enqueueMessage(Text::_('COM_TJUCM_TYPE_IMPORT_SUCCESS_MSG'), 'success');
-		$app->redirect(JUri::root() . 'administrator/index.php?option=com_tjucm&view=types&layout=import&tmpl=component');
+		$app->redirect(Uri::root() . 'administrator/index.php?option=com_tjucm&view=types&layout=import&tmpl=component');
 	}
 }

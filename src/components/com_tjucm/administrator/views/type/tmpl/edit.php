@@ -8,12 +8,16 @@
  */
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Factory;
 
-JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
-JHtml::_('behavior.tooltip');
-JHtml::_('behavior.formvalidation');
-JHtml::_('formbehavior.chosen', 'select');
-JHtml::_('behavior.keepalive');
+HTMLHelper::addIncludePath(JPATH_COMPONENT . '/helpers/html');
+HTMLHelper::_('bootstrap.tooltip');
+HTMLHelper::_('behavior.formvalidator');
+HTMLHelper::_('formbehavior.chosen', 'select');
+HTMLHelper::_('behavior.keepalive');
 ?>
 <script type="text/javascript">
 	Joomla.submitbutton = function (task) {
@@ -29,17 +33,17 @@ JHtml::_('behavior.keepalive');
 				Joomla.submitform(task, document.getElementById('type-form'));
 			}
 			else {
-				alert('<?php echo $this->escape(JText::_('JGLOBAL_VALIDATION_FORM_FAILED')); ?>');
+				alert('<?php echo $this->escape(Text::_('JGLOBAL_VALIDATION_FORM_FAILED')); ?>');
 			}
 		}
 	}
 </script>
 
-<form action="<?php echo JRoute::_('index.php?option=com_tjucm&layout=edit&id=' . (int) $this->item->id); ?>" method="post" enctype="multipart/form-data" name="adminForm" id="type-form" class="form-validate">
+<form action="<?php echo Route::_('index.php?option=com_tjucm&layout=edit&id=' . (int) $this->item->id); ?>" method="post" enctype="multipart/form-data" name="adminForm" id="type-form" class="form-validate">
 	<div class="form-horizontal">
-		<?php echo JHtml::_('bootstrap.startTabSet', 'myTab', array('active' => 'general')); ?>
+		<?php echo HTMLHelper::_('bootstrap.startTabSet', 'myTab', array('active' => 'general')); ?>
 
-			<?php echo JHtml::_('bootstrap.addTab', 'myTab', 'general', JText::_('COM_TJUCM_TITLE_TYPE', true)); ?>
+			<?php echo HTMLHelper::_('bootstrap.addTab', 'myTab', 'general', Text::_('COM_TJUCM_TITLE_TYPE', true)); ?>
 				<div class="row-fluid">
 					<div class="span10 form-horizontal">
 						<fieldset class="adminform">
@@ -64,17 +68,17 @@ JHtml::_('behavior.keepalive');
 						</fieldset>
 					</div>
 				</div>
-			<?php echo JHtml::_('bootstrap.endTab'); ?>
+			<?php echo HTMLHelper::_('bootstrap.endTab'); ?>
 
-			<?php if (JFactory::getUser()->authorise('core.admin', 'tjucm')) : ?>
-				<?php echo JHtml::_('bootstrap.addTab', 'myTab', 'permissions', JText::_('JGLOBAL_ACTION_PERMISSIONS_LABEL', true)); ?>
+			<?php if (Factory::getUser()->authorise('core.admin', 'tjucm')) : ?>
+				<?php echo HTMLHelper::_('bootstrap.addTab', 'myTab', 'permissions', Text::_('JGLOBAL_ACTION_PERMISSIONS_LABEL', true)); ?>
 				<?php echo $this->form->getInput('rules'); ?>
-				<?php echo JHtml::_('bootstrap.endTab'); ?>
+				<?php echo HTMLHelper::_('bootstrap.endTab'); ?>
 			<?php endif; ?>
 
-		<?php echo JHtml::_('bootstrap.endTabSet'); ?>
+		<?php echo HTMLHelper::_('bootstrap.endTabSet'); ?>
 
 		<input type="hidden" name="task" value=""/>
-		<?php echo JHtml::_('form.token'); ?>
+		<?php echo HTMLHelper::_('form.token'); ?>
 	</div>
 </form>

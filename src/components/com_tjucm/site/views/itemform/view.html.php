@@ -10,14 +10,21 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\MVC\View\HtmlView;
+use Joomla\CMS\Form\Form;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Factory;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\Plugin\PluginHelper;
 
 jimport('joomla.application.component.view');
 jimport('joomla.application.component.controller');
 jimport('joomla.filesystem.file');
 jimport('joomla.database.table');
 
-use Joomla\CMS\Factory;
-use Joomla\CMS\Language\Text;
 use Joomla\CMS\Component\ComponentHelper;
 
 /**
@@ -25,10 +32,10 @@ use Joomla\CMS\Component\ComponentHelper;
  *
  * @since  1.6
  */
-class TjucmViewItemform extends JViewLegacy
+class TjucmViewItemform extends HtmlView
 {
 	/**
-	 * The JForm object
+	 * The Form object
 	 *
 	 * @var  Form
 	 */
@@ -106,19 +113,19 @@ class TjucmViewItemform extends JViewLegacy
 
 		if (!$user->id)
 		{
-			$msg = JText::_('COM_TJUCM_LOGIN_MSG');
+			$msg = Text::_('COM_TJUCM_LOGIN_MSG');
 
 			// Get current url.
-			$current = JUri::getInstance()->toString();
+			$current = Uri::getInstance()->toString();
 			$url = base64_encode($current);
-			JFactory::getApplication()->redirect(JRoute::_('index.php?option=com_users&view=login&return=' . $url, false), $msg);
+			Factory::getApplication()->redirect(Route::_('index.php?option=com_users&view=login&return=' . $url, false), $msg);
 		}
 
 		$this->state   = $this->get('State');
 		$this->id = $input->getInt('id', $input->getInt('content_id', 0));
 
 		// Include models
-		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 
 		/* Get model instance here */
 		$model = $this->getModel();
@@ -178,7 +185,7 @@ class TjucmViewItemform extends JViewLegacy
 				if (!empty($this->ucm_type))
 				{
 					JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
-					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+					$ucmTypeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', Factory::getDbo()));
 					$ucmTypeTable->load(array('alias' => $this->ucm_type));
 					$this->client = $ucmTypeTable->unique_identifier;
 				}
@@ -217,7 +224,7 @@ class TjucmViewItemform extends JViewLegacy
 
 		// Get ucm type data
 		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
-		$typeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+		$typeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', Factory::getDbo()));
 		$typeTable->load(array('unique_identifier' => $this->client));
 		$typeParams = json_decode($typeTable->params);
 
@@ -277,8 +284,8 @@ class TjucmViewItemform extends JViewLegacy
 			);
 
 		// Check if draft save is enabled for the form
-		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/tables');
-		$tjUcmTypeTable = JTable::getInstance('Type', 'TjucmTable');
+		Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/tables');
+		$tjUcmTypeTable = Table::getInstance('Type', 'TjucmTable');
 		$tjUcmTypeTable->load(array('unique_identifier' => $this->client));
 		$typeParams = json_decode($tjUcmTypeTable->params);
 
@@ -296,7 +303,7 @@ class TjucmViewItemform extends JViewLegacy
 		}
 
 		// Ucm triggger before item form display
-		JPluginHelper::importPlugin('tjucm');
+		PluginHelper::importPlugin('tjucm');
 		$dispatcher = JDispatcher::getInstance();
 		$dispatcher->trigger('tjucmOnBeforeItemFormDisplay', array(&$this->item, &$this->form_extra));
 

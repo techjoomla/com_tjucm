@@ -10,6 +10,9 @@
 
 // No direct access
 defined('_JEXEC') or die('Restricted access');
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Filter\OutputFilter;
 
 /**
  * Migration file for TJ-UCM
@@ -31,8 +34,8 @@ class TjHouseKeepingUpdateAlias extends TjModelHouseKeeping
 	 */
 	public function migrate()
 	{
-		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
-		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_menus/tables');
+		Table::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
+		Table::addIncludePath(JPATH_ROOT . '/administrator/components/com_menus/tables');
 		JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_ADMINISTRATOR);
 
 		// TJ-Fields helper object
@@ -43,7 +46,7 @@ class TjHouseKeepingUpdateAlias extends TjModelHouseKeeping
 		try
 		{
 			// Get all the UCM types
-			$db = JFactory::getDbo();
+			$db = Factory::getDbo();
 			$query = $db->getQuery(true);
 			$query->select('*');
 			$query->from($db->qn('#__tj_ucm_types'));
@@ -54,11 +57,11 @@ class TjHouseKeepingUpdateAlias extends TjModelHouseKeeping
 			{
 				foreach ($ucmTypes as $ucmType)
 				{
-					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', $db));
+					$ucmTypeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', $db));
 					$ucmTypeTable->load($ucmType->id);
 
 					// Remove white spaces in alias of UCM types
-					$updatedAlias = JFilterOutput::stringURLSafe($ucmTypeTable->alias);
+					$updatedAlias = OutputFilter::stringURLSafe($ucmTypeTable->alias);
 					$ucmTypeTable->alias = $updatedAlias;
 					$ucmTypeTable->store();
 				}
@@ -79,14 +82,14 @@ class TjHouseKeepingUpdateAlias extends TjModelHouseKeeping
 			{
 				foreach ($menuItems as $menuItem)
 				{
-					$menuItemTable = JTable::getInstance('Menu', 'MenusTable', array('dbo', $db));
+					$menuItemTable = Table::getInstance('Menu', 'MenusTable', array('dbo', $db));
 					$menuItemTable->load($menuItem->id);
 					$oldparams = json_decode($menuItemTable->params);
 
 					// Remove white spaces in alias of menus
 					if (isset($oldparams->ucm_type))
 					{
-						$oldparams->ucm_type  = JFilterOutput::stringURLSafe($oldparams->ucm_type);
+						$oldparams->ucm_type  = OutputFilter::stringURLSafe($oldparams->ucm_type);
 					}
 
 					$menuItemTable->params = json_encode($oldparams);

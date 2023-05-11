@@ -10,6 +10,8 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\MVC\Controller\FormController;
+use Joomla\CMS\Response\JsonResponse;
 
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Factory;
@@ -23,7 +25,7 @@ use Joomla\CMS\Table\Table;
  *
  * @since  __DEPLOY_VERSION__
  */
-class TjucmControllerType extends JControllerForm
+class TjucmControllerType extends FormController
 {
 	/**
 	 * Constructor
@@ -53,7 +55,7 @@ class TjucmControllerType extends JControllerForm
 
 		if (empty($client))
 		{
-			echo new JResponseJson(null);
+			echo new JsonResponse(null);
 			$app->close();
 		}
 
@@ -88,7 +90,7 @@ class TjucmControllerType extends JControllerForm
 			$validUcmType = false;
 		}
 
-		echo new JResponseJson($validUcmType);
+		echo new JsonResponse($validUcmType);
 		$app->close();
 	}
 
@@ -118,7 +120,7 @@ class TjucmControllerType extends JControllerForm
 
 		if (empty($client))
 		{
-			echo new JResponseJson(null);
+			echo new JsonResponse(null);
 			$app->close();
 		}
 
@@ -127,7 +129,7 @@ class TjucmControllerType extends JControllerForm
 
 		if (empty($clusterExist))
 		{
-			echo new JResponseJson(null);
+			echo new JsonResponse(null);
 			$app->close();
 		}
 
@@ -137,7 +139,7 @@ class TjucmControllerType extends JControllerForm
 
 		if (!$fieldTable->id)
 		{
-			echo new JResponseJson(null);
+			echo new JsonResponse(null);
 			$app->close();
 		}
 
@@ -185,7 +187,7 @@ class TjucmControllerType extends JControllerForm
 			}
 		}
 
-		echo new JResponseJson($usersClusters);
+		echo new JsonResponse($usersClusters);
 		$app->close();
 	}
 }

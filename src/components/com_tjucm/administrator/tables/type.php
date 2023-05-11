@@ -10,6 +10,15 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\Table\Observer\ContentHistory;
+use Joomla\CMS\Table\Observer\AbstractObserver;
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\Factory;
+use Joomla\Data\DataObject;
+use Joomla\CMS\Filter\OutputFilter;
+use Joomla\Registry\Registry;
+use Joomla\CMS\Access\Access;
+use Joomla\CMS\Language\Text;
 
 use Joomla\Utilities\ArrayHelper;
 
@@ -18,7 +27,7 @@ use Joomla\Utilities\ArrayHelper;
  *
  * @since  1.6
  */
-class TjucmTabletype extends JTable
+class TjucmTabletype extends Table
 {
 	/**
 	 * Check if a field is unique
@@ -29,7 +38,7 @@ class TjucmTabletype extends JTable
 	 */
 	private function isUnique ($field)
 	{
-		$db = JFactory::getDbo();
+		$db = Factory::getDbo();
 		$query = $db->getQuery(true);
 
 		$query
@@ -47,7 +56,7 @@ class TjucmTabletype extends JTable
 	/**
 	 * Constructor
 	 *
-	 * @param   JDatabase  &$db  A database connector object
+	 * @param   DataObjectbase  &$db  A database connector object
 	 */
 	public function __construct(&$db)
 	{
@@ -63,7 +72,7 @@ class TjucmTabletype extends JTable
 	 *
 	 * @return  null|string  null is operation was satisfactory, otherwise returns an error
 	 *
-	 * @see     JTable:bind
+	 * @see     Table:bind
 	 * @since   1.5
 	 */
 	public function bind($array, $ignore = '')
@@ -73,27 +82,27 @@ class TjucmTabletype extends JTable
 		{
 			if (empty($array['title']))
 			{
-				$array['alias'] = JFilterOutput::stringURLSafe(date('Y-m-d H:i:s'));
+				$array['alias'] = OutputFilter::stringURLSafe(date('Y-m-d H:i:s'));
 			}
 			else
 			{
-				if (JFactory::getConfig()->get('unicodeslugs') == 1)
+				if (Factory::getConfig()->get('unicodeslugs') == 1)
 				{
-					$array['alias'] = JFilterOutput::stringURLUnicodeSlug(trim($array['title']));
+					$array['alias'] = OutputFilter::stringURLUnicodeSlug(trim($array['title']));
 				}
 				else
 				{
-					$array['alias'] = JFilterOutput::stringURLSafe(trim($array['title']));
+					$array['alias'] = OutputFilter::stringURLSafe(trim($array['title']));
 				}
 			}
 		}
 
-		$input = JFactory::getApplication()->input;
+		$input = Factory::getApplication()->input;
 		$task = $input->getString('task', '');
 
 		if ($array['id'] == 0)
 		{
-			$array['created_by'] = JFactory::getUser()->id;
+			$array['created_by'] = Factory::getUser()->id;
 		}
 
 		if ($array['id'] == 0)
@@ -103,10 +112,10 @@ class TjucmTabletype extends JTable
 
 		if ($array['id'] == 0)
 		{
-			$array['modified_by'] = JFactory::getUser()->id;
+			$array['modified_by'] = Factory::getUser()->id;
 		}
 
-		$task = JFactory::getApplication()->input->get('task');
+		$task = Factory::getApplication()->input->get('task');
 
 		if ($task == 'apply' || $task == 'save')
 
@@ -116,25 +125,25 @@ class TjucmTabletype extends JTable
 
 		if (isset($array['params']) && is_array($array['params']))
 		{
-			$registry = new JRegistry;
+			$registry = new Registry;
 			$registry->loadArray($array['params']);
 			$array['params'] = (string) $registry;
 		}
 
 		if (isset($array['metadata']) && is_array($array['metadata']))
 		{
-			$registry = new JRegistry;
+			$registry = new Registry;
 			$registry->loadArray($array['metadata']);
 			$array['metadata'] = (string) $registry;
 		}
 
-		if (!JFactory::getUser()->authorise('core.admin', 'com_tjucm.type.' . $array['id']))
+		if (!Factory::getUser()->authorise('core.admin', 'com_tjucm.type.' . $array['id']))
 		{
-			$actions         = JAccess::getActionsFromFile(
+			$actions         = Access::getActionsFromFile(
 				JPATH_ADMINISTRATOR . '/components/com_tjucm/access.xml',
 				"/access/section[@name='type']/"
 			);
-			$default_actions = JAccess::getAssetRules('com_tjucm.type.' . $array['id'])->getData();
+			$default_actions = Access::getAssetRules('com_tjucm.type.' . $array['id'])->getData();
 			$array_jaccess   = array();
 
 			foreach ($actions as $action)
@@ -142,7 +151,7 @@ class TjucmTabletype extends JTable
 				$array_jaccess[$action->name] = (!empty($default_actions[$action->name]))?$default_actions[$action->name]:'';
 			}
 
-			$array['rules'] = $this->JAccessRulestoArray($array_jaccess);
+			$array['rules'] = $this->RulestoArray($array_jaccess);
 		}
 
 		// Bind the rules for ACL where supported.
@@ -155,13 +164,13 @@ class TjucmTabletype extends JTable
 	}
 
 	/**
-	 * This function convert an array of JAccessRule objects into an rules array.
+	 * This function convert an array of Rule objects into an rules array.
 	 *
-	 * @param   array  $jaccessrules  An array of JAccessRule objects.
+	 * @param   array  $jaccessrules  An array of Rule objects.
 	 *
 	 * @return  array
 	 */
-	private function JAccessRulestoArray($jaccessrules)
+	private function RulestoArray($jaccessrules)
 	{
 		$rules = array();
 
@@ -241,7 +250,7 @@ class TjucmTabletype extends JTable
 			// Nothing to set publishing state on, return false.
 			else
 			{
-				throw new Exception(500, JText::_('JLIB_DATABASE_ERROR_NO_ROWS_SELECTED'));
+				throw new Exception(500, Text::_('JLIB_DATABASE_ERROR_NO_ROWS_SELECTED'));
 			}
 		}
 
@@ -291,7 +300,7 @@ class TjucmTabletype extends JTable
 	 *
 	 * @return string The asset name
 	 *
-	 * @see JTable::_getAssetName
+	 * @see Table::_getAssetName
 	 */
 	protected function _getAssetName()
 	{
@@ -303,17 +312,17 @@ class TjucmTabletype extends JTable
 	/**
 	 * Returns the parent asset's id. If you have a tree structure, retrieve the parent's id using the external key field
 	 *
-	 * @param   JTable   $table  Table name
+	 * @param   Table   $table  Table name
 	 * @param   integer  $id     Id
 	 *
-	 * @see JTable::_getAssetParentId
+	 * @see Table::_getAssetParentId
 	 *
 	 * @return mixed The id on success, false on failure.
 	 */
-	protected function _getAssetParentId(JTable $table = null, $id = null)
+	protected function _getAssetParentId(Table $table = null, $id = null)
 	{
 		// We will retrieve the parent-asset from the Asset-table
-		$assetParent = JTable::getInstance('Asset');
+		$assetParent = Table::getInstance('Asset');
 
 		// Default: if no asset-parent can be found we take the global asset
 		$assetParentId = $assetParent->getRootId();

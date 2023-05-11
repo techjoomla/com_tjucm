@@ -10,18 +10,24 @@
 
 // No direct access.
 defined('_JEXEC') or die;
+use Joomla\CMS\MVC\Model\AdminModel;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Object\CMSObject;
+use Joomla\CMS\Form\Form;
+use Joomla\CMS\Filesystem\File;
+use Joomla\CMS\Plugin\PluginHelper;
 
 jimport('joomla.application.component.modelform');
 jimport('joomla.event.dispatcher');
 
 require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
 
-use Joomla\CMS\Table\Table;
 use Joomla\Utilities\ArrayHelper;
-use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\Registry\Registry;
-use Joomla\CMS\Language\Text;
 use TJQueue\Admin\TJQueueProduce;
 
 if (ComponentHelper::getComponent('com_tjqueue', true)->enabled)
@@ -36,7 +42,7 @@ JLoader::register('TjucmAccess', JPATH_SITE . '/components/com_tjucm/includes/ac
  *
  * @since  1.0
  */
-class TjucmModelItemForm extends JModelAdmin
+class TjucmModelItemForm extends AdminModel
 {
 	private $item = null;
 
@@ -68,8 +74,8 @@ class TjucmModelItemForm extends JModelAdmin
 	 */
 	protected function populateState()
 	{
-		$app = JFactory::getApplication('com_tjucm');
-		$user = JFactory::getUser();
+		$app = Factory::getApplication('com_tjucm');
+		$user = Factory::getUser();
 
 		// Load state from the request.
 		$id = $app->input->getInt('id');
@@ -97,15 +103,15 @@ class TjucmModelItemForm extends JModelAdmin
 				if (!empty($ucm_type))
 				{
 					JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
-					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+					$ucmTypeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', Factory::getDbo()));
 					$ucmTypeTable->load(array('alias' => $ucm_type));
 					$ucmType = $ucmTypeTable->unique_identifier;
 				}
 			}
 		}
 
-		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
-		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$tjUcmModelType = BaseDatabaseModel::getInstance('Type', 'TjucmModel');
 		$ucmId = $tjUcmModelType->getTypeId($ucmType);
 
 		$this->setState('ucmType.id', $ucmId);
@@ -140,7 +146,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 */
 	public function &getData($id = null)
 	{
-		$user = JFactory::getUser();
+		$user = Factory::getUser();
 
 		$this->item = false;
 
@@ -170,7 +176,7 @@ class TjucmModelItemForm extends JModelAdmin
 				// Check for published state if filter set.
 				if (((is_numeric($published)) || (is_numeric($archived))) && (($table->state != $published) && ($table->state != $archived)))
 				{
-					return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
+					return JError::raiseError(404, Text::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
 				}
 			}
 
@@ -192,7 +198,7 @@ class TjucmModelItemForm extends JModelAdmin
 			}
 			else
 			{
-				if ($this->item->created_by == JFactory::getUser()->id)
+				if ($this->item->created_by == Factory::getUser()->id)
 				{
 					if ($canEditOwn || $canEdit)
 					{
@@ -210,7 +216,7 @@ class TjucmModelItemForm extends JModelAdmin
 		}
 		else
 		{
-			return JError::raiseError(404, JText::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
+			return JError::raiseError(404, Text::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
 		}
 
 		return $this->item;
@@ -223,7 +229,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 * @param   string  $prefix  A prefix for the table class name. Optional.
 	 * @param   array   $config  Configuration array for model. Optional.
 	 *
-	 * @return    JTable    A database object
+	 * @return    Table    A database object
 	 *
 	 * @since    1.0
 	 */
@@ -231,7 +237,7 @@ class TjucmModelItemForm extends JModelAdmin
 	{
 		$this->addTablePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/tables');
 
-		return JTable::getInstance($type, $prefix, $config);
+		return Table::getInstance($type, $prefix, $config);
 	}
 
 	/**
@@ -252,7 +258,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 * @param   array    $data      An optional array of data for the form to interogate.
 	 * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not.
 	 *
-	 * @return  JForm  A JForm object on success, false on failure
+	 * @return  Form  A Form object on success, false on failure
 	 *
 	 * @since    1.0
 	 */
@@ -280,7 +286,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 * @param   array    $data      An optional array of data for the form to interogate.
 	 * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not.
 	 *
-	 * @return  JForm  A JForm object on success, false on failure
+	 * @return  Form  A Form object on success, false on failure
 	 *
 	 * @since    1.2.2
 	 */
@@ -336,7 +342,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 * @param   array    $data      An optional array of data for the form to interogate.
 	 * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not.
 	 *
-	 * @return  JForm  A JForm object on success, false on failure
+	 * @return  Form  A Form object on success, false on failure
 	 *
 	 * @since    1.2.2
 	 */
@@ -399,7 +405,7 @@ class TjucmModelItemForm extends JModelAdmin
 	 * @param   array    $data      An optional array of data for the form to interogate.
 	 * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not.
 	 *
-	 * @return  JForm  A JForm object on success, false on failure
+	 * @return  Form  A Form object on success, false on failure
 	 *
 	 * @since    1.2.2
 	 */
@@ -456,9 +462,9 @@ class TjucmModelItemForm extends JModelAdmin
 		);
 
 		// Delete temp xml once its object is created
-		if (JFile::exists($newXmlFilePath))
+		if (File::exists($newXmlFilePath))
 		{
-			JFile::delete($newXmlFilePath);
+			File::delete($newXmlFilePath);
 		}
 
 		if (empty($sectionForm))
@@ -479,7 +485,7 @@ class TjucmModelItemForm extends JModelAdmin
 	protected function loadFormData()
 	{
 		// Check the session for previously entered form data.
-		$data = JFactory::getApplication()->getUserState('com_tjucm.edit.item.data', array());
+		$data = Factory::getApplication()->getUserState('com_tjucm.edit.item.data', array());
 
 		if (empty($data))
 		{
@@ -510,7 +516,7 @@ class TjucmModelItemForm extends JModelAdmin
 		// Guest users are not allowed to add the records
 		if (empty($user->id))
 		{
-			$this->setError(JText::_('COM_TJUCM_FORM_SAVE_FAILED_AUTHORIZATION_ERROR'));
+			$this->setError(Text::_('COM_TJUCM_FORM_SAVE_FAILED_AUTHORIZATION_ERROR'));
 
 			return false;
 		}
@@ -526,7 +532,7 @@ class TjucmModelItemForm extends JModelAdmin
 
 		// Get instance of UCM type table
 		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
-		$tjUcmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', Factory::getDbo()));
+		$tjUcmTypeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', Factory::getDbo()));
 
 		// Check and assign valid client and type_id to the record
 		if (!empty($data['type_id']) || !empty($data['client']))
@@ -544,7 +550,7 @@ class TjucmModelItemForm extends JModelAdmin
 		}
 		else
 		{
-			$this->setError(JText::_('COM_TJUCM_FORM_SAVE_FAILED_CLIENT_REQUIRED'));
+			$this->setError(Text::_('COM_TJUCM_FORM_SAVE_FAILED_CLIENT_REQUIRED'));
 
 			return false;
 		}
@@ -587,7 +593,7 @@ class TjucmModelItemForm extends JModelAdmin
 
 			if (!$canAdd)
 			{
-				$this->setError(JText::_('COM_TJUCM_FORM_SAVE_FAILED_AUTHORIZATION_ERROR'));
+				$this->setError(Text::_('COM_TJUCM_FORM_SAVE_FAILED_AUTHORIZATION_ERROR'));
 
 				return false;
 			}
@@ -599,7 +605,7 @@ class TjucmModelItemForm extends JModelAdmin
 
 				if (!$canAdd)
 				{
-					$this->setError(JText::sprintf('COM_TJUCM_ALLOWED_COUNT_LIMIT', $allowedCount));
+					$this->setError(Text::sprintf('COM_TJUCM_ALLOWED_COUNT_LIMIT', $allowedCount));
 
 					return false;
 				}
@@ -625,7 +631,7 @@ class TjucmModelItemForm extends JModelAdmin
 
 			if (!$authorised)
 			{
-				$this->setError(JText::_('COM_TJUCM_FORM_SAVE_FAILED_AUTHORIZATION_ERROR'));
+				$this->setError(Text::_('COM_TJUCM_FORM_SAVE_FAILED_AUTHORIZATION_ERROR'));
 
 				return false;
 			}
@@ -657,7 +663,7 @@ class TjucmModelItemForm extends JModelAdmin
 				|| array_key_exists($itemCategoryFieldName, $fieldData['fieldsvalue']))
 			{
 				JLoader::import('components.com_tjucm.tables.item', JPATH_ADMINISTRATOR);
-				$ucmItemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', JFactory::getDbo()));
+				$ucmItemTable = Table::getInstance('Item', 'TjucmTable', array('dbo', Factory::getDbo()));
 				$ucmItemTable->load(array('id' => $fieldData['content_id']));
 
 				if (!empty($fieldData['fieldsvalue'][$clusterFieldName]))
@@ -668,7 +674,7 @@ class TjucmModelItemForm extends JModelAdmin
 				if (!empty($fieldData['fieldsvalue'][$ownerShipFieldName]))
 				{
 					JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
-					$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', JFactory::getDbo()));
+					$fieldTable = Table::getInstance('Field', 'TjfieldsTable', array('dbo', Factory::getDbo()));
 					$fieldTable->load(array('name' => $ownerShipFieldName));
 					$fieldParams = new Registry($fieldTable->params);
 
@@ -703,7 +709,7 @@ class TjucmModelItemForm extends JModelAdmin
 	public function delete(&$contentId)
 	{
 		$ucmTypeId = $this->getState('ucmType.id');
-		$user = JFactory::getUser();
+		$user = Factory::getUser();
 		$table = $this->getTable();
 		$table->load($contentId);
 		$canDelete = TjucmAccess::canDelete($table->type_id, $contentId);
@@ -713,7 +719,7 @@ class TjucmModelItemForm extends JModelAdmin
 
 		if ($canDeleteown)
 		{
-			$deleteOwn = (JFactory::getUser()->id == $table->created_by ? true : false);
+			$deleteOwn = (Factory::getUser()->id == $table->created_by ? true : false);
 		}
 
 		if ($canDelete || $deleteOwn)
@@ -728,7 +734,7 @@ class TjucmModelItemForm extends JModelAdmin
 			}
 
 			// If there are child records then delete child records first
-			$db = JFactory::getDbo();
+			$db = Factory::getDbo();
 			$query = $db->getQuery(true);
 			$query->select('id');
 			$query->from($db->quoteName('#__tj_ucm_data'));
@@ -743,7 +749,7 @@ class TjucmModelItemForm extends JModelAdmin
 					$table->load($subFormContentId);
 
 					// Plugin trigger on before item delete
-					JPluginHelper::importPlugin('actionlog');
+					PluginHelper::importPlugin('actionlog');
 					$dispatcher = JDispatcher::getInstance();
 					$dispatcher->trigger('tjUcmOnBeforeDeleteItem', array($subFormContentId, $table->client));
 
@@ -752,7 +758,7 @@ class TjucmModelItemForm extends JModelAdmin
 						$this->deleteExtraFieldsData($subFormContentId, $table->client);
 
 						// Plugin trigger on after item delete
-						JPluginHelper::importPlugin('actionlog');
+						PluginHelper::importPlugin('actionlog');
 						$dispatcher = JDispatcher::getInstance();
 						$dispatcher->trigger('tjUcmOnAfterDeleteItem', array($subFormContentId, $table->client));
 					}
@@ -763,7 +769,7 @@ class TjucmModelItemForm extends JModelAdmin
 			$table->load($id);
 
 			// Plugin trigger on before item delete
-			JPluginHelper::importPlugin('actionlog');
+			PluginHelper::importPlugin('actionlog');
 			$dispatcher = JDispatcher::getInstance();
 			$dispatcher->trigger('tjUcmOnBeforeDeleteItem', array($id, $table->client));
 
@@ -772,7 +778,7 @@ class TjucmModelItemForm extends JModelAdmin
 				$this->deleteExtraFieldsData($id, $table->client);
 
 				// Plugin trigger on after item delete
-				JPluginHelper::importPlugin('actionlog');
+				PluginHelper::importPlugin('actionlog');
 				$dispatcher = JDispatcher::getInstance();
 				$dispatcher->trigger('tjUcmOnAfterDeleteItem', array($id, $table->client));
 
@@ -785,7 +791,7 @@ class TjucmModelItemForm extends JModelAdmin
 		}
 		else
 		{
-			throw new Exception(JText::_('COM_TJUCM_ITEM_SAVED_STATE_ERROR'), 403);
+			throw new Exception(Text::_('COM_TJUCM_ITEM_SAVED_STATE_ERROR'), 403);
 
 			return false;
 		}
@@ -804,7 +810,7 @@ class TjucmModelItemForm extends JModelAdmin
 	{
 		if (!empty($userId) && !empty($client))
 		{
-			$db    = JFactory::getDbo();
+			$db    = Factory::getDbo();
 			$query = $db->getQuery(true);
 			$query->select("count(" . $db->quoteName('id') . ")");
 			$query->from($db->quoteName('#__tj_ucm_data'));
@@ -849,7 +855,7 @@ class TjucmModelItemForm extends JModelAdmin
 			$efd->value = $efd->value[0];
 		}
 
-		$db = JFactory::getDbo();
+		$db = Factory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('id');
 		$query->from($db->quoteName('#__tj_ucm_data'));
@@ -961,11 +967,11 @@ class TjucmModelItemForm extends JModelAdmin
 			return false;
 		}
 
-		$db = JFactory::getDbo();
+		$db = Factory::getDbo();
 
 		// Get all the fields of the UCM type
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
-		$tjFieldsModelFields = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+		$tjFieldsModelFields = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
 		$tjFieldsModelFields->setState("filter.client", $client);
 		$tjFieldsModelFields->setState("filter.state", 1);
 		$fields = $tjFieldsModelFields->getItems();
@@ -977,7 +983,7 @@ class TjucmModelItemForm extends JModelAdmin
 
 		// Get object of TJ-Fields field model
 		JLoader::import('components.com_tjfields.models.field', JPATH_ADMINISTRATOR);
-		$tjFieldsModelField = JModelLegacy::getInstance('Field', 'TjfieldsModel');
+		$tjFieldsModelField = BaseDatabaseModel::getInstance('Field', 'TjfieldsModel');
 
 		$returnData = array();
 
@@ -1040,7 +1046,7 @@ class TjucmModelItemForm extends JModelAdmin
 					$sfFieldName = $field->name;
 
 					// Get fields of the subform of the parent form
-					$tjFieldsModelFields = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+					$tjFieldsModelFields = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
 					$tjFieldsModelFields->setState("filter.client", $ucmSubFormClient);
 					$tjFieldsModelFields->setState("filter.state", 1);
 					$ucmSubFormfields = $tjFieldsModelFields->getItems();

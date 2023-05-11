@@ -10,9 +10,12 @@
 
 // No direct access.
 defined('_JEXEC') or die;
-
-jimport('joomla.application.component.controlleradmin');
-
+use Joomla\CMS\MVC\Controller\AdminController;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Session\Session;
+use Joomla\CMS\Log\Log;
+use Joomla\CMS\Router\Route;
 use Joomla\Utilities\ArrayHelper;
 
 /**
@@ -20,7 +23,7 @@ use Joomla\Utilities\ArrayHelper;
  *
  * @since  1.6
  */
-class TjucmControllerItems extends JControllerAdmin
+class TjucmControllerItems extends AdminController
 {
 	/**
 	 * Constructor
@@ -31,11 +34,11 @@ class TjucmControllerItems extends JControllerAdmin
 	{
 		// $this->view_list = 'items';
 
-		$this->client = JFactory::getApplication()->input->get('client');
+		$this->client = Factory::getApplication()->input->get('client');
 
 		if (empty($this->client))
 		{
-			$this->client = JFactory::getApplication()->input->get('jform', array(), 'array')['client'];
+			$this->client = Factory::getApplication()->input->get('jform', array(), 'array')['client'];
 		}
 
 		parent::__construct();
@@ -49,7 +52,7 @@ class TjucmControllerItems extends JControllerAdmin
 	public function duplicate()
 	{
 		// Check for request forgeries
-		Jsession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+		Jsession::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
 		// Get id(s)
 		$pks = $this->input->post->get('cid', array(), 'array');
@@ -58,7 +61,7 @@ class TjucmControllerItems extends JControllerAdmin
 		{
 			if (empty($pks))
 			{
-				throw new Exception(JText::_('COM_TJUCM_NO_ELEMENT_SELECTED'));
+				throw new Exception(Text::_('COM_TJUCM_NO_ELEMENT_SELECTED'));
 			}
 
 			ArrayHelper::toInteger($pks);
@@ -68,7 +71,7 @@ class TjucmControllerItems extends JControllerAdmin
 		}
 		catch (Exception $e)
 		{
-			JFactory::getApplication()->enqueueMessage($e->getMessage(), 'warning');
+			Factory::getApplication()->enqueueMessage($e->getMessage(), 'warning');
 		}
 
 		$this->setRedirect('index.php?option=com_tjucm&view=items' . $this->client);
@@ -102,7 +105,7 @@ class TjucmControllerItems extends JControllerAdmin
 	public function saveOrderAjax()
 	{
 		// Get the input
-		$input = JFactory::getApplication()->input;
+		$input = Factory::getApplication()->input;
 		$pks   = $input->post->get('cid', array(), 'array');
 		$order = $input->post->get('order', array(), 'array');
 
@@ -122,7 +125,7 @@ class TjucmControllerItems extends JControllerAdmin
 		}
 
 		// Close the application
-		JFactory::getApplication()->close();
+		Factory::getApplication()->close();
 	}
 
 	/**
@@ -135,14 +138,14 @@ class TjucmControllerItems extends JControllerAdmin
 	public function delete()
 	{
 		// Check for request forgeries
-		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
 		// Get items to remove from the request.
-		$cid = JFactory::getApplication()->input->get('cid', array(), 'array');
+		$cid = Factory::getApplication()->input->get('cid', array(), 'array');
 
 		if (!is_array($cid) || count($cid) < 1)
 		{
-			JLog::add(JText::_($this->text_prefix . '_NO_ITEM_SELECTED'), JLog::WARNING, 'jerror');
+			Log::add(Text::_($this->text_prefix . '_NO_ITEM_SELECTED'), Log::WARNING, 'jerror');
 		}
 		else
 		{
@@ -159,7 +162,7 @@ class TjucmControllerItems extends JControllerAdmin
 			// Remove the items.
 			if ($model->delete($cid))
 			{
-				$this->setMessage(JText::plural($this->text_prefix . '_N_ITEMS_DELETED', count($cid)));
+				$this->setMessage(Text::plural($this->text_prefix . '_N_ITEMS_DELETED', count($cid)));
 			}
 			else
 			{
@@ -170,6 +173,6 @@ class TjucmControllerItems extends JControllerAdmin
 			$this->postDeleteHook($model, $cid);
 		}
 
-		$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=' . $this->view_list . '&client=' . $this->client, false));
+		$this->setRedirect(Route::_('index.php?option=' . $this->option . '&view=' . $this->view_list . '&client=' . $this->client, false));
 	}
 }

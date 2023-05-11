@@ -10,15 +10,16 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\MVC\Controller\BaseController;
 
 // Access check.
-if (!JFactory::getUser()->authorise('core.manage', 'com_tjucm'))
+if (!Factory::getUser()->authorise('core.manage', 'com_tjucm'))
 {
-	throw new Exception(JText::_('JERROR_ALERTNOAUTHOR'));
+	throw new Exception(Text::_('JERROR_ALERTNOAUTHOR'));
 }
 
-// Include dependancies
-jimport('joomla.application.component.controller');
 
 // Load backend helper
 $path = JPATH_ADMINISTRATOR . '/components/com_tjucm/helpers/tjucm.php';
@@ -31,6 +32,6 @@ if (!class_exists('TjucmHelper'))
 
 JLoader::registerPrefix('Tjucm', JPATH_COMPONENT_ADMINISTRATOR);
 
-$controller = JControllerLegacy::getInstance('Tjucm');
-$controller->execute(JFactory::getApplication()->input->get('task'));
+$controller = BaseController::getInstance('Tjucm');
+$controller->execute(Factory::getApplication()->input->get('task'));
 $controller->redirect();

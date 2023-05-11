@@ -10,13 +10,20 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Session\Session;
 
 /**
  * Item controller class.
  *
  * @since  1.6
  */
-class TjucmControllerItem extends JControllerLegacy
+class TjucmControllerItem extends BaseController
 {
 	/**
 	 * Constructor
@@ -25,10 +32,10 @@ class TjucmControllerItem extends JControllerLegacy
 	 */
 	public function __construct()
 	{
-		$app = JFactory::getApplication();
+		$app = Factory::getApplication();
 
-		$this->client  = JFactory::getApplication()->input->get('client');
-		$this->created_by  = JFactory::getApplication()->input->get('created_by');
+		$this->client  = Factory::getApplication()->input->get('client');
+		$this->created_by  = Factory::getApplication()->input->get('created_by');
 
 		// If client is empty then get client from menu params
 		if (empty($this->client))
@@ -46,7 +53,7 @@ class TjucmControllerItem extends JControllerLegacy
 				if (!empty($this->ucm_type))
 				{
 					JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
-					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+					$ucmTypeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', Factory::getDbo()));
 					$ucmTypeTable->load(array('alias' => $this->ucm_type));
 					$this->client = $ucmTypeTable->unique_identifier;
 				}
@@ -54,8 +61,8 @@ class TjucmControllerItem extends JControllerLegacy
 		}
 
 		// Get UCM type id from uniquue identifier
-		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
-		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$tjUcmModelType = BaseDatabaseModel::getInstance('Type', 'TjucmModel');
 		$this->ucmTypeId = $tjUcmModelType->getTypeId($this->client);
 
 		$this->appendUrl = "";
@@ -82,7 +89,7 @@ class TjucmControllerItem extends JControllerLegacy
 	 */
 	public function edit()
 	{
-		$app = JFactory::getApplication();
+		$app = Factory::getApplication();
 
 		// Get the previous edit id (if any) and the current edit id.
 		$previousId = (int) $app->getUserState('com_tjucm.edit.item.id');
@@ -111,7 +118,7 @@ class TjucmControllerItem extends JControllerLegacy
 		$link = 'index.php?option=com_tjucm&view=itemform&layout=default&client=' . $this->client . '&id=' . $editId;
 		$itemId = $tjUcmFrontendHelper->getItemId($link);
 
-		$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=itemform&id=' . $editId . '&Itemid=' . $itemId, false));
+		$this->setRedirect(Route::_('index.php?option=com_tjucm&view=itemform&id=' . $editId . '&Itemid=' . $itemId, false));
 	}
 
 	/**
@@ -125,10 +132,10 @@ class TjucmControllerItem extends JControllerLegacy
 	public function publish()
 	{
 		// Check for request forgeries.
-		(JSession::checkToken('get') or JSession::checkToken()) or jexit(JText::_('JINVALID_TOKEN'));
+		(Session::checkToken('get') or Session::checkToken()) or jexit(Text::_('JINVALID_TOKEN'));
 
 		// Initialise variables.
-		$app = JFactory::getApplication();
+		$app = Factory::getApplication();
 		$id = $app->input->getInt('id');
 		$tjUcmFrontendHelper = new TjucmHelpersTjucm;
 
@@ -149,7 +156,7 @@ class TjucmControllerItem extends JControllerLegacy
 			// Check for errors.
 			if ($return === false)
 			{
-				$this->setMessage(JText::sprintf('COM_TJUCM_SAVE_FAILED', $model->getError()), 'warning');
+				$this->setMessage(Text::sprintf('COM_TJUCM_SAVE_FAILED', $model->getError()), 'warning');
 			}
 
 			// Clear the profile id from the session.
@@ -159,11 +166,11 @@ class TjucmControllerItem extends JControllerLegacy
 			$app->setUserState('com_tjucm.edit.item.data', null);
 
 			// Redirect to the list screen.
-			$this->setMessage(JText::_('COM_TJUCM_ITEM_SAVED_SUCCESSFULLY'));
+			$this->setMessage(Text::_('COM_TJUCM_ITEM_SAVED_SUCCESSFULLY'));
 
 			// If there isn't any menu item active, redirect to list view
 			$itemId = $tjUcmFrontendHelper->getItemId('index.php?option=com_tjucm&view=items' . $this->client);
-			$this->setRedirect(JRoute::_('index.php?option=com_tjucm&view=items' . $this->appendUrl . '&Itemid=' . $itemId, false));
+			$this->setRedirect(Route::_('index.php?option=com_tjucm&view=items' . $this->appendUrl . '&Itemid=' . $itemId, false));
 
 			// Call trigger on after publish/unpublish the record
 			$dispatcher = JDispatcher::getInstance();
@@ -174,7 +181,7 @@ class TjucmControllerItem extends JControllerLegacy
 			// If there isn't any menu item active, redirect to list view
 			$link = 'index.php?option=com_tjucm&view=items' . $this->appendUrl;
 			$itemId = $tjUcmFrontendHelper->getItemId($link);
-			$this->setRedirect(JRoute::_($link . '&Itemid=' . $itemId, false), JText::_('COM_TJUCM_ITEM_SAVED_STATE_ERROR'), 'error');
+			$this->setRedirect(Route::_($link . '&Itemid=' . $itemId, false), Text::_('COM_TJUCM_ITEM_SAVED_STATE_ERROR'), 'error');
 		}
 	}
 
@@ -188,10 +195,10 @@ class TjucmControllerItem extends JControllerLegacy
 	public function remove()
 	{
 		// Check for request forgeries.
-		(JSession::checkToken('get') or JSession::checkToken()) or jexit(JText::_('JINVALID_TOKEN'));
+		(Session::checkToken('get') or Session::checkToken()) or jexit(Text::_('JINVALID_TOKEN'));
 
 		// Initialise variables.
-		$app = JFactory::getApplication();
+		$app = Factory::getApplication();
 
 		// Get the user data.
 		$id = $app->input->getInt('id', 0);
@@ -209,7 +216,7 @@ class TjucmControllerItem extends JControllerLegacy
 			// Check for errors.
 			if ($return === false)
 			{
-				$this->setMessage(JText::sprintf("COM_TJUCM_DELETE_FAILED", $model->getError()), 'warning');
+				$this->setMessage(Text::sprintf("COM_TJUCM_DELETE_FAILED", $model->getError()), 'warning');
 			}
 			else
 			{
@@ -225,20 +232,20 @@ class TjucmControllerItem extends JControllerLegacy
 				// Flush the data from the session.
 				$app->setUserState('com_tjucm.edit.item.data', null);
 
-				$this->setMessage(JText::_('COM_TJUCM_ITEM_DELETED_SUCCESSFULLY'));
+				$this->setMessage(Text::_('COM_TJUCM_ITEM_DELETED_SUCCESSFULLY'));
 			}
 
 			// If there isn't any menu item active, redirect to list view
 			$link = 'index.php?option=com_tjucm&view=items' . $this->appendUrl;
 			$itemId = $tjUcmFrontendHelper->getItemId($link);
-			$this->setRedirect(JRoute::_($link . '&Itemid=' . $itemId, false));
+			$this->setRedirect(Route::_($link . '&Itemid=' . $itemId, false));
 		}
 		else
 		{
 			// If there isn't any menu item active, redirect to list view
 			$link = 'index.php?option=com_tjucm&view=items' . $this->appendUrl;
 			$itemId = $tjUcmFrontendHelper->getItemId($link);
-			$this->setRedirect(JRoute::_($link . '&Itemid=' . $itemId, false), JText::_('COM_TJUCM_ITEM_SAVED_STATE_ERROR'), 'error');
+			$this->setRedirect(Route::_($link . '&Itemid=' . $itemId, false), Text::_('COM_TJUCM_ITEM_SAVED_STATE_ERROR'), 'error');
 		}
 	}
 }

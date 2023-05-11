@@ -10,10 +10,10 @@
 
 // No direct access
 defined('_JEXEC') or die('Restricted access');
-
-use Joomla\Registry\Registry;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\Table\Table;
+use Joomla\Registry\Registry;
 
 /**
  * Migration file for TJ-UCM
@@ -172,7 +172,7 @@ class TjHouseKeepingUcmSubformData extends TjModelHouseKeeping
 	 */
 	public function saveUcmSubFormRecords(&$validData, $ucmSubFormDataSet, $ucmTypeId)
 	{
-		$db = JFactory::getDbo();
+		$db = Factory::getDbo();
 		$subFormContentIds = array();
 		$isNew = empty($validData['id']) ? 1 : 0;
 
@@ -189,8 +189,8 @@ class TjHouseKeepingUcmSubformData extends TjModelHouseKeeping
 
 		JLoader::import('components.com_tjfields.tables.fieldsvalue', JPATH_ADMINISTRATOR);
 		JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
-		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
-		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$tjUcmModelType = BaseDatabaseModel::getInstance('Type', 'TjucmModel');
 		$itemFormModel  = BaseDatabaseModel::getInstance('ItemForm', 'TjucmModel', array('ignore_request' => true));
 		$itemFormModel->setState('ucmType.id', $ucmTypeId);
 
@@ -223,11 +223,11 @@ class TjHouseKeepingUcmSubformData extends TjModelHouseKeeping
 						$ucmSubFormData[$ucmSubformContentIdFieldName] = $insertedId;
 
 						// Get field id of contentid field
-						$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
+						$fieldTable = Table::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
 						$fieldTable->load(array('name' => $ucmSubformContentIdFieldName));
 
 						// Add-Update the value of content id field in the fields value table - start
-						$fieldsValueTable = JTable::getInstance('Fieldsvalue', 'TjfieldsTable', array('dbo', $db));
+						$fieldsValueTable = Table::getInstance('Fieldsvalue', 'TjfieldsTable', array('dbo', $db));
 						$fieldsValueTable->load(array('field_id' => $fieldTable->id, 'content_id' => $insertedId, 'client' => $validData['client']));
 
 						if (empty($fieldsValueTable->id))
@@ -237,7 +237,7 @@ class TjHouseKeepingUcmSubformData extends TjModelHouseKeeping
 							$fieldsValueTable->client = $validData['client'];
 						}
 
-						$fieldsValueTable->user_id = JFactory::getUser()->id;
+						$fieldsValueTable->user_id = Factory::getUser()->id;
 						$fieldsValueTable->store();
 
 						// Add-Update the value of content id field in the fields value table - end

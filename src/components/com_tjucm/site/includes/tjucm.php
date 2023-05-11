@@ -139,7 +139,6 @@ class TJUCM
 	/**
 	 * Load the component configuration
 	 *
-	 * @return  Joomla\Registry\Registry  A Registry object.
 	 */
 	public static function config()
 	{
