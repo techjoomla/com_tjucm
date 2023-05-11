@@ -9,6 +9,10 @@
  */
 
 defined('_JEXEC') or die;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\Language\Text;
 jimport('joomla.plugin.plugin');
 
 /**
@@ -29,26 +33,26 @@ class TjucmApiResourceType extends ApiResource
 	 */
 	public function get()
 	{
-		$jInput = JFactory::getApplication()->input;
+		$jInput = Factory::getApplication()->input;
 		$client = $jInput->get('client');
-		$table = JTable::getInstance('Type', 'TjucmTable');
+		$table = Table::getInstance('Type', 'TjucmTable');
 		$table->load(["unique_identifier" => $client]);
 
-		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		$tjUcmModelType = BaseDatabaseModel::getInstance('Type', 'TjucmModel');
 		$tjUcmModelType->setState("filter.client", $client);
 
 		// Variable to store UCM Type
 		$ucmType = $tjUcmModelType->getItem($table->id);
 
 		// Variable to store creator name and id
-		$created_by = JFactory::getUser($ucmType->created_by);
+		$created_by = Factory::getUser($ucmType->created_by);
 		$ucmType->created_by = array("id" => $created_by->id, "name" => $created_by->name);
 
 		// Variable to store modifier name and id
-		$modified_by = JFactory::getUser($ucmType->modified_by);
+		$modified_by = Factory::getUser($ucmType->modified_by);
 		$ucmType->modified_by = array("id" => $modified_by->id, "name" => $modified_by->name);
 
-		$tjFieldsModelGroups = JModelLegacy::getInstance('Groups', 'TjfieldsModel', array('ignore_request' => true));
+		$tjFieldsModelGroups = BaseDatabaseModel::getInstance('Groups', 'TjfieldsModel', array('ignore_request' => true));
 		$tjFieldsModelGroups->setState('list.ordering', 'a.ordering');
 		$tjFieldsModelGroups->setState('list.direction', 'asc');
 
@@ -58,7 +62,7 @@ class TjucmApiResourceType extends ApiResource
 		// Getting fields of fieldgroups
 		foreach ($fieldgroups as $groupKey => $groupValue)
 		{
-			$tjFieldsModelFields = JModelLegacy::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
+			$tjFieldsModelFields = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel', array('ignore_request' => true));
 			$tjFieldsModelFields->setState("filter.group_id", $fieldgroups[$groupKey]->id);
 			$tjFieldsModelFields->setState('list.ordering', 'a.ordering');
 			$tjFieldsModelFields->setState('list.direction', 'asc');
@@ -69,7 +73,7 @@ class TjucmApiResourceType extends ApiResource
 			// Getting options of field
 			foreach ($fields as $fieldKey => $fieldValue)
 			{
-				$tjFieldsModelOptions = JModelLegacy::getInstance('Options', 'TjfieldsModel');
+				$tjFieldsModelOptions = BaseDatabaseModel::getInstance('Options', 'TjfieldsModel');
 				$tjFieldsModelOptions->setState("filter.field_id", $fields[$fieldKey]->id);
 
 				// Variable to store Options of Field
@@ -93,7 +97,7 @@ class TjucmApiResourceType extends ApiResource
 		if (empty($ucmType))
 		{
 			$return_arr['success'] = false;
-			$return_arr['message'] = JText::_("COM_TJUCM_NO_TYPE");
+			$return_arr['message'] = Text::_("COM_TJUCM_NO_TYPE");
 		}
 		else
 		{
