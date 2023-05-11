@@ -9,6 +9,9 @@
  */
 
 defined('_JEXEC') or die;
+use Joomla\CMS\Factory;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\Language\Text;
 jimport('joomla.plugin.plugin');
 
 /**
@@ -29,9 +32,9 @@ class TjucmApiResourceItem extends ApiResource
 	 */
 	public function get()
 	{
-		$jInput = JFactory::getApplication()->input;
+		$jInput = Factory::getApplication()->input;
 		$id = $jInput->get('id');
-		$tjUcmModelItem = JModelLegacy::getInstance('Item', 'TjucmModel');
+		$tjUcmModelItem = BaseDatabaseModel::getInstance('Item', 'TjucmModel');
 
 		// Setting Client ID
 		$item = $tjUcmModelItem->getItem($id);
@@ -48,11 +51,11 @@ class TjucmApiResourceItem extends ApiResource
 	 */
 	public function post()
 	{
-		$jInput = JFactory::getApplication()->input;
+		$jInput = Factory::getApplication()->input;
 		$client = $jInput->get('client');
 
 		// Getting the request Body Data
-		$jinput = JFactory::getApplication()->input->json;
+		$jinput = Factory::getApplication()->input->json;
 
 		// Setting Item details
 		$data = array();
@@ -65,7 +68,7 @@ class TjucmApiResourceItem extends ApiResource
 		$extra_jform_data = array();
 
 		// Addding Extra item field values
-		$tjFieldsModelFields = JModelLegacy::getInstance('Fields', 'TjfieldsModel');
+		$tjFieldsModelFields = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel');
 		$tjFieldsModelFields->setState("filter.client", $client);
 
 		// Variable to store Fields of FieldGroup
@@ -87,7 +90,7 @@ class TjucmApiResourceItem extends ApiResource
 			$extra_jform_data[$fieldsAssoc[(int) $field["id"]]] = $field["value"];
 		}
 
-		$tjUcmModelItemForm = JModelLegacy::getInstance('ItemForm', 'TjucmModel');
+		$tjUcmModelItemForm = BaseDatabaseModel::getInstance('ItemForm', 'TjucmModel');
 
 		// Setting Client ID
 		$tjUcmModelItemForm->setClient($client);
@@ -99,13 +102,13 @@ class TjucmApiResourceItem extends ApiResource
 		if ($itemId)
 		{
 			$return_arr['success'] = true;
-			$return_arr['message'] = JText::_("COM_TJUCM_ITEM_ADDED");
+			$return_arr['message'] = Text::_("COM_TJUCM_ITEM_ADDED");
 			$return_arr['id'] = $itemId;
 		}
 		else
 		{
 			$return_arr['success'] = false;
-			$return_arr['message'] = JText::_("COM_TJUCM_ITEM_NOT_ADDED");
+			$return_arr['message'] = Text::_("COM_TJUCM_ITEM_NOT_ADDED");
 		}
 
 		$this->plugin->setResponse($return_arr);
