@@ -9,10 +9,12 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+use Joomla\CMS\Factory;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\Table\Table;
 jimport('joomla.plugin.plugin');
-jimport('joomla.application.component.model');
 
-$lang = JFactory::getLanguage();
+$lang = Factory::getLanguage();
 $lang->load('com_tjucm', JPATH_ADMINISTRATOR);
 
 /**
@@ -46,13 +48,13 @@ class PlgAPITjucm extends ApiPlugin
 		}
 
 		// Load component models
-		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
-		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
-		JModelLegacy::addIncludePath(JPATH_SITE . '/components/com_tjucm/models');
+		BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/models');
+		BaseDatabaseModel::addIncludePath(JPATH_SITE . '/components/com_tjucm/models');
 
 		// Load component tables
-		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/tables');
-		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/tables');
+		Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/tables');
+		Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjfields/tables');
 
 		ApiResource::addIncludePath(dirname(__FILE__) . '/tjucm');
 	}
