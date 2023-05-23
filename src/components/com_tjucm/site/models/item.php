@@ -16,8 +16,6 @@ use Joomla\CMS\Table\Table;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Object\CMSObject;
-
-jimport('joomla.application.component.modelitem');
 jimport('joomla.event.dispatcher');
 
 require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";

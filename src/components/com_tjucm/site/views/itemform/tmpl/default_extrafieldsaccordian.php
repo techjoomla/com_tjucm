@@ -22,8 +22,8 @@ use Joomla\CMS\Helper\TagsHelper;
 
 HTMLHelper::script('media/com_dpe/js/tjucm.js');
 Text::script('COM_TJUCM_ROP_ITEM_FORM_NEXT_DATE_REVIEW_VALIDATION_MESSAGE');
-JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
-JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
+Table::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
+Table::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
 JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_ADMINISTRATOR);
 
 

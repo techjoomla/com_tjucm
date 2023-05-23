@@ -19,9 +19,7 @@ use Joomla\CMS\Object\CMSObject;
 use Joomla\CMS\Form\Form;
 use Joomla\CMS\Filesystem\File;
 use Joomla\CMS\Plugin\PluginHelper;
-
-jimport('joomla.application.component.modelform');
-jimport('joomla.event.dispatcher');
+use Joomla\Event\Dispatcher as EventDispatcher;
 
 require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
 
@@ -750,8 +748,8 @@ class TjucmModelItemForm extends AdminModel
 
 					// Plugin trigger on before item delete
 					PluginHelper::importPlugin('actionlog');
-					$dispatcher = JDispatcher::getInstance();
-					$dispatcher->trigger('tjUcmOnBeforeDeleteItem', array($subFormContentId, $table->client));
+					$dispatcher = new EventDispatcher();
+					$dispatcher->triggerEvent('tjUcmOnBeforeDeleteItem', array($subFormContentId, $table->client));
 
 					if ($table->delete($subFormContentId) === true)
 					{
@@ -759,8 +757,8 @@ class TjucmModelItemForm extends AdminModel
 
 						// Plugin trigger on after item delete
 						PluginHelper::importPlugin('actionlog');
-						$dispatcher = JDispatcher::getInstance();
-						$dispatcher->trigger('tjUcmOnAfterDeleteItem', array($subFormContentId, $table->client));
+						$dispatcher = new EventDispatcher();
+						$dispatcher->triggerEvent('tjUcmOnAfterDeleteItem', array($subFormContentId, $table->client));
 					}
 				}
 			}
@@ -770,8 +768,8 @@ class TjucmModelItemForm extends AdminModel
 
 			// Plugin trigger on before item delete
 			PluginHelper::importPlugin('actionlog');
-			$dispatcher = JDispatcher::getInstance();
-			$dispatcher->trigger('tjUcmOnBeforeDeleteItem', array($id, $table->client));
+			$dispatcher = new EventDispatcher();
+			$dispatcher->triggerEvent('tjUcmOnBeforeDeleteItem', array($id, $table->client));
 
 			if ($table->delete($id) === true)
 			{
@@ -779,8 +777,8 @@ class TjucmModelItemForm extends AdminModel
 
 				// Plugin trigger on after item delete
 				PluginHelper::importPlugin('actionlog');
-				$dispatcher = JDispatcher::getInstance();
-				$dispatcher->trigger('tjUcmOnAfterDeleteItem', array($id, $table->client));
+				$dispatcher = new EventDispatcher();
+				$dispatcher->triggerEvent('tjUcmOnAfterDeleteItem', array($id, $table->client));
 
 				return $id;
 			}

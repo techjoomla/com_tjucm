@@ -15,7 +15,7 @@ use Joomla\CMS\Router\Route;
 use Joomla\CMS\Session\Session;
 
 /*To load language constant of js file*/
-JText::script('COM_TJUCM_DELETE_MESSAGE');
+Text::script('COM_TJUCM_DELETE_MESSAGE');
 
 $user = Factory::getUser();
 $tjUcmFrontendHelper = new TjucmHelpersTjucm;

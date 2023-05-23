@@ -19,6 +19,9 @@ use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Filter\InputFilter;
 use Joomla\CMS\Filter\OutputFilter;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\Event\Dispatcher as EventDispatcher;
+use Joomla\String\StringHelper;
+
 
 
 
@@ -179,7 +182,7 @@ class TjucmModelType extends AdminModel
 			throw new Exception(Text::_('JERROR_CORE_CREATE_NOT_PERMITTED'));
 		}
 
-		$dispatcher = JEventDispatcher::getInstance();
+		$dispatcher = new EventDispatcher();
 		$context    = $this->option . '.' . $this->name;
 
 		// Include the plugins for the save events.
@@ -200,7 +203,7 @@ class TjucmModelType extends AdminModel
 				}
 
 				// Trigger the before save event.
-				$result = $dispatcher->trigger($this->event_before_save, array($context, &$table, true));
+				$result = $dispatcher->triggerEvent($this->event_before_save, array($context, &$table, true));
 
 				if (in_array(false, $result, true) || !$table->store())
 				{
@@ -208,7 +211,7 @@ class TjucmModelType extends AdminModel
 				}
 
 				// Trigger the after save event.
-				$dispatcher->trigger($this->event_after_save, array($context, &$table, true));
+				$dispatcher->triggerEvent($this->event_after_save, array($context, &$table, true));
 			}
 			else
 			{
@@ -373,14 +376,19 @@ class TjucmModelType extends AdminModel
 			$data['params']['allow_draft_save'] = 1;
 		}
 
+		if ($data['id'] == 0 && $data['checked_out'] == '') 
+		{
+			$data['checked_out'] = '0';	
+		}
+
 		if (parent::save($data))
 		{
 			$id = (int) $this->getState($this->getName() . '.id');
 			$data['typeId'] = $id;
-			$dispatcher = JDispatcher::getInstance();
+			$dispatcher = new EventDispatcher();
 			PluginHelper::importPlugin('actionlog', 'tjucm');
 			$isNew = ($data['id'] != 0) ? false : true;
-			$dispatcher->trigger('tjUcmOnAfterTypeSave', array($data, $isNew));
+			$dispatcher->triggerEvent('tjUcmOnAfterTypeSave', array($data, $isNew));
 
 			return true;
 		}
@@ -440,8 +448,8 @@ class TjucmModelType extends AdminModel
 
 		while ($table->load(array('alias' => $alias)))
 		{
-			$title = JString::increment($title);
-			$alias = JString::increment($alias, 'dash');
+			$title = StringHelper::increment($title);
+			$alias = StringHelper::increment($alias, 'dash');
 		}
 
 		return array($title, $alias);

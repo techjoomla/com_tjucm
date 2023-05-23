@@ -19,18 +19,18 @@ use Joomla\CMS\Table\Table;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Layout\FileLayout;
 
-JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
-JHtml::_('bootstrap.tooltip');
-JHtml::_('behavior.keepalive');
-JHtml::_('behavior.formvalidation');
-JHtml::_('behavior.multiselect');
-JHtml::_('behavior.modal');
-JHtml::_('formbehavior.chosen', 'select');
-JHtml::_('jquery.token');
+HTMLHelper::addIncludePath(JPATH_COMPONENT . '/helpers/html');
+HTMLHelper::_('bootstrap.tooltip');
+HTMLHelper::_('behavior.keepalive');
+HTMLHelper::_('behavior.formvalidation');
+HTMLHelper::_('behavior.multiselect');
+HTMLHelper::_('behavior.modal');
+HTMLHelper::_('formbehavior.chosen', 'select');
+HTMLHelper::_('jquery.token');
 
 $importItemsPopUpUrl = Uri::root() . '/index.php?option=com_tjucm&view=items&layout=importitems&tmpl=component&client=' . $this->client;
 $copyItemPopupUrl = Uri::root() . 'index.php?option=com_tjucm&view=items&layout=copyitems&tmpl=component&client=' . $this->client;
-JFactory::getDocument()->addScriptDeclaration('
+Factory::getDocument()->addScriptDeclaration('
 	jQuery(document).ready(function(){
 		jQuery("#adminForm #import-items").click(function() {
 			SqueezeBox.open("' . $importItemsPopUpUrl . '" ,{handler: "iframe", size: {x: window.innerWidth-250, y: window.innerHeight-150}});
@@ -60,7 +60,7 @@ $link = 'index.php?option=com_tjucm&view=items' . $appendUrl;
 $itemId = $tjUcmFrontendHelper->getItemId($link);
 $fieldsData = array();
 
-JFactory::getDocument()->addScriptDeclaration("
+Factory::getDocument()->addScriptDeclaration("
 	function copySameUcmTypeItem()
 	{
 		var afterCopyItem = function(error, response){

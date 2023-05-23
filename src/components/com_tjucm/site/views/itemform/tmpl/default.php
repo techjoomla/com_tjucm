@@ -58,7 +58,7 @@ else
 	$itemState = ($this->allow_auto_save || $this->allow_draft_save) ? 1 : 0;
 }
 
-JFactory::getDocument()->addScriptDeclaration('
+Factory::getDocument()->addScriptDeclaration('
 	jQuery(function() {
 		jQuery("#item-form").areYouSure();
 	});

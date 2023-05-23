@@ -28,7 +28,7 @@ HTMLHelper::_('behavior.keepalive');
 		else
 		{
 
-			if (task != 'type.cancel' && document.formvalidator.isValid(document.id('type-form'))) {
+			if (task != 'type.cancel' && document.formvalidator.isValid(document.getElementById('type-form'))) {
 
 				Joomla.submitform(task, document.getElementById('type-form'));
 			}

@@ -19,6 +19,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\Event\Dispatcher as EventDispatcher;
 
 jimport('joomla.application.component.view');
 jimport('joomla.application.component.controller');
@@ -304,8 +305,8 @@ class TjucmViewItemform extends HtmlView
 
 		// Ucm triggger before item form display
 		PluginHelper::importPlugin('tjucm');
-		$dispatcher = JDispatcher::getInstance();
-		$dispatcher->trigger('tjucmOnBeforeItemFormDisplay', array(&$this->item, &$this->form_extra));
+		$dispatcher = new EventDispatcher();
+		$dispatcher->triggerEvent('tjucmOnBeforeItemFormDisplay', array(&$this->item, &$this->form_extra));
 
 		$this->_prepareDocument();
 

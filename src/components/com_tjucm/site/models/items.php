@@ -14,9 +14,6 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Table\Table;
 use Joomla\Data\DataObject;
-
-jimport('joomla.application.component.modellist');
-
 use Joomla\CMS\Component\ComponentHelper;
 
 /**

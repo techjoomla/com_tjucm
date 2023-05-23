@@ -17,6 +17,7 @@ use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Session\Session;
+use Joomla\Event\Dispatcher as EventDispatcher;
 
 /**
  * Item controller class.
@@ -173,8 +174,8 @@ class TjucmControllerItem extends BaseController
 			$this->setRedirect(Route::_('index.php?option=com_tjucm&view=items' . $this->appendUrl . '&Itemid=' . $itemId, false));
 
 			// Call trigger on after publish/unpublish the record
-			$dispatcher = JDispatcher::getInstance();
-			$dispatcher->trigger('tjUcmOnAfterStateChangeItem', array($id, $state));
+			$dispatcher = new EventDispatcher();
+			$dispatcher->triggerEvent('tjUcmOnAfterStateChangeItem', array($id, $state));
 		}
 		else
 		{

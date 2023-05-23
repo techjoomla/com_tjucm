@@ -17,6 +17,7 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\Event\Dispatcher as EventDispatcher;
 
 jimport('joomla.application.component.view');
 
@@ -148,8 +149,8 @@ class TjucmViewItem extends HtmlView
 
 		// Ucm triggger before item display
 		PluginHelper::importPlugin('tjucm');
-		$dispatcher = JDispatcher::getInstance();
-		$dispatcher->trigger('tjucmOnBeforeItemDisplay', array(&$this->item, &$this->form_extra));
+		$dispatcher = new EventDispatcher();
+		$dispatcher->triggerEvent('tjucmOnBeforeItemDisplay', array(&$this->item, &$this->form_extra));
 
 		$xmlFileName = explode(".", $this->form_extra->getName());
 		$this->formXml = simplexml_load_file(JPATH_SITE . "/administrator/components/com_tjucm/models/forms/" . $xmlFileName[1] . ".xml");

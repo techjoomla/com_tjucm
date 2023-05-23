@@ -17,6 +17,8 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Filter\InputFilter;
+use Joomla\Event\Dispatcher as EventDispatcher;
+
 
 jimport('joomla.filesystem.file');
 
@@ -183,7 +185,7 @@ class TjucmModelItem extends AdminModel
 			throw new Exception(Text::_('JERROR_CORE_CREATE_NOT_PERMITTED'));
 		}
 
-		$dispatcher = JEventDispatcher::getInstance();
+		$dispatcher = new EventDispatcher();
 		$context    = $this->option . '.' . $this->name;
 
 		// Include the plugins for the save events.
@@ -216,7 +218,7 @@ class TjucmModelItem extends AdminModel
 				}
 
 				// Trigger the before save event.
-				$result = $dispatcher->trigger($this->event_before_save, array($context, &$table, true));
+				$result = $dispatcher->triggerEvent($this->event_before_save, array($context, &$table, true));
 
 				if (in_array(false, $result, true) || !$table->store())
 				{
@@ -224,7 +226,7 @@ class TjucmModelItem extends AdminModel
 				}
 
 				// Trigger the after save event.
-				$dispatcher->trigger($this->event_after_save, array($context, &$table, true));
+				$dispatcher->triggerEvent($this->event_after_save, array($context, &$table, true));
 			}
 			else
 			{
@@ -284,6 +286,7 @@ class TjucmModelItem extends AdminModel
 		$tjUcmTypeTable = Table::getInstance('TjucmTableType', 'Table', array('dbo', Factory::getDbo()));
 		$tjUcmTypeTable->load(array('unique_identifier' => $this->client));
 		$data['type_id'] = $tjUcmTypeTable->id;
+
 
 		if (parent::save($data))
 		{
