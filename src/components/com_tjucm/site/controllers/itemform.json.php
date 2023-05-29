@@ -127,8 +127,8 @@ class TjucmControllerItemForm extends FormController
 
 			// Plugin trigger on before item save
 			PluginHelper::importPlugin('actionlog');
-			$dispatcher = new EventDispatcher();
-			$dispatcher->triggerEvent('tjUcmOnBeforeSaveItem', array($data, $isNew));
+			
+			Factory::getApplication()->triggerEvent('tjUcmOnBeforeSaveItem', array($data, $isNew));
 
 			if ($model->save($data))
 			{
@@ -136,8 +136,8 @@ class TjucmControllerItemForm extends FormController
 
 				// Plugin trigger on after item save
 				PluginHelper::importPlugin('actionlog');
-				$dispatcher = new EventDispatcher();
-				$dispatcher->triggerEvent('tjUcmOnafterSaveItem', array($data, $isNew));
+				
+				Factory::getApplication()->triggerEvent('tjUcmOnafterSaveItem', array($data, $isNew));
 
 				echo new JResponseJson($result, Text::_('COM_TJUCM_ITEM_SAVED_SUCCESSFULLY'));
 				$app->close();
@@ -216,16 +216,16 @@ class TjucmControllerItemForm extends FormController
 
 			// Plugin trigger on before item date save
 			PluginHelper::importPlugin('actionlog');
-			$dispatcher = new EventDispatcher();
-			$dispatcher->triggerEvent('tjUcmOnBeforeSaveItemData', array($recordId, $client, $data));
+			
+			Factory::getApplication()->triggerEvent('tjUcmOnBeforeSaveItemData', array($recordId, $client, $data));
 
 			// If data is valid then save the data into DB
 			$response = $model->saveFieldsData($fieldData);
 
 			// Plugin trigger on after item data save
 			PluginHelper::importPlugin('actionlog');
-			$dispatcher = new EventDispatcher();
-			$dispatcher->triggerEvent('tjUcmOnAfterSaveItemData', array($recordId, $client, $data));
+			
+			Factory::getApplication()->triggerEvent('tjUcmOnAfterSaveItemData', array($recordId, $client, $data));
 
 			echo new JsonResponse($response);
 			$app->close();
@@ -337,16 +337,16 @@ class TjucmControllerItemForm extends FormController
 
 			// Plugin trigger on before item date save
 			PluginHelper::importPlugin('actionlog');
-			$dispatcher = new EventDispatcher();
-			$dispatcher->triggerEvent('tjUcmOnBeforeSaveItemData', array($recordId, $client, $data));
+			
+			Factory::getApplication()->triggerEvent('tjUcmOnBeforeSaveItemData', array($recordId, $client, $data));
 
 			// If data is valid then save the data into DB
 			$response = $model->saveFieldsData($formData);
 
 			// Plugin trigger on before item date save
 			PluginHelper::importPlugin('actionlog');
-			$dispatcher = new EventDispatcher();
-			$dispatcher->triggerEvent('tjUcmOnAfterSaveItemData', array($recordId, $client, $data));
+			
+			Factory::getApplication()->triggerEvent('tjUcmOnAfterSaveItemData', array($recordId, $client, $data));
 
 			$msg = null;
 
@@ -376,7 +376,7 @@ class TjucmControllerItemForm extends FormController
 					// TJ-ucm plugin trigger after save
 					$dispatcher = JEventDispatcher::getInstance();
 					PluginHelper::importPlugin("content");
-					$dispatcher->triggerEvent('onUcmItemAfterSave', array($table->getProperties(), $data));
+					Factory::getApplication()->triggerEvent('onUcmItemAfterSave', array($table->getProperties(), $data));
 				}
 			}
 			else

@@ -174,8 +174,8 @@ class TjucmControllerItem extends BaseController
 			$this->setRedirect(Route::_('index.php?option=com_tjucm&view=items' . $this->appendUrl . '&Itemid=' . $itemId, false));
 
 			// Call trigger on after publish/unpublish the record
-			$dispatcher = new EventDispatcher();
-			$dispatcher->triggerEvent('tjUcmOnAfterStateChangeItem', array($id, $state));
+			
+			Factory::getApplication()->triggerEvent('tjUcmOnAfterStateChangeItem', array($id, $state));
 		}
 		else
 		{

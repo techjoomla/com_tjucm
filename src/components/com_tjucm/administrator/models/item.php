@@ -185,7 +185,6 @@ class TjucmModelItem extends AdminModel
 			throw new Exception(Text::_('JERROR_CORE_CREATE_NOT_PERMITTED'));
 		}
 
-		$dispatcher = new EventDispatcher();
 		$context    = $this->option . '.' . $this->name;
 
 		// Include the plugins for the save events.
@@ -218,7 +217,7 @@ class TjucmModelItem extends AdminModel
 				}
 
 				// Trigger the before save event.
-				$result = $dispatcher->triggerEvent($this->event_before_save, array($context, &$table, true));
+				$result = Factory::getApplication()->triggerEvent($this->event_before_save, array($context, &$table, true));
 
 				if (in_array(false, $result, true) || !$table->store())
 				{
@@ -226,7 +225,7 @@ class TjucmModelItem extends AdminModel
 				}
 
 				// Trigger the after save event.
-				$dispatcher->triggerEvent($this->event_after_save, array($context, &$table, true));
+				Factory::getApplication()->triggerEvent($this->event_after_save, array($context, &$table, true));
 			}
 			else
 			{

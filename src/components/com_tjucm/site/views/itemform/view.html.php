@@ -305,8 +305,7 @@ class TjucmViewItemform extends HtmlView
 
 		// Ucm triggger before item form display
 		PluginHelper::importPlugin('tjucm');
-		$dispatcher = new EventDispatcher();
-		$dispatcher->triggerEvent('tjucmOnBeforeItemFormDisplay', array(&$this->item, &$this->form_extra));
+		Factory::getApplication()->triggerEvent('tjucmOnBeforeItemFormDisplay', array(&$this->item, &$this->form_extra));
 
 		$this->_prepareDocument();
 
