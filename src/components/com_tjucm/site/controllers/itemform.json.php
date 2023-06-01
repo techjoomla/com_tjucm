@@ -374,7 +374,6 @@ class TjucmControllerItemForm extends FormController
 				if (!$draft)
 				{
 					// TJ-ucm plugin trigger after save
-					$dispatcher = JEventDispatcher::getInstance();
 					PluginHelper::importPlugin("content");
 					Factory::getApplication()->triggerEvent('onUcmItemAfterSave', array($table->getProperties(), $data));
 				}

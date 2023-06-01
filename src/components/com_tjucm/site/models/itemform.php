@@ -92,7 +92,7 @@ class TjucmModelItemForm extends AdminModel
 			$menuitem   = $app->getMenu()->getActive();
 
 			// Get the params
-			$menuparams = $menuitem->params;
+			$menuparams = $menuitem->getparams();
 
 			if (!empty($menuparams))
 			{

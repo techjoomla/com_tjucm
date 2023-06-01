@@ -53,7 +53,7 @@ class TjucmControllerItemForm extends FormController
 			$menuitem   = $app->getMenu()->getActive();
 
 			// Get the params
-			$this->menuparams = $menuitem->params;
+			$this->menuparams = $menuitem->getparams();
 
 			if (!empty($this->menuparams))
 			{

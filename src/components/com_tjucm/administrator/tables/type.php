@@ -60,7 +60,7 @@ class TjucmTabletype extends Table
 	 */
 	public function __construct(&$db)
 	{
-		JObserverMapper::addObserverClassToClass('JTableObserverContenthistory', 'TjucmTabletype', array('typeAlias' => 'com_tjucm.type'));
+		//JObserverMapper::addObserverClassToClass('JTableObserverContenthistory', 'TjucmTabletype', array('typeAlias' => 'com_tjucm.type'));
 		parent::__construct('#__tj_ucm_types', 'id', $db);
 	}
 

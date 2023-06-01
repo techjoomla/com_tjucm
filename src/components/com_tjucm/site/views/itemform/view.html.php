@@ -177,7 +177,7 @@ class TjucmViewItemform extends HtmlView
 			$menuItem = $app->getMenu()->getActive();
 
 			// Get the params
-			$this->menuparams = $menuItem->params;
+			$this->menuparams = $menuItem->getparams();
 
 			if (!empty($this->menuparams))
 			{
@@ -206,7 +206,7 @@ class TjucmViewItemform extends HtmlView
 			$menuItem = $app->getMenu()->getActive();
 	
 				// Get the params
-				$this->menuparams = $menuItem->params;
+				$this->menuparams = $menuItem->getparams();
 	
 				if (!empty($this->menuparams))
 				{

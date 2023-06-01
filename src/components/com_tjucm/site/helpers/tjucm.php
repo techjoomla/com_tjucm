@@ -115,7 +115,7 @@ class TjucmHelpersTjucm
 
 					foreach ($menuItems as $menuItem)
 					{
-						$menuParams = $menuItem->params;
+						$menuParams = $menuItem->getparams();
 
 						if (!empty($menuParams))
 						{
@@ -137,7 +137,7 @@ class TjucmHelpersTjucm
 
 		if (!$itemId)
 		{
-			if ($app->issite())
+			if ($app->isClient('site'))
 			{
 				$menu = $app->getMenu();
 				$menuItem = $menu->getItems('link', $link, true);
