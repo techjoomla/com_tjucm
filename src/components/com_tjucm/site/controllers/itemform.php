@@ -171,9 +171,8 @@ class TjucmControllerItemForm extends FormController
 				if ($model->checkin($recordId) === false)
 				{
 					// Check-in failed, go back to the record and display a notice.
-					$this->setError(Text::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
-					$this->setMessage($this->getError(), 'error');
-
+					
+					Factory::getApplication()->enqueueMessage(Text::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()), 'error');
 					$link = 'index.php?option=com_tjucm&view=itemform&client=' . $this->client;
 					$itemId = $tjUcmFrontendHelper->getItemId($link);
 					$this->setRedirect(Route::_($link . '&Itemid=' . $itemId . $this->getRedirectToItemAppend($recordId, $key), false));

@@ -19,14 +19,12 @@ use Joomla\CMS\Object\CMSObject;
 use Joomla\CMS\Form\Form;
 use Joomla\CMS\Filesystem\File;
 use Joomla\CMS\Plugin\PluginHelper;
-use Joomla\Event\Dispatcher as EventDispatcher;
-
-require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
-
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\Registry\Registry;
 use TJQueue\Admin\TJQueueProduce;
+
+require_once JPATH_SITE . "/components/com_tjfields/filterFields.php";
 
 if (ComponentHelper::getComponent('com_tjqueue', true)->enabled)
 {
@@ -174,7 +172,8 @@ class TjucmModelItemForm extends AdminModel
 				// Check for published state if filter set.
 				if (((is_numeric($published)) || (is_numeric($archived))) && (($table->state != $published) && ($table->state != $archived)))
 				{
-					return JError::raiseError(404, Text::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
+					return throw new Exception(Text::_('COM_TJUCM_ITEM_DOESNT_EXIST'), 404);
+
 				}
 			}
 
@@ -214,7 +213,7 @@ class TjucmModelItemForm extends AdminModel
 		}
 		else
 		{
-			return JError::raiseError(404, Text::_('COM_TJUCM_ITEM_DOESNT_EXIST'));
+			return throw new Exception(Text::_('COM_TJUCM_ITEM_DOESNT_EXIST'), 404);
 		}
 
 		return $this->item;
@@ -565,7 +564,7 @@ class TjucmModelItemForm extends AdminModel
 				$tableParentData = $this->getTable();
 				$tableParentData->load(array('id' => $data['parent_id']));
 
-				if (!property_exists($tableParentData->id) && (!$tableParentData->id))
+				if (!property_exists($tableParentData, 'id') && (!$tableParentData->id))
 				{
 					$this->setError(Text::_('COM_TJUCM_INVALID_PARENT_ID'));
 

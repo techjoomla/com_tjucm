@@ -14,6 +14,8 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Table\Table;
 use Joomla\Data\DataObject;
+use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Component\ComponentHelper;
 
 /**
@@ -102,7 +104,7 @@ class TjucmModelItems extends ListModel
 			$menuitem   = $app->getMenu()->getActive();
 
 			// Get the params
-			$this->menuparams = $menuitem->getparams();
+			$this->menuparams = $menuitem->getParams();
 
 			if (!empty($this->menuparams))
 			{
@@ -204,6 +206,7 @@ class TjucmModelItems extends ListModel
 	{
 		// Call function to initialise fields lists
 		$this->getFields();
+		$user = Factory::getUser();
 
 		// Create a new query object.
 		$db    = $this->getDbo();

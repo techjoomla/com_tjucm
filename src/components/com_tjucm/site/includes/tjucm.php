@@ -189,7 +189,8 @@ class TJUCM
 			$options = array("version" => $version);
 
 			if ($view == 'itemform' || $view == 'items')
-			{
+			{	
+				HTMLHelper::script('/media/system/js/messages.min.js');
 				HTMLHelper::script('media/com_tjucm/js/com_tjucm.min.js', $options);
 				HTMLHelper::script('media/com_tjucm/js/core/class.min.js', $options);
 				HTMLHelper::script('media/com_tjucm/js/core/base.min.js', $options);

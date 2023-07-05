@@ -63,7 +63,7 @@ Factory::getDocument()->addScriptDeclaration('
 		jQuery("#item-form").areYouSure();
 	});
 
-	jQuery(window).load(function ()
+	jQuery(document).ready(function ()
 	{
 		jQuery("#item-form .nav-tabs li a").first().click();
 	});
