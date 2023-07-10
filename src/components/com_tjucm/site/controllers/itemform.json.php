@@ -91,7 +91,8 @@ class TjucmControllerItemForm extends FormController
 
 		$data = array();
 		$data['id'] = $post->get('id', 0, 'INT');
-
+		$data['category_id'] = $post->get('category_id', 0, 'INT');
+		
 		if (empty($data['id']))
 		{
 			$client = $post->get('client', '', 'STRING');
@@ -129,6 +130,20 @@ class TjucmControllerItemForm extends FormController
 			PluginHelper::importPlugin('actionlog');
 			
 			Factory::getApplication()->triggerEvent('tjUcmOnBeforeSaveItem', array($data, $isNew));
+
+			if ($isNew)
+			{
+				$data['checked_out'] = 0;
+			    $data['modified_by'] = 0;
+   			    $data['modified_date'] = '0000-00-00 00:00:00';
+
+			}
+			else
+			{
+				$data['checked_out'] = Factory::getUser()->id;
+			    $data['modified_by'] = Factory::getUser()->id;
+			    $data['modified_date'] = new Date('now');
+			}
 
 			if ($model->save($data))
 			{
