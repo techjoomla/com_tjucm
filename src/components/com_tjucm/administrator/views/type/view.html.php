@@ -10,15 +10,17 @@
 
 // No direct access
 defined('_JEXEC') or die;
-
-jimport('joomla.application.component.view');
+use Joomla\CMS\MVC\View\HtmlView;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Toolbar\ToolbarHelper;
 
 /**
  * View to edit
  *
  * @since  1.6
  */
-class TjucmViewType extends JViewLegacy
+class TjucmViewType extends HtmlView
 {
 	protected $state;
 
@@ -60,9 +62,9 @@ class TjucmViewType extends JViewLegacy
 	 */
 	protected function addToolbar()
 	{
-		JFactory::getApplication()->input->set('hidemainmenu', true);
+		Factory::getApplication()->input->set('hidemainmenu', true);
 
-		$user  = JFactory::getUser();
+		$user  = Factory::getUser();
 		$isNew = ($this->item->id == 0);
 
 		if (isset($this->item->checked_out))
@@ -76,31 +78,31 @@ class TjucmViewType extends JViewLegacy
 
 		$canDo = TjucmHelper::getActions();
 
-		$component_title = JText::_('COM_TJUCM_COMPONENT');
-		JToolbarHelper::title(
-		$component_title . ": " . JText::_('COM_TJUCM_PAGE_' . ($checkedOut ? 'VIEW_TYPE' : ($isNew ? 'ADD_TYPE' : 'EDIT_TYPE'))),
+		$component_title = Text::_('COM_TJUCM_COMPONENT');
+		ToolbarHelper::title(
+		$component_title . ": " . Text::_('COM_TJUCM_PAGE_' . ($checkedOut ? 'VIEW_TYPE' : ($isNew ? 'ADD_TYPE' : 'EDIT_TYPE'))),
 			'pencil-2 article-add'
 		);
 
 		// If not checked out, can save the item.
 		if (!$checkedOut && ($canDo->get('core.edit') || ($canDo->get('core.create'))))
 		{
-			JToolBarHelper::apply('type.apply', 'JTOOLBAR_APPLY');
-			JToolBarHelper::save('type.save', 'JTOOLBAR_SAVE');
+			ToolbarHelper::apply('type.apply', 'JTOOLBAR_APPLY');
+			ToolbarHelper::save('type.save', 'JTOOLBAR_SAVE');
 		}
 
 		if (!$checkedOut && ($canDo->get('core.create')))
 		{
-			JToolBarHelper::custom('type.save2new', 'save-new.png', 'save-new_f2.png', 'JTOOLBAR_SAVE_AND_NEW', false);
+			ToolbarHelper::custom('type.save2new', 'save-new.png', 'save-new_f2.png', 'JTOOLBAR_SAVE_AND_NEW', false);
 		}
 
 		if (empty($this->item->id))
 		{
-			JToolBarHelper::cancel('type.cancel', 'JTOOLBAR_CANCEL');
+			ToolbarHelper::cancel('type.cancel', 'JTOOLBAR_CANCEL');
 		}
 		else
 		{
-			JToolBarHelper::cancel('type.cancel', 'JTOOLBAR_CLOSE');
+			ToolbarHelper::cancel('type.cancel', 'JTOOLBAR_CLOSE');
 		}
 	}
 }

@@ -9,15 +9,15 @@
  */
 
 defined('_JEXEC') or die;
-
-// Include dependancies
-jimport('joomla.application.component.controller');
+use Joomla\CMS\Factory;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\MVC\Controller\BaseController;
 
 JLoader::registerPrefix('Tjucm', JPATH_COMPONENT);
 JLoader::register('TjucmController', JPATH_COMPONENT . '/controller.php');
 
 // Load tj-fields language files
-$lang = JFactory::getLanguage();
+$lang = Factory::getLanguage();
 $lang->load('com_tjfields', JPATH_ADMINISTRATOR);
 $lang->load('com_tjfields', JPATH_SITE);
 
@@ -25,8 +25,8 @@ $lang->load('com_tjfields', JPATH_SITE);
 $path = JPATH_ADMINISTRATOR . '/components/com_tjucm/helpers/tjucm.php';
 
 // Load joomla icon media file
-$doc = JFactory::getDocument();
-$doc->addStyleSheet(JUri::root() . '/media/jui/css/icomoon.css');
+$doc = Factory::getDocument();
+$doc->addStyleSheet(Uri::root() . '/media/jui/css/icomoon.css');
 
 if (!class_exists('TjucmHelper'))
 {
@@ -44,7 +44,7 @@ JLoader::register('TJUCM', JPATH_SITE . '/components/com_tjucm/includes/tjucm.ph
 TJUCM::init();
 
 // Execute the task.
-$controller = JControllerLegacy::getInstance('Tjucm');
+$controller = BaseController::getInstance('Tjucm');
 
-$controller->execute(JFactory::getApplication()->input->getCmd('task'));
+$controller->execute(Factory::getApplication()->input->getCmd('task'));
 $controller->redirect();

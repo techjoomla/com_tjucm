@@ -10,6 +10,10 @@
 
 // No direct access.
 defined('_JEXEC') or die();
+use Joomla\CMS\Form\FormHelper;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\HTML\HTMLHelper;
 
 JFormHelper::loadFieldClass('list');
 
@@ -20,7 +24,7 @@ JFormHelper::loadFieldClass('list');
  * @subpackage  com_quick2cart
  * @since       2.2
  */
-class JFormFieldUcmTypes extends JFormFieldList
+class JFormFieldUcmTypes extends FormFieldList
 {
 	public $type = 'ucmtypes';
 
@@ -35,7 +39,7 @@ class JFormFieldUcmTypes extends JFormFieldList
 	{
 		// Initialize variables.
 		$options = array();
-		$db	= JFactory::getDbo();
+		$db	= Factory::getDbo();
 		$query	= $db->getQuery(true);
 		$query->select($db->quoteName(array("title", "alias")));
 		$query->from($db->quoteName('#__tj_ucm_types'));
@@ -48,11 +52,11 @@ class JFormFieldUcmTypes extends JFormFieldList
 
 		$options = array();
 
-		$options[] = JHtml::_('select.option', '', JText::_('COM_TJUCM_SELECT_UCM_TYPE_DESC'));
+		$options[] = HTMLHelper::_('select.option', '', Text::_('COM_TJUCM_SELECT_UCM_TYPE_DESC'));
 
 		foreach ($ucmTypes as $ucmType)
 		{
-			$options[] = JHtml::_('select.option', $ucmType->alias, $ucmType->title);
+			$options[] = HTMLHelper::_('select.option', $ucmType->alias, $ucmType->title);
 		}
 
 		return $options;

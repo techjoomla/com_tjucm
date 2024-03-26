@@ -10,9 +10,10 @@
 
 // No direct access
 defined('_JEXEC') or die('Restricted access');
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\Factory;
 
 use Joomla\Registry\Registry;
-use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Filesystem\File;
 
@@ -36,8 +37,8 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 	 */
 	public function migrate()
 	{
-		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
-		JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
+		Table::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
+		Table::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
 		JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_ADMINISTRATOR);
 
 		// TJ-Fields helper object
@@ -49,14 +50,14 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 		try
 		{
 			// Get all the UCM types
-			$db = JFactory::getDbo();
+			$db = Factory::getDbo();
 			$query = $db->getQuery(true);
 			$query->select('*');
 			$query->from($db->qn('#__tj_ucm_types'));
 			$db->setQuery($query);
 			$ucmTypes = $db->loadObjectlist();
 
-			$session = JFactory::getSession();
+			$session = Factory::getSession();
 			$updatedTypes = (empty($session->get('updatedTypes'))) ? array() : $session->get('updatedTypes');
 
 			if (!empty($ucmTypes))
@@ -68,7 +69,7 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 						continue;
 					}
 
-					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', $db));
+					$ucmTypeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', $db));
 					$ucmTypeTable->load($ucmType->id);
 					$updatedUniqueIdentifier = 'com_tjucm.' . preg_replace("/[^a-zA-Z0-9]/", "", str_replace('com_tjucm.', '', $ucmTypeTable->unique_identifier));
 					$ucmTypeParams = new Registry($ucmType->params);
@@ -89,7 +90,7 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 
 						foreach ($fieldGroups as $fieldGroup)
 						{
-							$tjfieldsGroupTable = JTable::getInstance('Group', 'TjfieldsTable', array('dbo', $db));
+							$tjfieldsGroupTable = Table::getInstance('Group', 'TjfieldsTable', array('dbo', $db));
 							$tjfieldsGroupTable->load($fieldGroup->id);
 							$tjfieldsGroupTable->client = $updatedUniqueIdentifier;
 
@@ -106,7 +107,7 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 
 								foreach ($fields as $field)
 								{
-									$tjfieldsFieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
+									$tjfieldsFieldTable = Table::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
 									$tjfieldsFieldTable->load($field->id);
 									$tjfieldsFieldTable->client = $updatedUniqueIdentifier;
 
@@ -190,7 +191,7 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 
 							foreach ($ucmSubFormFields as $ucmSubFormField)
 							{
-								$tjfieldsFieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
+								$tjfieldsFieldTable = Table::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
 								$tjfieldsFieldTable->load($ucmSubFormField->id);
 								$tjfieldsFieldTable->params = str_replace($oldFileName, $newFileName, $tjfieldsFieldTable->params);
 								$tjfieldsFieldTable->store();
@@ -209,7 +210,7 @@ class TjHouseKeepingUpdateClientName extends TjModelHouseKeeping
 
 							foreach ($formFields as $formField)
 							{
-								$tjfieldsFieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
+								$tjfieldsFieldTable = Table::getInstance('Field', 'TjfieldsTable', array('dbo', $db));
 								$tjfieldsFieldTable->load($formField->id);
 								$fieldParams = new Registry($tjfieldsFieldTable->params);
 

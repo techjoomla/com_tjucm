@@ -9,15 +9,17 @@
  */
 
 defined('_JEXEC') or die;
-
-jimport('joomla.application.component.modellist');
+use Joomla\CMS\MVC\Model\ListModel;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\Data\DataObject;
 
 /**
  * Methods supporting a list of Tjucm records.
  *
  * @since  1.6
  */
-class TjucmModelTypes extends JModelList
+class TjucmModelTypes extends ListModel
 {
 /**
 	* Constructor.
@@ -65,7 +67,7 @@ class TjucmModelTypes extends JModelList
 	protected function populateState($ordering = 'a.id', $direction = 'DESC')
 	{
 		// Initialise variables.
-		$app = JFactory::getApplication('administrator');
+		$app = Factory::getApplication('administrator');
 
 		// Load the filter state.
 		$search = $app->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
@@ -75,7 +77,7 @@ class TjucmModelTypes extends JModelList
 		$this->setState('filter.state', $published);
 
 		// Load the parameters.
-		$params = JComponentHelper::getParams('com_tjucm');
+		$params = ComponentHelper::getParams('com_tjucm');
 		$this->setState('params', $params);
 
 		// List state information.
@@ -107,7 +109,7 @@ class TjucmModelTypes extends JModelList
 	/**
 	 * Build an SQL query to load the list data.
 	 *
-	 * @return   JDatabaseQuery
+	 * @return   DataObjectbaseQuery
 	 *
 	 * @since    1.6
 	 */

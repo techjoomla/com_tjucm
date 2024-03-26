@@ -9,19 +9,21 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\Filter\OutputFilter;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\Language\Text;
 use Joomla\CMS\Component\ComponentHelper;
-use Joomla\CMS\Table\Table;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Helper\TagsHelper;
 
 HTMLHelper::script('media/com_dpe/js/tjucm.js');
 Text::script('COM_TJUCM_ROP_ITEM_FORM_NEXT_DATE_REVIEW_VALIDATION_MESSAGE');
-JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
-JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
+Table::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables');
+Table::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
 JLoader::import('components.com_tjfields.helpers.tjfields', JPATH_ADMINISTRATOR);
 
 
@@ -75,7 +77,7 @@ if ($this->form_extra)
 
 					if (!$field->hidden)
 					{
-						$tabName = JFilterOutput::stringURLUnicodeSlug(trim($fieldset->name));
+						$tabName = OutputFilter::stringURLUnicodeSlug(trim($fieldset->name));
 						echo HTMLHelper::_("bootstrap.addTab", "tjucm_myTab", $tabName, $fieldset->name);
 						break;
 					}
@@ -368,7 +370,7 @@ if ($this->form_extra)
 
 			<?php if (empty($tmpl)) : ?>
 			<input type="button" class="btn btn-primary px-25 mobile-space" value="<?php echo Text::_("COM_TJUCM_SAVE_CLOSE_ITEM"); ?>" id="tjUcmSectionFinalSaveClose" onclick="tjUcmItemForm.saveUcmFormData();" />
-			<input type="button" class="btn btn-warning mobile-space" value="<?php echo JText::_('COM_TJUCM_CANCEL_BUTTON'); ?>" onclick="Joomla.submitbutton('itemform.cancel');" />
+			<input type="button" class="btn btn-warning mobile-space" value="<?php echo Text::_('COM_TJUCM_CANCEL_BUTTON'); ?>" onclick="Joomla.submitbutton('itemform.cancel');" />
 			<?php endif; ?>
 			</span>
 			<?php
@@ -429,7 +431,7 @@ $tmpl  = $app->input->get('tmpl', '', 'STRING');
 if ($clusterFieldName == 'com_tjucm_ropvendors_clusterclusterid' && empty($tmpl))
 {
 $doc = Factory::getDocument();
-$doc->addScript(JUri::root() . 'media/com_dpe/js/tjucmreverselist.js');
+$doc->addScript(Uri::root() . 'media/com_dpe/js/tjucmreverselist.js');
 ?>
 
 <script type="text/javascript">

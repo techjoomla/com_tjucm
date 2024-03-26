@@ -9,14 +9,18 @@
 
 // No direct access
 defined('_JEXEC') or die('Restricted access');
+use Joomla\CMS\Factory;
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\Layout\FileLayout;
 
 if (!key_exists('formObject', $displayData) || !key_exists('xmlFormObject', $displayData))
 {
 	return;
 }
 
-$app = JFactory::getApplication();
-$user = JFactory::getUser();
+$app = Factory::getApplication();
+$user = Factory::getUser();
 
 // Layout for field types
 $fieldLayout = array();
@@ -51,7 +55,7 @@ $controlDivClass = ($isSubForm) ? 'col-xs-6' : 'col-xs-8';
 
 // Get Field table
 JTable::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjfields/tables');
-$tjFieldsFieldTable = JTable::getInstance('field', 'TjfieldsTable');
+$tjFieldsFieldTable = Table::getInstance('field', 'TjfieldsTable');
 
 $fieldSets = $formObject->getFieldsets();
 $count = 0;
@@ -103,7 +107,7 @@ foreach ($fieldSets as $fieldset)
 
 							// Call to extra fields
 							JLoader::import('components.com_tjucm.models.item', JPATH_SITE);
-							$tjucmItemModel = JModelLegacy::getInstance('Item', 'TjucmModel');
+							$tjucmItemModel = BaseDatabaseModel::getInstance('Item', 'TjucmModel');
 
 							// Get Subform field data
 							$formData = $TjfieldsHelper->getFieldData($field->getAttribute('name'));
@@ -142,7 +146,7 @@ foreach ($fieldSets as $fieldset)
 									$ucmSubFormRecordData = $tjucmItemModel->getData($ucmSubFormData->$contentIdFieldname);
 
 									// Call the JLayout recursively to render fields of ucmsubform
-									$layout = new JLayoutFile('fields', JPATH_ROOT . '/components/com_tjucm/layouts/detail');
+									$layout = new FileLayout('fields', JPATH_ROOT . '/components/com_tjucm/layouts/detail');
 									echo $layout->render(array('xmlFormObject' => $ucmSubFormXmlFieldSets, 'formObject' => $ucmSubformFormObject, 'itemData' => $ucmSubFormRecordData, 'isSubForm' => 1));
 									echo "<hr>";
 								}
@@ -176,7 +180,7 @@ foreach ($fieldSets as $fieldset)
 								$field->setValue('');
 							}
 
-							$layout = new JLayoutFile($layoutToUse, JPATH_ROOT . '/components/com_tjfields/layouts/fields');
+							$layout = new FileLayout($layoutToUse, JPATH_ROOT . '/components/com_tjfields/layouts/fields');
 							$output = $layout->render(array('fieldXml' => $xmlField, 'field' => $field));
 
 							// To align text, textarea, textareacounter, editor and tjlist fields properly

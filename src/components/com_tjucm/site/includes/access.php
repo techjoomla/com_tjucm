@@ -9,12 +9,12 @@
  */
 
 defined('_JEXEC') or die();
-
 use Joomla\CMS\Factory;
+use Joomla\CMS\Table\Table;
+
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
-use Joomla\CMS\Table\Table;
 use Joomla\String\StringHelper;
 
 require_once JPATH_SITE . '/components/com_tjucm/includes/defines.php';
@@ -65,7 +65,7 @@ class TjucmAccess
 			{
 				JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
 
-				return RBACL::check($user->id, 'com_cluster', 'core.importitem.' . $ucmTypeId) && RBACL::check(JFactory::getUser()->id, 'com_cluster', 'core.createtitem.' . $ucmTypeId);
+				return RBACL::check($user->id, 'com_cluster', 'core.importitem.' . $ucmTypeId) && RBACL::check(Factory::getUser()->id, 'com_cluster', 'core.createtitem.' . $ucmTypeId);
 			}
 		}
 		else
@@ -79,7 +79,7 @@ class TjucmAccess
 		$user = empty($userId) ? Factory::getUser() : Factory::getUser($userId);
 
 		JLoader::import('components.com_tjucm.tables.item', JPATH_ADMINISTRATOR);
-		$itemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', JFactory::getDbo()));
+		$itemTable = Table::getInstance('Item', 'TjucmTable', array('dbo', Factory::getDbo()));
 		$itemTable->load($contentId);
 
 		if ($user->id == $itemTable->created_by)
@@ -131,7 +131,7 @@ class TjucmAccess
 			if ($subUserExist)
 			{
 				JLoader::import('components.com_tjucm.tables.item', JPATH_ADMINISTRATOR);
-				$itemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', JFactory::getDbo()));
+				$itemTable = Table::getInstance('Item', 'TjucmTable', array('dbo', Factory::getDbo()));
 				$itemTable->load($contentId);
 
 				return RBACL::check($user->id, 'com_cluster', 'core.edititem.' . $ucmTypeId, $itemTable->cluster_id);
@@ -163,7 +163,7 @@ class TjucmAccess
 			if ($subUserExist)
 			{
 				JLoader::import('components.com_tjucm.tables.item', JPATH_ADMINISTRATOR);
-				$itemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', JFactory::getDbo()));
+				$itemTable = Table::getInstance('Item', 'TjucmTable', array('dbo', Factory::getDbo()));
 				$itemTable->load($contentId);
 
 				return RBACL::check($user->id, 'com_cluster', 'core.edititemstate.' . $ucmTypeId, $itemTable->cluster_id);
@@ -189,7 +189,7 @@ class TjucmAccess
 			{
 				JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
 				JLoader::import('components.com_tjucm.tables.item', JPATH_ADMINISTRATOR);
-				$itemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', JFactory::getDbo()));
+				$itemTable = Table::getInstance('Item', 'TjucmTable', array('dbo', Factory::getDbo()));
 				$itemTable->load($contentId);
 
 				return RBACL::check($user->id, 'com_cluster', 'core.editownitem.' . $ucmTypeId, $itemTable->cluster_id);
@@ -221,7 +221,7 @@ class TjucmAccess
 			if ($subUserExist)
 			{
 				JLoader::import('components.com_tjucm.tables.item', JPATH_ADMINISTRATOR);
-				$itemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', JFactory::getDbo()));
+				$itemTable = Table::getInstance('Item', 'TjucmTable', array('dbo', Factory::getDbo()));
 				$itemTable->load($contentId);
 
 				return RBACL::check($user->id, 'com_cluster', 'core.deleteitem.' . $ucmTypeId, $itemTable->cluster_id);
@@ -247,7 +247,7 @@ class TjucmAccess
 			{
 				JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
 				JLoader::import('components.com_tjucm.tables.item', JPATH_ADMINISTRATOR);
-				$itemTable = JTable::getInstance('Item', 'TjucmTable', array('dbo', JFactory::getDbo()));
+				$itemTable = Table::getInstance('Item', 'TjucmTable', array('dbo', Factory::getDbo()));
 				$itemTable->load($contentId);
 
 				return RBACL::check($user->id, 'com_cluster', 'core.deleteownitem.' . $ucmTypeId, $itemTable->cluster_id);
@@ -264,11 +264,11 @@ class TjucmAccess
 		if (ComponentHelper::getComponent('com_cluster', true)->enabled)
 		{
 			JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
-			$typeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+			$typeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', Factory::getDbo()));
 			$typeTable->load($ucmTypeId);
 
 			JLoader::import('components.com_tjfields.tables.field', JPATH_ADMINISTRATOR);
-			$fieldTable = JTable::getInstance('Field', 'TjfieldsTable', array('dbo', JFactory::getDbo()));
+			$fieldTable = Table::getInstance('Field', 'TjfieldsTable', array('dbo', Factory::getDbo()));
 			$fieldTable->load(array('client' => $typeTable->unique_identifier, 'type' => 'cluster', 'state' => 1));
 
 			if ($fieldTable->id)

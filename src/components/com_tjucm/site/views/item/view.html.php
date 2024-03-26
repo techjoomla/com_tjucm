@@ -10,6 +10,14 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\MVC\View\HtmlView;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\Event\Dispatcher as EventDispatcher;
 
 jimport('joomla.application.component.view');
 
@@ -18,7 +26,7 @@ jimport('joomla.application.component.view');
  *
  * @since  1.6
  */
-class TjucmViewItem extends JViewLegacy
+class TjucmViewItem extends HtmlView
 {
 	protected $state;
 
@@ -39,20 +47,20 @@ class TjucmViewItem extends JViewLegacy
 	 */
 	public function display($tpl = null)
 	{
-		$app  = JFactory::getApplication();
+		$app  = Factory::getApplication();
 
-		if (!JFactory::getUser()->id)
+		if (!Factory::getUser()->id)
 		{
-			$msg = JText::_('COM_TJUCM_LOGIN_MSG');
+			$msg = Text::_('COM_TJUCM_LOGIN_MSG');
 
 			// Get current url.
-			$current = JUri::getInstance()->toString();
+			$current = Uri::getInstance()->toString();
 			$url = base64_encode($current);
-			JFactory::getApplication()->redirect(JRoute::_('index.php?option=com_users&view=login&return=' . $url, false), $msg);
+			Factory::getApplication()->redirect(Route::_('index.php?option=com_users&view=login&return=' . $url, false), $msg);
 		}
 
 		// Load tj-fields language file
-		$lang = JFactory::getLanguage();
+		$lang = Factory::getLanguage();
 		$lang->load('com_tjfields', JPATH_SITE);
 
 		$this->state  = $this->get('State');
@@ -76,7 +84,7 @@ class TjucmViewItem extends JViewLegacy
 		// Check the view access to the article (the model has already computed the values).
 		if ($this->item->params->get('access-view') == false)
 		{
-			$app->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
+			$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
 			$app->setHeader('status', 403, true);
 
 			return false;
@@ -84,7 +92,7 @@ class TjucmViewItem extends JViewLegacy
 
 		/* Get model instance here */
 		$model = $this->getModel();
-		$this->client  = JFactory::getApplication()->input->get('client');
+		$this->client  = Factory::getApplication()->input->get('client');
 
 		// If did not get the client from url then get if from menu param
 		if (empty($this->client))
@@ -93,7 +101,7 @@ class TjucmViewItem extends JViewLegacy
 			$menuItem = $app->getMenu()->getActive();
 
 			// Get the params
-			$this->menuparams = $menuItem->params;
+			$this->menuparams = $menuItem->getparams();
 
 			if (!empty($this->menuparams))
 			{
@@ -102,14 +110,14 @@ class TjucmViewItem extends JViewLegacy
 				if (!empty($this->ucm_type))
 				{
 					JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
-					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+					$ucmTypeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', Factory::getDbo()));
 					$ucmTypeTable->load(array('alias' => $this->ucm_type));
 					$this->client = $ucmTypeTable->unique_identifier;
 				}
 			}
 		}
 
-		$this->id = JFactory::getApplication()->input->get('id');
+		$this->id = Factory::getApplication()->input->get('id');
 		$view = explode('.', $this->client);
 
 		// Call to extra fields
@@ -129,7 +137,7 @@ class TjucmViewItem extends JViewLegacy
 		}
 
 		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
-		$typeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+		$typeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', Factory::getDbo()));
 		$typeTable->load(array('unique_identifier' => $this->client));
 		$typeParams = json_decode($typeTable->params);
 		$this->title = $typeTable->title;
@@ -140,9 +148,9 @@ class TjucmViewItem extends JViewLegacy
 		}
 
 		// Ucm triggger before item display
-		JPluginHelper::importPlugin('tjucm');
-		$dispatcher = JDispatcher::getInstance();
-		$dispatcher->trigger('tjucmOnBeforeItemDisplay', array(&$this->item, &$this->form_extra));
+		PluginHelper::importPlugin('tjucm');
+		
+		Factory::getApplication()->triggerEvent('tjucmOnBeforeItemDisplay', array(&$this->item, &$this->form_extra));
 
 		$xmlFileName = explode(".", $this->form_extra->getName());
 		$this->formXml = simplexml_load_file(JPATH_SITE . "/administrator/components/com_tjucm/models/forms/" . $xmlFileName[1] . ".xml");
@@ -161,7 +169,7 @@ class TjucmViewItem extends JViewLegacy
 	 */
 	protected function _prepareDocument()
 	{
-		$app   = JFactory::getApplication();
+		$app   = Factory::getApplication();
 		$menus = $app->getMenu();
 		$title = null;
 
@@ -175,7 +183,7 @@ class TjucmViewItem extends JViewLegacy
 		}
 		else
 		{
-			$this->params->def('page_heading', JText::_('COM_TJUCM_DEFAULT_PAGE_TITLE'));
+			$this->params->def('page_heading', Text::_('COM_TJUCM_DEFAULT_PAGE_TITLE'));
 		}
 
 		$title = $this->params->get('page_title', '');
@@ -186,11 +194,11 @@ class TjucmViewItem extends JViewLegacy
 		}
 		elseif ($app->get('sitename_pagetitles', 0) == 1)
 		{
-			$title = JText::sprintf('JPAGETITLE', $app->get('sitename'), $title);
+			$title = Text::sprintf('JPAGETITLE', $app->get('sitename'), $title);
 		}
 		elseif ($app->get('sitename_pagetitles', 0) == 2)
 		{
-			$title = JText::sprintf('JPAGETITLE', $title, $app->get('sitename'));
+			$title = Text::sprintf('JPAGETITLE', $title, $app->get('sitename'));
 		}
 
 		$this->document->setTitle($title);

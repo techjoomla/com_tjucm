@@ -10,21 +10,22 @@
 
 // No direct access
 defined('_JEXEC') or die;
-
-jimport('joomla.application.component.controller');
+use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\Filter\InputFilter;
+use Joomla\CMS\Factory;
 
 /**
  * Class TjucmController
  *
  * @since  1.6
  */
-class TjucmController extends JControllerLegacy
+class TjucmController extends BaseController
 {
 	/**
 	 * Method to display a view.
 	 *
 	 * @param   boolean  $cachable   If true, the view output will be cached
-	 * @param   mixed    $urlparams  An array of safe url parameters and their variable types, for valid values see {@link JFilterInput::clean()}.
+	 * @param   mixed    $urlparams  An array of safe url parameters and their variable types, for valid values see {@link InputFilter::clean()}.
 	 *
 	 * @return  JController   This object to support chaining.
 	 *
@@ -32,7 +33,7 @@ class TjucmController extends JControllerLegacy
 	 */
 	public function display($cachable = false, $urlparams = false)
 	{
-		$app  = JFactory::getApplication();
+		$app  = Factory::getApplication();
 		$view = $app->input->getCmd('view', 'types');
 		$app->input->set('view', $view);
 

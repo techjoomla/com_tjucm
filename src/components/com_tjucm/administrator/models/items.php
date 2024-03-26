@@ -9,15 +9,19 @@
  */
 
 defined('_JEXEC') or die;
+use Joomla\CMS\MVC\Model\ListModel;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\Data\DataObject;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 
-jimport('joomla.application.component.modellist');
 
 /**
  * Methods supporting a list of Tjucm records.
  *
  * @since  1.6
  */
-class TjucmModelItems extends JModelList
+class TjucmModelItems extends ListModel
 {
 	private $client = '';
 /**
@@ -65,7 +69,7 @@ class TjucmModelItems extends JModelList
 	protected function populateState($ordering = null, $direction = null)
 	{
 		// Initialise variables.
-		$app = JFactory::getApplication('administrator');
+		$app = Factory::getApplication('administrator');
 
 		// Load the filter state.
 		$search = $app->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
@@ -75,7 +79,7 @@ class TjucmModelItems extends JModelList
 		$this->setState('filter.state', $published);
 
 		// Load the parameters.
-		$params = JComponentHelper::getParams('com_tjucm');
+		$params = ComponentHelper::getParams('com_tjucm');
 		$this->setState('params', $params);
 
 		// List state information.
@@ -107,7 +111,7 @@ class TjucmModelItems extends JModelList
 	/**
 	 * Build an SQL query to load the list data.
 	 *
-	 * @return   JDatabaseQuery
+	 * @return   DataObjectbaseQuery
 	 *
 	 * @since    1.6
 	 */
@@ -238,7 +242,7 @@ class TjucmModelItems extends JModelList
 	public function getFields()
 	{
 		JLoader::import('components.com_tjfields.models.fields', JPATH_ADMINISTRATOR);
-		$items_model = JModelLegacy::getInstance('Fields', 'TjfieldsModel');
+		$items_model = BaseDatabaseModel::getInstance('Fields', 'TjfieldsModel');
 		$items_model->setState('filter.showonlist', 1);
 
 		if (!empty($this->client))
@@ -322,7 +326,7 @@ class TjucmModelItems extends JModelList
 	{
 		if (!empty($client))
 		{
-			$db = JFactory::getDbo();
+			$db = Factory::getDbo();
 			$query = $db->getQuery(true);
 			$query->select("count(" . $db->quoteName('id') . ")");
 			$query->from($db->quoteName('#__tjfields_fields'));

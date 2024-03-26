@@ -8,11 +8,16 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Layout\FileLayout;
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Session\Session;
 
 /*To load language constant of js file*/
-JText::script('COM_TJUCM_DELETE_MESSAGE');
+Text::script('COM_TJUCM_DELETE_MESSAGE');
 
-$user = JFactory::getUser();
+$user = Factory::getUser();
 $tjUcmFrontendHelper = new TjucmHelpersTjucm;
 
 if ($this->form_extra)
@@ -38,14 +43,14 @@ if ($this->form_extra)
 	}
 
 	// Call the JLayout to render the fields in the details view
-	$layout = new JLayoutFile('detail.fields', JPATH_ROOT . '/components/com_tjucm');
+	$layout = new FileLayout('detail.fields', JPATH_ROOT . '/components/com_tjucm');
 	echo $layout->render(array('xmlFormObject' => $xmlFieldSets, 'formObject' => $this->form_extra, 'itemData' => $this->item));
 }
 else
 {
 	?>
 	<div class="alert alert-info">
-		<?php echo JText::_('COM_TJUCM_NO_DATA_FOUND');?>
+		<?php echo Text::_('COM_TJUCM_NO_DATA_FOUND');?>
 	</div>
 	<?php
 }
@@ -54,11 +59,11 @@ else
 <div>
 	<div class="form-group">
 		<?php
-		if ((TjucmAccess::canEdit($this->ucmTypeId, $this->item->id)) || (TjucmAccess::canEditOwn($this->ucmTypeId, $this->item->id) && JFactory::getUser()->id == $this->item->created_by))
+		if ((TjucmAccess::canEdit($this->ucmTypeId, $this->item->id)) || (TjucmAccess::canEditOwn($this->ucmTypeId, $this->item->id) && Factory::getUser()->id == $this->item->created_by))
 		{
-			$redirectURL = JRoute::_('index.php?option=com_tjucm&task=item.edit&id=' . $this->item->id . '&client=' . $this->client, false);
+			$redirectURL = Route::_('index.php?option=com_tjucm&task=item.edit&id=' . $this->item->id . '&client=' . $this->client, false);
 			?>
-			<a class="btn btn-default" href="<?php echo $redirectURL; ?>"><?php echo JText::_("COM_TJUCM_EDIT_ITEM"); ?></a>
+			<a class="btn btn-default" href="<?php echo $redirectURL; ?>"><?php echo Text::_("COM_TJUCM_EDIT_ITEM"); ?></a>
 			<?php
 		}
 
@@ -66,20 +71,20 @@ else
 
 		if (TjucmAccess::canDeleteOwn($this->ucmTypeId, $this->item->id))
 		{
-			$deleteOwn = (JFactory::getUser()->id == $this->item->created_by ? true : false);
+			$deleteOwn = (Factory::getUser()->id == $this->item->created_by ? true : false);
 		}
 
 		if (TjucmAccess::canDelete($this->ucmTypeId, $this->item->id) || $deleteOwn)
 		{
-			$redirectURL = JRoute::_('index.php?option=com_tjucm&task=itemform.remove&id=' . $this->item->id . '&client=' . $this->client . "&" . JSession::getFormToken() . '=1', false);
+			$redirectURL = Route::_('index.php?option=com_tjucm&task=itemform.remove&id=' . $this->item->id . '&client=' . $this->client . "&" . Session::getFormToken() . '=1', false);
 			?>
-			<a class="btn btn-default delete-button" href="<?php echo $redirectURL; ?>"><?php echo JText::_("COM_TJUCM_DELETE_ITEM"); ?></a>
+			<a class="btn btn-default delete-button" href="<?php echo $redirectURL; ?>"><?php echo Text::_("COM_TJUCM_DELETE_ITEM"); ?></a>
 			<?php
 		}
 
 		$link = 'index.php?option=com_tjucm&view=items&client=' . $this->client;
 		$itemId = $tjUcmFrontendHelper->getItemId($link);
 		?>
-		<a class="btn btn-default" href="<?php echo JRoute::_($link . '&Itemid=' . $itemId); ?>"><?php echo JText::_("COM_TJUCM_CANCEL_BUTTON"); ?></a>
+		<a class="btn btn-default" href="<?php echo Route::_($link . '&Itemid=' . $itemId); ?>"><?php echo Text::_("COM_TJUCM_CANCEL_BUTTON"); ?></a>
 	</div>
 </div>

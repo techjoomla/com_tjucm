@@ -10,6 +10,13 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\MVC\View\HtmlView;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 
 jimport('joomla.application.component.view');
 
@@ -18,7 +25,7 @@ jimport('joomla.application.component.view');
  *
  * @since  1.6
  */
-class TjucmViewItems extends JViewLegacy
+class TjucmViewItems extends HtmlView
 {
 	protected $items;
 
@@ -65,23 +72,23 @@ class TjucmViewItems extends JViewLegacy
 	 */
 	public function display($tpl = null)
 	{
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
+		$app  = Factory::getApplication();
+		$user = Factory::getUser();
 
 		if (!$user->id)
 		{
-			$msg = JText::_('COM_TJUCM_LOGIN_MSG');
+			$msg = Text::_('COM_TJUCM_LOGIN_MSG');
 
 			// Get current url.
-			$current = JUri::getInstance()->toString();
+			$current = Uri::getInstance()->toString();
 			$url = base64_encode($current);
-			JFactory::getApplication()->redirect(JRoute::_('index.php?option=com_users&view=login&return=' . $url, false), $msg);
+			Factory::getApplication()->redirect(Route::_('index.php?option=com_users&view=login&return=' . $url, false), $msg);
 		}
 
 		// Check the view access to the items.
 		if (!$user->id)
 		{
-			$app->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
+			$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
 			$app->setHeader('status', 403, true);
 
 			return false;
@@ -98,8 +105,8 @@ class TjucmViewItems extends JViewLegacy
 		$this->client       = $model->getState('ucm.client');
 		$this->canCreate    = TjucmAccess::canCreate($this->ucmTypeId);
 		$this->canImport    = TjucmAccess::canImport($this->ucmTypeId);
-		$this->draft        = array("" => JText::_('COM_TJUCM_DATA_STATUS_SELECT_OPTION'),
-			"0" => JText::_("COM_TJUCM_DATA_STATUS_SAVE"), "1" => JText::_('COM_TJUCM_DATA_STATUS_DRAFT'));
+		$this->draft        = array("" => Text::_('COM_TJUCM_DATA_STATUS_SELECT_OPTION'),
+			"0" => Text::_("COM_TJUCM_DATA_STATUS_SAVE"), "1" => Text::_('COM_TJUCM_DATA_STATUS_DRAFT'));
 		$this->canCopyItem = $user->authorise('core.type.copyitem', 'com_tjucm.type.' . $this->ucmTypeId);
 		$this->canCopyToSameUcmType = $model->canCopyToSameUcmType($this->client);
 		$this->sortableFields = array('text', 'number', 'checkbox', 'textarea', 'textareacounter', 'calendar', 'email', 'radio', 'single_select', 'itemcategory', 'cluster', 'ownership');
@@ -111,7 +118,7 @@ class TjucmViewItems extends JViewLegacy
 			$menuItem = $app->getMenu()->getActive();
 
 			// Get the params
-			$this->menuparams = $menuItem->params;
+			$this->menuparams = $menuItem->getparams();
 
 			if (!empty($this->menuparams))
 			{
@@ -120,7 +127,7 @@ class TjucmViewItems extends JViewLegacy
 				if (!empty($this->ucm_type))
 				{
 					JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
-					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+					$ucmTypeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', Factory::getDbo()));
 					$ucmTypeTable->load(array('alias' => $this->ucm_type));
 					$this->client = $ucmTypeTable->unique_identifier;
 					$this->title = $ucmTypeTable->title;
@@ -132,7 +139,7 @@ class TjucmViewItems extends JViewLegacy
 		if (!isset($this->title))
 		{
 			JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
-			$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+			$ucmTypeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', Factory::getDbo()));
 			$ucmTypeTable->load(array('unique_identifier' => $this->client));
 			$this->title = $ucmTypeTable->title;
 		}
@@ -141,18 +148,18 @@ class TjucmViewItems extends JViewLegacy
 		$this->showList = $model->showListCheck($this->client);
 
 		// Include models
-		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
 
 		/* Get model instance here */
-		$itemFormModel = JModelLegacy::getInstance('itemForm', 'TjucmModel');
+		$itemFormModel = BaseDatabaseModel::getInstance('itemForm', 'TjucmModel');
 
-		$input = JFactory::getApplication()->input;
+		$input = Factory::getApplication()->input;
 		$input->set("content_id", $id);
 		$this->created_by = $input->get("created_by", '', 'INT');
 
 		// Get ucm type data
 		JLoader::import('components.com_tjucm.tables.type', JPATH_ADMINISTRATOR);
-		$typeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+		$typeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', Factory::getDbo()));
 		$typeTable->load(array('unique_identifier' => $this->client));
 		$this->ucmTypeParams = json_decode($typeTable->params);
 
@@ -191,7 +198,7 @@ class TjucmViewItems extends JViewLegacy
 	 */
 	protected function _prepareDocument()
 	{
-		$app   = JFactory::getApplication();
+		$app   = Factory::getApplication();
 		$menus = $app->getMenu();
 		$title = null;
 
@@ -200,7 +207,7 @@ class TjucmViewItems extends JViewLegacy
 		$menu = $menus->getActive();
 
 		$menu ? $this->params->def('page_heading', $this->params->get('page_title', $menu->title))
-		: $this->params->def('page_heading', JText::_('COM_TJUCM_DEFAULT_PAGE_TITLE'));
+		: $this->params->def('page_heading', Text::_('COM_TJUCM_DEFAULT_PAGE_TITLE'));
 
 		$title = $this->params->get('page_title', '');
 
@@ -210,11 +217,11 @@ class TjucmViewItems extends JViewLegacy
 		}
 		elseif ($app->get('sitename_pagetitles', 0) == 1)
 		{
-			$title = JText::sprintf('JPAGETITLE', $app->get('sitename'), $title);
+			$title = Text::sprintf('JPAGETITLE', $app->get('sitename'), $title);
 		}
 		elseif ($app->get('sitename_pagetitles', 0) == 2)
 		{
-			$title = JText::sprintf('JPAGETITLE', $title, $app->get('sitename'));
+			$title = Text::sprintf('JPAGETITLE', $title, $app->get('sitename'));
 		}
 
 		$this->document->setTitle($title);

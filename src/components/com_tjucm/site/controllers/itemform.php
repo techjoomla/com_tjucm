@@ -10,7 +10,10 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\MVC\Controller\FormController;
+use Joomla\CMS\Table\Table;
 use Joomla\CMS\Factory;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\User\User;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Session\Session;
@@ -23,7 +26,7 @@ jimport('joomla.filesystem.file');
  *
  * @since  1.6
  */
-class TjucmControllerItemForm extends JControllerForm
+class TjucmControllerItemForm extends FormController
 {
 	/**
 	 * Constructor
@@ -50,7 +53,7 @@ class TjucmControllerItemForm extends JControllerForm
 			$menuitem   = $app->getMenu()->getActive();
 
 			// Get the params
-			$this->menuparams = $menuitem->params;
+			$this->menuparams = $menuitem->getparams();
 
 			if (!empty($this->menuparams))
 			{
@@ -59,7 +62,7 @@ class TjucmControllerItemForm extends JControllerForm
 				if (!empty($this->ucm_type))
 				{
 					JLoader::import('components.com_tjfields.tables.type', JPATH_ADMINISTRATOR);
-					$ucmTypeTable = JTable::getInstance('Type', 'TjucmTable', array('dbo', JFactory::getDbo()));
+					$ucmTypeTable = Table::getInstance('Type', 'TjucmTable', array('dbo', Factory::getDbo()));
 					$ucmTypeTable->load(array('alias' => $this->ucm_type));
 					$this->client = $ucmTypeTable->unique_identifier;
 				}
@@ -67,8 +70,8 @@ class TjucmControllerItemForm extends JControllerForm
 		}
 
 		// Get UCM type id from unique identifier
-		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
-		$tjUcmModelType = JModelLegacy::getInstance('Type', 'TjucmModel');
+		BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tjucm/models');
+		$tjUcmModelType = BaseDatabaseModel::getInstance('Type', 'TjucmModel');
 		$this->ucmTypeId = $tjUcmModelType->getTypeId($this->client);
 
 		$this->appendUrl = "";
@@ -168,9 +171,8 @@ class TjucmControllerItemForm extends JControllerForm
 				if ($model->checkin($recordId) === false)
 				{
 					// Check-in failed, go back to the record and display a notice.
-					$this->setError(Text::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
-					$this->setMessage($this->getError(), 'error');
-
+					
+					Factory::getApplication()->enqueueMessage(Text::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()), 'error');
 					$link = 'index.php?option=com_tjucm&view=itemform&client=' . $this->client;
 					$itemId = $tjUcmFrontendHelper->getItemId($link);
 					$this->setRedirect(Route::_($link . '&Itemid=' . $itemId . $this->getRedirectToItemAppend($recordId, $key), false));

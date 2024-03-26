@@ -10,16 +10,20 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\MVC\View\HtmlView;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Toolbar\Toolbar;
+use Joomla\CMS\Uri\Uri;
 
-jimport('joomla.application.component.view');
-JHTML::_('behavior.modal');
+// JHTML::_('behavior.modal');
 
 /**
  * View class for a list of Tjucm.
  *
  * @since  1.6
  */
-class TjucmViewTypes extends JViewLegacy
+class TjucmViewTypes extends HtmlView
 {
 	protected $items;
 
@@ -69,16 +73,16 @@ class TjucmViewTypes extends JViewLegacy
 	{
 		$state = $this->get('State');
 		$canDo = TjucmHelper::getActions();
-		$component_title = JText::_('COM_TJUCM_COMPONENT');
-		JToolBarHelper::title($component_title . " : " . JText::_('COM_TJUCM_TITLE_TYPES'), 'list');
+		$component_title = Text::_('COM_TJUCM_COMPONENT');
+		JToolBarHelper::title($component_title . " : " . Text::_('COM_TJUCM_TITLE_TYPES'), 'list');
 
 		// Check if the form exists before showing the add/edit buttons
 		$formPath = JPATH_COMPONENT_ADMINISTRATOR . '/views/type';
 
-		$toolbar = JToolbar::getInstance('toolbar');
+		$toolbar = Toolbar::getInstance('toolbar');
 		$toolbar->appendButton(
 		'Custom', '<a id="tjHouseKeepingFixDatabasebutton" class="btn btn-default hidden"><span class="icon-refresh"></span>'
-		. JText::_('COM_TJUCM_FIX_DATABASE') . '</a>');
+		. Text::_('COM_TJUCM_FIX_DATABASE') . '</a>');
 
 		if (file_exists($formPath))
 		{
@@ -128,11 +132,11 @@ class TjucmViewTypes extends JViewLegacy
 			JToolBarHelper::custom('types.export', 'download', '', 'COM_TJUCM_TYPE_EXPORT', false);
 
 			// Add import button on UCM Types view
-			$link = "'" . JUri::root() . "administrator/index.php?option=com_tjucm&view=types&layout=import&tmpl=component" . "'";
+			$link = "'" . Uri::root() . "administrator/index.php?option=com_tjucm&view=types&layout=import&tmpl=component" . "'";
 			$toolbar->appendButton(
 			'Custom', '<a class="modal btn"
 			onclick="tjUcm.admin.openTjUcmSqueezeBox(' . $link . ',40, 38)">
-			<span class="icon-upload"></span>' . JText::_('COM_TJUCM_TYPE_IMPORT') . '</a>'
+			<span class="icon-upload"></span>' . Text::_('COM_TJUCM_TYPE_IMPORT') . '</a>'
 			);
 		}
 
@@ -150,10 +154,10 @@ class TjucmViewTypes extends JViewLegacy
 	protected function getSortFields()
 	{
 		return array(
-			'a.`id`' => JText::_('JGRID_HEADING_ID'),
-			'a.`ordering`' => JText::_('JGRID_HEADING_ORDERING'),
-			'a.`title`' => JText::_('COM_TJUCM_TYPES_TITLE'),
-			'a.`state`' => JText::_('JSTATUS'),
+			'a.`id`' => Text::_('JGRID_HEADING_ID'),
+			'a.`ordering`' => Text::_('JGRID_HEADING_ORDERING'),
+			'a.`title`' => Text::_('COM_TJUCM_TYPES_TITLE'),
+			'a.`state`' => Text::_('JSTATUS'),
 		);
 	}
 }

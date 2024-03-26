@@ -10,6 +10,8 @@
 
 // No direct access.
 defined('_JEXEC') or die;
+use Joomla\CMS\Component\Router\RouterBase;
+use Joomla\CMS\Factory;
 
 use Joomla\CMS\Table\Table;
 
@@ -23,7 +25,7 @@ Table::addIncludePath(JPATH_ROOT . '/administrator/components/com_tjucm/tables')
  *
  * @since       _DEPLOY_VERSION_
  */
-class TjUcmRouter extends JComponentRouterBase
+class TjUcmRouter extends RouterBase
 {
 	private $views = array('itemform', 'items', 'item');
 
@@ -43,9 +45,9 @@ class TjUcmRouter extends JComponentRouterBase
 		$segments = array();
 
 		// Get a menu item based on Itemid or currently active
-		$app = JFactory::getApplication();
+		$app = Factory::getApplication();
 		$menu = $app->getMenu();
-		$db = JFactory::getDbo();
+		$db = Factory::getDbo();
 
 		// We need a menu item.  Either the one specified in the query, or the current active one if none specified
 		if (empty($query['Itemid']))
@@ -131,7 +133,7 @@ class TjUcmRouter extends JComponentRouterBase
 	{
 		$item = $this->menu->getActive();
 		$vars = array();
-		$db = JFactory::getDbo();
+		$db = Factory::getDbo();
 
 		// Count route segments
 		$count = count($segments);

@@ -10,15 +10,20 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\MVC\View\HtmlView;
+use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Toolbar\ToolbarHelper;
 
-jimport('joomla.application.component.view');
+
 
 /**
  * View class for a list of Tjucm.
  *
  * @since  1.6
  */
-class TjucmViewItems extends JViewLegacy
+class TjucmViewItems extends HtmlView
 {
 	protected $items;
 
@@ -40,7 +45,7 @@ class TjucmViewItems extends JViewLegacy
 		$this->state = $this->get('State');
 		$model_items = $this->getModel('items');
 
-		$client = JFactory::getApplication()->input->get('client');
+		$client = Factory::getApplication()->input->get('client');
 
 		// Set client value
 		$model_items->setClient($client);
@@ -78,7 +83,7 @@ class TjucmViewItems extends JViewLegacy
 		$state = $this->get('State');
 		$canDo = TjucmHelper::getActions();
 
-		JToolBarHelper::title(JText::_('COM_TJUCM_TITLE_ITEMS'), 'list');
+		ToolbarHelper::title(Text::_('COM_TJUCM_TITLE_ITEMS'), 'list');
 
 		// Check if the form exists before showing the add/edit buttons
 		$formPath = JPATH_COMPONENT_ADMINISTRATOR . '/views/item';
@@ -87,13 +92,13 @@ class TjucmViewItems extends JViewLegacy
 		{
 			if ($canDo->get('core.create'))
 			{
-				JToolBarHelper::addNew('item.add', 'JTOOLBAR_NEW');
-				JToolbarHelper::custom('items.duplicate', 'copy.png', 'copy_f2.png', 'JTOOLBAR_DUPLICATE', true);
+				ToolbarHelper::addNew('item.add', 'JTOOLBAR_NEW');
+			ToolbarHelper::custom('items.duplicate', 'copy.png', 'copy_f2.png', 'JTOOLBAR_DUPLICATE', true);
 			}
 
 			/*if ($canDo->get('core.edit') && isset($this->items[0]))
 			{
-				JToolBarHelper::editList('item.edit', 'JTOOLBAR_EDIT');
+				ToolbarHelper::editList('item.edit', 'JTOOLBAR_EDIT');
 			}*/
 		}
 
@@ -101,25 +106,25 @@ class TjucmViewItems extends JViewLegacy
 		{
 			if (isset($this->items[0]->state))
 			{
-				JToolBarHelper::divider();
-				JToolBarHelper::custom('items.publish', 'publish.png', 'publish_f2.png', 'JTOOLBAR_PUBLISH', true);
-				JToolBarHelper::custom('items.unpublish', 'unpublish.png', 'unpublish_f2.png', 'JTOOLBAR_UNPUBLISH', true);
+				ToolbarHelper::divider();
+				ToolbarHelper::custom('items.publish', 'publish.png', 'publish_f2.png', 'JTOOLBAR_PUBLISH', true);
+				ToolbarHelper::custom('items.unpublish', 'unpublish.png', 'unpublish_f2.png', 'JTOOLBAR_UNPUBLISH', true);
 			}
 			elseif (isset($this->items[0]))
 			{
 				// If this component does not use state then show a direct delete button as we can not trash
-				JToolBarHelper::deleteList('', 'items.delete', 'JTOOLBAR_DELETE');
+				ToolbarHelper::deleteList('', 'items.delete', 'JTOOLBAR_DELETE');
 			}
 
 			if (isset($this->items[0]->state))
 			{
-				JToolBarHelper::divider();
-				JToolBarHelper::archiveList('items.archive', 'JTOOLBAR_ARCHIVE');
+				ToolbarHelper::divider();
+				ToolbarHelper::archiveList('items.archive', 'JTOOLBAR_ARCHIVE');
 			}
 
 			if (isset($this->items[0]->checked_out))
 			{
-				JToolBarHelper::custom('items.checkin', 'checkin.png', 'checkin_f2.png', 'JTOOLBAR_CHECKIN', true);
+				ToolbarHelper::custom('items.checkin', 'checkin.png', 'checkin_f2.png', 'JTOOLBAR_CHECKIN', true);
 			}
 		}
 
@@ -128,19 +133,19 @@ class TjucmViewItems extends JViewLegacy
 		{
 			if ($state->get('filter.state') == -2 && $canDo->get('core.delete'))
 			{
-				JToolBarHelper::deleteList('', 'items.delete', 'JTOOLBAR_EMPTY_TRASH');
-				JToolBarHelper::divider();
+				ToolbarHelper::deleteList('', 'items.delete', 'JTOOLBAR_EMPTY_TRASH');
+				ToolbarHelper::divider();
 			}
 			elseif ($canDo->get('core.edit.state'))
 			{
-				JToolBarHelper::trash('items.trash', 'JTOOLBAR_TRASH');
-				JToolBarHelper::divider();
+				ToolbarHelper::trash('items.trash', 'JTOOLBAR_TRASH');
+				ToolbarHelper::divider();
 			}
 		}
 
 		if ($canDo->get('core.admin'))
 		{
-			JToolBarHelper::preferences('com_tjucm');
+			ToolbarHelper::preferences('com_tjucm');
 		}
 
 		// Set sidebar action - New in 3.0
@@ -149,11 +154,11 @@ class TjucmViewItems extends JViewLegacy
 		$this->extra_sidebar = '';
 		JHtmlSidebar::addFilter(
 
-			JText::_('JOPTION_SELECT_PUBLISHED'),
+			Text::_('JOPTION_SELECT_PUBLISHED'),
 
 			'filter_published',
 
-			JHtml::_('select.options', JHtml::_('jgrid.publishedOptions'), "value", "text", $this->state->get('filter.state'), true)
+			HTMLHelper::_('select.options', HTMLHelper::_('jgrid.publishedOptions'), "value", "text", $this->state->get('filter.state'), true)
 
 		);
 	}
@@ -166,9 +171,9 @@ class TjucmViewItems extends JViewLegacy
 	protected function getSortFields()
 	{
 		return array(
-			'a.`id`' => JText::_('JGRID_HEADING_ID'),
-			'a.`ordering`' => JText::_('JGRID_HEADING_ORDERING'),
-			'a.`state`' => JText::_('JSTATUS'),
+			'a.`id`' => Text::_('JGRID_HEADING_ID'),
+			'a.`ordering`' => Text::_('JGRID_HEADING_ORDERING'),
+			'a.`state`' => Text::_('JSTATUS'),
 		);
 	}
 }
