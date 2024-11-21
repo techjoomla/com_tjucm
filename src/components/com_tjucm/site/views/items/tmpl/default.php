@@ -28,6 +28,14 @@ HTMLHelper::_('behavior.modal');
 HTMLHelper::_('formbehavior.chosen', 'select');
 HTMLHelper::_('jquery.token');
 
+$doc           = Factory::getDocument();
+
+$doc->addStyleSheet(Uri::root() . 'media/com_tjucm/css/modal.css');
+$doc->addScript(Uri::root() . 'media/com_tjucm/js/mootools-core.js');
+$doc->addScript(Uri::root() . 'media/com_tjucm/js/mootools-more.js');
+$doc->addScript(Uri::root() . 'media/com_tjucm/js/messages.min.js');
+$doc->addScript(Uri::root() . 'media/com_tjucm/js/modal.js');
+
 $importItemsPopUpUrl = Uri::root() . '/index.php?option=com_tjucm&view=items&layout=importitems&tmpl=component&client=' . $this->client;
 $copyItemPopupUrl = Uri::root() . 'index.php?option=com_tjucm&view=items&layout=copyitems&tmpl=component&client=' . $this->client;
 Factory::getDocument()->addScriptDeclaration('
