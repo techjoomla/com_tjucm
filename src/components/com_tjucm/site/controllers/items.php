@@ -19,6 +19,8 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Log\Log;
+
 
 /**
  * Items list controller class.
@@ -123,6 +125,24 @@ class TjucmControllerItems extends TjucmController
 
 			$fieldsArray[$field->name] = $field;
 		}
+
+			header('Cache-Control: no-cache, must-revalidate');
+			header('Content-type: application/json');
+
+			// Format the date for the log file name
+			$date = Factory::getDate()->format('Y-m-d_H-i-s');
+			$logFileName = 'com_tjucm.import_records_' . $date . '.log.php'; // Ensuring valid filename
+
+			// Register the logger with a valid log file name
+			Log::addLogger(
+				array('text_file' => $logFileName), 
+				Log::ALL, 
+				array('com_tjucm')
+			);
+
+			// Set log file name to session
+			$session     = Factory::getSession();
+			$session->set('import_filename', $logFileName);
 
 		// Read the CSV file
 		$file = fopen($uploadPath, 'r');
@@ -243,16 +263,27 @@ class TjucmControllerItems extends TjucmController
 						else
 						{
 							$itemData[$fieldName] = trim($value);
+							
+						
 						}
 					}
 				}
-
+				
 				// Check if all the required values are present in the row
 				$isValid = (count(array_intersect_key($itemData, $requiredFieldsName)) == count($requiredFieldsName));
 
+				$missingFields = array_diff_key($requiredFieldsName, $itemData);
+				$missingValues = array_values($missingFields);
+				$missingvaluesString = implode(', ', $missingValues);
+
+	
 				if (!$isValid || empty($itemData))
 				{
 					$invalidRows++;
+					
+					Log::add(Text::sprintf("COM_TJUCM_IMPORT_FIELD_VALUE_EMPTY_ON_ROW_NO", $invalidRows), Log::INFO, 'com_tjucm');
+					Log::add(Text::sprintf("COM_TJUCM_IMPORT_FIELD_VALUE_EMPTY", $missingvaluesString), Log::INFO, 'com_tjucm');
+
 				}
 				else
 				{
@@ -305,7 +336,11 @@ class TjucmControllerItems extends TjucmController
 		}
 
 		if ($invalidRows)
-		{
+		{		
+	
+			Log::add(Text::sprintf("COM_TJUCM_INVALID_IMPORT_RECORD_ROW", $invalidRows), Log::INFO, 'com_tjucm');
+
+
 			$app->enqueueMessage(Text::sprintf('COM_TJUCM_ITEMS_IMPORT_REJECTED_RECORDS', $invalidRows), 'warning');
 		}
 
@@ -313,6 +348,19 @@ class TjucmControllerItems extends TjucmController
 		{
 			$app->enqueueMessage(Text::_('COM_TJUCM_ITEMS_NO_RECORDS_TO_IMPORT'), 'error');
 		}
+
+		$session  = Factory::getSession();
+
+		$logFilePath = JPATH_ADMINISTRATOR . '/logs/' . $logFileName;
+
+		$filename = $session->get('import_filename');
+		
+		$downloadUrl = Uri::root() . 'index.php?option=com_tjucm&task=items.downloadLog&file=' . urlencode($filename);
+
+		$app->enqueueMessage(Text::_('COM_TJUCM_ITEMS_LOG_FILE_READY').
+			'<a href="' . $downloadUrl . '" target="_blank">'.Text::_('COM_TJUCM_DOWNLOAD_LOG_FILE').'</a>',
+			'message'
+		);
 
 		$app->redirect(Uri::root() . 'index.php?option=com_tjucm&view=items&layout=importitems&tmpl=component&client=' . $client);
 	}
@@ -412,4 +460,51 @@ class TjucmControllerItems extends TjucmController
 			$app->enqueueMessage(implode("<br>", $msg), 'error');
 		}
 	}
+
+	/**
+	 * Method to download log file
+	 *
+	 * @return  void
+	 *
+	 * @since 1.0
+	 */
+   public function downloadLog()
+    {
+        // Get the file name from the request
+        $logFileName = Factory::getApplication()->input->getString('file');
+		$safeFileName = basename($logFileName);
+
+        // Full path to the log file
+        $logFilePath = JPATH_ADMINISTRATOR . '/logs/' . $safeFileName;
+		$fullPath = realpath($baseDir . $safeFileName);
+
+		// Validate: Ensure the path is within the intended directory
+		if (strpos($fullPath, $baseDir) !== 0 || !$fullPath) 
+		{
+			JError::raiseWarning(404, JText::_('JERROR_ALERTNOAUTHOR'));
+			return false;
+		}
+
+
+        // Check if the file exists
+        if (file_exists($fullPath)) 
+        {
+            // Set headers for file download
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="' . $safeFileName . '"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($fullPath));
+
+            // Clear output buffer
+            ob_clean();
+            flush();
+
+            // Read and output the file content
+            readfile($fullPath);
+            exit;
+		}
+	}	
 }
