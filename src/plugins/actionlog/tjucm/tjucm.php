@@ -10,13 +10,16 @@
 
 // No direct access.
 defined('_JEXEC') or die();
+use Joomla\CMS\Application\CMSApplication;
+use Joomla\Data\DataObject;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\Router\Route;
 
 JLoader::register('ActionlogsHelper', JPATH_ADMINISTRATOR . '/components/com_actionlogs/helpers/actionlogs.php');
 
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\CMS\Factory;
-use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Table\Table;
 
 /**
@@ -29,7 +32,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 	/**
 	 * Application object.
 	 *
-	 * @var    JApplicationCms
+	 * @var    CMSApplication
 	 * @since  __DEPLOY__VERSION__
 	 */
 	protected $app;
@@ -37,7 +40,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 	/**
 	 * Database object.
 	 *
-	 * @var    JDatabaseDriver
+	 * @var    DataObjectbaseDriver
 	 * @since  __DEPLOY__VERSION__
 	 */
 	protected $db;
@@ -317,7 +320,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 			$clusterField = str_replace(".", "_", $client) . '_clusterclusterid';
 
 			JLoader::import('components.com_cluster.models.clusteruser', JPATH_ADMINISTRATOR);
-			$clusterUserModel = JModelLegacy::getInstance('ClusterUser', 'ClusterModel');
+			$clusterUserModel = BaseDatabaseModel::getInstance('ClusterUser', 'ClusterModel');
 			$usersClusters = $clusterUserModel->getUsersClusters($user->id);
 
 			if ($data[$clusterField])
@@ -370,7 +373,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 		$tjUcmFrontendHelper = new TjucmHelpersTjucm;
 		$link = 'index.php?option=com_tjucm&view=item&client=' . $client . '&id=' . $recordId;
 		$itemId = $tjUcmFrontendHelper->getItemId($link);
-		$link = JRoute::_($link . '&Itemid=' . $itemId, false);
+		$link = Route::_($link . '&Itemid=' . $itemId, false);
 
 		$message = array(
 				'action'              => 'add',
@@ -428,7 +431,7 @@ class PlgActionlogTjUcm extends CMSPlugin
 			$tjucmTableItem->load($item);
 
 			JLoader::import('components.com_cluster.models.clusteruser', JPATH_ADMINISTRATOR);
-			$clusterUserModel = JModelLegacy::getInstance('ClusterUser', 'ClusterModel');
+			$clusterUserModel = BaseDatabaseModel::getInstance('ClusterUser', 'ClusterModel');
 			$usersClusters = $clusterUserModel->getUsersClusters($user->id);
 
 			$deletingRecordOfOtherCluster = true;
