@@ -247,6 +247,19 @@ $statusColumnWidth = 0;
 			<?php
 				}
 			}?>
+
+
+			<!-- Note display code -->
+			<?php
+			if (isset($this->ucmTypeParams->note_enable) && $this->ucmTypeParams->note_enable == 1 && !empty($this->ucmTypeParams->note_editor))
+			{
+				$noteContent = str_replace(array('<p>', '</p>'), array('', ''), $this->ucmTypeParams->note_editor);
+				?>
+				<div class="alert alert-warning alert-dismissible fade show mt-2 mb-3" role="alert">
+					<strong>Note:</strong> <?php echo $noteContent; ?>
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+		<?php }?>
 		<tbody>
 		<?php
 		if (!empty($this->showList))
